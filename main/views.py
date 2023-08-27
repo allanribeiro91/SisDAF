@@ -1,28 +1,28 @@
 from django.shortcuts import render
 
 def index(request):
-    return render(request, 'main\index.html')
+    return render(request, 'main/index.html')
 
 def home(request):
-    return render(request, 'main\home.html')
+    return render(request, 'main/home.html')
 
 def cadastro(request):
-    return render(request, 'main\cadastro.html')
+    return render(request, 'main/cadastro.html')
 
 def equipe_tecnica(request):
-    return render(request, 'main\equipe_tecnica.html')
+    return render(request, 'main/equipe_tecnica.html')
 
 def produtos_daf(request):
-    return render(request, 'main\produtos_daf.html')
+    return render(request, 'main/produtos_daf.html')
 
 def fornecedores(request):
-    return render(request, 'main\\fornecedores.html')
+    return render(request, 'main/fornecedores.html')
 
 def unidades_saude(request):
-    return render(request, 'main\\unidades_saude.html')
+    return render(request, 'main/unidades_saude.html')
 
 def processos_aquisitivos(request):
-    return render(request, 'main\\processos_aquisitivos.html')
+    return render(request, 'main/processos_aquisitivos.html')
 
 def contratos(request):
-    return render(request, 'main\\contratos.html')
+    return render(request, 'main/contratos.html')
