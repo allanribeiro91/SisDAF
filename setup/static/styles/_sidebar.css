@@ -15,11 +15,11 @@
     color: white;
     padding: 10px;
     cursor: pointer;
-    width: 100%; /* Ocupa todo o espaço horizontal disponível */
-    box-sizing: border-box; /* Inclui o padding na largura total */
-    display: block; /* Cada aba ocupa uma linha inteira */
-    text-align: left; /* Alinha o texto à esquerda */
-    border-left: 4px solid transparent; /* Inicialmente sem a barra indicadora */
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+    text-align: left;
+    border-left: 4px solid transparent;
 }
 
 .tab:hover {
@@ -45,13 +45,37 @@
 }
 
 .logout-tab i {
-    margin-right: 10px;  /* Espaço entre a seta e o texto */
+    margin-right: 10px;
 }
 
-/* Estilos hover para o tab de saída. Copie os estilos do .tab:hover */
 .logout-tab:hover {
     background-color: #2e2e2e;
     font-weight: bold;
     border-left: 4px solid white;
 }
 
+/* Media queries para responsividade da sidebar */
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;  /* Largura fixa que mostrará apenas ícones, por exemplo */
+    }
+
+    .tab, .logout-tab {
+        font-size: 0;  /* Esconde o texto, deixando apenas os ícones visíveis */
+        justify-content: center;  /* Centraliza os ícones */
+    }
+
+    /* Quando você hover em uma aba na versão compacta, mostrará o texto */
+    .tab:hover, .logout-tab:hover {
+        font-size: 12px; 
+        width: 12%;  /* Restaura a largura original ao pairar */
+    }
+}
+
+@media (max-width: 480px) {
+    /* Aqui você pode ocultar a barra lateral e mostrar um botão hamburger no topo para revelar a barra lateral, se desejado. Por enquanto, apenas esconderei a barra lateral. */
+    .sidebar {
+        display: none;
+    }
+}

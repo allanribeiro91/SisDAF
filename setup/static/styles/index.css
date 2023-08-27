@@ -177,3 +177,65 @@ button {
 .additional-links {
     margin-top: calc(2*1vh);    /* cadastrar 15% abaixo do botão entrar */
 }
+
+
+
+/* Media queries para responsividade na página de login */
+
+@media (max-width: 768px) {
+    /* Nessa largura de tela, vamos alterar a disposição das seções */
+    .container {
+        flex-direction: column;
+        height: auto;  /* Ajuste de altura para auto */
+        padding-bottom: 2vh; /* Padding adicional no fundo */
+    }
+
+    .image-section, .login-section {
+        flex: 1;
+        width: 100%; /* Ocupa toda a largura */
+        border-radius: 0; /* Remover borda arredondada */
+    }
+
+    .image-section {
+        height: 200px; /* Altura fixa para a imagem */
+        border-bottom: 0.5px solid #5c5c5c; /* Adicionando borda no fundo da imagem */
+    }
+
+    .login-section {
+        padding: 15px; /* Padding reduzido */
+        border-top: none; /* Remover borda superior */
+    }
+
+    .login-section h1 {
+        font-size: 22px; /* Tamanho de fonte reduzido para o título */
+    }
+
+    .input-group input, button {
+        width: 100%; /* Ocupa toda a largura disponível */
+    }
+
+    button {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    /* Ajustes adicionais */
+    .additional-links {
+        margin-top: 10%;
+    }
+
+    .forgot-password {
+        text-align: center;
+        margin-top: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-section {
+        height: 150px; /* Altura ainda mais reduzida para a imagem */
+    }
+
+    .login-section {
+        padding: 10px; /* Padding ainda mais reduzido */
+    }
+}

@@ -173,3 +173,47 @@ button:hover {
 }
 
 
+
+/* Media queries para responsividade na página de cadastro */
+
+@media (max-width: 1024px) {
+    /* Ajustes para telas médias, como tablets em modo paisagem */
+    .registration-box {
+        width: 70%; /* Aumento da largura para ocupar mais espaço na tela */
+    }
+}
+
+@media (max-width: 768px) {
+    /* Ajustes para tablets em modo retrato e alguns dispositivos menores */
+    .registration-box {
+        width: 85%; /* Aumento da largura para ocupar mais espaço na tela */
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes para dispositivos móveis */
+    .registration-box {
+        width: 100%; /* Caixa de registro ocupa toda a largura da tela */
+        padding: 15px; /* Padding reduzido */
+    }
+
+    .registration-box h1, .registration-box h2 {
+        font-size: 18px; /* Redução do tamanho da fonte para títulos */
+    }
+
+    .input-group label {
+        width: 100%; /* Rótulos ocupam toda a largura */
+        margin-bottom: 5px; /* Espaçamento entre o rótulo e o campo de entrada */
+    }
+
+    .input-group input, .input-group select {
+        width: 100%; /* Campos de entrada e seleções ocupam toda a largura */
+        margin-left: 0; /* Remoção da margem à esquerda */
+    }
+
+    button {
+        width: 60%; /* Aumento da largura do botão para melhor visualização */
+        margin-top: 30px; /* Espaçamento reduzido acima do botão */
+    }
+}
+

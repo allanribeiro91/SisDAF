@@ -4,12 +4,12 @@
     background-color: white;
     border-left: 10px solid #1B2144;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin-top: 30px; /* Espaçamento entre o caminho da área de trabalho e as caixas */
-    margin-left: 25px; /* Distância da borda esquerda */
+    margin-top: 30px;
+    margin-left: 25px;
     padding: 5px 10px 5px 5px;
     display: flex;
     flex-direction: column;
-    border-radius: 5px; /* Adiciona bordas arredondadas */
+    border-radius: 5px;
 }
 
 .presentation-box h2 {
@@ -29,7 +29,38 @@
 
 .presentation-container {
     display: flex;
-    align-items: flex-start; /* Alinha os itens ao topo */
-    margin-top: 0px; /* Espaçamento entre o caminho da área de trabalho e as caixas */
-    margin-left: 0px; /* Distância da borda esquerda */
+    align-items: flex-start;
+    margin-top: 0px;
+    margin-left: 0px;
+}
+
+/* Media queries para responsividade na home */
+
+@media (max-width: 768px) {
+    .presentation-box {
+        width: 45%; /* Ajuste para caber 2 caixas lado a lado */
+        margin-left: 2.5%; /* Reduzir a margem para economizar espaço */
+        padding: 3px 8px 3px 3px; /* Ajustes no padding */
+    }
+
+    .presentation-box p {
+        font-size: 25px; /* Reduz o tamanho da fonte */
+    }
+}
+
+@media (max-width: 480px) {
+    .presentation-container {
+        flex-direction: column; /* Caixas de apresentação empilhadas verticalmente */
+        align-items: center; /* Centraliza as caixas no centro */
+    }
+
+    .presentation-box {
+        width: 80%; /* Usa a maior parte da largura da tela */
+        margin-top: 15px; /* Espaço entre caixas empilhadas */
+        margin-left: 0; /* Sem margem lateral */
+    }
+
+    .presentation-box p {
+        font-size: 20px; /* Reduz ainda mais o tamanho da fonte */
+    }
 }
