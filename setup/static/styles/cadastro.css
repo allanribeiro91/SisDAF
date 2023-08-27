@@ -1,0 +1,175 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #1B2144;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.registration-box {
+    width: 50%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 0.5px solid #5c5c5c;
+    border-radius: 1%;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 5vh 0;
+}
+
+.registration-box h1 {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 20px;
+    text-align: left;
+    color: #16213d;
+    margin: 0;
+}
+
+.registration-box h2 {
+    padding-top: 30px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: normal;
+    font-size: 20px;
+    text-align: left;
+    color: #16213d;
+    margin: 20px;
+}
+
+.registration-box .logo {
+    max-height: 90px;
+    margin-top: 0px;
+    padding-top: -10px;
+}
+
+.registration-box form {
+    width: 100%;
+    padding-top: 20px;
+}
+
+.input-group {
+    width: 100%;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center; /* Alinhar verticalmente os campos */
+}
+
+.input-group label {
+    width: 35%; /* Largura do rótulo (label) */
+    font-weight: normal; /* Negrito nos rótulos */
+}
+
+.input-group input, .input-group select {
+    width: 65%; /* Largura do campo de entrada (input/select) */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.input-group select {
+    appearance: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' class='bi bi-caret-down' viewBox='0 0 16 16'%3E%3Cpath d='M3.612 5.97a.5.5 0 0 1 .776 0l4.61 5.957a.5.5 0 0 1-.388.773H3.39a.5.5 0 0 1-.388-.773L8 5.97 3.612 0a.5.5 0 0 1 .776 0h9.224z'/%3E%3C/svg%3E") no-repeat right 10px center;
+    background-size: 14px 14px;
+}
+
+
+.input-group input#cpf {
+    width: 120px; 
+    margin-left: -20px;
+}
+
+.input-group input#nome {
+    width: 485px; 
+    margin-left: -20px;
+}
+
+.input-group input#data-nascimento {
+    width: 120px; 
+    margin-left: -20px;
+}
+
+.input-group select#sexo {
+    width: 140px; 
+    margin-left: -20px;
+}
+
+.input-group input#email {
+    width: 300px; 
+    margin-left: -20px;
+}
+
+.input-group input#celular {
+    width: 120px; 
+    margin-left: -20px;
+}
+
+.input-group select#setor {
+    width: 140px; 
+    margin-left: -20px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 30%;
+    margin: 0 auto;
+    display: block;
+    font-weight: bold;
+    margin: 60px auto 30px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.error-label {
+    color: red;
+    font-size: 12px;
+    text-align: left;
+    margin-top: 5px;
+    visibility: hidden;
+}
+
+.input-group #cpf-error {
+    display: inline; /* Exibe o label quando necessário */
+    margin-left: 10px; /* Ajusta o espaçamento à esquerda do label */
+}
+
+
+.back-button {
+    display: flex;
+    align-items: center;      /* Isto deve centralizar verticalmente os itens dentro do .back-button */
+    align-self: flex-start;   /* Alinhar à esquerda dentro do container flexível */
+}
+
+.back-button i {
+    display: flex;
+    align-items: center;      /* Isto deve centralizar verticalmente os itens dentro do .back-button */
+    align-self: flex-start;   /* Alinhar à esquerda dentro do container flexível */
+    margin-bottom: 0px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    margin-right: 2px;        /* Espaço à direita da imagem, para separar do texto */
+}
+
+.back-button a {
+    text-decoration: none;
+    color: #4e4e4e;
+    font-size: 12px;
+    display: flex;            /* Garante que o link (a) seja tratado como um container flexível */
+    align-items: center;      /* Centraliza verticalmente o conteúdo do link */
+}
+
+

@@ -1,0 +1,49 @@
+{% extends 'main/base_sistema.html' %}
+{% load static %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static '/styles/home.css' %}">
+{% endblock %}
+{% block content %}    
+
+        
+        <!-- Caminho da Área de Trabalho -->
+        <div class="breadcrumb">
+            <i class="fas fa-home"></i> Home
+        </div>
+        
+        
+
+        <!-- Contêiner das Caixas de Apresentação -->
+        <div class="presentation-container">
+            <div class="presentation-box">
+                <h2>Título 1</h2>
+                <p>1.234</p>
+            </div>
+
+            <div class="presentation-box">
+                <h2>Título 2</h2>
+                <p>5.678</p>
+            </div>
+
+            <div class="presentation-box">
+                <h2>Título 3</h2>
+                <p>5.678</p>
+            </div>
+
+            <div class="presentation-box">
+                <h2>Título 4</h2>
+                <p>5.678</p>
+            </div>
+
+            <div class="presentation-box">
+                <h2>Título 5</h2>
+                <p>5.678</p>
+            </div>
+
+            <div class="presentation-box">
+                <h2>Título 6</h2>
+                <p>5.678</p>
+            </div>    
+        </div>
+
+{% endblock %}
