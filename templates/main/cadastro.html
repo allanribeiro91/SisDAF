@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - SisDAF</title>
-    <link rel="stylesheet" href="{% static 'styles/cadastro.css' %}">
+    <link rel="stylesheet" href="{% static 'styles\cadastro.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="icon" href="{% static 'assets/favicon/sisdaf.ico' %}" type="image/x-icon">
-    <script src="{% static 'js/valida_cpf.js' %}"></script>
+    <link rel="icon" href="{% static 'assets\favicon\sisdaf.ico' %}" type="image/x-icon">
+    <script src="{% static 'js\valida_cpf.js' %}"></script>
 </head>
 <body>
     <div class="container">
@@ -20,7 +20,7 @@
                 <i class="fas fa-arrow-left"></i> Voltar
                 </a>
             </div>
-            <img class="logo" src="{% static 'assets/logo/logo_sisdaf.png' %}" alt="Logo SisDAF">
+            <img class="logo" src="{% static 'assets\logo\logo_sisdaf.png' %}" alt="Logo SisDAF">
             <h1>SisDAF</h1>
             <h2>Cadastro de Usuário</h2>
             <form action="{% url 'index' %}">
