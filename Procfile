@@ -1,1 +1,1 @@
-web: gunicorn SISDAF.wsgi
+web: gunicorn setup.wsgi
