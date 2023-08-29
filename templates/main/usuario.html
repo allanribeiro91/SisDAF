@@ -1,0 +1,87 @@
+{% extends 'main/base_sistema.html' %}
+{% load static %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'styles/usuarios.css' %}">
+{% endblock %}
+{% block content %}    
+    
+<!-- Caminho da Área de Trabalho -->
+<div class="breadcrumb">
+    <i class="fas fa-user"></i>Usuário
+</div>
+
+<form id="usuarioForm">
+
+    <div class="horizontal-sections">
+        <!-- Dados Pessoais -->
+        <div class="section subsecao1-seventy">
+            <h3>Dados pessoais</h3>
+            <div class="grid">
+                <input type="text" placeholder="CPF" name="cpf" class="input-cpf" readonly>
+                <input type="text" placeholder="Nome completo" name="nome_completo" class="input-nome-completo">
+                <input type="date" placeholder="Data de nascimento" name="data_nascimento" class="input-data-nascimento">
+                <select name="genero" class="select-genero">
+                    <option value="" disabled selected>Gênero</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="feminino">Feminino</option>
+                    <option value="outro">Outro</option>
+                </select>
+                <select name="cor_pele" class="select-cor-pele">
+                    <option value="" disabled selected>Cor da pele</option>
+                    <option value="branca">Branca</option>
+                    <option value="preta">Preta</option>
+                    <option value="parda">Parda</option>
+                    <option value="amarela">Amarela</option>
+                    <option value="vermelha">Vermelha</option>
+                    <option value="outra">Outra</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Alocação Atual -->
+        <div class="section subsecao1-thirty">
+            <h3>Alocação Atual</h3>
+            <div class="grid">
+                <input type="text" placeholder="Unidade DAF" name="unidade_daf" class="unidade_daf">
+                <input type="text" placeholder="Setor da Unidade" name="setor_unidade">
+                <input type="date" placeholder="Data de início" name="data_inicio">
+            </div>
+        </div>
+    </div>
+
+    <div class="horizontal-sections">
+        <!-- Vínculo MS -->
+        <div class="section half-section">
+            <h3>Vínculo MS</h3>
+            <div class="grid">
+                <select name="tipo_vinculo">
+                    <option value="" disabled selected>Tipo de vínculo</option>
+                    <!-- opções de tipo de vínculo -->
+                </select>
+                <input type="text" placeholder="Órgão de origem" name="orgao_origem">
+                <input type="text" placeholder="Outro" name="outro">
+            </div>
+        </div>
+        <!-- Contato -->
+        <div class="section half-section">
+            <h3>Contato</h3>
+            <div class="grid">
+                <input type="text" placeholder="Ramal MS" name="ramal_ms" class="ramal_ms">
+                <input type="text" placeholder="Celular" name="celular" class="celular">
+                <input type="email" placeholder="Email institucional" name="email_institucional" class="email">
+                <input type="email" placeholder="Email pessoal" name="email_pessoal" class="email">
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Botões -->
+    <div class="buttons">
+        <button type="button" id="btnEdit">Editar</button>
+        <button type="button" id="btnCancel">Cancelar</button>
+        <button type="submit" id="btnSave">Salvar</button>
+    </div>
+
+</form>
+
+{% endblock %}

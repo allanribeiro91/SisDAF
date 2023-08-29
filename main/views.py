@@ -26,3 +26,6 @@ def processos_aquisitivos(request):
 
 def contratos(request):
     return render(request, 'main/contratos.html')
+
+def usuario(request):
+    return render(request, 'main/usuario.html')
