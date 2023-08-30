@@ -1,18 +1,33 @@
-{% extends 'main/base_sistema.html' %}
+{% extends 'main/base_main.html' %}
 {% load static %}
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'styles/usuarios.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 {% endblock %}
 {% block content %}    
     
-<!-- Caminho da Área de Trabalho -->
-<div class="breadcrumb">
-    <i class="fas fa-user"></i>Ficha do Usuário
-</div>
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb">
+        <i class="fas fa-user"></i>Ficha do Usuário
+    </div>
 
-<form id="usuarioForm">
+    <!-- Abas -->
+    <div class="tabs">
+        <button class="tab-button active" id="tabMeusDados"><i class="fas fa-user"></i> Meus Dados</button>
+        <button class="tab-button" id="tabHistoricoDAF"><i class="fas fa-history"></i> Histórico DAF</button>
+        <button class="tab-button" id="tabContratos"><i class="fas fa-file-contract"></i> Contratos</button>
+    </div>
+
+    <!-- Meus Dados -->
+    <form id="usuarioForm">
+
+    <!-- Botões -->
+    <div class="buttons">
+        <button type="submit" id="btnSave"><i class="fas fa-save"></i></button>
+    </div>
 
     <div class="horizontal-sections">
+        
         <!-- Dados Pessoais -->
         <div class="section subsecao1-seventy">
             <h3>Dados pessoais</h3>
@@ -73,13 +88,25 @@
             </div>
         </div>
     </div>
-    
 
-    <!-- Botões -->
-    <div class="buttons">
-        <button type="button" id="btnEdit">Editar</button>
-        <button type="button" id="btnCancel">Cancelar</button>
-        <button type="submit" id="btnSave">Salvar</button>
+    <!-- Tabela de Formação Técnica -->
+    <div class="section">
+        <h3>Formação Técnica</h3>
+        <table id="tabelaFormacao" class="formacao-table">
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Instituição</th>
+                    <th>Ano de Conclusão</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- As linhas serão preenchidas dinamicamente -->
+            </tbody>
+        </table>
+        <div class="buttons">
+            <button type="button" id="btnAddFormacao"><i class="fas fa-plus"></i> Adicionar Formação</button>
+        </div>
     </div>
 
 </form>

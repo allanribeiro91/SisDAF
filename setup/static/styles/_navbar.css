@@ -23,7 +23,7 @@
 
 .sisdaf-title {
     font-family: 'Ubuntu', sans-serif;
-    font-weight: normal;
+    font-weight: bold;
     font-size: 16px;
     margin-bottom: 2px;
     color: white;
@@ -32,15 +32,22 @@
 .version-info {
     font-family: 'Open Sans', sans-serif;
     font-weight: 400;
-    font-size: 12px;
+    font-size: 11px;
     color: white;
+}
+
+.unidade-info {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 15%;
 }
 
 .user-info {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    right: 30px;
+    right: 3%;
 }
 
 .user-label {
@@ -87,3 +94,4 @@
         margin-left: 2px;
     }
 }
+

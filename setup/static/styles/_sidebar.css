@@ -79,3 +79,27 @@
         display: none;
     }
 }
+
+
+.toggle-button {
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+    padding: 5px 10px 0px 0px;
+    text-align: right;
+}
+
+.sidebar.collapsed .tab,
+.sidebar.collapsed .logout-tab {
+    font-size: 0; /* Esconde o texto, deixando apenas os ícones visíveis */
+    justify-content: center;
+}
+
+.sidebar.collapsed .tab:hover,
+.sidebar.collapsed .logout-tab:hover {
+    font-size: 0; /* Garante que o texto permanece oculto mesmo quando pairado */
+}
+
+.sidebar {
+    transition: width 0.3s ease-in-out;
+}

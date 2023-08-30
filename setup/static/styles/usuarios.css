@@ -1,6 +1,6 @@
 /* ==== ESTRUTURA/LAYOUT ==== */
 #usuarioForm {
-    padding: 20px 10px 0 10px;
+    padding: 0px 10px 10px 10px;
 }
 
 .section {
@@ -20,6 +20,41 @@
     width: calc(50% - 10px);
     box-sizing: border-box;
 }
+
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #E5E5E5;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: #000;
+    font-weight: normal;
+    border-bottom: 2px solid transparent;
+    display: inline-flex;
+    align-items: center;
+}
+
+.tab-button i {
+    margin-right: 8px;
+}
+
+.tab-button.active {
+    border-bottom: 2px solid #000;
+    font-weight: bold;
+}
+
+.tab-button:hover {
+    opacity: 0.7;
+}
+
+
+
 
 /* ==== CONTROLES DE INPUT ==== */
 h3 {
@@ -89,18 +124,51 @@ h3 {
     transition: background-color 0.3s;
 }
 
-#btnEdit {
-    background-color: #FFC107;
+.buttons i {
+    font-size: 18px;  /* ajuste o tamanho como preferir */
+    color: rgb(0, 0, 0);  /* ajuste a cor como preferir */
 }
 
-#btnCancel {
-    background-color: #b8b8b8;
-}
 
-#btnSave {
-    background-color: #28A745;
-}
 
 .buttons button:hover {
     opacity: 0.9;
+}
+
+
+
+
+/* ==== TABELA DE FORMAÇÃO ==== */
+.formacao-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.formacao-table th, .formacao-table td {
+    border: 1px solid #E5E5E5;
+    padding: 8px;
+    text-align: left;
+}
+
+.formacao-table tbody tr:hover {
+    background-color: #f2f2f2;
+    cursor: pointer;
+}
+
+/* ==== BOTÃO DE ADICIONAR FORMAÇÃO ==== */
+#btnAddFormacao {
+    color: rgb(0, 0, 0);
+    display: inline-flex;  /* Adicione esta linha */
+    align-items: center;  /* Adicione esta linha */
+    justify-content: center; /* Adicione esta linha se necessário */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+#btnAddFormacao i {
+    margin-right: 10px;  /* Adicione uma margem à direita do ícone */
 }

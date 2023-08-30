@@ -16,14 +16,14 @@
     <div class="container">
         <div class="registration-box">
             <div class="back-button">
-                <a href="{% url 'index' %}">
+                <a href="{% url 'login' %}">
                 <i class="fas fa-arrow-left"></i> Voltar
                 </a>
             </div>
             <img class="logo" src="{% static 'assets\logo\logo_sisdaf.png' %}" alt="Logo SisDAF">
             <h1>SisDAF</h1>
             <h2>Cadastro de Usuário</h2>
-            <form action="{% url 'index' %}">
+            <form action="{% url 'login' %}">
                 <div class="input-group">
                     <label for="cpf">CPF</label>
                     <input type="text" id="cpf" name="cpf" placeholder="Digite seu CPF">

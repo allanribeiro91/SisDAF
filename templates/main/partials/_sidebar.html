@@ -2,6 +2,9 @@
     <!-- Barra Lateral Esquerda -->
     <div class="sidebar">
 
+        <!-- Adicione o botão abaixo -->
+        <div id="toggleButton" class="toggle-button"><i class="fas fa-arrow-left"></i></div>
+
         <div>
             <a class="tab {% if request.resolver_match.url_name == 'home' %}active-tab{% endif %}" href="{% url 'home' %}">Home</a>
         </div>
@@ -24,7 +27,8 @@
             <a class="tab {% if request.resolver_match.url_name == 'contratos' %}active-tab{% endif %}" href="{% url 'contratos' %}">Contratos</a>
         </div>
         
-        <a class="tab logout-tab" href="{% url 'index' %}">
+        <a class="tab logout-tab" href="{% url 'login' %}">
             <i class="fas fa-arrow-left"></i> Sair
         </a>
     </div>
+    <script src="{% static 'js/_sidebar.js' %}"></script>
