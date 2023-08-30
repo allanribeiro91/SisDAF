@@ -1,13 +1,16 @@
 from django.shortcuts import render
+from main.forms import LoginForms, CadastroForms
 
 def login(request):
-    return render(request, 'main/login.html')
+    form = LoginForms()
+    return render(request, 'main/login.html', {'form': form})
+
+def cadastro(request):
+    form = CadastroForms()
+    return render(request, 'main/cadastro.html', {'form': form})
 
 def home(request):
     return render(request, 'main/home.html')
-
-def cadastro(request):
-    return render(request, 'main/cadastro.html')
 
 def equipe_tecnica(request):
     return render(request, 'main/equipe_tecnica.html')

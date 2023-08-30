@@ -12,141 +12,6 @@ body, html {
     min-height: 100vh;
 }
 
-.registration-box {
-    width: 50%;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 0.5px solid #5c5c5c;
-    border-radius: 1%;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 5vh 0;
-}
-
-.registration-box h1 {
-    font-family: 'Ubuntu', sans-serif;
-    font-size: 20px;
-    text-align: left;
-    color: #16213d;
-    margin: 0;
-}
-
-.registration-box h2 {
-    padding-top: 30px;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: normal;
-    font-size: 20px;
-    text-align: left;
-    color: #16213d;
-    margin: 20px;
-}
-
-.registration-box .logo {
-    max-height: 90px;
-    margin-top: 0px;
-    padding-top: -10px;
-}
-
-.registration-box form {
-    width: 100%;
-    padding-top: 20px;
-}
-
-.input-group {
-    width: 100%;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center; /* Alinhar verticalmente os campos */
-}
-
-.input-group label {
-    width: 35%; /* Largura do rótulo (label) */
-    font-weight: normal; /* Negrito nos rótulos */
-}
-
-.input-group input, .input-group select {
-    width: 65%; /* Largura do campo de entrada (input/select) */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.input-group select {
-    appearance: none;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' class='bi bi-caret-down' viewBox='0 0 16 16'%3E%3Cpath d='M3.612 5.97a.5.5 0 0 1 .776 0l4.61 5.957a.5.5 0 0 1-.388.773H3.39a.5.5 0 0 1-.388-.773L8 5.97 3.612 0a.5.5 0 0 1 .776 0h9.224z'/%3E%3C/svg%3E") no-repeat right 10px center;
-    background-size: 14px 14px;
-}
-
-
-.input-group input#cpf {
-    width: 120px; 
-    margin-left: -20px;
-}
-
-.input-group input#nome {
-    width: 485px; 
-    margin-left: -20px;
-}
-
-.input-group input#data-nascimento {
-    width: 120px; 
-    margin-left: -20px;
-}
-
-.input-group select#sexo {
-    width: 140px; 
-    margin-left: -20px;
-}
-
-.input-group input#email {
-    width: 300px; 
-    margin-left: -20px;
-}
-
-.input-group input#celular {
-    width: 120px; 
-    margin-left: -20px;
-}
-
-.input-group select#setor {
-    width: 140px; 
-    margin-left: -20px;
-}
-
-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-    width: 30%;
-    margin: 0 auto;
-    display: block;
-    font-weight: bold;
-    margin: 60px auto 30px;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-.error-label {
-    color: red;
-    font-size: 12px;
-    text-align: left;
-    margin-top: 5px;
-    visibility: hidden;
-}
-
-.input-group #cpf-error {
-    display: inline; /* Exibe o label quando necessário */
-    margin-left: 10px; /* Ajusta o espaçamento à esquerda do label */
-}
-
-
 .back-button {
     display: flex;
     align-items: center;      /* Isto deve centralizar verticalmente os itens dentro do .back-button */
@@ -172,48 +37,124 @@ button:hover {
     align-items: center;      /* Centraliza verticalmente o conteúdo do link */
 }
 
-
-
-/* Media queries para responsividade na página de cadastro */
-
-@media (max-width: 1024px) {
-    /* Ajustes para telas médias, como tablets em modo paisagem */
-    .registration-box {
-        width: 70%; /* Aumento da largura para ocupar mais espaço na tela */
-    }
+.registration-box {
+    width: 50%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 0.5px solid #5c5c5c;
+    border-radius: 1%;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 5vh 0;
 }
 
-@media (max-width: 768px) {
-    /* Ajustes para tablets em modo retrato e alguns dispositivos menores */
-    .registration-box {
-        width: 85%; /* Aumento da largura para ocupar mais espaço na tela */
-    }
+.registration-box h1 {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 20px;
+    text-align: left;
+    color: #16213d;
+    margin: 0;
 }
 
-@media (max-width: 480px) {
-    /* Ajustes para dispositivos móveis */
-    .registration-box {
-        width: 100%; /* Caixa de registro ocupa toda a largura da tela */
-        padding: 15px; /* Padding reduzido */
-    }
-
-    .registration-box h1, .registration-box h2 {
-        font-size: 18px; /* Redução do tamanho da fonte para títulos */
-    }
-
-    .input-group label {
-        width: 100%; /* Rótulos ocupam toda a largura */
-        margin-bottom: 5px; /* Espaçamento entre o rótulo e o campo de entrada */
-    }
-
-    .input-group input, .input-group select {
-        width: 100%; /* Campos de entrada e seleções ocupam toda a largura */
-        margin-left: 0; /* Remoção da margem à esquerda */
-    }
-
-    button {
-        width: 60%; /* Aumento da largura do botão para melhor visualização */
-        margin-top: 30px; /* Espaçamento reduzido acima do botão */
-    }
+.registration-box h2 {
+    padding-top: 10px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: normal;
+    font-size: 20px;
+    text-align: left;
+    color: #16213d;
+    margin: 20px;
 }
 
+.registration-box .logo {
+    max-height: 90px;
+    margin-top: 0px;
+    padding-top: -10px;
+}
+
+.registration-box form {
+    width: 100%;
+    padding-top: 20px;
+}
+
+/* Estilização para campos de entrada de texto */
+.cadastro-form label {
+    color: black;
+    font-size: 14px;
+}
+
+.cadastro-form input[type="text"],
+.cadastro-form input[type="email"],
+.cadastro-form select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+}
+
+/* Estilização para campos de entrada de texto quando focados */
+.cadastro-form input[type="text"]:focus,
+.cadastro-form input[type="email"]:focus,
+.cadastro-form select:focus {
+    border-color: #0056b3;
+    box-shadow: 0 0 5px #0056b3;
+}
+
+.cadastro-form input[name="cpf"] {
+    padding-left: 10px;
+    width: 140px;
+}
+
+.error-label  {
+    color: red !important;
+    font-size: 11px !important;
+    text-align: right !important;
+    visibility: hidden;
+    margin-left: 10px;
+}
+
+/* Adicione estilos para a nova classe '.form-row' */
+.form-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Dê um tamanho fixo para todas as labels. Isso faz com que elas tenham o mesmo tamanho */
+.form-row label:not(.error-label) {
+    width: 150px;
+    text-align: left;
+}
+
+/* Adicione estilos para o wrapper do campo de entrada */
+.input-wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #1B2144;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 30%;
+    margin: 0 auto;
+    display: block;
+    font-weight: bold;
+    margin: 60px auto 30px;
+}
+
+button:hover {
+    background-color: #0056b3;
+    transition: 0.5s;
+}
