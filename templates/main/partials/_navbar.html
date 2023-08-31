@@ -9,14 +9,23 @@
         </div>
         <div class="unidade-info">
             <span class="user-label">Unidade DAF</span>
-            <a span class="user-name">Gabinete</span>
+            <span class="user-name">Gabinete</span>
         </div>
         <div class="user-info">
             <span class="user-label">Usuário</span>
-            <a span class="user-name" href="{% url 'meusdados' %}">Nome do Usuário</span>
+            <span class="user-name">Nome do Usuário</span>
         </div>
-        <div class="profile-pic">
-            <img src="{% static 'assets\imagens\user.png' %}" alt="User Profile Pic">
+        <div class="profile-pic" id="profile-pic">
+            <img src="{% static 'assets\imagens\user.png' %}" alt="User Profile Pic" id="profile-pic-img">
+        </div>        
+        <div class="dropdown" id="dropdown">
+            <a href="{% url 'meusdados' %}">
+                <i class="fas fa-user"></i>
+                Meus Dados</a>
+            <a href="{% url 'login' %}">
+                <i class="fas fa-sign-out-alt"></i>
+                Sair</a>
         </div>
     </div>
+    <script src="{% static 'js/_navbar.js' %}"></script>
     
