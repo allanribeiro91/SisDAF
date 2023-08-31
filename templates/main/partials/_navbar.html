@@ -1,7 +1,8 @@
 {% load static %}
     <!-- Barra Superior -->
-    <div class="top-bar">
+    <div class="top-bar">        
         <img src="{% static 'assets/logo/logo_sisdaf_negativo.png' %}" alt="Logo SisDAF" class="top-logo">
+        
         <div class="logo-text">
             <span class="sisdaf-title">SisDAF</span>
             <span class="version-info">Versão 1.0</span>
@@ -14,4 +15,8 @@
             <span class="user-label">Usuário</span>
             <a span class="user-name" href="{% url 'meusdados' %}">Nome do Usuário</span>
         </div>
+        <div class="profile-pic">
+            <img src="{% static 'assets\imagens\user.png' %}" alt="User Profile Pic">
+        </div>
     </div>
+    

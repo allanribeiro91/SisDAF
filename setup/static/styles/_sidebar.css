@@ -1,3 +1,5 @@
+
+
 .sidebar {
     background-color: #3B3B3B;
     flex: 0 0 12%;
@@ -7,7 +9,10 @@
     flex-direction: column;
     font-size: 12px;
     line-height: 1.5;
+    border-radius: 0 0 10px 0;
 }
+
+
 
 .tab {
     font-size: 12px;
@@ -20,6 +25,7 @@
     display: block;
     text-align: left;
     border-left: 4px solid transparent;
+    transition: background-color 0.3s ease-in-out, border-left 0.3s ease-in-out;
 }
 
 .tab:hover {
@@ -35,58 +41,14 @@
     background-color: #2e2e2e;
 }
 
-.logout-tab {
-    margin-top: auto;
-    position: relative;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.logout-tab i {
-    margin-right: 10px;
-}
-
-.logout-tab:hover {
-    background-color: #2e2e2e;
-    font-weight: bold;
-    border-left: 4px solid white;
-}
-
-/* Media queries para responsividade da sidebar */
-
-@media (max-width: 768px) {
-    .sidebar {
-        width: 60px;  /* Largura fixa que mostrará apenas ícones, por exemplo */
-    }
-
-    .tab, .logout-tab {
-        font-size: 0;  /* Esconde o texto, deixando apenas os ícones visíveis */
-        justify-content: center;  /* Centraliza os ícones */
-    }
-
-    /* Quando você hover em uma aba na versão compacta, mostrará o texto */
-    .tab:hover, .logout-tab:hover {
-        font-size: 12px; 
-        width: 12%;  /* Restaura a largura original ao pairar */
-    }
-}
-
-@media (max-width: 480px) {
-    /* Aqui você pode ocultar a barra lateral e mostrar um botão hamburger no topo para revelar a barra lateral, se desejado. Por enquanto, apenas esconderei a barra lateral. */
-    .sidebar {
-        display: none;
-    }
-}
-
-
 .toggle-button {
     cursor: pointer;
     font-size: 18px;
     color: white;
     padding: 5px 10px 0px 0px;
     text-align: right;
+    margin-top: auto; /* Empurra o botão para o canto inferior */
+    border-top: 1px solid rgb(165, 165, 165); /* Adiciona uma linha branca fina acima do botão */
 }
 
 .sidebar.collapsed .tab,
@@ -100,6 +62,25 @@
     font-size: 0; /* Garante que o texto permanece oculto mesmo quando pairado */
 }
 
-.sidebar {
-    transition: width 0.3s ease-in-out;
+
+
+/* Remove os efeitos de hover e seleção quando a sidebar está recolhida */
+.sidebar.collapsed .tab:hover,
+.sidebar.collapsed .active-tab {
+    background-color: inherit;
+    font-weight: normal;
+    border-left: 4px solid transparent;
 }
+
+/* Remove o efeito de aba ativa quando a sidebar está recolhida */
+.sidebar.collapsed .active-tab {
+    background-color: inherit;
+    font-weight: normal;
+    border-left: 4px solid transparent;
+}
+
+.sidebar {
+    transition: flex-basis 0.45s ease-in-out;
+    overflow-x: hidden;
+}
+

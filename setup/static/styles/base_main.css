@@ -8,7 +8,7 @@ body, html {
 
 .main-container {
     display: flex;
-    height: calc(100vh - 10vh); /* Subtrai a altura da top-bar */
+    height: calc(100vh - 8vh); /* Subtrai a altura da top-bar */
     overflow: hidden; /* Impede a exibição das barras de rolagem */
 }
 

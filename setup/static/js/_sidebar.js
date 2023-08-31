@@ -4,10 +4,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const workspace = document.querySelector(".workspace");
     const icon = toggleButton.querySelector("i");
 
+    const expandedWidth = sidebar.offsetWidth;  // captura a largura inicial em pixels
+
     toggleButton.addEventListener("click", function(event) {
         event.preventDefault();
-        if (sidebar.style.flexBasis === "30px") {
-            sidebar.style.flexBasis = "12%";
+        if (sidebar.style.flexBasis === "30px" || sidebar.style.flexBasis === "") {
+            sidebar.style.flexBasis = `${expandedWidth}px`;  // usa a largura em pixels
             sidebar.classList.remove("collapsed");
             icon.className = "fas fa-arrow-left";
         } else {
