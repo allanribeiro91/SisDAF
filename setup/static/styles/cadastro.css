@@ -87,6 +87,7 @@ body, html {
 
 .cadastro-form input[type="text"],
 .cadastro-form input[type="email"],
+.cadastro-form input[type="password"],
 .cadastro-form select {
     padding: 10px;
     border: 1px solid #ccc;
@@ -94,26 +95,27 @@ body, html {
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 5px;
+    width: 180px;
 }
 
-/* Estilização para campos de entrada de texto quando focados */
-.cadastro-form input[type="text"]:focus,
-.cadastro-form input[type="email"]:focus,
-.cadastro-form select:focus {
-    border-color: #0056b3;
-    box-shadow: 0 0 5px #0056b3;
-}
-
-.cadastro-form input[name="cpf"] {
+.cadastro-form input[name="nome_usuario"],
+.cadastro-form input[type="email"]{
     padding-left: 10px;
-    width: 140px;
+    width: 100%;
 }
 
 .error-label  {
     color: red !important;
     font-size: 11px !important;
-    text-align: right !important;
+    text-align: left !important;
     visibility: hidden;
+    margin-left: 10px;
+}
+
+.senha_caracteres  {
+    color: rgb(97, 97, 97) !important;
+    font-size: 11px !important;
+    text-align: left !important;
     margin-left: 10px;
 }
 

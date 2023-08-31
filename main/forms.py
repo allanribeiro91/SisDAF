@@ -27,14 +27,14 @@ class LoginForms(forms.Form):
 
 class CadastroForms(forms.Form):
     SETOR_DAF = [
-        ('cgafb', "CGAFB"),
-        ('cgafme', "CGAFME"),
-        ('cgceaf', "CGCEAF"),
-        ('cgfp', "CGFP"),
-        ('cofisc', "COFISC"),
-        ('gabinete', "GABINETE")
-    ]
-    
+    ('', '--- Selecione ---'),  # Opção vazia
+    ('cgafb', "CGAFB"),
+    ('cgafme', "CGAFME"),
+    ('cgceaf', "CGCEAF"),
+    ('cgfp', "CGFP"),
+    ('cofisc', "COFISC"),
+    ('gabinete', "GABINETE")
+    ]    
     
     cpf=forms.CharField(
         label="CPF",
@@ -104,7 +104,34 @@ class CadastroForms(forms.Form):
         widget=forms.Select(
             attrs={
                 "class": "form-control",
+                "value": "none"
+            }
+        ),
+        initial='',
+    )
+    senha_1=forms.CharField(
+        label="Senha",
+        required=True,
+        min_length=6,
+        max_length=50,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Digite a senha",
+                "autocomplete": "new-password"
             }
         )
     )
-
+    senha_2=forms.CharField(
+        label="Confirme a Senha",
+        required=True,
+        min_length=6,
+        max_length=50,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Digite a senha novamente",
+                "autocomplete": "new-password"
+            }
+        )
+    )

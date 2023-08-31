@@ -34,6 +34,12 @@
                             {% if field.label == "CPF" %}
                             <label id="cpf-error" class="error-label">CPF Inválido!</label>
                             {% endif %}
+                            {% if field.label == "Senha" %}
+                            <label class="senha_caracteres">Mínimo de 6 caracteres.</label>
+                            {% endif %}
+                            {% if field.label == "Confirme a Senha" %}
+                            <label class="error-label">As senhas são diferentes!.</label>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
