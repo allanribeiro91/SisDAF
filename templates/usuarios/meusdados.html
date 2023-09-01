@@ -1,72 +1,72 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'styles/usuarios.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/meusdados.css' %}">
 {% endblock %}
 {% block content %}    
     
     <!-- Caminho da Área de Trabalho -->
-    <div class="breadcrumb">
+    <div class="breadcrumb2">
         <i class="fas fa-user"></i>Ficha do Usuário
     </div>
 
-    <!-- Abas -->
-    <div class="tabs">
-        <button class="tab-button active" id="tabMeusDados"><i class="fas fa-user"></i> Meus Dados</button>
-        <button class="tab-button" id="tabHistoricoDAF"><i class="fas fa-history"></i> Histórico DAF</button>
-        <button class="tab-button" id="tabContratos"><i class="fas fa-file-contract"></i> Contratos</button>
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab-button active" id="tabMeusDados"><i class="fas fa-user"></i> Meus Dados</button>
+            <button class="tab-button" id="tabHistoricoDAF"><i class="fas fa-history"></i> Histórico DAF</button>
+            <button class="tab-button" id="tabContratos"><i class="fas fa-file-contract"></i> Contratos</button>
+        </div>
+
+        <!-- Botões -->
+        <div class="buttons">
+            <button type="submit" id="btnSave"><i class="fas fa-save"></i></button>
+        </div>
     </div>
 
     <!-- Meus Dados -->
     <form id="usuarioForm">
-
-    <!-- Botões -->
-    <div class="buttons">
-        <button type="submit" id="btnSave"><i class="fas fa-save"></i></button>
-    </div>
-
-    <div class="horizontal-sections">
-        
-        <!-- Dados Pessoais -->
-        <div class="section subsecao1-seventy">
-            <h3>Dados pessoais</h3>
-            <div class="grid">
-                <input type="text" placeholder="CPF" name="cpf" class="input-cpf" readonly>
-                <input type="text" placeholder="Nome completo" name="nome_completo" class="input-nome-completo">
-                <input type="date" placeholder="Data de nascimento" name="data_nascimento" class="input-data-nascimento">
-                <select name="genero" class="select-genero">
-                    <option value="" disabled selected>Gênero</option>
-                    <option value="masculino">Masculino</option>
-                    <option value="feminino">Feminino</option>
-                    <option value="outro">Outro</option>
-                </select>
-                <select name="cor_pele" class="select-cor-pele">
-                    <option value="" disabled selected>Cor da pele</option>
-                    <option value="branca">Branca</option>
-                    <option value="preta">Preta</option>
-                    <option value="parda">Parda</option>
-                    <option value="amarela">Amarela</option>
-                    <option value="vermelha">Vermelha</option>
-                    <option value="outra">Outra</option>
-                </select>
+        <div class="horizontal-sections">
+            <!-- Foto do usuário --> 
+            <div class="image-upload">
+                <label for="file-input">
+                    <!-- A classe "rounded-circle" está incluída aqui -->
+                    <img id="preview" src="{% static 'assets\imagens\user.png' %}" class="rounded-circle" alt="Imagem do usuário">
+                </label>
+                <input id="file-input" type="file" style="display:none;" accept="image/*" />
             </div>
-        </div>
-        
-        <!-- Alocação Atual -->
-        <div class="section subsecao1-thirty">
-            <h3>Alocação Atual</h3>
-            <div class="grid">
-                <input type="text" placeholder="Unidade DAF" name="unidade_daf" class="unidade_daf">
-                <input type="text" placeholder="Setor da Unidade" name="setor_unidade">
-                <input type="date" placeholder="Data de início" name="data_inicio">
+
+            <!-- Dados Pessoais -->
+            <div class="section subsecao1">
+                <h3>Dados pessoais</h3>
+                <div class="grid">
+                    <input type="text" placeholder="CPF" name="cpf" readonly value="016.944.401-50">
+                    <input type="text" placeholder="Nome completo" name="nome_completo">
+                    <input type="date" placeholder="Data de nascimento" name="data_nascimento">
+                    <select name="genero" class="select-genero">
+                        <option value="" disabled selected>Gênero</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="feminino">Feminino</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                    <select name="cor_pele" class="select-cor-pele">
+                        <option value="" disabled selected>Cor da pele</option>
+                        <option value="branca">Branca</option>
+                        <option value="preta">Preta</option>
+                        <option value="parda">Parda</option>
+                        <option value="amarela">Amarela</option>
+                        <option value="vermelha">Vermelha</option>
+                        <option value="outra">Outra</option>
+                    </select>
+                </div>
             </div>
+            
         </div>
-    </div>
 
     <div class="horizontal-sections">
         <!-- Vínculo MS -->
-        <div class="section half-section">
+        <div class="section subsecao2">
             <h3>Vínculo MS</h3>
             <div class="grid">
                 <select name="tipo_vinculo">
@@ -77,14 +77,33 @@
                 <input type="text" placeholder="Outro" name="outro">
             </div>
         </div>
-        <!-- Contato -->
-        <div class="section half-section">
+        <!-- Alocação Atual -->
+        <div class="section subsecao2">
+            <h3>Alocação Atual</h3>
+            <div class="grid">
+                <input type="text" placeholder="Unidade DAF" name="unidade_daf" class="unidade_daf" readonly>
+                <input type="text" placeholder="Setor da Unidade" name="setor_unidade" readonly>
+                <input type="date" placeholder="Data de início" name="data_inicio" readonly>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contato -->
+    <div class="horizontal-sections">
+        <div class="section subsecao2">
             <h3>Contato</h3>
             <div class="grid">
                 <input type="text" placeholder="Ramal MS" name="ramal_ms" class="ramal_ms">
                 <input type="text" placeholder="Celular" name="celular" class="celular">
                 <input type="email" placeholder="Email institucional" name="email_institucional" class="email">
                 <input type="email" placeholder="Email pessoal" name="email_pessoal" class="email">
+            </div>
+        </div>
+        <div class="section subsecao2">
+            <h3>Redes Sociais Profissionais</h3>
+            <div class="grid">
+                <input type="text" placeholder="Link do LinkedIn" name="linkendin">
+                <input type="text" placeholder="Link do Lattes" name="lattes">
             </div>
         </div>
     </div>
@@ -110,5 +129,7 @@
     </div>
 
 </form>
+
+<script src="{% static 'js/upload.js' %}"></script>
 
 {% endblock %}

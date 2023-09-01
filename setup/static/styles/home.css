@@ -1,3 +1,10 @@
+.presentation-container {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 0px;
+    margin-left: 0px;
+}
+
 .presentation-box {
     width: 12%;
     height: 60%;
@@ -15,7 +22,7 @@
 .presentation-box h2 {
     font-size: 12px;
     color: #1B2144;
-    margin: 2px 0;
+    margin: 5px 5px;
     font-weight: bold;
 }
 
@@ -23,44 +30,7 @@
     font-size: 35px;
     font-weight: normal;
     color: #1B2144;
-    margin: 2px 0;
+    margin: 5px 5px 20px;
     text-align: right;
 }
 
-.presentation-container {
-    display: flex;
-    align-items: flex-start;
-    margin-top: 0px;
-    margin-left: 0px;
-}
-
-/* Media queries para responsividade na home */
-
-@media (max-width: 768px) {
-    .presentation-box {
-        width: 45%; /* Ajuste para caber 2 caixas lado a lado */
-        margin-left: 2.5%; /* Reduzir a margem para economizar espaço */
-        padding: 3px 8px 3px 3px; /* Ajustes no padding */
-    }
-
-    .presentation-box p {
-        font-size: 25px; /* Reduz o tamanho da fonte */
-    }
-}
-
-@media (max-width: 480px) {
-    .presentation-container {
-        flex-direction: column; /* Caixas de apresentação empilhadas verticalmente */
-        align-items: center; /* Centraliza as caixas no centro */
-    }
-
-    .presentation-box {
-        width: 80%; /* Usa a maior parte da largura da tela */
-        margin-top: 15px; /* Espaço entre caixas empilhadas */
-        margin-left: 0; /* Sem margem lateral */
-    }
-
-    .presentation-box p {
-        font-size: 20px; /* Reduz ainda mais o tamanho da fonte */
-    }
-}

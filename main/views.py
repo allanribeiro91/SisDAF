@@ -69,7 +69,7 @@ def cadastro(request):
             usuario = User.objects.create(
                 username=cpf,
                 email=email_pessoal,
-                password=hashed_password  # Considere usar make_password para segurança
+                password=hashed_password
             )
 
             usuario.save()
