@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from main.forms import LoginForms, CadastroForms
 from django.contrib.auth.models import User
 from django.contrib import auth
+from django.contrib.auth.hashers import make_password
 
 
 def login(request):
@@ -45,6 +46,10 @@ def cadastro(request):
             if User.objects.filter(username=cpf).exists():
                 return redirect("cadastro")
             
+
+            #senha criptografada
+            hashed_password = make_password(senha_1)
+
             # Outros campos
             nome_usuario=form.cleaned_data["nome_usuario"]
             email_ms=form.cleaned_data["email_ms"]
@@ -55,12 +60,11 @@ def cadastro(request):
             usuario = User.objects.create(
                 username=cpf,
                 email=email_pessoal,
-                password=senha_1  # Considere usar make_password para segurança
+                password=hashed_password  # Considere usar make_password para segurança
             )
 
             usuario.save()
 
-            messages.success(request, "Cadastro realizado com sucesso!")
             return redirect("login")
 
     return render(request, 'main/cadastro.html', {'form': form})
