@@ -88,8 +88,7 @@ class CadastroForms(forms.Form):
     celular=forms.CharField(
         label="Celular",
         required=True,
-        min_length=16, 
-        max_length=16, 
+        max_length=16,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",

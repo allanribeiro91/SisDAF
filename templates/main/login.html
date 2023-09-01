@@ -19,7 +19,7 @@
             <img src="{% static 'assets/logo/logo_sisdaf.png' %}" alt="Logo SisDAF">
             <h1>SisDAF</h1>
             <div class="form-wrapper">
-                <form action="{% url 'home' %}" method="POST">
+                <form action="{% url 'login' %}" method="POST">
                     {% csrf_token %}
                     <div class="input-group">
                         {% for field in form.visible_fields %}
@@ -41,6 +41,14 @@
             </div>
         </div>
     </div>
+
+
+    {% if messages %}
+        {% for message in messages %}
+        alert("{{ message }}");
+        {% endfor %}
+    {% endif %}
+
     <script src="{% static 'js/valida_cpf.js' %}"></script>
 </body>
 </html>
