@@ -7,6 +7,13 @@
             <span class="sisdaf-title">SisDAF</span>
             <span class="version-info">Versão 1.0</span>
         </div>
+        <div class="alert-container">  <!-- Contêiner para o alerta -->
+            {% for message in messages %}
+            <div class="alert alert-info">
+                {{message}}
+            </div>
+            {% endfor %}  
+        </div>
         <div class="unidade-info">
             <span class="user-label">Unidade DAF</span>
             <span class="user-name">Gabinete</span>
@@ -22,10 +29,9 @@
             <a href="{% url 'meusdados' %}">
                 <i class="fas fa-user"></i>
                 Meus Dados</a>
-            <a href="{% url 'login' %}">
+            <a href="{% url 'logout' %}">
                 <i class="fas fa-sign-out-alt"></i>
                 Sair</a>
         </div>
     </div>
     <script src="{% static 'js/_navbar.js' %}"></script>
-    

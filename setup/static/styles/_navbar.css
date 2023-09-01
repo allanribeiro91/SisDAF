@@ -113,3 +113,11 @@
     background-color: #ddd;
     border-radius: 5px;
 }
+
+.alert {
+    position: absolute;
+    top: 50%;  /* Alinha verticalmente ao centro */
+    left: 50%;  /* Alinha horizontalmente ao centro */
+    transform: translate(-50%, -50%);  /* Ajusta a posição para que o alerta seja verdadeiramente centralizado */
+    transition: opacity 1s ease-out;
+}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from main.forms import LoginForms, CadastroForms
 from django.contrib.auth.models import User
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.contrib.auth.hashers import make_password
 
 
@@ -22,12 +22,19 @@ def login(request):
             )
         if usuario is not None:
             auth.login(request, usuario)
+            messages.success(request, f"{cpf} logado com sucesso!")
             return redirect('home')
         else:
+            messages.error(request, "Erro ao efetuar login")
             return redirect('login')
 
 
     return render(request, 'main/login.html', {'form': form})
+
+def logout(request):
+    auth.logout(request)
+    messages.success(request, "Logout efetuado com sucesso!")
+    return redirect('login')
 
 def cadastro(request):
     form = CadastroForms()
@@ -41,9 +48,11 @@ def cadastro(request):
             cpf = form.cleaned_data["cpf"]
             
             if senha_1 != senha_2:
+                messages.error(request, "Senhas não são iguais")
                 return redirect("cadastro")
             
             if User.objects.filter(username=cpf).exists():
+                messages.error(request, "CPF já cadastrado")
                 return redirect("cadastro")
             
 
@@ -64,7 +73,7 @@ def cadastro(request):
             )
 
             usuario.save()
-
+            messages.success(request, "Usuário cadastrado com sucesso!")
             return redirect("login")
 
     return render(request, 'main/cadastro.html', {'form': form})

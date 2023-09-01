@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.urls import path
-from main.views import login, home, cadastro, equipe_tecnica, produtos_daf, fornecedores, unidades_saude, processos_aquisitivos, contratos
+from main.views import login, logout, home, cadastro, equipe_tecnica, produtos_daf, fornecedores, unidades_saude, processos_aquisitivos, contratos
 
 urlpatterns = [
     path('', login, name='login'),
+    path('logout', logout, name='logout'),
     path('home/', home, name='home'),
     path('cadastro/', cadastro, name='cadastro'),
     path('equipe/', equipe_tecnica, name='equipe_tecnica'),

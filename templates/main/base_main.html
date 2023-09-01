@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - SisDAF</title>
     
+    <!-- Folhas de estilo específca da página -->
+    {% block extra_head %}{% endblock %}
+
     <!-- Folhas de estilos gerais -->
     <link rel="stylesheet" href="{% static 'styles/base_main.css' %}">
     <link rel="stylesheet" href="{% static 'styles/_sidebar.css' %}">
     <link rel="stylesheet" href="{% static 'styles/_navbar.css' %}">
 
-    <!-- Folhas de estilo específca da página -->
-    {% block extra_head %}{% endblock %}
-    
     <!-- Adicionando jQuery via CDN -->
     <script src="{% static 'js/jquery.min.js' %}"></script>
     
@@ -37,6 +37,8 @@
         </div>
         
     </div>
+
+    <script src="{% static 'js/alert.js' %}"></script>
 
 </body>
 

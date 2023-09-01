@@ -12,12 +12,10 @@
     border-radius: 0 0 10px 0;
 }
 
-
-
 .tab {
     font-size: 12px;
     text-decoration: none;
-    color: white;
+    color: white !important;
     padding: 10px;
     cursor: pointer;
     width: 100%;

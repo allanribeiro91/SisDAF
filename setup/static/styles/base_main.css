@@ -46,26 +46,3 @@ body, html {
     vertical-align: middle; 
 }
 
-/* Media queries para responsividade */
-/* Estilos para tablets e dispositivos com largura menor que 768px */
-@media (max-width: 768px) {
-    .main-container {
-        flex-direction: column;
-    }
-
-    .workspace {
-        width: 100%;
-        /* ajustes adicionais conforme necessário */
-    }
-}
-
-/* Estilos para smartphones e dispositivos com largura menor que 480px */
-@media (max-width: 480px) {
-    .breadcrumb {
-        font-size: 12px;
-    }
-
-    .breadcrumb i, .breadcrumb i.fas {
-        font-size: 14px;
-    }
-}
