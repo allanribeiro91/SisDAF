@@ -42,37 +42,44 @@ def cadastro(request):
     if request.method == 'POST':
         form = CadastroForms(request.POST)
 
+        #Validações
         if form.is_valid():
             senha_1 = form.cleaned_data["senha_1"]
             senha_2 = form.cleaned_data["senha_2"]
             cpf = form.cleaned_data["cpf"]
             
+            #Verificar se as senhas são iguais
             if senha_1 != senha_2:
                 messages.error(request, "Senhas não são iguais")
                 return redirect("cadastro")
             
+            #Verificar se o CPF já está cadastrado na base
             if User.objects.filter(username=cpf).exists():
                 messages.error(request, "CPF já cadastrado")
                 return redirect("cadastro")
             
-
             #senha criptografada
             hashed_password = make_password(senha_1)
 
-            # Outros campos
+            #outros campos
             nome_usuario=form.cleaned_data["nome_usuario"]
             email_ms=form.cleaned_data["email_ms"]
             email_pessoal=form.cleaned_data["email_pessoal"]
             celular=form.cleaned_data["celular"]
             setor_daf=form.cleaned_data["setor_daf"]
 
+            #auth_user
             usuario = User.objects.create(
                 username=cpf,
                 email=email_pessoal,
                 password=hashed_password
             )
-
             usuario.save()
+            
+            #tabela usuario
+            #usuario = tab_usuario.objects.create(
+            #)
+
             messages.success(request, "Usuário cadastrado com sucesso!")
             return redirect("login")
 
