@@ -20,11 +20,11 @@
         </div>
         <div class="user-info">
             <span class="user-label">Usuário</span>
-            <span class="user-name">Allan Ribeiro</span>
+            <span class="user-name">{{ request.user.usuario_relacionado.primeiro_ultimo_nome  }}</span>
         </div>
         <div class="profile-pic" id="profile-pic">
-            <img src="{% static 'assets\imagens\user.png' %}" alt="User Profile Pic" id="profile-pic-img">
-        </div>        
+            <img src="{% if request.user.usuario_relacionado.foto_usuario %}{{ request.user.usuario_relacionado.foto_usuario.url }}{% else %}{% static 'assets/imagens/user.png' %}{% endif %}" alt="User Profile Pic" id="profile-pic-img">
+        </div>
         <div class="dropdown" id="dropdown">
             <a href="{% url 'meusdados' %}">
                 <i class="fas fa-user"></i>

@@ -18,47 +18,67 @@
             <button class="tab-button" id="tabHistoricoDAF"><i class="fas fa-history"></i> Histórico DAF</button>
             <button class="tab-button" id="tabContratos"><i class="fas fa-file-contract"></i> Contratos</button>
         </div>
-
-        <!-- Botões -->
-        <div class="buttons">
-            <button type="submit" id="btnSave"><i class="fas fa-save"></i></button>
-        </div>
     </div>
 
     <!-- Meus Dados -->
-    <form id="usuarioForm">
+    <form id="usuarioForm" method="POST" action="{% url 'meusdados' %}">
+        {% csrf_token %}
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button class="btn btn-primary me-md-2" type="submit" id="btnSave" style="font-size: 12px;">
+                <i class="fas fa-save me-1"></i> <!-- Ícone com margem à direita -->
+                Salvar
+            </button>            
+        </div>
+        
         <div class="horizontal-sections">
             <!-- Foto do usuário --> 
             <div class="image-upload">
                 <label for="file-input">
-                    <!-- A classe "rounded-circle" está incluída aqui -->
-                    <img id="preview" src="{% static 'assets\imagens\user.png' %}" class="rounded-circle" alt="Imagem do usuário">
+                    <img id="foto_usuario" src="{% if usuario.foto_usuario %}{{ usuario.foto_usuario.url }}{% else %}{% static 'assets\imagens\user.png' %}{% endif %}" class="rounded-circle" alt="Imagem do usuário" name="foto_usuario">
                 </label>
-                <input id="file-input" type="file" style="display:none;" accept="image/*" />
+                <input id="file-input" type="file" style="display:none;" accept="image/*" onchange="previewImage(this)">
             </div>
 
             <!-- Dados Pessoais -->
             <div class="section subsecao1">
                 <h3>Dados pessoais</h3>
                 <div class="grid">
-                    <input type="text" placeholder="CPF" name="cpf" readonly value="016.944.401-50">
-                    <input type="text" placeholder="Nome completo" name="nome_completo">
-                    <input type="date" placeholder="Data de nascimento" name="data_nascimento">
-                    <select name="genero" class="select-genero">
-                        <option value="" disabled selected>Gênero</option>
-                        <option value="masculino">Masculino</option>
-                        <option value="feminino">Feminino</option>
-                        <option value="outro">Outro</option>
-                    </select>
-                    <select name="cor_pele" class="select-cor-pele">
-                        <option value="" disabled selected>Cor da pele</option>
-                        <option value="branca">Branca</option>
-                        <option value="preta">Preta</option>
-                        <option value="parda">Parda</option>
-                        <option value="amarela">Amarela</option>
-                        <option value="vermelha">Vermelha</option>
-                        <option value="outra">Outra</option>
-                    </select>
+                    <!-- CPF, nome e data de nascimento -->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="cpf" name="cpf" readonly value="{{ usuario.dp_cpf|default_if_none:'' }}">
+                        <label for="floatingInput">CPF</label>
+                    </div>
+                    <div class="form-floating mb-3 full-width">
+                        <input type="text" class="form-control" id="nome_completo" name="nome_completo" value="{{ usuario.dp_nome_completo|default_if_none:'' }}">
+                        <label for="floatingInput">Nome Completo</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" value="{% if usuario.dp_data_nascimento %}{{ usuario.dp_data_nascimento|date:'Y-m-d' }}{% endif %}">
+                        <label for="floatingInput">Data de nascimento</label>
+                    </div>                    
+
+                    <!-- Gênero -->
+                    <div class="form-floating">
+                        <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="genero">
+                            <option value="" disabled {% if not usuario.dp_genero %}selected{% endif %}>Não Informado</option>
+                            {% for value, display in GENERO_SEXUAL %}
+                            <option value="{{ value }}" {% if usuario.dp_genero == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="floatingSelect">Gênero</label>
+                    </div>
+
+                    <!-- Cor da Pele -->
+                    <div class="form-floating">
+                        <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="cor_pele">
+                            <option value="" disabled {% if not usuario.dp_cor_pele %}selected{% endif %}>Não Informado</option>
+                            {% for value, display in COR_PELE %}
+                            <option value="{{ value }}" {% if usuario.dp_cor_pele == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="floatingSelect">Cor da Pele</label>
+                    </div>
+
                 </div>
             </div>
             
@@ -69,21 +89,41 @@
         <div class="section subsecao2">
             <h3>Vínculo MS</h3>
             <div class="grid">
-                <select name="tipo_vinculo">
-                    <option value="" disabled selected>Tipo de vínculo</option>
-                    <!-- opções de tipo de vínculo -->
-                </select>
-                <input type="text" placeholder="Órgão de origem" name="orgao_origem">
-                <input type="text" placeholder="Outro" name="outro">
+                <div class="form-floating subsecao_vinculo">
+                    <select class="form-select" id="tipo_vinculo" name="tipo_vinculo" aria-label="Floating label select example">
+                        <option value="" disabled {% if not usuario.vms_vinculo %}selected{% endif %}>Não Informado</option>
+                        {% for value, display in VINCULO_MS %}
+                        <option value="{{ value }}" {% if usuario.vms_vinculo == value %}selected{% endif %}>{{ display }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="floatingSelect">Tipo de Vínculo</label>
+                </div>
+                <div class="form-floating mb-3 subsecao_vinculo">
+                    <input type="text" class="form-control" id="orgao_origem" name="orgao_origem" value="{{ usuario.vms_orgao|default_if_none:'' }}">
+                    <label for="floatingInput">Órgão de Origem</label>
+                </div>
+                <div class="form-floating mb-3 full-width">
+                    <input type="text" class="form-control" id="orgao_outro" name="orgao_outro" value="{{ usuario.vms_orgao_outro|default_if_none:'' }}">
+                    <label for="floatingInput">Outro</label>
+                </div>
             </div>
         </div>
         <!-- Alocação Atual -->
         <div class="section subsecao2">
             <h3>Alocação Atual</h3>
             <div class="grid">
-                <input type="text" placeholder="Unidade DAF" name="unidade_daf" class="unidade_daf" readonly>
-                <input type="text" placeholder="Setor da Unidade" name="setor_unidade" readonly>
-                <input type="date" placeholder="Data de início" name="data_inicio" readonly>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="unidade_daf" name="unidade_daf" readonly >
+                    <label for="floatingInput">Unidade DAF</label>
+                </div>
+                <div class="form-floating mb-3 full-width">
+                    <input type="text" class="form-control" id="setor_unidade" name="setor_unidade" readonly>
+                    <label for="floatingInput">Setor da Unidade</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="data_inicio" name="data_inicio" readonly>
+                    <label for="floatingInput">Data de Início</label>
+                </div>
             </div>
         </div>
     </div>
@@ -93,17 +133,35 @@
         <div class="section subsecao2">
             <h3>Contato</h3>
             <div class="grid">
-                <input type="text" placeholder="Ramal MS" name="ramal_ms" class="ramal_ms">
-                <input type="text" placeholder="Celular" name="celular" class="celular">
-                <input type="email" placeholder="Email institucional" name="email_institucional" class="email">
-                <input type="email" placeholder="Email pessoal" name="email_pessoal" class="email">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="ramal_ms" name="ramal_ms" value="{{ usuario.ctt_ramal_ms|default_if_none:'' }}">
+                    <label for="floatingInput">Ramal MS</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="celular" id="celular" placeholder="" value="{{ usuario.ctt_celular|default_if_none:'' }}">
+                    <label for="floatingInput">Celular</label>
+                </div>
+                <div class="form-floating mb-3 full-width">
+                    <input type="text" class="form-control" id="email_institucional" name="email_institucional" placeholder="" value="{{ usuario.ctt_email_ms|default_if_none:'' }}">
+                    <label for="floatingInput">Email Institucional</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="email_pessoal" name="email_pessoal" placeholder="" value="{{ usuario.ctt_email_pessoal|default_if_none:'' }}">
+                    <label for="floatingInput">Email Pessoal</label>
+                </div>
             </div>
         </div>
         <div class="section subsecao2">
             <h3>Redes Sociais Profissionais</h3>
             <div class="grid">
-                <input type="text" placeholder="Link do LinkedIn" name="linkendin">
-                <input type="text" placeholder="Link do Lattes" name="lattes">
+                <div class="form-floating mb-3 half-width">
+                    <input type="text" class="form-control" id="linkendin" name="linkendin" placeholder="" value="{{ usuario.rs_linkedin|default_if_none:'' }}">
+                    <label for="floatingInput">LinkedIn</label>
+                </div>
+                <div class="form-floating mb-3 half-width">
+                    <input type="text" class="form-control" id="lattes" name="lattes" placeholder="" value="{{ usuario.rs_lattes|default_if_none:'' }}">
+                    <label for="floatingInput">Lattes</label>
+                </div>
             </div>
         </div>
     </div>
@@ -130,6 +188,6 @@
 
 </form>
 
-<script src="{% static 'js/upload.js' %}"></script>
+<script src="{% static 'js/meus_dados.js' %}"></script>
 
 {% endblock %}

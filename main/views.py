@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from main.forms import LoginForms, CadastroForms
+from main.models import Usuario
 from django.contrib.auth.models import User
 from django.contrib import auth, messages
 from django.contrib.auth.hashers import make_password
+from django.db import transaction
 
 
 def login(request):
@@ -30,6 +33,11 @@ def login(request):
 
 
     return render(request, 'main/login.html', {'form': form})
+
+@login_required
+def home(request):
+    usuario = request.user.usuario_relacionado
+    return render(request, 'home.html', {'usuario': usuario})
 
 def logout(request):
     auth.logout(request)
@@ -68,17 +76,24 @@ def cadastro(request):
             celular=form.cleaned_data["celular"]
             setor_daf=form.cleaned_data["setor_daf"]
 
-            #auth_user
-            usuario = User.objects.create(
-                username=cpf,
-                email=email_pessoal,
-                password=hashed_password
-            )
-            usuario.save()
-            
-            #tabela usuario
-            #usuario = tab_usuario.objects.create(
-            #)
+            with transaction.atomic():
+                #tabela auth_user
+                auth_usuario = User.objects.create(
+                    username=cpf,
+                    email=email_pessoal,
+                    password=hashed_password
+                )
+
+                #tabela main_usuario
+                Usuario.objects.create(
+                    user=auth_usuario,
+                    dp_cpf=cpf,
+                    dp_nome_completo=nome_usuario,
+                    ctt_celular=celular,
+                    ctt_email_ms=email_ms,
+                    ctt_email_pessoal=email_pessoal,
+                )
+
 
             messages.success(request, "Usuário cadastrado com sucesso!")
             return redirect("login")
