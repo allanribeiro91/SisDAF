@@ -218,6 +218,9 @@ input[name="tipo_vinculo"] {
 
 }
 
+.clickable-input {
+    cursor: pointer;
+}
   
 
 

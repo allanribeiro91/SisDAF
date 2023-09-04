@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from setup.choices import GENERO_SEXUAL, COR_PELE, VINCULO_MS, ORGAO_PUBLICO
 from datetime import datetime
-import pdb
 
 
 
@@ -24,7 +23,7 @@ def meusdados(request):
         'ORGAO_PUBLICO': ORGAO_PUBLICO
     })
 
-
+@login_required
 def editar_meusdados(request, usuario):
     #Dados Pessoais
     usuario.dp_nome_completo = request.POST.get('nome_completo')

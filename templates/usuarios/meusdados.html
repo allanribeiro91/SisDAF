@@ -155,12 +155,12 @@
             <h3>Redes Sociais Profissionais</h3>
             <div class="grid">
                 <div class="form-floating mb-3 half-width">
-                    <input type="text" class="form-control" id="linkendin" name="linkendin" placeholder="" value="{{ usuario.rs_linkedin|default_if_none:'' }}">
+                    <input type="text" class="form-control clickable-input" id="linkendin" name="linkendin" placeholder="" value="{{ usuario.rs_linkedin|default_if_none:'' }}">
                     <label for="floatingInput">LinkedIn</label>
                 </div>
                 <div class="form-floating mb-3 half-width">
-                    <input type="text" class="form-control" id="lattes" name="lattes" placeholder="" value="{{ usuario.rs_lattes|default_if_none:'' }}">
-                    <label for="floatingInput">Lattes</label>
+                    <input type="text" class="form-control clickable-input" id="lattes" name="lattes" placeholder="" value="{{ usuario.rs_lattes|default_if_none:'' }}">
+                    <label for="floatingInput">Lattes ID</label>
                 </div>
             </div>
         </div>

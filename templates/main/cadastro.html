@@ -36,6 +36,7 @@
                             {% if field.label == "CPF" %}
                             <label id="cpf-error" class="error-label">CPF Inválido!</label>
                             {% endif %}
+                            
                             {% if field.label == "Senha" %}
                             <label class="senha_caracteres">Mínimo de 6 caracteres.</label>
                             {% endif %}
@@ -47,11 +48,7 @@
                     {% endfor %}
                 </div>
                 <button type="submit">Cadastrar</button>
-                {% for message in messages %}
-                <div>
-                    <p id="messages" class="alert alert-danger">{{message}}</p>
-                </div>
-                {% endfor %}
+                {% include '_partials/_alertas.html' %}
             </form>  
         </div>
     </div>

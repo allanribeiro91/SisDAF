@@ -60,3 +60,17 @@ function previewImage(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const clickableInputs = document.querySelectorAll('.clickable-input');
+
+    clickableInputs.forEach(function(input) {
+        input.addEventListener('click', function(event) {
+            const value = event.target.value;
+            if (value) {
+                window.open(value, '_blank');
+            }
+        });
+    });
+});

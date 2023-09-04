@@ -27,8 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',
-    'usuarios',
+    'apps.main.apps.MainConfig',
+    'apps.usuarios.apps.UsuariosConfig',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +131,13 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Heroku
 django_heroku.settings(locals())
+
+
+# messages
+
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+   messages.ERROR: 'danger',
+   messages.SUCCESS: 'success',
+   messages.INFO: 'info',
+}

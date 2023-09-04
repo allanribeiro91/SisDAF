@@ -5,14 +5,10 @@
         
         <div class="logo-text">
             <span class="sisdaf-title">SisDAF</span>
-            <span class="version-info">Versão 1.0</span>
+            <span class="version-info">SECTICS/MS</span>
         </div>
         <div class="alert-container">  <!-- Contêiner para o alerta -->
-            {% for message in messages %}
-            <div class="alert alert-info">
-                {{message}}
-            </div>
-            {% endfor %}  
+            {% include '_partials/_alertas.html' %}  
         </div>
         <div class="unidade-info">
             <span class="user-label">Unidade DAF</span>

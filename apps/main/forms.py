@@ -1,4 +1,5 @@
 from django import forms
+from setup.funcoes import valida_cpf
 
 class LoginForms(forms.Form):
     cpf=forms.CharField(
@@ -24,6 +25,8 @@ class LoginForms(forms.Form):
             }
         )
     )
+
+    
 
 class CadastroForms(forms.Form):
     SETOR_DAF = [
@@ -134,3 +137,5 @@ class CadastroForms(forms.Form):
             }
         )
     )
+
+    

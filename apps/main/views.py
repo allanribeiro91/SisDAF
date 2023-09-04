@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from main.forms import LoginForms, CadastroForms
-from main.models import Usuario
+from apps.main.forms import LoginForms, CadastroForms
+from apps.main.models import Usuario
 from django.contrib.auth.models import User
 from django.contrib import auth, messages
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from setup.funcoes import valida_cpf
+
 
 
 def login(request):
@@ -25,13 +27,13 @@ def login(request):
             )
         if usuario is not None:
             auth.login(request, usuario)
-            messages.success(request, f"{cpf} logado com sucesso!")
+            messages.info(request, f"{cpf} logado com sucesso!")
             return redirect('home')
         else:
-            messages.error(request, "Erro ao efetuar login")
-            return redirect('login')
-
-
+            messages.error(request, "Usuário ou senha inválido!")
+            form.fields['cpf'].initial = cpf
+            return render(request, 'main/login.html', {'form': form})
+    
     return render(request, 'main/login.html', {'form': form})
 
 @login_required
@@ -41,7 +43,7 @@ def home(request):
 
 def logout(request):
     auth.logout(request)
-    messages.success(request, "Logout efetuado com sucesso!")
+    messages.info(request, "Logout efetuado com sucesso!")
     return redirect('login')
 
 def cadastro(request):
@@ -56,15 +58,25 @@ def cadastro(request):
             senha_2 = form.cleaned_data["senha_2"]
             cpf = form.cleaned_data["cpf"]
             
+            erro = False  # Variável para rastrear se ocorreu algum erro
+            
             #Verificar se as senhas são iguais
             if senha_1 != senha_2:
                 messages.error(request, "Senhas não são iguais")
-                return redirect("cadastro")
+                erro = True
             
+            #Verificar o CPF
+            if not valida_cpf(cpf):
+                messages.error(request, "Não é possível cadastrar usuário com CPF inválido!")
+                erro = True
+
             #Verificar se o CPF já está cadastrado na base
             if User.objects.filter(username=cpf).exists():
                 messages.error(request, "CPF já cadastrado")
-                return redirect("cadastro")
+                erro = True
+            
+            if erro:
+                return render(request, 'main/cadastro.html', {'form': form})
             
             #senha criptografada
             hashed_password = make_password(senha_1)
@@ -93,7 +105,6 @@ def cadastro(request):
                     ctt_email_ms=email_ms,
                     ctt_email_pessoal=email_pessoal,
                 )
-
 
             messages.success(request, "Usuário cadastrado com sucesso!")
             return redirect("login")

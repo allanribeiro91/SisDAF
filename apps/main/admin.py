@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import Usuario
+from apps.main.models import Usuario
 
 
 class ListandoUsuario(admin.ModelAdmin):

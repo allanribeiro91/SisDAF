@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from main.views import login, logout, home, cadastro, equipe_tecnica, produtos_daf, fornecedores, unidades_saude, processos_aquisitivos, contratos
+from apps.main.views import login, logout, home, cadastro, equipe_tecnica, produtos_daf, fornecedores, unidades_saude, processos_aquisitivos, contratos
 
 urlpatterns = [
     path('', login, name='login'),
