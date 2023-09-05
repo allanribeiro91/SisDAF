@@ -4,13 +4,13 @@ from apps.usuarios.models import Usuario
 class UsuarioForms(forms.ModelForm):
     class Meta:
         model = Usuario
-        exclude = ['data_registro', 'data_ultima_atualizacao', 'del_status', 'del_data', 'del_cpf']
+        exclude = ['user', 'data_registro', 'data_ultima_atualizacao', 'del_status', 'del_data', 'del_cpf']
         labels = {
             #dados pessoais
             'dp_cpf': 'CPF',
             'dp_nome_completo': 'Nome Completo',
             'dp_data_nascimento': 'Data de Nascimento',
-            'dp_genero': 'Gênero',
+            'dp_genero': 'Gênero Sexual',
             'dp_cor_pele': 'Cor da Pele',
 
             #foto

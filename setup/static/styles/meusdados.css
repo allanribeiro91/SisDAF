@@ -179,25 +179,25 @@ h3 {
     font-weight: bold;
 }
 
-input[name="ramal_ms"] {
+input[name="ctt_ramal_ms"] {
     width: 100px !important;
     text-align: left;
 }
 
-input[name="celular"] {
+input[name="ctt_celular"] {
     width: 140px !important;
     text-align: left;
 }
 
-input[name="cpf"], input[name="data_nascimento"], 
-select[name="genero"], select[name="cor_pele"],
-input[name="unidade_daf"], input[name="data_inicio"] {
+input[name="dp_cpf"], input[name="dp_data_nascimento"], 
+select[name="dp_genero"], select[name="dp_cor_pele"],
+input[name="dp_unidade_daf"], input[name="dp_data_inicio"] {
     flex: none;
     width: 160px !important;
     text-align: left;
 }
 
-input[name="cpf"] {
+input[name="dp_cpf"] {
     text-align: center;
 }
 
@@ -213,7 +213,7 @@ input[name="cpf"] {
     width: 20% !important;
 }
 
-input[name="tipo_vinculo"] {
+input[name="vms_tipo_vinculo"] {
     width: 160px !important;
 
 }
