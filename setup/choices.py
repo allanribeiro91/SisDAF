@@ -29,3 +29,13 @@ ORGAO_PUBLICO = (
     ('outro', "Outro"),
     ('nao_informado', 'Não Informado'),
 )
+
+SETOR_DAF = [
+    ('', '--- Selecione ---'),  # Opção vazia
+    ('cgafb', "CGAFB"),
+    ('cgafme', "CGAFME"),
+    ('cgceaf', "CGCEAF"),
+    ('cgfp', "CGFP"),
+    ('cofisc', "COFISC"),
+    ('gabinete', "GABINETE")
+    ]   

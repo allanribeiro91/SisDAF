@@ -1,13 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from apps.main.forms import LoginForms, CadastroForms
-from apps.main.models import Usuario
+from apps.usuarios.models import Usuario
 from django.contrib.auth.models import User
 from django.contrib import auth, messages
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from setup.funcoes import valida_cpf
-
 
 
 def login(request):
@@ -118,8 +117,7 @@ def home(request):
 def equipe_tecnica(request):
     return render(request, 'main/equipe_tecnica.html')
 
-def produtos_daf(request):
-    return render(request, 'main/produtos_daf.html')
+
 
 def fornecedores(request):
     return render(request, 'main/fornecedores.html')

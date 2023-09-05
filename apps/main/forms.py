@@ -1,5 +1,6 @@
 from django import forms
 from setup.funcoes import valida_cpf
+from setup.choices import SETOR_DAF
 
 class LoginForms(forms.Form):
     cpf=forms.CharField(
@@ -29,15 +30,6 @@ class LoginForms(forms.Form):
     
 
 class CadastroForms(forms.Form):
-    SETOR_DAF = [
-    ('', '--- Selecione ---'),  # Opção vazia
-    ('cgafb', "CGAFB"),
-    ('cgafme', "CGAFME"),
-    ('cgceaf', "CGCEAF"),
-    ('cgfp', "CGFP"),
-    ('cofisc', "COFISC"),
-    ('gabinete', "GABINETE")
-    ]    
     
     cpf=forms.CharField(
         label="CPF",

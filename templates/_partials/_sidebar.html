@@ -6,10 +6,7 @@
             <a class="tab {% if request.resolver_match.url_name == 'home' %}active-tab{% endif %}" href="{% url 'home' %}">Home</a>
         </div>
         <div>
-            <a class="tab {% if request.resolver_match.url_name == 'equipe_tecnica' %}active-tab{% endif %}" href="{% url 'equipe_tecnica' %}">Equipe Técnica</a>
-        </div>
-        <div>
-            <a class="tab {% if request.resolver_match.url_name == 'produtos_daf' %}active-tab{% endif %}" href="{% url 'produtos_daf' %}">Produtos DAF</a>
+            <a class="tab {% if request.resolver_match.url_name == 'produtos' %}active-tab{% endif %}" href="{% url 'produtos' %}">Produtos DAF</a>
         </div>
         <div>
             <a class="tab {% if request.resolver_match.url_name == 'fornecedores' %}active-tab{% endif %}" href="{% url 'fornecedores' %}">Fornecedores</a>

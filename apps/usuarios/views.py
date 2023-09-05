@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from setup.choices import GENERO_SEXUAL, COR_PELE, VINCULO_MS, ORGAO_PUBLICO
 from datetime import datetime
-
+from apps.usuarios.forms import UsuarioForms
 
 
 @login_required
@@ -11,17 +11,18 @@ def meusdados(request):
     usuario = request.user.usuario_relacionado
     
     if request.method == 'POST':
-        print("Editar meus dados")
         editar_meusdados(request, usuario)
         return redirect('meusdados')
     
+    form = UsuarioForms(instance=usuario)
     return render(request, 'usuarios/meusdados.html', {
-        'usuario': usuario,
+        'form': form,
         'GENERO_SEXUAL': GENERO_SEXUAL,
         'COR_PELE': COR_PELE,
         'VINCULO_MS': VINCULO_MS,
         'ORGAO_PUBLICO': ORGAO_PUBLICO
     })
+
 
 @login_required
 def editar_meusdados(request, usuario):

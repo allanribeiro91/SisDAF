@@ -34,7 +34,7 @@
             <!-- Foto do usuário --> 
             <div class="image-upload">
                 <label for="file-input">
-                    <img id="foto_usuario" src="{% if usuario.foto_usuario %}{{ usuario.foto_usuario.url }}{% else %}{% static 'assets\imagens\user.png' %}{% endif %}" class="rounded-circle" alt="Imagem do usuário" name="foto_usuario">
+                    <img id="foto_usuario" src="{% if form.foto_usuario.url %}{{ form.foto_usuario.url }}{% else %}{% static 'assets/imagens/user.png' %}{% endif %}" class="rounded-circle" alt="Imagem do usuário" name="foto_usuario">
                 </label>
                 <input id="file-input" type="file" style="display:none;" accept="image/*" onchange="previewImage(this)">
             </div>
@@ -45,24 +45,24 @@
                 <div class="grid">
                     <!-- CPF, nome e data de nascimento -->
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="cpf" name="cpf" readonly value="{{ usuario.dp_cpf|default_if_none:'' }}">
-                        <label for="floatingInput">CPF</label>
+                        <input type="text" class="form-control" id="cpf" name="cpf" readonly value="{{ form.dp_cpf.value|default_if_none:'' }}">
+                        <label for="floatingInput">{{ form.dp_cpf.label }}</label>
                     </div>
                     <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="nome_completo" name="nome_completo" value="{{ usuario.dp_nome_completo|default_if_none:'' }}">
-                        <label for="floatingInput">Nome Completo</label>
+                        <input type="text" class="form-control" id="nome_completo" name="nome_completo" value="{{ form.dp_nome_completo.value|default_if_none:'' }}">
+                        <label for="floatingInput">{{ form.dp_nome_completo.label }}</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" value="{% if usuario.dp_data_nascimento %}{{ usuario.dp_data_nascimento|date:'Y-m-d' }}{% endif %}">
+                        <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" value="{% if form.dp_data_nascimento.value %}{{ form.dp_data_nascimento.value|date:'Y-m-d' }}{% endif %}">
                         <label for="floatingInput">Data de nascimento</label>
                     </div>                    
 
                     <!-- Gênero -->
                     <div class="form-floating">
                         <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="genero">
-                            <option value="" disabled {% if not usuario.dp_genero %}selected{% endif %}>Não Informado</option>
+                            <option value="" disabled {% if not form.dp_genero.value %}selected{% endif %}>Não Informado</option>
                             {% for value, display in GENERO_SEXUAL %}
-                            <option value="{{ value }}" {% if usuario.dp_genero == value %}selected{% endif %}>{{ display }}</option>
+                            <option value="{{ value }}" {% if form.dp_genero.value == value %}selected{% endif %}>{{ display }}</option>
                             {% endfor %}
                         </select>
                         <label for="floatingSelect">Gênero</label>
@@ -71,9 +71,9 @@
                     <!-- Cor da Pele -->
                     <div class="form-floating">
                         <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="cor_pele">
-                            <option value="" disabled {% if not usuario.dp_cor_pele %}selected{% endif %}>Não Informado</option>
+                            <option value="" disabled {% if not form.dp_cor_pele.value %}selected{% endif %}>Não Informado</option>
                             {% for value, display in COR_PELE %}
-                            <option value="{{ value }}" {% if usuario.dp_cor_pele == value %}selected{% endif %}>{{ display }}</option>
+                            <option value="{{ value }}" {% if form.dp_cor_pele.value == value %}selected{% endif %}>{{ display }}</option>
                             {% endfor %}
                         </select>
                         <label for="floatingSelect">Cor da Pele</label>
@@ -91,19 +91,19 @@
             <div class="grid">
                 <div class="form-floating subsecao_vinculo">
                     <select class="form-select" id="tipo_vinculo" name="tipo_vinculo" aria-label="Floating label select example">
-                        <option value="" disabled {% if not usuario.vms_vinculo %}selected{% endif %}>Não Informado</option>
+                        <option value="" disabled {% if not form.vms_vinculo.value %}selected{% endif %}>Não Informado</option>
                         {% for value, display in VINCULO_MS %}
-                        <option value="{{ value }}" {% if usuario.vms_vinculo == value %}selected{% endif %}>{{ display }}</option>
+                        <option value="{{ value }}" {% if form.vms_vinculo.value == value %}selected{% endif %}>{{ display }}</option>
                         {% endfor %}
                     </select>
                     <label for="floatingSelect">Tipo de Vínculo</label>
                 </div>
                 <div class="form-floating mb-3 subsecao_vinculo">
-                    <input type="text" class="form-control" id="orgao_origem" name="orgao_origem" value="{{ usuario.vms_orgao|default_if_none:'' }}">
+                    <input type="text" class="form-control" id="orgao_origem" name="orgao_origem" value="{{ form.vms_orgao.value|default_if_none:'' }}">
                     <label for="floatingInput">Órgão de Origem</label>
                 </div>
                 <div class="form-floating mb-3 full-width">
-                    <input type="text" class="form-control" id="orgao_outro" name="orgao_outro" value="{{ usuario.vms_orgao_outro|default_if_none:'' }}">
+                    <input type="text" class="form-control" id="orgao_outro" name="orgao_outro" value="{{ form.vms_orgao_outro.value|default_if_none:'' }}">
                     <label for="floatingInput">Outro</label>
                 </div>
             </div>
@@ -134,19 +134,19 @@
             <h3>Contato</h3>
             <div class="grid">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="ramal_ms" name="ramal_ms" value="{{ usuario.ctt_ramal_ms|default_if_none:'' }}">
+                    <input type="text" class="form-control" id="ramal_ms" name="ramal_ms" value="{{ form.ctt_ramal_ms.value|default_if_none:'' }}">
                     <label for="floatingInput">Ramal MS</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" name="celular" id="celular" placeholder="" value="{{ usuario.ctt_celular|default_if_none:'' }}">
+                    <input type="text" class="form-control" name="celular" id="celular" placeholder="" value="{{ form.ctt_celular.value|default_if_none:'' }}">
                     <label for="floatingInput">Celular</label>
                 </div>
                 <div class="form-floating mb-3 full-width">
-                    <input type="text" class="form-control" id="email_institucional" name="email_institucional" placeholder="" value="{{ usuario.ctt_email_ms|default_if_none:'' }}">
+                    <input type="text" class="form-control" id="email_institucional" name="email_institucional" placeholder="" value="{{ form.ctt_email_ms.value|default_if_none:'' }}">
                     <label for="floatingInput">Email Institucional</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="email_pessoal" name="email_pessoal" placeholder="" value="{{ usuario.ctt_email_pessoal|default_if_none:'' }}">
+                    <input type="text" class="form-control" id="email_pessoal" name="email_pessoal" placeholder="" value="{{ form.ctt_email_pessoal.value|default_if_none:'' }}">
                     <label for="floatingInput">Email Pessoal</label>
                 </div>
             </div>
@@ -155,11 +155,11 @@
             <h3>Redes Sociais Profissionais</h3>
             <div class="grid">
                 <div class="form-floating mb-3 half-width">
-                    <input type="text" class="form-control clickable-input" id="linkendin" name="linkendin" placeholder="" value="{{ usuario.rs_linkedin|default_if_none:'' }}">
+                    <input type="text" class="form-control clickable-input" id="linkendin" name="linkendin" placeholder="" value="{{ form.rs_linkedin.value|default_if_none:'' }}">
                     <label for="floatingInput">LinkedIn</label>
                 </div>
                 <div class="form-floating mb-3 half-width">
-                    <input type="text" class="form-control clickable-input" id="lattes" name="lattes" placeholder="" value="{{ usuario.rs_lattes|default_if_none:'' }}">
+                    <input type="text" class="form-control clickable-input" id="lattes" name="lattes" placeholder="" value="{{ form.rs_lattes.value|default_if_none:'' }}">
                     <label for="floatingInput">Lattes ID</label>
                 </div>
             </div>
