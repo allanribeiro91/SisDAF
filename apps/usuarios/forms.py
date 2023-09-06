@@ -1,5 +1,6 @@
 from django import forms
-from apps.usuarios.models import Usuario
+from django.core.exceptions import ValidationError
+from apps.usuarios.models import Usuario, Alocacao
 
 class UsuarioForms(forms.ModelForm):
     class Meta:
@@ -64,16 +65,32 @@ class UsuarioForms(forms.ModelForm):
 
             #vinculo com o Ministério da Saúde (vms)
             'vms_vinculo': forms.Select(attrs={'class':'form-control'}),
-            'vms_orgao': forms.TextInput(attrs={'class':'form-control'}),
+            'vms_orgao': forms.Select(attrs={'class':'form-control'}),
             'vms_orgao_outro': forms.TextInput(attrs={'class':'form-control'}),
 
-            #alocação atual
-            'aloc_unidade': forms.TextInput(attrs={'class':'form-control'}),
-            'aloc_setor': forms.TextInput(attrs={'class':'form-control'}),
-            'aloc_data_inicio': forms.DateInput(
-                format='%d/%m/%Y',
-                attrs={
-                    'type': 'date',
-                    'class':'form-control'}),
         }
-    
+
+
+class AlocacaoForm(forms.ModelForm):
+    class Meta:
+        model = Alocacao
+        fields = ['unidade', 'setor', 'data_inicio', 'data_fim', 'is_ativo']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        is_ativo = cleaned_data.get('is_ativo')
+        data_fim = cleaned_data.get('data_fim')
+        usuario = self.instance.usuario
+
+        # Verifica se já existe uma alocação ativa para o usuário
+        if is_ativo:
+            alocacoes_ativas = Alocacao.objects.filter(usuario=usuario, is_ativo=True).exclude(pk=self.instance.pk)
+            if alocacoes_ativas.exists():
+                raise ValidationError('Já existe uma alocação ativa para este usuário.')
+
+        # Verifica se a data_fim está preenchida quando is_ativo é False
+        if not is_ativo and data_fim is None:
+            raise ValidationError('A data de fim é requerida quando a alocação não está ativa.')
+
+        return cleaned_data
+

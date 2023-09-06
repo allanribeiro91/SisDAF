@@ -15,8 +15,7 @@
         <!-- Abas -->
         <div class="tabs">
             <button class="tab-button active" id="tabMeusDados"><i class="fas fa-user"></i> Meus Dados</button>
-            <button class="tab-button" id="tabHistoricoDAF"><i class="fas fa-history"></i> Histórico DAF</button>
-            <button class="tab-button" id="tabContratos"><i class="fas fa-file-contract"></i> Contratos</button>
+            
         </div>
     </div>
 
@@ -99,7 +98,12 @@
                     <label for="floatingSelect">{{ form.vms_vinculo.label }}</label>
                 </div>
                 <div class="form-floating mb-3 subsecao_vinculo">
-                    <input type="text" class="form-control" id="orgao_origem" name="vms_orgao_origem" value="{{ form.vms_orgao.value|default_if_none:'' }}">
+                    <select class="form-select" id="orgao_origem" name="vms_orgao_origem" aria-label="Floating label select example">
+                        <option value="" disabled {% if not form.vms_orgao_origem.value %}selected{% endif %}>Não Informado</option>
+                        {% for value, display in ORGAO_PUBLICO %}
+                        <option value="{{ value }}" {% if form.vms_orgao_origem.value == value %}selected{% endif %}>{{ display }}</option>
+                        {% endfor %}
+                    </select>
                     <label for="floatingInput">{{ form.vms_orgao.label }}</label>
                 </div>
                 <div class="form-floating mb-3 full-width">
@@ -113,16 +117,17 @@
             <h3>Alocação Atual</h3>
             <div class="grid">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="unidade_daf" name="aloc_unidade" readonly >
-                    <label for="floatingInput">{{ form.aloc_unidade.label }}</label>
+                    <input type="text" class="form-control" id="unidade_daf" name="aloc_unidade" value="{{ alocacao_ativa.unidade|upper }}" readonly>
+                    <label for="floatingInput">Unidade DAF</label>
                 </div>
                 <div class="form-floating mb-3 full-width">
-                    <input type="text" class="form-control" id="setor_unidade" name="aloc_setor" readonly>
-                    <label for="floatingInput">{{ form.aloc_setor.label }}</label>
+                    <input type="text" class="form-control" id="setor_unidade" name="aloc_setor" value="{{ alocacao_ativa.setor }}" readonly>
+                    <label for="floatingInput">Setor</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="data_inicio" name="aloc_data_inicio" readonly>
-                    <label for="floatingInput">{{ form.aloc_data_inicio.label }}</label>
+                    <input type="text" class="form-control" id="data_inicio" name="aloc_data_inicio" 
+                    value="{% if alocacao_ativa and alocacao_ativa.data_inicio %}{{ alocacao_ativa.data_inicio|date:'d/m/Y' }}{% endif %}" readonly>
+                    <label for="floatingInput">Data de Início</label>
                 </div>
             </div>
         </div>
@@ -165,27 +170,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Tabela de Formação Técnica -->
-    <div class="section">
-        <h3>Formação Técnica</h3>
-        <table id="tabelaFormacao" class="formacao-table">
-            <thead>
-                <tr>
-                    <th>Curso</th>
-                    <th>Instituição</th>
-                    <th>Ano de Conclusão</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- As linhas serão preenchidas dinamicamente -->
-            </tbody>
-        </table>
-        <div class="buttons">
-            <button type="button" id="btnAddFormacao"><i class="fas fa-plus"></i> Adicionar Formação</button>
-        </div>
-    </div>
-
 </form>
 
 <script src="{% static 'js/meus_dados.js' %}"></script>

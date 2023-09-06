@@ -5,14 +5,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Função para verificar o estado dos campos
     function checkFields() {
-        if (tipoVinculo.value === 'consultor' | tipoVinculo.value === 'nao_informado' | tipoVinculo.value === '') {
-            orgaoOrigem.value = '';
-            orgaoOutro.value = '';
-            orgaoOrigem.setAttribute('readonly', 'readonly');
+        if (tipoVinculo.value === 'consultor' || tipoVinculo.value === 'nao_informado' || tipoVinculo.value === '') {
+            orgaoOrigem.value = 'nao_informado';
+            orgaoOutro.value = 'Não Informado';
+            orgaoOrigem.setAttribute('disabled', 'disabled');
             orgaoOutro.setAttribute('readonly', 'readonly');
         } else {
-            orgaoOrigem.removeAttribute('readonly');
+            
+            orgaoOrigem.removeAttribute('disabled');
             orgaoOutro.removeAttribute('readonly');
+        }
+
+        if (orgaoOrigem.value === 'outro') {
+            orgaoOutro.removeAttribute('readonly');
+        } else {
+            orgaoOutro.value = 'Não Informado';
+            orgaoOutro.setAttribute('readonly', 'readonly');
         }
     }
 
@@ -21,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Adiciona um ouvinte de evento para verificar cada vez que o valor do dropdown muda
     tipoVinculo.addEventListener('change', checkFields);
+    orgaoOrigem.addEventListener('change', checkFields);
 });
 
 document.addEventListener("DOMContentLoaded", function() {

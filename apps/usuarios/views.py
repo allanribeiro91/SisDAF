@@ -10,6 +10,7 @@ import pdb
 @login_required
 def meusdados(request):
     usuario = request.user.usuario_relacionado
+    alocacao_ativa = usuario.alocacao_ativa()
     
     if request.method == 'POST':
         form = UsuarioForms(request.POST, request.FILES, instance=usuario)
@@ -21,6 +22,7 @@ def meusdados(request):
     return render(request, 'usuarios/meusdados.html', {
         'usuario': usuario,
         'form': form,
+        'alocacao_ativa': alocacao_ativa,
         'GENERO_SEXUAL': GENERO_SEXUAL,
         'COR_PELE': COR_PELE,
         'VINCULO_MS': VINCULO_MS,
