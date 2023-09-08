@@ -92,7 +92,7 @@ class CadastroForms(forms.Form):
         )
     )
     setor_daf=forms.ChoiceField(
-        label="Setor do DAF",
+        label="Unidade do DAF",
         required=True,
         choices=SETOR_DAF,
         widget=forms.Select(
