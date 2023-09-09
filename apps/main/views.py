@@ -10,30 +10,38 @@ from setup.funcoes import valida_cpf
 
 
 def login(request):
-    form = LoginForms()
-
-    if request.method == 'POST':
-        form = LoginForms(request.POST)
-
-        if form.is_valid():
-            cpf=form['cpf'].value()
-            senha=form['senha'].value()
-
-            usuario = auth.authenticate(
-                request,
-                username=cpf,
-                password=senha
-            )
-        if usuario is not None:
-            auth.login(request, usuario)
-            messages.info(request, f"{cpf} logado com sucesso!")
-            return redirect('home')
-        else:
-            messages.error(request, "Usuário ou senha inválido!")
-            form.fields['cpf'].initial = cpf
-            return render(request, 'main/login.html', {'form': form})
+    form = LoginForms(request.POST or None)
     
+    if request.method == 'POST' and form.is_valid():
+        cpf = form.cleaned_data['cpf']
+        senha = form.cleaned_data['senha']
+
+        usuario = auth.authenticate(request, username=cpf, password=senha)
+        
+        if not usuario:
+            messages.error(request, "Usuário ou senha inválido!")
+        else:
+            usuario_validacao = usuario.usuario_relacionado
+            
+            #Verificações
+            if not usuario_validacao.usuario_is_ativo:
+                messages.error(request, "Usuário Inativado!")
+            elif usuario_validacao.del_status:
+                messages.error(request, "Usuário ou senha inválido!")
+            elif not usuario_validacao.alocacao_ativa():
+                messages.error(request, "Cadastro Em Análise!")
+            else:
+                # Todas as verificações passaram, então podemos logar o usuário
+                auth.login(request, usuario)
+                messages.info(request, f"{cpf} logado com sucesso!")
+                return redirect('home')
+        
+        # Se qualquer uma das verificações falhar, setar o valor inicial de 'cpf' e renderizar novamente
+        form.fields['cpf'].initial = cpf
+        return render(request, 'main/login.html', {'form': form})
+
     return render(request, 'main/login.html', {'form': form})
+
 
 @login_required
 def home(request):
@@ -85,7 +93,7 @@ def cadastro(request):
             email_ms=form.cleaned_data["email_ms"]
             email_pessoal=form.cleaned_data["email_pessoal"]
             celular=form.cleaned_data["celular"]
-            setor_daf=form.cleaned_data["setor_daf"]
+            unidade_daf=form.cleaned_data["unidade_daf"]
 
             with transaction.atomic():
                 #tabela auth_user
@@ -103,12 +111,16 @@ def cadastro(request):
                     ctt_celular=celular,
                     ctt_email_ms=email_ms,
                     ctt_email_pessoal=email_pessoal,
+                    cad_unidade_daf_info=unidade_daf,
                 )
 
-            messages.success(request, "Usuário cadastrado com sucesso!")
-            return redirect("login")
+            return redirect("cadastro_confirmacao")
 
     return render(request, 'main/cadastro.html', {'form': form})
+
+
+def cadastro_confirmacao(request):
+    return render(request, 'main/cadastro_confirmacao.html')
 
 
 def home(request):
@@ -116,8 +128,6 @@ def home(request):
 
 def equipe_tecnica(request):
     return render(request, 'main/equipe_tecnica.html')
-
-
 
 def fornecedores(request):
     return render(request, 'main/fornecedores.html')

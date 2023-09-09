@@ -30,7 +30,7 @@ ORGAO_PUBLICO = (
     ('nao_informado', 'Não Informado'),
 )
 
-SETOR_DAF = [
+UNIDADE_DAF = [
     ('', '--- Selecione ---'),  # Opção vazia
     ('cgafb', "CGAFB"),
     ('cgafme', "CGAFME"),

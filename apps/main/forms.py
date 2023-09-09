@@ -1,6 +1,6 @@
 from django import forms
 from setup.funcoes import valida_cpf
-from setup.choices import SETOR_DAF
+from setup.choices import UNIDADE_DAF
 
 class LoginForms(forms.Form):
     cpf=forms.CharField(
@@ -91,10 +91,10 @@ class CadastroForms(forms.Form):
             }
         )
     )
-    setor_daf=forms.ChoiceField(
-        label="Unidade do DAF",
+    unidade_daf=forms.ChoiceField(
+        label="Unidade DAF",
         required=True,
-        choices=SETOR_DAF,
+        choices=UNIDADE_DAF,
         widget=forms.Select(
             attrs={
                 "class": "form-control",

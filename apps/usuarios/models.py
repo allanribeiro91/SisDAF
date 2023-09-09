@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
-from setup.choices import GENERO_SEXUAL, COR_PELE, VINCULO_MS, ORGAO_PUBLICO, SETOR_DAF
+from setup.choices import GENERO_SEXUAL, COR_PELE, VINCULO_MS, ORGAO_PUBLICO, UNIDADE_DAF
 
 class Usuario(models.Model):
     #relacionamento
@@ -18,6 +18,9 @@ class Usuario(models.Model):
     dp_data_nascimento = models.DateField(null=True, blank=True)
     dp_genero = models.CharField(max_length=15, choices=GENERO_SEXUAL, null=True, blank=True)
     dp_cor_pele = models.CharField(max_length=15, choices=COR_PELE, null=True, blank=True)
+
+    #cadastro - setor_daf informado
+    cad_unidade_daf_info = models.CharField(max_length=20, choices=UNIDADE_DAF, null=False, blank=False)
 
     #foto
     foto_usuario = models.ImageField(upload_to="fotos_usuarios/%Y/%m/%d/", blank=True)
@@ -36,6 +39,9 @@ class Usuario(models.Model):
     vms_vinculo = models.CharField(max_length=20, choices=VINCULO_MS, null=True, blank=True)
     vms_orgao = models.CharField(max_length=120, choices=ORGAO_PUBLICO, null=True, blank=True)
     vms_orgao_outro = models.CharField(max_length=120, null=True, blank=True)
+
+    #usuario está ativo
+    usuario_is_ativo = models.BooleanField(default=True, null=False, blank=False, db_index=True)
 
     #delete (del)
     del_status = models.BooleanField(default=False)
@@ -58,14 +64,14 @@ class Usuario(models.Model):
 
 class Alocacao(models.Model):
     # relacionamento
-    usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='alocacao')
+    usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='alocacao', null=True)
     
     # log
     data_registro = models.DateTimeField(auto_now_add=True)
     data_ultima_atualizacao = models.DateTimeField(auto_now=True)
 
     # alocacao atual
-    unidade = models.CharField(default='gabinete', max_length=20, choices=SETOR_DAF, null=False, blank=False)
+    unidade = models.CharField(max_length=20, choices=UNIDADE_DAF, null=False, blank=False)
     setor = models.CharField(max_length=60, null=True, blank=True)
     data_inicio = models.DateField(default=date.today, null=False, blank=False)
     data_fim = models.DateField(null=True, blank=True)

@@ -72,9 +72,24 @@ class UsuarioForms(forms.ModelForm):
 
 
 class AlocacaoForm(forms.ModelForm):
+    # Adicionando o campo cad_unidade_daf_info
+    cad_unidade_daf_info = forms.CharField(
+        label='Unidade DAF informada no cadastro',
+        required=False,  # definir como não obrigatório, uma vez que é somente para exibição
+        disabled=True  # isso tornará o campo somente leitura
+    )
+
     class Meta:
         model = Alocacao
-        fields = ['unidade', 'setor', 'data_inicio', 'data_fim', 'is_ativo']
+        fields = ['cad_unidade_daf_info', 'unidade', 'setor', 'data_inicio', 'data_fim', 'is_ativo',
+                  'del_status', 'del_data', 'del_cpf',
+                  ]
+
+    def __init__(self, *args, **kwargs):
+        super(AlocacaoForm, self).__init__(*args, **kwargs)
+        # Populando o campo cad_unidade_daf_info com o valor do usuário associado
+        if self.instance and self.instance.usuario:
+            self.fields['cad_unidade_daf_info'].initial = self.instance.usuario.cad_unidade_daf_info
 
     def clean(self):
         cleaned_data = super().clean()
