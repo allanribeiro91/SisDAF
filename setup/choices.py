@@ -1,11 +1,4 @@
 #Choices
-GENERO_SEXUAL = (
-    ('masculino', 'Masculino'),
-    ('feminino', 'Feminino'),
-    ('outro', 'Outro'),
-    ('nao_informado', 'Não Informado'),
-)
-
 COR_PELE = (
     ('branco', 'Branco'),
     ('preto', 'Preto'),
@@ -16,17 +9,24 @@ COR_PELE = (
     ('nao_informado', 'Não Informado'),
 )
 
-VINCULO_MS = (
-    ('consultor', "Consultor Técnico"),
-    ('servidor_federal', "Servidor Federal"),
-    ('servidor_estadual', "Servidor Estadual"),
-    ('servidor_municipal', "Servidor Municipal"),
+GENERO_SEXUAL = (
+    ('masculino', 'Masculino'),
+    ('feminino', 'Feminino'),
+    ('outro', 'Outro'),
     ('nao_informado', 'Não Informado'),
 )
+
 
 ORGAO_PUBLICO = (
     ('min_saude', "Ministério da Saúde"),
     ('outro', "Outro"),
+    ('nao_informado', 'Não Informado'),
+)
+
+TIPO_PRODUTO = (
+    ('', ""),
+    ('Insumo', "Insumo"),
+    ('Medicamento', "Medicamento"),
     ('nao_informado', 'Não Informado'),
 )
 
@@ -39,3 +39,11 @@ UNIDADE_DAF = [
     ('cofisc', "COFISC"),
     ('gabinete', "GABINETE")
     ]   
+
+VINCULO_MS = (
+    ('consultor', "Consultor Técnico"),
+    ('servidor_federal', "Servidor Federal"),
+    ('servidor_estadual', "Servidor Estadual"),
+    ('servidor_municipal', "Servidor Municipal"),
+    ('nao_informado', 'Não Informado'),
+)

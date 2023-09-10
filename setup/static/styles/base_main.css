@@ -28,7 +28,8 @@ body, html {
 
 .breadcrumb2 {
     background-color: #F5F5F5;
-    height: 5%;
+    height: 6%;
+    min-height: 5vh;
     padding: 0 10px;
     display: flex;
     align-items: center;

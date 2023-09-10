@@ -17,7 +17,6 @@ class ListandoAlocacao(admin.ModelAdmin):
     list_filter = ("is_ativo", "unidade")
     list_per_page = 100
     
-
     def cad_unidade_daf_info(self, obj):
         return obj.usuario.cad_unidade_daf_info
     cad_unidade_daf_info.short_description = 'Unidade Info Cadastro'

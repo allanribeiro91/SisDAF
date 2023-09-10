@@ -21,3 +21,5 @@ def valida_cpf(cpf):
     digito2 = 0 if resto < 2 else 11 - resto
 
     return cpf[-2:] == f"{digito1}{digito2}"
+
+
