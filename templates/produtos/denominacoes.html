@@ -121,7 +121,7 @@
             </thead>
             <tbody>
                 {% for item in denominacoes %}
-                <tr>
+                <tr data-id="{{ item.id }}">
                     <td>{{ item.id }}</td>
                     <td>{{ item.tipo_produto }}</td>
                     <td>{{ item.denominacao }}</td>

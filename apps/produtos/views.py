@@ -12,6 +12,7 @@ from datetime import datetime
 from io import BytesIO
 import json
 
+@login_required
 def produtos(request):
     return render(request, 'produtos/produtos.html')
 
@@ -27,7 +28,12 @@ def denominacoes(request):
     return render(request, 'produtos/denominacoes.html', context)
 
 @login_required
+def denominacoes_ficha(request, denominacao_id):
+    return render(request, 'produtos/denominacoes_ficha.html', {'denominacao_id': denominacao_id})
+
+@login_required
 def get_filtros_denominacoes(request):
+    print("Função get_filtros_denominacoes chamada!")
     tipo_produto = request.GET.get('tipo_produto', None)
     denominacao = request.GET.get('denominacao', None)
     basico = request.GET.get('basico', None)
@@ -155,3 +161,5 @@ def exportar_denominacoes(request):
 
 def produtos_ficha(request, product_id):
     return render(request, 'produtos/produtos_ficha.html', {'product_id': product_id})
+
+

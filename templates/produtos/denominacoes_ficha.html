@@ -1,0 +1,28 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/produtos_ficha.css' %}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fas fa-pills"></i>Produtos DAF / Denominações Genérica / Ficha da Denominação Genérica
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tab-voltar">
+            <a href="{% url 'denominacoes' %}" style="color: black;">
+                <i class="fas fa-arrow-left"></i> 
+            </a>
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" id="tabMeusDados">Dados Gerais </button>
+        </div>
+    </div>
+
+    <script src="{% static 'js/produtos.js' %}"></script>
+
+{% endblock %}

@@ -80,7 +80,7 @@ function updateTable(denominacoes) {
 
     denominacoes.forEach(denominacao => {
         var row = `
-            <tr>
+            <tr data-id="${denominacao.id}">
                 <td>${denominacao.id}</td>
                 <td>${denominacao.tipo_produto}</td>
                 <td>${denominacao.denominacao}</td>
@@ -138,5 +138,18 @@ document.querySelector('#exportarBtn').addEventListener('click', function() {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+    });
+});
+
+
+//Mudar de página
+document.addEventListener('DOMContentLoaded', function() {
+    const rows = document.querySelectorAll('.table tbody tr');
+
+    rows.forEach(row => {
+        row.addEventListener('click', function() {
+            const denominacaoId = this.getAttribute('data-id');
+            window.location.href = `/produtosdaf/denominacoes/ficha/${denominacaoId}/`;
+        });
     });
 });

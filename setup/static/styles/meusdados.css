@@ -94,9 +94,9 @@ img.rounded-circle {
 }
 
 .image-upload {
-    width: 7%;  /* ou qualquer outra porcentagem ou valor fixo que você preferir */
+    width: 6%;  /* ou qualquer outra porcentagem ou valor fixo que você preferir */
     min-width: 5%;  /* ou outro valor mínimo que você achar adequado */
-    margin-left: 7px;
+    margin-left: 1.15%;
     
 }
 
