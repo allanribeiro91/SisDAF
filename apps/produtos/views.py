@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.paginator import Paginator, EmptyPage
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth, messages
+from django.contrib.auth.models import User
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas
 from apps.produtos.forms import DenominacoesGenericasForm
@@ -30,22 +31,48 @@ def denominacoes(request):
 
 @login_required
 def denominacoes_ficha(request, denominacao_id):
+
     try:
         denominacao = DenominacoesGenericas.objects.get(id=denominacao_id)
     except DenominacoesGenericas.DoesNotExist:
         messages.error(request, "Denominação não encontrada.")
         return redirect('denominacoes')
 
+    if request.method == 'POST':
+        denominacao_form = DenominacoesGenericasForm(request.POST, instance=denominacao)
+        
+        if not denominacao_form.has_changed():
+            messages.error(request, "Dados não foram salvos. Não houve mudanças.")
+            return redirect('denominacoes_ficha', denominacao_id)
+
+        if denominacao_form.is_valid():
+            denominacao = denominacao_form.save(commit=False)  # Não salve no banco de dados ainda
+            denominacao.save(current_user=request.user.usuario_relacionado      )  # Agora salve o modelo com o argumento current_user
+            messages.success(request, f"Dados atualizados com sucesso!")
+            return redirect('denominacoes_ficha', denominacao_id)
+        else:
+            messages.error(request, "Formulário inválido")
+            print("Erro formulário denominação")
+            print(denominacao_form.errors)
+
     form = DenominacoesGenericasForm(instance=denominacao)
     return render(request, 'produtos/denominacoes_ficha.html', {
+        'denominacao': denominacao,
         'form': form,
         'TIPO_PRODUTO': TIPO_PRODUTO,
     })
 
 
+
+
+
+
+
+
+
+
 @login_required
 def get_filtros_denominacoes(request):
-    print("Função get_filtros_denominacoes chamada!")
     tipo_produto = request.GET.get('tipo_produto', None)
     denominacao = request.GET.get('denominacao', None)
     basico = request.GET.get('basico', None)

@@ -1,5 +1,4 @@
 import openpyxl
-import os
 from django.utils import timezone
 from apps.produtos.models import DenominacoesGenericas 
 from apps.usuarios.models import Usuario 
@@ -33,5 +32,5 @@ def import_from_excel(file_path):
 
 def run():
     # Caminho do arquivo que você quer importar
-    file_path = r"C:\Users\Allan Ribeiro\Downloads\denominacao.xlsx"
+    file_path = r"G:\Meu Drive\Django\SisDAF\dados\DIM_DENOMINACAO_GENERICA.xlsx"
     import_from_excel(file_path)

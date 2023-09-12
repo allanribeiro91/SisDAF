@@ -39,23 +39,23 @@
                 <h3>Log</h3>
                 <div class="grid-log">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ form.instance.registro_data|date:"d/m/Y H:i:s" }}">
+                        <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
                         <label for="floatingInput">Data do Registro</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ form.instance.usuario_registro.dp_nome_completo }}">
+                        <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
                         <label for="floatingInput">Responsável pelo Registro</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ form.instance.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                        <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
                         <label for="floatingInput">Última Atualização</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ form.instance.usuario_atualizacao.dp_nome_completo }}">
+                        <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
                         <label for="floatingInput">Responsável Atualização</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_edicoes" id="log_edicoes" name="log_edicoes" readonly value=1>
+                        <input type="text" class="form-control log_edicoes" id="log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
                         <label for="floatingInput">Nº Edições</label>
                     </div>
                 </div>
@@ -86,23 +86,23 @@
                     <div class="unidades-ficha">
                         <span>Unidades DAF</span></br>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="basico" {% if form.instance.unidade_basico %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" name="unidade_basico" {% if form.instance.unidade_basico %}checked{% endif %}>
                             <label class="form-check-label" for="basico">Básico</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="especializado" {% if form.instance.unidade_especializado %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" name="unidade_especializado" {% if form.instance.unidade_especializado %}checked{% endif %}>
                             <label class="form-check-label" for="especializado">Especializado</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="estrategico" {% if form.instance.unidade_estrategico %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" name="unidade_estrategico" {% if form.instance.unidade_estrategico %}checked{% endif %}>
                             <label class="form-check-label" for="estrategico">Estratégico</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="farmacia_popular" {% if form.instance.unidade_farm_popular %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" name="unidade_farm_popular" {% if form.instance.unidade_farm_popular %}checked{% endif %}>
                             <label class="form-check-label" for="farmacia_popular">Farmácia Popular</label>
                         </div>                                    
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="hospitalar" {% if form.instance.hospitalar %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" name="hospitalar" {% if form.instance.hospitalar %}checked{% endif %}>
                             <label class="form-check-label" for="hospitalar">Hospitalar</label>
                         </div>       
                     </div>

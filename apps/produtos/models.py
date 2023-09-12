@@ -32,8 +32,17 @@ class DenominacoesGenericas(models.Model):
     del_cpf = models.CharField(max_length=14, null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)  # Obtenha o usuário atual e remova-o dos kwargs
+
+        # Se o objeto já tem um ID, então ele já existe no banco de dados
         if self.id:
             self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
         super(DenominacoesGenericas, self).save(*args, **kwargs)
 
     def __str__(self):
