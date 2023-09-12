@@ -1,0 +1,69 @@
+/*<!-- Barra Superior --> */
+/* Estilização para a barra superior para utilizar flexbox */
+.barra-superior {
+    display: flex;
+    justify-content: space-between; /* Alinha horizontalmente */
+    align-items: center; /* Alinha verticalmente */
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Estilização para as abas */
+.tab-voltar{
+    display: flex;
+    margin-bottom: 10px;
+    justify-content: center;
+    font-size: 18px !important;
+    width: 3%;  /* Define a largura para 80% */
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #E5E5E5;
+    margin-bottom: 20px;
+    font-size: 12px;
+    width: 100%;  /* Define a largura para 80% */
+}
+
+/* Estilização para os botões */
+.buttons {
+    width: 20%;  /* Define a largura para 20% */
+    display: flex;
+    justify-content: flex-end; /* Alinha o conteúdo à direita */
+    margin-bottom: 20px;
+    margin-right: 10px;
+}
+
+/* Estilização para os botões das abas */
+.tab-button {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: #000;
+    font-weight: normal;
+    border-bottom: 2px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    
+}
+
+/* Estilização para os ícones nos botões das abas */
+.tab-button i {
+    margin-right: 8px;
+}
+
+/* Estilização para a aba ativa */
+.tab-button.active {
+    border-bottom: 2px solid #000;
+    font-weight: bold;
+}
+
+/* Estilização para a aba ao passar o mouse */
+.tab-button:hover {
+    opacity: 0.7;
+}
+
+.d-grid{
+    font-size: 12px;
+}
