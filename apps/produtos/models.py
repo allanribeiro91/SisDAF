@@ -10,10 +10,7 @@ class DenominacoesGenericas(models.Model):
     # log
     registro_data = models.DateTimeField(auto_now_add=True)
     ult_atual_data = models.DateTimeField(auto_now=True)
-<<<<<<< HEAD
     log_n_edicoes = models.IntegerField(default=1)
-=======
->>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
 
     #denominação genérica
     denominacao = models.CharField(max_length=140, null=False, blank=False)
@@ -34,13 +31,10 @@ class DenominacoesGenericas(models.Model):
     del_data = models.DateTimeField(null=True, blank=True)
     del_cpf = models.CharField(max_length=14, null=True, blank=True)
 
-<<<<<<< HEAD
     def save(self, *args, **kwargs):
         if self.id:
             self.log_n_edicoes += 1
         super(DenominacoesGenericas, self).save(*args, **kwargs)
 
-=======
->>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
     def __str__(self):
         return f"Denominação Genérica: {self.denominacao} - ID ({self.id})"

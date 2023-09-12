@@ -24,10 +24,6 @@ ORGAO_PUBLICO = (
 )
 
 TIPO_PRODUTO = (
-<<<<<<< HEAD
-=======
-    ('', ""),
->>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
     ('Insumo', "Insumo"),
     ('Medicamento', "Medicamento"),
     ('nao_informado', 'Não Informado'),

@@ -6,10 +6,7 @@ class DenominacoesGenericasForm(forms.ModelForm):
         model = DenominacoesGenericas
         exclude = ['del_status', 'del_data', 'del_cpf']
         labels = {
-<<<<<<< HEAD
             'id': 'ID',
-=======
->>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
             'registro_data': 'Data do Registro',
             'usuario_registro': 'Responsável Registro',
             'ult_atual_data': 'Última Atualização',
