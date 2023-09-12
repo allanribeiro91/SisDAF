@@ -1,5 +1,6 @@
 let currentPage = 1;
 
+<<<<<<< HEAD
 //Mudar de página
 $(document).ready(function() {
     console.log('ler');
@@ -17,6 +18,15 @@ $(document).ready(function() {
 //Limpar Filtros
 $('.limpar-filtro').on('click', function() {
     console.log('limpar filtros')
+=======
+$(document).ready(function() {
+    fetchAndRenderTableData();
+});
+
+
+//Limpar Filtros
+$('.limpar-filtro').on('click', function() {
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
     $('#tipo_produto').val('');
     $('#denominacao').val('');
     $('#basico').prop('checked', false);
@@ -29,17 +39,26 @@ $('.limpar-filtro').on('click', function() {
 
 //Filtrar
 $('#tipo_produto, #denominacao').change(function() {
+<<<<<<< HEAD
     console.log('filtrar: tipo_produto, denominacao')
+=======
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
     fetchAndRenderTableData();
 });
 
 $('#basico, #especializado, #estrategico, #farmacia_popular, #hospitalar').change(function() {
+<<<<<<< HEAD
     console.log('filtrar: unidades')
+=======
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
     fetchAndRenderTableData();
 });
 
 function fetchAndRenderTableData(page = 1) {
+<<<<<<< HEAD
     console.log('fetchAndRenderTableData')
+=======
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
     var selectedTipo = $('#tipo_produto').val();
     var denominacao = $('#denominacao').val();
     
@@ -88,7 +107,10 @@ $('#previousPage').on('click', function() {
 });
 
 function updateTable(denominacoes) {
+<<<<<<< HEAD
     console.log('updateTable')
+=======
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
     var $tableBody = $('.table tbody');
     $tableBody.empty(); // Limpar as linhas existentes
 
@@ -156,4 +178,18 @@ document.querySelector('#exportarBtn').addEventListener('click', function() {
 });
 
 
+<<<<<<< HEAD
 
+=======
+//Mudar de página
+document.addEventListener('DOMContentLoaded', function() {
+    const rows = document.querySelectorAll('.table tbody tr');
+
+    rows.forEach(row => {
+        row.addEventListener('click', function() {
+            const denominacaoId = this.getAttribute('data-id');
+            window.location.href = `/produtosdaf/denominacoes/ficha/${denominacaoId}/`;
+        });
+    });
+});
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb

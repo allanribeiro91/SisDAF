@@ -1,7 +1,10 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from apps.usuarios.models import Usuario, Alocacao
+<<<<<<< HEAD
 from datetime import datetime
+=======
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
 
 class UsuarioForms(forms.ModelForm):
     class Meta:
@@ -92,6 +95,7 @@ class AlocacaoForm(forms.ModelForm):
         if self.instance and self.instance.usuario:
             self.fields['cad_unidade_daf_info'].initial = self.instance.usuario.cad_unidade_daf_info
 
+<<<<<<< HEAD
     def clean_aloc_data_inicio(self):
         data = self.cleaned_data.get('aloc_data_inicio')
         if data:
@@ -101,6 +105,8 @@ class AlocacaoForm(forms.ModelForm):
                 raise forms.ValidationError("Formato de data inválido. Use DD/MM/YYYY.")
         return data
 
+=======
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
     def clean(self):
         cleaned_data = super().clean()
         is_ativo = cleaned_data.get('is_ativo')

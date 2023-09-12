@@ -4,7 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import auth, messages
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas
+<<<<<<< HEAD
 from apps.produtos.forms import DenominacoesGenericasForm
+=======
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
 from setup.choices import TIPO_PRODUTO
 from django.http import JsonResponse, HttpResponse
 from openpyxl import Workbook
@@ -30,6 +33,7 @@ def denominacoes(request):
 
 @login_required
 def denominacoes_ficha(request, denominacao_id):
+<<<<<<< HEAD
     try:
         denominacao = DenominacoesGenericas.objects.get(id=denominacao_id)
     except DenominacoesGenericas.DoesNotExist:
@@ -42,6 +46,9 @@ def denominacoes_ficha(request, denominacao_id):
         'TIPO_PRODUTO': TIPO_PRODUTO,
     })
 
+=======
+    return render(request, 'produtos/denominacoes_ficha.html', {'denominacao_id': denominacao_id})
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
 
 @login_required
 def get_filtros_denominacoes(request):

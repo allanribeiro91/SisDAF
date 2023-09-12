@@ -20,7 +20,11 @@ class Usuario(models.Model):
     dp_cor_pele = models.CharField(max_length=15, choices=COR_PELE, null=True, blank=True)
 
     #cadastro - setor_daf informado
+<<<<<<< HEAD
     cad_unidade_daf_info = models.CharField(max_length=20, choices=UNIDADE_DAF, null=True, blank=True)
+=======
+    cad_unidade_daf_info = models.CharField(max_length=20, choices=UNIDADE_DAF, null=False, blank=False)
+>>>>>>> d7527f12e93f2b264d596d3b2b420724cce871fb
 
     #foto
     foto_usuario = models.ImageField(upload_to="fotos_usuarios/%Y/%m/%d/", blank=True)
