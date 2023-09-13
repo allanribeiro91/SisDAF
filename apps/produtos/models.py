@@ -1,6 +1,7 @@
 from django.db import models
 from apps.usuarios.models import Usuario
 from setup.choices import TIPO_PRODUTO
+from django.utils import timezone
 
 class DenominacoesGenericas(models.Model):
      # relacionamento
@@ -29,7 +30,7 @@ class DenominacoesGenericas(models.Model):
     #delete (del)
     del_status = models.BooleanField(default=False)
     del_data = models.DateTimeField(null=True, blank=True)
-    del_cpf = models.CharField(max_length=14, null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='denominacoes_deletadas')
 
     def save(self, *args, **kwargs):
         user = kwargs.pop('current_user', None)  # Obtenha o usuário atual e remova-o dos kwargs
@@ -44,6 +45,16 @@ class DenominacoesGenericas(models.Model):
                 self.usuario_registro = user
                 self.usuario_atualizacao = user
         super(DenominacoesGenericas, self).save(*args, **kwargs)
+
+
+    def soft_delete(self, user):
+        """
+        Realiza uma "deleção lógica" do registro.
+        """
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
 
     def __str__(self):
         return f"Denominação Genérica: {self.denominacao} - ID ({self.id})"

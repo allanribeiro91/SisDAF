@@ -29,27 +29,75 @@ def denominacoes(request):
     }
     return render(request, 'produtos/denominacoes.html', context)
 
-@login_required
-def denominacoes_ficha(request, denominacao_id):
 
-    try:
-        denominacao = DenominacoesGenericas.objects.get(id=denominacao_id)
-    except DenominacoesGenericas.DoesNotExist:
-        messages.error(request, "Denominação não encontrada.")
-        return redirect('denominacoes')
+
+@login_required
+def denominacoes_ficha(request, denominacao_id=None):
+
+    if denominacao_id:
+        try:
+            denominacao = DenominacoesGenericas.objects.get(id=denominacao_id)
+        except DenominacoesGenericas.DoesNotExist:
+            messages.error(request, "Denominação não encontrada.")
+            return redirect('denominacoes')
+    else:
+        denominacao = None  # Preparando para criar uma nova denominação
 
     if request.method == 'POST':
-        denominacao_form = DenominacoesGenericasForm(request.POST, instance=denominacao)
-        
+        if denominacao:
+            denominacao_form = DenominacoesGenericasForm(request.POST, instance=denominacao)
+        else:
+            denominacao_form = DenominacoesGenericasForm(request.POST)
+
+        #Conferir se denominação e tipo de produto foram preenchidos
+        nome_denominacao = request.POST.get('denominacao')
+        tipo_produto = request.POST.get('tipo_produto')
+        if not nome_denominacao or not tipo_produto:
+            messages.error(request, "O nome da denominação genérica e o tipo de produto são obrigatórios!")
+            if denominacao:
+                return redirect('denominacoes_ficha', denominacao_id=denominacao.id)
+            else:
+                return redirect('nova_denominacao')
+
+        #Verificar se houve alteração no formulário
         if not denominacao_form.has_changed():
             messages.error(request, "Dados não foram salvos. Não houve mudanças.")
-            return redirect('denominacoes_ficha', denominacao_id)
+            if denominacao:
+                return redirect('denominacoes_ficha', denominacao_id=denominacao.id)
+            else:
+                return redirect('nova_denominacao')
 
         if denominacao_form.is_valid():
-            denominacao = denominacao_form.save(commit=False)  # Não salve no banco de dados ainda
-            denominacao.save(current_user=request.user.usuario_relacionado      )  # Agora salve o modelo com o argumento current_user
+            #Verificar se já existe a denominação na base [
+            nome_denominacao = denominacao_form.cleaned_data.get('denominacao')
+            denominacao_existente = DenominacoesGenericas.objects.filter(denominacao=nome_denominacao)
+            
+            #Se estivermos atualizando uma denominação existente, excluímos essa denominação da verificação
+            if denominacao:
+                denominacao_existente = denominacao_existente.exclude(id=denominacao.id)
+
+            if denominacao_existente.exists():
+                messages.error(request, "Já existe uma denominação com esse nome. Não foi possível salvar.")
+                if denominacao:
+                    return redirect('denominacoes_ficha', denominacao_id=denominacao.id)
+                else:
+                    return redirect('nova_denominacao')
+
+            #Salvar a denominação
+            denominacao = denominacao_form.save(commit=False)
+            denominacao.save(current_user=request.user.usuario_relacionado)
             messages.success(request, f"Dados atualizados com sucesso!")
-            return redirect('denominacoes_ficha', denominacao_id)
+            
+            #Retornar log
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'registro_data': denominacao.registro_data.strftime('%d/%m/%Y %H:%M:%S'),
+                    'usuario_registro': denominacao.usuario_registro.dp_nome_completo,
+                    'ult_atual_data': denominacao.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S'),
+                    'usuario_atualizacao': denominacao.usuario_atualizacao.dp_nome_completo,
+                    'log_n_edicoes': denominacao.log_n_edicoes,
+                })           
+            
         else:
             messages.error(request, "Formulário inválido")
             print("Erro formulário denominação")
@@ -63,6 +111,16 @@ def denominacoes_ficha(request, denominacao_id):
     })
 
 
+
+@login_required
+def delete_denominacao(request, denominacao_id):
+    try:
+        denominacao = DenominacoesGenericas.objects.get(id=denominacao_id)
+        denominacao.soft_delete(request.user.usuario_relacionado)
+        return JsonResponse({"message": "Denominação deletada com sucesso!"})
+    except DenominacoesGenericas.DoesNotExist:
+        messages.error(request, "Denominação não encontrada.")    
+    return redirect('denominacoes')
 
 
 

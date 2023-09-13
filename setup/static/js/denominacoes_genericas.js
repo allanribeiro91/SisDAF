@@ -1,6 +1,39 @@
 let currentPage = 1;
 
-//Mudar de página
+
+//Deletar
+$(document).ready(function() {
+    $('#apagarRegistro').on('click', function() {
+        const denominacaoId = $('#id').val();  // Pega o ID da denominação do campo de input
+    
+        if (!denominacaoId) { //Trata-se de um novo registro que ainda não foi salvo
+            window.location.href = `/produtosdaf/denominacoes`;
+            return; // Sai da função
+        }
+        
+        $.ajax({
+            url: `/produtosdaf/denominacoes/deletar/${denominacaoId}/`,
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')  // Pega o token CSRF para autenticação
+            },
+            success: function(response) {
+                // Redireciona para a lista de denominações após a deleção bem-sucedida
+                alert(response.message);
+                window.location.href = `/produtosdaf/denominacoes`;
+            },
+            error: function(error) {
+                // Aqui você pode adicionar qualquer lógica que deseja executar se houver um erro ao tentar deletar a denominação.
+                alert('Ocorreu um erro ao tentar deletar a denominação. Por favor, tente novamente.');
+            }
+        });
+    });
+});
+
+
+
+
+//Acessar ficha
 $(document).ready(function() {
     console.log('ler');
     fetchAndRenderTableData();
@@ -11,6 +44,7 @@ $(document).ready(function() {
         window.location.href = `/produtosdaf/denominacoes/ficha/${denominacaoId}/`;
     });
 });
+
 
 
 
@@ -155,5 +189,29 @@ document.querySelector('#exportarBtn').addEventListener('click', function() {
     });
 });
 
+
+//Salvar dados
+document.getElementById('btnSave').addEventListener('click', function(e) {
+    e.preventDefault();  // Evita o envio padrão do formulário
+
+    let formData = new FormData(document.getElementById('denominacaoForm'));
+
+    fetch("{% if form.instance.id %}{% url 'denominacoes_ficha' form.instance.id %}{% else %}{% url 'nova_denominacao' %}{% endif %}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'  // Indica que é uma requisição AJAX
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Atualize os campos do log com os dados retornados
+        document.getElementById('log_data_registro').value = data.registro_data;
+        document.getElementById('log_responsavel_registro').value = data.usuario_registro;
+        document.getElementById('lot_ult_atualizacao').value = data.ult_atual_data;
+        document.getElementById('log_responsavel_atualizacao').value = data.usuario_atualizacao;
+        document.getElementById('log_edicoes').value = data.log_n_edicoes;
+    });
+});
 
 
