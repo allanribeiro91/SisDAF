@@ -3,23 +3,14 @@ body, html {
     margin: 0;
     font-family: 'Open Sans', sans-serif;
     background-color: #FAFAFA;
-    overflow: hidden; /* Impede a exibição das barras de rolagem */
 }
 
 .main-container {
     display: flex;
     height: calc(100vh - 8vh); /* Subtrai a altura da top-bar */
-    overflow: hidden; /* Impede a exibição das barras de rolagem */
 }
 
-.workspace {
-    width: 88%;
-    flex-grow: 1;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Impede a exibição das barras de rolagem */
-}
+
 
 .content {
     flex-grow: 1;
@@ -47,3 +38,10 @@ body, html {
     vertical-align: middle; 
 }
 
+.workspace {
+    width: 88%;
+    flex-grow: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}

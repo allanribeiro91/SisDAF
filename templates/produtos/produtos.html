@@ -21,36 +21,90 @@
 
 
     <div class="horizontal-sections">
+        
+        <div class="section numbers">
+            <div class="filter-title">
+                Total de Produtos
+            </div>
+            <div id="numeroDenominacoes" class="total-geral">{{ numero_denominacoes }}</div>
+        </div>
+        
+        <div class="section filter">
+            <div class="filter-title">Filtros
+                Filtros
+            </div>
+            
+            <!-- Tipo de Produto -->
+            <div class="form-floating tipo-produto">
+                <select class="form-select" aria-label="Floating label select example" name="tipo_produto" id="tipo_produto">
+                    <option value="" disabled {% if not tipo_produto.value %}selected{% endif %}></option>
+                    {% for value, display in TIPO_PRODUTO %}
+                    <option value="{{ value }}" {% if tipo_produto.value == value %}selected{% endif %}>{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Tipo de Produto</label>
+            </div>
+            
+            <!-- Denominação Genérica -->
+            <div class="form-floating  denominacao">
+                <input type="text" class="form-control" id="denominacao" name="denominacao">
+                <label for="floatingInput">Produto Farmacêutico</label>
+            </div>
+            
+            <!-- Unidades -->
+            <div class="unidades">
+                <span>Unidades</span></br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="basico" value=1>
+                    <label class="form-check-label" for="basico">Básico</label> <!-- Corrigido aqui -->
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="especializado" value=1>
+                    <label class="form-check-label" for="especializado">Especializado</label> <!-- Corrigido aqui -->
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="estrategico" value=1>
+                    <label class="form-check-label" for="estrategico">Estratégico</label> <!-- Corrigido aqui -->
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="farmacia_popular" value=1>
+                    <label class="form-check-label" for="farmacia_popular">Farm. Popular</label> <!-- Corrigido aqui -->
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="hospitalar" value=1>
+                    <label class="form-check-label" for="hospitalar">Hospitalar</label> <!-- Corrigido aqui -->
+                </div>
+            </div>
+                
+            <button class="custom-btn limpar-filtro">
+                <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
+                <span style="font-size: 10px;">Limpar Filtros</span>
+            </button>
+        </div>
+
         <div class="section funcionalidades">
             <div style="font-size: 12px; font-weight: bold;">
                 Funcionalidades
             </div>
             <div class="btn-container">
-                <button class="custom-btn">
-                    <div class="icon-container">
-                        <i class="fa fa-plus-circle" style="font-size: 1.5vw"></i>
-                        <span>Inserir</span>
-                    </div>
-                </button>
-                <button class="custom-btn">
+                <a href="{% url 'nova_denominacao' %}" style="text-decoration: none;">
+                    <button class="custom-btn" id="inserir">
+                        <div class="icon-container">
+                            <i class="fa fa-plus-circle" style="font-size: 1.5vw"></i>
+                            <span>Inserir</span>
+                        </div>
+                    </button>
+                </a>
+                <button class="custom-btn" id="exportarBtn">
                     <div class="icon-container">
                         <i class="fa fa-download" style="font-size: 1.5vw"></i>
                         <span>Exportar</span>
-                    </div>
+                    </div>                    
                 </button>
+                
             </div>   
         </div>
         
-        <div class="section filter">
-            <div style="font-size: 12px; font-weight: bold;">
-                Filtros
-            </div>
-        </div>
-        <div class="section numbers">
-            <div style="font-size: 12px; font-weight: bold;">
-                Números Gerais
-            </div>
-        </div>
     </div>
 
         <div class="section-tabela">

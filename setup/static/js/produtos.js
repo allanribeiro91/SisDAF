@@ -14,3 +14,15 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const textareas = document.querySelectorAll('.auto-expand');
+
+    textareas.forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto'; // Reset height to auto
+            this.style.height = this.scrollHeight + 'px'; // Set height to scrollHeight
+        });
+    });
+});
