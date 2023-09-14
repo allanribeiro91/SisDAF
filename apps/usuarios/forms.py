@@ -6,7 +6,7 @@ from datetime import datetime
 class UsuarioForms(forms.ModelForm):
     class Meta:
         model = Usuario
-        exclude = ['user', 'data_registro', 'data_ultima_atualizacao', 'del_status', 'del_data', 'del_cpf']
+        exclude = ['user', 'data_registro', 'data_ultima_atualizacao', 'usuario_is_ativo', 'del_status', 'del_data', 'del_cpf']
         labels = {
             #dados pessoais
             'dp_cpf': 'CPF',

@@ -133,10 +133,31 @@ input[name="denominacao"]{
     margin-right: 5px;
 }
 
-select[name="tipo_produto"] {
-    width: 200px !important;
-    text-align: left;
+.form-select{
     font-size: 14px !important;
+}
+
+select[name="tipo_produto"], select[name="forma_farmaceutica"] {
+    width: 160px !important;
+    text-align: left;
+}
+
+select[name="denominacao"] {
+    width: 350px !important;
+    text-align: left;
+}
+
+select[name="oncologico"], select[name="biologico"] {
+    width: 100px !important;
+    text-align: left;
+}
+
+.form-control{
+    font-size: 14px;
+}
+
+.form-control.unidade{
+    width: 140px;
 }
 
 .section-log {
@@ -176,3 +197,4 @@ select[name="tipo_produto"] {
 .area-scroll{
     overflow-y: auto;
 }
+

@@ -46,3 +46,38 @@ VINCULO_MS = (
     ('servidor_municipal', "Servidor Municipal"),
     ('nao_informado', 'Não Informado'),
 )
+
+FORMA_FARMACEUTICA = {
+    ('adesivo_transdermico', 'Adesivo Transdérmico'),
+    ('capsula', 'Cápsula'),
+    ('capsula_mole', 'Cápsula Mole'),
+    ('comprimido', 'Comprimido'),
+    ('comprimido_lib_prolongada', 'Comprimido de Liberação Prolongada'),
+    ('comprimido_dispersivel', 'Comprimido Dispersível'),
+    ('comprimido_mastigavel', 'Comprimido Mastigável'),
+    ('gel', 'Gel'),
+    ('goma_mascar', 'Goma de Mascar'),
+    ('granulado_oral', 'Granulado Oral'),
+    ('pastilha', 'Pastilha'),
+    ('po_solucao_injetavel', 'Pó para Solução Injetável'),
+    ('seringa_preenchida', 'Seringa Preenchida'),
+    ('seringa_injetavel', 'Solução Injetável'),
+    ('solucao_oral', 'Solução Oral'),
+    ('suspensao_injetavel', 'Suspenção Injetável'),
+    ('suspensao_oral', 'Suspensão Oral'),
+    ('xarope', 'Xarope'),
+    ('nao_informado', 'Não Informado'),
+}
+
+STATUS_INCORPORACAO = {
+    ('incorporado', "Incorporado"),
+    ('excluido', "Excluído"),
+    ('nao_informado', 'Não Informado'),
+}
+
+CONCENTRACAO_TIPO = {
+    ('nao_se_aplica','Não se aplica'),
+    ('mostrar_nome','Mostrar'),
+    ('mostrar_nao','Não mostrar'),
+    ('nao_informado', 'Não Informado'),
+}

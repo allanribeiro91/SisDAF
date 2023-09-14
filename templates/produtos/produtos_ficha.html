@@ -21,7 +21,6 @@
         </div>
         <div class="tabs">
             <button class="tab-button active" id="tabMeusDados">Dados Gerais</button>
-            <button class="tab-button" id="tabMeusDados">Pactuação AF</button>
         </div>
     </div>
 
@@ -34,9 +33,12 @@
                     <i class="fas fa-trash-alt"></i>
                     Deletar
                 </button>
-                
+                <button class="btn btn-primary me-md-2" type="submit" id="btnPrint" style="font-size: 12px; margin-left: 10px; margin-right: 10px; background-color: rgb(4, 124, 0);border-color: rgb(4, 124, 0);">
+                    <i class="fas fa-print me-1"></i>
+                    Imprimir
+                </button>
                 <button class="btn btn-primary me-md-2" type="submit" id="btnSave" style="font-size: 12px;">
-                    <i class="fas fa-save me-1"></i> <!-- Ícone com margem à direita -->
+                    <i class="fas fa-save me-1"></i>
                     Salvar
                 </button>
             </div>
@@ -95,13 +97,13 @@
                             <label for="floatingSelect">Tipo de Produto</label>
                         </div>
                         <div class="form-floating">
-                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="tipo_produto">
+                            <select class="form-select" id="denominacao" aria-label="Floating label select example" name="denominacao">
                                 <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
                                 {% for value, display in TIPO_PRODUTO %}
                                 <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
                                 {% endfor %}
                             </select>
-                            <label for="floatingSelect">Denominação Genérica</label>
+                            <label for="denominacao">Denominação Genérica</label>
                         </div>
                         <div class="form-floating">
                             <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="tipo_produto">
@@ -110,30 +112,68 @@
                                 <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
                                 {% endfor %}
                             </select>
-                            <label for="floatingSelect">Forma Farmacêutica</label>
-                        </div>
-                        <div class="form-floating">
-                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="tipo_produto">
-                                <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
-                                {% for value, display in TIPO_PRODUTO %}
-                                <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="floatingSelect">Oncológico</label>
-                        </div>
-                        <div class="form-floating">
-                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="tipo_produto">
-                                <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
-                                {% for value, display in TIPO_PRODUTO %}
-                                <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="floatingSelect">Biológico</label>
+                            <label for="floatingSelect">Concentração</label>
                         </div>
                         <div class="form-floating mb-3 full-width">
                             <input type="text" class="form-control" id="denominacao" name="denominacao" value="{{ form.instance.denominacao|default_if_none:'' }}">
                             <label for="floatingInput">Concentração/Composição</label>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="grid" style="font-size: 14px;">
+                        
+                        <div class="form-floating">
+                            <select class="form-select" id="forma_farmaceutica" aria-label="Floating label select example" name="forma_farmaceutica">
+                                <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
+                                {% for value, display in TIPO_PRODUTO %}
+                                <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="forma_farmaceutica">Forma Farmacêutica</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="oncologico" aria-label="Floating label select example" name="oncologico">
+                                <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não</option>
+                                {% for value, display in TIPO_PRODUTO %}
+                                <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="oncologico">Oncológico</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="biologico" aria-label="Floating label select example" name="biologico">
+                                <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não</option>
+                                {% for value, display in TIPO_PRODUTO %}
+                                <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="biologico">Biológico</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="forma_farmaceutica" aria-label="Floating label select example" name="forma_farmaceutica">
+                                <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
+                                {% for value, display in TIPO_PRODUTO %}
+                                <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="forma_farmaceutica">Classificação AWaRe</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="forma_farmaceutica" aria-label="Floating label select example" name="forma_farmaceutica">
+                                <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
+                                {% for value, display in TIPO_PRODUTO %}
+                                <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="forma_farmaceutica">Código ATC</label>
+                        </div>
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
+                            <label for="floatingInput">ATC</label>
                         </div>  
+                        
+                        
                     </div>
                 </div>
             </div>
@@ -145,143 +185,150 @@
                     <div class="grid" style="font-size: 14px;">
                         
                         <div class="form-floating">
-                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="tipo_produto">
+                            <select class="form-select" id="status_incorporacao" aria-label="Floating label select example" name="status_incorporacao">
                                 <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
                                 {% for value, display in TIPO_PRODUTO %}
                                 <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
                                 {% endfor %}
                             </select>
-                            <label for="floatingSelect">Status</label>
+                            <label for="status_incorporacao">Status</label>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input type="date" class="form-control" id="data_incorporacao" name="data_incorporacao" value="{% if form.dp_data_nascimento.value %}{{ form.dp_data_nascimento.value|date:'Y-m-d' }}{% endif %}">
-                            <label for="floatingInput">Data de Incorporação</label>
+                            <label for="floatingInput">Data Incorporação</label>
                         </div> 
 
                         <div class="form-floating mb-3 full-width">
-                            <input type="text" class="form-control" id="denominacao" name="denominacao" value="{{ form.instance.denominacao|default_if_none:'' }}">
+                            <input type="text" class="form-control" id="portaria_incorporacao" name="portaria_incorporacao" value="{{ form.instance.denominacao|default_if_none:'' }}">
                             <label for="floatingInput">Portaria de Incorporação</label>
                         </div>  
                         
                         <div class="form-floating mb-3 full-width">
-                            <input type="text" class="form-control" id="denominacao" name="denominacao" value="{{ form.instance.denominacao|default_if_none:'' }}">
+                            <input type="text" class="form-control" id="portaria_incorporacao_link" name="portaria_incorporacao_link" value="{{ form.instance.denominacao|default_if_none:'' }}">
                             <label for="floatingInput">Link Portaria Incorporação</label>
                         </div> 
-
+                    </div>
+                    
+                    <div class="grid" style="font-size: 14px;">
                         <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="data_incorporacao" name="data_incorporacao" value="{% if form.dp_data_nascimento.value %}{{ form.dp_data_nascimento.value|date:'Y-m-d' }}{% endif %}">
+                            <input type="date" class="form-control" id="data_incorporacao" name="data_exclusao" value="{% if form.dp_data_nascimento.value %}{{ form.dp_data_nascimento.value|date:'Y-m-d' }}{% endif %}">
                             <label for="floatingInput">Data de Exclusão</label>
                         </div>
 
                         <div class="form-floating mb-3 full-width">
-                            <input type="text" class="form-control" id="denominacao" name="denominacao" value="{{ form.instance.denominacao|default_if_none:'' }}">
+                            <input type="text" class="form-control" id="portaria_exclusao" name="portaria_exclusao" value="{{ form.instance.denominacao|default_if_none:'' }}">
                             <label for="floatingInput">Portaria de Incorporação</label>
                         </div>  
 
                         <div class="form-floating mb-3 full-width">
-                            <input type="text" class="form-control" id="denominacao" name="denominacao" value="{{ form.instance.denominacao|default_if_none:'' }}">
+                            <input type="text" class="form-control" id="portaria_exclusao_link" name="portaria_exclusao_link" value="{{ form.instance.denominacao|default_if_none:'' }}">
                             <label for="floatingInput">Link Portaria Exclusão</label>
                         </div> 
-
                     </div>  
                 </div>
             </div>
 
             <div class="section">
                 <h3>Pactuação na Política de Assistência Farmacêutica</h3>
-                <div class="grid" style="font-size: 14px;">
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
-                        <label for="floatingInput">Básico</label>
+                <div class="grid" style="flex-grow: 1; font-size: 14px !important;">
+                    <div class="unidades-ficha">
+                        <span style="font-size: 12px;">Componente da Assistência Farmacêutica</span></br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="unidade_basico" name="unidade_basico" {% if form.instance.unidade_basico %}checked{% endif %}>
+                            <label class="form-check-label" for="unidade_basico">Básico</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="unidade_especializado" name="unidade_especializado" {% if form.instance.unidade_especializado %}checked{% endif %}>
+                            <label class="form-check-label" for="unidade_especializado">Especializado</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="unidade_estrategico" name="unidade_estrategico" {% if form.instance.unidade_estrategico %}checked{% endif %}>
+                            <label class="form-check-label" for="unidade_estrategico">Estratégico</label>
+                        </div>
                     </div>
+                    <div class="unidades-ficha">
+                        <span style="font-size: 12px;">Disponível</span></br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="unidade_farm_popular" name="unidade_farm_popular" {% if form.instance.unidade_farm_popular %}checked{% endif %}>
+                            <label class="form-check-label" for="unidade_farm_popular">Farmácia Popular</label>
+                        </div>                                    
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="hospitalar" name="hospitalar" {% if form.instance.hospitalar %}checked{% endif %}>
+                            <label class="form-check-label" for="hospitalar">Hospitalar</label>
+                        </div>       
+                    </div>  
                     <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
+                        <input type="text" class="form-control" id="unidade_basico_programa" name="unidade_basico_programa" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
                         <label for="floatingInput">Programa - Básico</label>
                     </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
-                        <label for="floatingInput">Especializado</label>
-                    </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
+                    <div class="form-floating mb-3" style="width: 200px;">
+                        <input type="text" class="form-control" id="unidade_especializado_grupo" name="unidade_especializado_grupo" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
                         <label for="floatingInput">Grupo AF - Especializado</label>
                     </div>
                     <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
-                        <label for="floatingInput">Estratégico</label>
-                    </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
+                        <input type="text" class="form-control" id="unidade_estrategico_programa" name="unidade_estrategico_programa" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
                         <label for="floatingInput">Programa - Estratégico</label>
-                    </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
-                        <label for="floatingInput">Disp. Farm. Popular</label>
-                    </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
-                        <label for="floatingInput">Hospitalar</label>
                     </div>
                 </div>
             </div>
 
             <div class="section">
                 <h3>Outros Sistemas</h3>
-                <div class="grid" style="font-size: 14px;">
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control auto-expand" id="observacoes" name="observacoes" style="width: 150px;">{{ form.instance.denominacao|default_if_none:'' }}</textarea>
+                <div class="grid" style="font-size: 14px; align-items: center;">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="sigtap_codigo" name="sigtap_codigo" style="width: 150px;">{{ form.instance.denominacao|default_if_none:'' }}
                         <label for="observacoes">SIGTAP - Código</label>
                     </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control auto-expand" id="observacoes" name="observacoes" rows="1">{{ form.instance.denominacao|default_if_none:'' }}</textarea>
+                    <div class="form-floating mb-3 full-width" style="max-width: 78%;">
+                        <input type="text" class="form-control" id="sigtap_nome" name="sigtap_nome">{{ form.instance.denominacao|default_if_none:'' }}
                         <label for="observacoes">SIGTAP - Nome</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="unidade_estrategico" name="unidade_estrategico" {% if form.instance.unidade_estrategico %}checked{% endif %}>
-                        <label class="form-check-label" for="unidade_estrategico">Não possui SIGTAP</label>
+                        <input class="form-check-input" type="checkbox" id="sigtap_possui" name="sigtap_possui" {% if form.instance.unidade_estrategico %}checked{% endif %}>
+                        <label class="form-check-label" for="sigtap_possui">Não possui SIGTAP</label>
                     </div>
                 </div>
-                <div class="grid" style="font-size: 14px;">
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control auto-expand" id="observacoes" name="observacoes" style="width: 150px;">{{ form.instance.denominacao|default_if_none:'' }}</textarea>
-                        <label for="observacoes">SIGTAP - Código</label>
+                <div class="grid" style="font-size: 14px; align-items: center;">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="sismat_codigo" name="sismat_codigo" style="width: 150px;">{{ form.instance.denominacao|default_if_none:'' }}
+                        <label for="observacoes">SISMAT - Código</label>
                     </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control auto-expand" id="observacoes" name="observacoes" rows="1">{{ form.instance.denominacao|default_if_none:'' }}</textarea>
-                        <label for="observacoes">SIGTAP - Nome</label>
+                    <div class="form-floating mb-3 full-width" style="max-width: 78%;">
+                        <input type="text" class="form-control" id="sismat_nome" name="sismat_nome">{{ form.instance.denominacao|default_if_none:'' }}
+                        <label for="observacoes">SISMAT - Nome</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="unidade_estrategico" name="unidade_estrategico" {% if form.instance.unidade_estrategico %}checked{% endif %}>
-                        <label class="form-check-label" for="unidade_estrategico">Não possui SIGTAP</label>
+                        <input class="form-check-input" type="checkbox" id="sismat_possui" name="sismat_possui" {% if form.instance.unidade_estrategico %}checked{% endif %}>
+                        <label class="form-check-label" for="sismat_possui">Não possui SISMAT</label>
                     </div>
                 </div>
-                <div class="grid" style="font-size: 14px;">
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control auto-expand" id="observacoes" name="observacoes" style="width: 150px;">{{ form.instance.denominacao|default_if_none:'' }}</textarea>
-                        <label for="observacoes">SIGTAP - Código</label>
+                <div class="grid" style="font-size: 14px; align-items: center;">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="catmat_codigo" name="catmat_codigo" style="width: 150px;">{{ form.instance.denominacao|default_if_none:'' }}
+                        <label for="observacoes">CATMAT - Código</label>
                     </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control auto-expand" id="observacoes" name="observacoes" rows="1">{{ form.instance.denominacao|default_if_none:'' }}</textarea>
-                        <label for="observacoes">SIGTAP - Nome</label>
+                    <div class="form-floating mb-3 full-width" style="max-width: 78%;">
+                        <input type="text" class="form-control" id="catmat_nome" name="catmat_nome">{{ form.instance.denominacao|default_if_none:'' }}
+                        <label for="observacoes">CATMAT - Nome</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="unidade_estrategico" name="unidade_estrategico" {% if form.instance.unidade_estrategico %}checked{% endif %}>
-                        <label class="form-check-label" for="unidade_estrategico">Não possui SIGTAP</label>
+                        <input class="form-check-input" type="checkbox" id="catmat_possui" name="sismat_possui" {% if form.instance.unidade_estrategico %}checked{% endif %}>
+                        <label class="form-check-label" for="catmat_possui">Não pssui CATMAT</label>
                     </div>
                 </div>
-                <div class="grid" style="font-size: 14px;">
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control auto-expand" id="observacoes" name="observacoes" style="width: 150px;">{{ form.instance.denominacao|default_if_none:'' }}</textarea>
-                        <label for="observacoes">SIGTAP - Código</label>
+                <div class="grid" style="font-size: 14px; align-items: center;">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="obm_codigo" name="obm_codigo" style="width: 150px;">{{ form.instance.denominacao|default_if_none:'' }}
+                        <label for="observacoes">OBM - Código</label>
                     </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control auto-expand" id="observacoes" name="observacoes" rows="1">{{ form.instance.denominacao|default_if_none:'' }}</textarea>
-                        <label for="observacoes">SIGTAP - Nome</label>
+                    <div class="form-floating mb-3 full-width" style="max-width: 78%;">
+                        <input type="text" class="form-control" id="obm_nome" name="obm_nome">{{ form.instance.denominacao|default_if_none:'' }}
+                        <label for="observacoes">OBM - Nome</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="unidade_estrategico" name="unidade_estrategico" {% if form.instance.unidade_estrategico %}checked{% endif %}>
-                        <label class="form-check-label" for="unidade_estrategico">Não possui SIGTAP</label>
+                        <input class="form-check-input" type="checkbox" id="obm_possui" name="obm_possui" {% if form.instance.unidade_estrategico %}checked{% endif %}>
+                        <label class="form-check-label" for="obm_possui">Não possui OBM</label>
                     </div>
                 </div>
             </div>

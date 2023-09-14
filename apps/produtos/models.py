@@ -1,6 +1,6 @@
 from django.db import models
 from apps.usuarios.models import Usuario
-from setup.choices import TIPO_PRODUTO
+from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO
 from django.utils import timezone
 
 class DenominacoesGenericas(models.Model):
@@ -58,3 +58,66 @@ class DenominacoesGenericas(models.Model):
 
     def __str__(self):
         return f"Denominação Genérica: {self.denominacao} - ID ({self.id})"
+
+
+class ProdutosFarmaceuticos(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_registro_produto')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_atualizacao_produto')
+    denominacao = models.ForeignKey(DenominacoesGenericas, on_delete=models.DO_NOTHING, related_name='denominacao_produto')
+
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados do produto farmacêutico
+    produto = models.CharField(max_length=240, null=False, blank=False)
+    concentracao_tipo = models.CharField(max_length=20, choices=CONCENTRACAO_TIPO, null=False, blank=False)
+    concentracao = models.CharField(max_length=120, null=False, blank=False)
+    forma_farmaceutica = models.CharField(max_length=60, choices=FORMA_FARMACEUTICA, null=False, blank=False)
+    oncologico = models.BooleanField(default=False, null=False, blank=False)
+    biologico = models.BooleanField(default=False, null=False, blank=False)
+    aware = models.CharField(max_length=20, null=False, blank=False)
+    
+    #incorporacao SUS
+    incorp_status = models.CharField(max_length=20, choices=STATUS_INCORPORACAO, null=False, blank=False)
+    incorp_data = models.DateField(null=True, blank=True)
+    incorp_portaria = models.CharField(max_length=30, null=False, blank=False)
+    incorp_link = models.URLField(max_length=100, null=False, blank=False)
+    exclusao_data = models.DateField(null=True, blank=True)
+    exclusao_portaria = models.CharField(max_length=30, null=False, blank=False)
+    exclusao_link = models.URLField(max_length=100, null=False, blank=False)
+
+    #pactuacao
+    comp_basico = models.BooleanField(default=False, null=False, blank=False)
+    comp_especializado = models.BooleanField(default=False, null=False, blank=False)
+    comp_estrategico = models.BooleanField(default=False, null=False, blank=False)
+    comp_basico_programa = models.CharField(max_length=60, null=True, blank=False)
+    comp_especializado_grupo = models.CharField(max_length=60, null=True, blank=False)
+    comp_estrategico_programa = models.CharField(max_length=60, null=True, blank=False)
+    
+    #outros sistemas
+    sigtap_possui = models.BooleanField(default=False, null=False, blank=False)
+    sigtap_codigo = models.CharField(max_length=10, null=True, blank=False)
+    sigtap_nome = models.CharField(max_length=60, null=True, blank=False)
+    sismat_possui = models.BooleanField(default=False, null=False, blank=False)
+    sismat_codigo = models.CharField(max_length=10, null=True, blank=False)
+    sismat_nome = models.CharField(max_length=60, null=True, blank=False)
+    catmat_possui = models.BooleanField(default=False, null=False, blank=False)
+    catmat_codigo = models.CharField(max_length=10, null=True, blank=False)
+    catmat_nome = models.CharField(max_length=60, null=True, blank=False)
+    obm_possui = models.BooleanField(default=False, null=False, blank=False)
+    obm_codigo = models.CharField(max_length=10, null=True, blank=False)
+    obm_nome = models.CharField(max_length=60, null=True, blank=False)
+    
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True)
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='usuario_produto_deletado')
+
+    def __str__(self):
+        return f"Produto Farmacêutico: {self.produto} - ID ({self.id})"
