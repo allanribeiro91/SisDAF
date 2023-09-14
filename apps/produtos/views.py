@@ -4,9 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from apps.usuarios.models import Usuario
-from apps.produtos.models import DenominacoesGenericas
-from apps.produtos.forms import DenominacoesGenericasForm
-from setup.choices import TIPO_PRODUTO
+from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
+from apps.produtos.forms import DenominacoesGenericasForm, ProdutosFarmaceuticosForm
+from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO
 from django.http import JsonResponse, HttpResponse
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -257,6 +257,27 @@ def exportar_denominacoes(request):
 
 
 def produtos_ficha(request, product_id):
-    return render(request, 'produtos/produtos_ficha.html', {'product_id': product_id})
+
+    # if product_id:
+    #     try:
+    #         produto = ProdutosFarmaceuticos.objects.get(id=product_id)
+    #     except ProdutosFarmaceuticos.DoesNotExist:
+    #         messages.error(request, "Produto não encontrado.")
+    #         return redirect('denominacoes')
+    # else:
+    #     produto = None  # Preparando para criar uma nova denominação
+
+    denominacoes_genericas = DenominacoesGenericas.objects.values_list('id', 'denominacao')
+
+    form = ProdutosFarmaceuticosForm(instance=None)
+    return render(request, 'produtos/produtos_ficha.html', {
+        'product_id': product_id,
+        'form': form,
+        'denominacoes_genericas': denominacoes_genericas,
+        'TIPO_PRODUTO': TIPO_PRODUTO,
+        'FORMA_FARMACEUTICA': FORMA_FARMACEUTICA, 
+        'STATUS_INCORPORACAO': STATUS_INCORPORACAO,
+        'CONCENTRACAO_TIPO': CONCENTRACAO_TIPO,
+    })
 
 

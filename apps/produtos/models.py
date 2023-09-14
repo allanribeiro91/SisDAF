@@ -96,6 +96,10 @@ class ProdutosFarmaceuticos(models.Model):
     comp_basico_programa = models.CharField(max_length=60, null=True, blank=False)
     comp_especializado_grupo = models.CharField(max_length=60, null=True, blank=False)
     comp_estrategico_programa = models.CharField(max_length=60, null=True, blank=False)
+
+    #outros
+    disp_farmacia_popular = models.BooleanField(default=False, null=False, blank=False)
+    hospitalar = models.BooleanField(default=False, null=False, blank=False)
     
     #outros sistemas
     sigtap_possui = models.BooleanField(default=False, null=False, blank=False)
@@ -118,6 +122,29 @@ class ProdutosFarmaceuticos(models.Model):
     del_status = models.BooleanField(default=False)
     del_data = models.DateTimeField(null=True, blank=True)
     del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='usuario_produto_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)  # Obtenha o usuário atual e remova-o dos kwargs
+
+        # Se o objeto já tem um ID, então ele já existe no banco de dados
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(DenominacoesGenericas, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        """
+        Realiza uma "deleção lógica" do registro.
+        """
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
 
     def __str__(self):
         return f"Produto Farmacêutico: {self.produto} - ID ({self.id})"

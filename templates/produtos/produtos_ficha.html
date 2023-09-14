@@ -98,13 +98,13 @@
                         </div>
                         <div class="form-floating">
                             <select class="form-select" id="denominacao" aria-label="Floating label select example" name="denominacao">
-                                <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
-                                {% for value, display in TIPO_PRODUTO %}
-                                <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                                <option value="" disabled {% if not form.instance.denominacao %}selected{% endif %}>Selecione uma denominação</option>
+                                {% for id, denominacao in denominacoes_genericas %}
+                                <option value="{{ id }}" {% if form.instance.denominacao_id == id %}selected{% endif %}>{{ denominacao }}</option>
                                 {% endfor %}
                             </select>
                             <label for="denominacao">Denominação Genérica</label>
-                        </div>
+                        </div>    
                         <div class="form-floating">
                             <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="tipo_produto">
                                 <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
@@ -117,7 +117,7 @@
                         <div class="form-floating mb-3 full-width">
                             <input type="text" class="form-control" id="denominacao" name="denominacao" value="{{ form.instance.denominacao|default_if_none:'' }}">
                             <label for="floatingInput">Concentração/Composição</label>
-                        </div>
+                        </div>                    
                     </div>
                     
                     
