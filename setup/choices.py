@@ -1,5 +1,11 @@
 #Choices
-COR_PELE = (
+YES_NO = [
+    ('sim', 'Sim'),
+    ('nao', 'Não'),
+]
+
+
+COR_PELE = [
     ('branco', 'Branco'),
     ('preto', 'Preto'),
     ('pardo', 'Pardo'),
@@ -7,27 +13,27 @@ COR_PELE = (
     ('vermelho', 'Vermelho'),
     ('outro', 'Outro'),
     ('nao_informado', 'Não Informado'),
-)
+]
 
-GENERO_SEXUAL = (
+GENERO_SEXUAL = [
     ('masculino', 'Masculino'),
     ('feminino', 'Feminino'),
     ('outro', 'Outro'),
     ('nao_informado', 'Não Informado'),
-)
+]
 
 
-ORGAO_PUBLICO = (
+ORGAO_PUBLICO = [
     ('min_saude', "Ministério da Saúde"),
     ('outro', "Outro"),
     ('nao_informado', 'Não Informado'),
-)
+]
 
-TIPO_PRODUTO = (
+TIPO_PRODUTO = [
     ('Insumo', "Insumo"),
     ('Medicamento', "Medicamento"),
     ('nao_informado', 'Não Informado'),
-)
+]
 
 UNIDADE_DAF = [
     ('', '--- Selecione ---'),  # Opção vazia
@@ -39,15 +45,15 @@ UNIDADE_DAF = [
     ('gabinete', "GABINETE")
     ]   
 
-VINCULO_MS = (
+VINCULO_MS = [
     ('consultor', "Consultor Técnico"),
     ('servidor_federal', "Servidor Federal"),
     ('servidor_estadual', "Servidor Estadual"),
     ('servidor_municipal', "Servidor Municipal"),
     ('nao_informado', 'Não Informado'),
-)
+]
 
-FORMA_FARMACEUTICA = {
+FORMA_FARMACEUTICA = [
     ('adesivo_transdermico', 'Adesivo Transdérmico'),
     ('capsula', 'Cápsula'),
     ('capsula_mole', 'Cápsula Mole'),
@@ -67,17 +73,17 @@ FORMA_FARMACEUTICA = {
     ('suspensao_oral', 'Suspensão Oral'),
     ('xarope', 'Xarope'),
     ('nao_informado', 'Não Informado'),
-}
+]
 
-STATUS_INCORPORACAO = {
+STATUS_INCORPORACAO = [
     ('incorporado', "Incorporado"),
     ('excluido', "Excluído"),
     ('nao_informado', 'Não Informado'),
-}
+]
 
-CONCENTRACAO_TIPO = {
+CONCENTRACAO_TIPO = [
     ('nao_se_aplica','Não se aplica'),
-    ('mostrar_nome','Mostrar'),
+    ('mostrar_nome','Mostrar no nome'),
     ('mostrar_nao','Não mostrar'),
     ('nao_informado', 'Não Informado'),
-}
+]

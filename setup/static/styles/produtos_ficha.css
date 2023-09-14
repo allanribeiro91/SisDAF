@@ -137,7 +137,7 @@ input[name="denominacao"]{
     font-size: 14px !important;
 }
 
-select[name="tipo_produto"], select[name="forma_farmaceutica"] {
+input[name="tipo_produto"], select[name="forma_farmaceutica"] {
     width: 160px !important;
     text-align: left;
 }

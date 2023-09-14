@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.produtos.forms import DenominacoesGenericasForm, ProdutosFarmaceuticosForm
-from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO
+from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO, YES_NO
 from django.http import JsonResponse, HttpResponse
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -278,6 +278,7 @@ def produtos_ficha(request, product_id):
         'FORMA_FARMACEUTICA': FORMA_FARMACEUTICA, 
         'STATUS_INCORPORACAO': STATUS_INCORPORACAO,
         'CONCENTRACAO_TIPO': CONCENTRACAO_TIPO,
+        'YES_NO': YES_NO,
     })
 
 
