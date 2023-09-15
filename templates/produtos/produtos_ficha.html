@@ -156,14 +156,14 @@
                             </select>
                             <label for="classificacao_aware">AWaRe</label>
                         </div>
-                        <div class="form-floating">
+                        <div class="form-floating">                            
                             <select class="form-select" id="atc_codigo" aria-label="Floating label select example" name="atc_codigo">
                                 <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
-                                {% for value, display in CODIGO_ATC %}
-                                <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                                {% for cod_atc, descricao in lista_atc %}
+                                <option value="{{ cod_atc }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ cod_atc }}</option>
                                 {% endfor %}
                             </select>
-                            <label for="forma_farmaceutica">Código ATC</label>
+                            <label for="atc_codigo">Código ATC</label>
                         </div>
                         <div class="form-floating mb-3 full-width">
                             <input type="text" class="form-control" id="denominacao" name="denominacao" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">

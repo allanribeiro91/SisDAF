@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from apps.usuarios.models import Usuario
-from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos, TagProdutos
+from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos, TagProdutos, ListaATC
 from apps.produtos.forms import DenominacoesGenericasForm, ProdutosFarmaceuticosForm
 from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO, YES_NO, CLASSIFICACAO_AWARE
 from django.http import JsonResponse, HttpResponse
@@ -111,7 +111,6 @@ def denominacoes_ficha(request, denominacao_id=None):
     })
 
 
-
 @login_required
 def delete_denominacao(request, denominacao_id):
     try:
@@ -121,12 +120,6 @@ def delete_denominacao(request, denominacao_id):
     except DenominacoesGenericas.DoesNotExist:
         messages.error(request, "Denominação não encontrada.")    
     return redirect('denominacoes')
-
-
-
-
-
-
 
 
 @login_required
@@ -256,6 +249,7 @@ def exportar_denominacoes(request):
         return response
 
 
+@login_required
 def produtos_ficha(request, product_id):
 
     # if product_id:
@@ -268,14 +262,16 @@ def produtos_ficha(request, product_id):
     #     produto = None  # Preparando para criar uma nova denominação
 
     denominacoes_genericas = DenominacoesGenericas.objects.values_list('id', 'denominacao')
-    #tags_produtos = TagProdutos.objects.values_list('id','tag')
+    lista_atc = ListaATC.objects.values_list('codigo', 'descricao')
     tags_produtos = json.dumps(list(TagProdutos.objects.values_list('id','tag')))
+    
 
     form = ProdutosFarmaceuticosForm(instance=None)
     return render(request, 'produtos/produtos_ficha.html', {
         'product_id': product_id,
         'form': form,
         'denominacoes_genericas': denominacoes_genericas,
+        'lista_atc': lista_atc,
         'tags_produtos': tags_produtos,
         'TIPO_PRODUTO': TIPO_PRODUTO,
         'FORMA_FARMACEUTICA': FORMA_FARMACEUTICA, 
