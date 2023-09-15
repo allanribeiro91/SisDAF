@@ -82,8 +82,16 @@ STATUS_INCORPORACAO = [
 ]
 
 CONCENTRACAO_TIPO = [
-    ('nao_se_aplica','Não se aplica'),
     ('mostrar_nome','Mostrar no nome'),
     ('mostrar_nao','Não mostrar'),
+    ('nao_se_aplica','Não se aplica'),
+    ('nao_informado', 'Não Informado'),
+]
+
+CLASSIFICACAO_AWARE = [
+    ('acesso','Acesso'),
+    ('alerta','Alerta'),
+    ('reservado','Reservado'),
+    ('nao_se_aplica','Não se aplica'),
     ('nao_informado', 'Não Informado'),
 ]

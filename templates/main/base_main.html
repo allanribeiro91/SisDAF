@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SisDAF</title>
     
+    <!-- Adicionando jQuery via CDN -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+
     <!-- CSS do Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -22,15 +25,13 @@
 
     <!-- Folhas de estilo específca da página -->
     {% block extra_head %}{% endblock %}
-
-    <!-- Adicionando jQuery via CDN -->
-    <script src="{% static 'js/jquery.min.js' %}"></script>
     
 </head>
 
 <body>
     
     {% include "_modals/delete_confirmacao.html" %}
+    {% include "_modals/tags.html" %}
     
     {% include '_partials/_navbar.html' %}
     

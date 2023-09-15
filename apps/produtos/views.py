@@ -4,9 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from apps.usuarios.models import Usuario
-from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
+from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos, TagProdutos
 from apps.produtos.forms import DenominacoesGenericasForm, ProdutosFarmaceuticosForm
-from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO, YES_NO
+from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO, YES_NO, CLASSIFICACAO_AWARE
 from django.http import JsonResponse, HttpResponse
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -268,17 +268,21 @@ def produtos_ficha(request, product_id):
     #     produto = None  # Preparando para criar uma nova denominação
 
     denominacoes_genericas = DenominacoesGenericas.objects.values_list('id', 'denominacao')
+    #tags_produtos = TagProdutos.objects.values_list('id','tag')
+    tags_produtos = json.dumps(list(TagProdutos.objects.values_list('id','tag')))
 
     form = ProdutosFarmaceuticosForm(instance=None)
     return render(request, 'produtos/produtos_ficha.html', {
         'product_id': product_id,
         'form': form,
         'denominacoes_genericas': denominacoes_genericas,
+        'tags_produtos': tags_produtos,
         'TIPO_PRODUTO': TIPO_PRODUTO,
         'FORMA_FARMACEUTICA': FORMA_FARMACEUTICA, 
         'STATUS_INCORPORACAO': STATUS_INCORPORACAO,
         'CONCENTRACAO_TIPO': CONCENTRACAO_TIPO,
         'YES_NO': YES_NO,
+        'CLASSIFICACAO_AWARE': CLASSIFICACAO_AWARE,
     })
 
 

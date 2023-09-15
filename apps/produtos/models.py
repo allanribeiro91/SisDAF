@@ -1,6 +1,6 @@
 from django.db import models
 from apps.usuarios.models import Usuario
-from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO
+from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO, CLASSIFICACAO_AWARE
 from django.utils import timezone
 
 class DenominacoesGenericas(models.Model):
@@ -78,7 +78,7 @@ class ProdutosFarmaceuticos(models.Model):
     forma_farmaceutica = models.CharField(max_length=60, choices=FORMA_FARMACEUTICA, null=False, blank=False)
     oncologico = models.BooleanField(default=False, null=False, blank=False)
     biologico = models.BooleanField(default=False, null=False, blank=False)
-    aware = models.CharField(max_length=20, null=False, blank=False)
+    aware = models.CharField(max_length=20, choices=CLASSIFICACAO_AWARE, null=False, blank=False)
     
     #incorporacao SUS
     incorp_status = models.CharField(max_length=20, choices=STATUS_INCORPORACAO, null=False, blank=False)
@@ -148,3 +148,10 @@ class ProdutosFarmaceuticos(models.Model):
 
     def __str__(self):
         return f"Produto Farmacêutico: {self.produto} - ID ({self.id})"
+
+
+class TagProdutos(models.Model):
+    tag = models.CharField(max_length=255, unique=True)
+
+
+#python manage.py runscript apps.produtos.scripts.import_tag_produtos

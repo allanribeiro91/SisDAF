@@ -148,18 +148,18 @@
                             <label for="biologico">Biológico</label>
                         </div>
                         <div class="form-floating">
-                            <select class="form-select" id="forma_farmaceutica" aria-label="Floating label select example" name="forma_farmaceutica">
+                            <select class="form-select" id="classificacao_aware" aria-label="Floating label select example" name="classificacao_aware">
                                 <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
-                                {% for value, display in TIPO_PRODUTO %}
+                                {% for value, display in CLASSIFICACAO_AWARE %}
                                 <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
                                 {% endfor %}
                             </select>
-                            <label for="forma_farmaceutica">Classificação AWaRe</label>
+                            <label for="classificacao_aware">AWaRe</label>
                         </div>
                         <div class="form-floating">
-                            <select class="form-select" id="forma_farmaceutica" aria-label="Floating label select example" name="forma_farmaceutica">
+                            <select class="form-select" id="atc_codigo" aria-label="Floating label select example" name="atc_codigo">
                                 <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
-                                {% for value, display in TIPO_PRODUTO %}
+                                {% for value, display in CODIGO_ATC %}
                                 <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
                                 {% endfor %}
                             </select>
@@ -255,18 +255,17 @@
                             <label class="form-check-label" for="hospitalar">Hospitalar</label>
                         </div>       
                     </div>  
+                </div>
+                <div class="grid" style="flex-grow: 1; font-size: 14px !important;">
+                    <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#tagsModal" style="font-size: 18px !important; background-color: None; border-color:None;">
+                        <i class="fas fa-tag"></i>
+                        Tags
+                    </button>
                     <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="unidade_basico_programa" name="unidade_basico_programa" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
-                        <label for="floatingInput">Programa - Básico</label>
+                        <span style="font-size: 12px;">Programas/Condições Clínicas/Doenças</span></br>
+                        <input type="text" class="form-control" id="portaria_exclusao_link" name="portaria_exclusao_link" readonly>
                     </div>
-                    <div class="form-floating mb-3" style="width: 200px;">
-                        <input type="text" class="form-control" id="unidade_especializado_grupo" name="unidade_especializado_grupo" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
-                        <label for="floatingInput">Grupo AF - Especializado</label>
-                    </div>
-                    <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="unidade_estrategico_programa" name="unidade_estrategico_programa" readonly value="{{ form.instance.denominacao|default_if_none:'' }}">
-                        <label for="floatingInput">Programa - Estratégico</label>
-                    </div>
+                    
                 </div>
             </div>
 
@@ -343,6 +342,31 @@
     </div>
     
 
+    
+    <script>
+        $(document).ready(function() {
+            var tags_produtos = {{ tags_produtos|safe }};  // Usando a variável JSON
+
+            var content = "";
+            var colCount = 0;
+            var itemsPerColumn = Math.ceil(tags_produtos.length / 3);  // Dividindo por 5
+
+            tags_produtos.forEach(function(tag, index) {
+                if (index % itemsPerColumn == 0) {
+                    if (colCount > 0) {
+                        content += "</div>";  // fechar a coluna anterior
+                    }
+                    content += "<div class='tags-column col'>";  // iniciar uma nova coluna e usando a classe 'col' do Bootstrap para grid
+                    colCount++;
+                }
+                content += "<input type='checkbox' id='tag_" + tag[0] + "' value='" + tag[0] + "'> <label for='tag_" + tag[0] + "'>" + tag[1] + "</label><br>";
+            });
+            content += "</div>";  // fechar a última coluna
+
+            $(".modal-body").html(content);
+        });
+
+    </script>
     <script src="{% static 'js/produtos.js' %}"></script>
 
 {% endblock %}
