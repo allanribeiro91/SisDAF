@@ -263,6 +263,7 @@ def produtos_ficha(request, product_id):
 
     denominacoes_genericas = DenominacoesGenericas.objects.values_list('id', 'denominacao')
     lista_atc = ListaATC.objects.values_list('codigo', 'descricao')
+    
     tags_produtos = json.dumps(list(TagProdutos.objects.values_list('id','tag')))
     
 
