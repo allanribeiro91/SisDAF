@@ -345,27 +345,29 @@
     
     <script>
         $(document).ready(function() {
-            var tags_produtos = {{ tags_produtos|safe }};  // Usando a variável JSON
+            // Manipulador de eventos para o botão "Tags"
+            $("button[data-bs-target='#tagsModal']").on('click', function() {
+                var tags_produtos = {{ tags_produtos|safe }};  // Usando a variável JSON
 
-            var content = "";
-            var colCount = 0;
-            var itemsPerColumn = Math.ceil(tags_produtos.length / 3);  // Dividindo por 5
+                var content = "";
+                var colCount = 0;
+                var itemsPerColumn = Math.ceil(tags_produtos.length / 3);  // Dividindo por 5
 
-            tags_produtos.forEach(function(tag, index) {
-                if (index % itemsPerColumn == 0) {
-                    if (colCount > 0) {
-                        content += "</div>";  // fechar a coluna anterior
+                tags_produtos.forEach(function(tag, index) {
+                    if (index % itemsPerColumn == 0) {
+                        if (colCount > 0) {
+                            content += "</div>";  // fechar a coluna anterior
+                        }
+                        content += "<div class='tags-column col'>";
+                        colCount++;
                     }
-                    content += "<div class='tags-column col'>";  // iniciar uma nova coluna e usando a classe 'col' do Bootstrap para grid
-                    colCount++;
-                }
-                content += "<input type='checkbox' id='tag_" + tag[0] + "' value='" + tag[0] + "'> <label for='tag_" + tag[0] + "'>" + tag[1] + "</label><br>";
+                    content += "<input type='checkbox' class='form-check-input' id='tag" + tag[0] + "' name='tag" + tag[0] + "' value='" + tag[0] + "'> <label for='tag" + tag[0] + "'>" + tag[1] + "</label><br>";
+                });
+                content += "</div>";  // fechar a última coluna
+
+                $(".modal-body").html(content);
             });
-            content += "</div>";  // fechar a última coluna
-
-            $(".modal-body").html(content);
         });
-
     </script>
     <script src="{% static 'js/produtos.js' %}"></script>
 

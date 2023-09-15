@@ -76,44 +76,42 @@ class ProdutosFarmaceuticos(models.Model):
     concentracao_tipo = models.CharField(max_length=20, choices=CONCENTRACAO_TIPO, null=False, blank=False)
     concentracao = models.CharField(max_length=120, null=False, blank=False)
     forma_farmaceutica = models.CharField(max_length=60, choices=FORMA_FARMACEUTICA, null=False, blank=False)
-    oncologico = models.BooleanField(default=False, null=False, blank=False)
-    biologico = models.BooleanField(default=False, null=False, blank=False)
-    aware = models.CharField(max_length=20, choices=CLASSIFICACAO_AWARE, null=False, blank=False)
+    oncologico = models.BooleanField(default=False, null=True, blank=True)
+    biologico = models.BooleanField(default=False, null=True, blank=True)
+    aware = models.CharField(max_length=20, choices=CLASSIFICACAO_AWARE, null=True, blank=True)
+    atc = models.CharField(max_length=10, null=True, blank=True)
     
     #incorporacao SUS
-    incorp_status = models.CharField(max_length=20, choices=STATUS_INCORPORACAO, null=False, blank=False)
+    incorp_status = models.CharField(max_length=20, choices=STATUS_INCORPORACAO, null=True, blank=True)
     incorp_data = models.DateField(null=True, blank=True)
-    incorp_portaria = models.CharField(max_length=30, null=False, blank=False)
-    incorp_link = models.URLField(max_length=100, null=False, blank=False)
+    incorp_portaria = models.CharField(max_length=30, null=True, blank=True)
+    incorp_link = models.URLField(max_length=100, null=True, blank=True)
     exclusao_data = models.DateField(null=True, blank=True)
-    exclusao_portaria = models.CharField(max_length=30, null=False, blank=False)
-    exclusao_link = models.URLField(max_length=100, null=False, blank=False)
+    exclusao_portaria = models.CharField(max_length=30, null=True, blank=True)
+    exclusao_link = models.URLField(max_length=100, null=True, blank=True)
 
     #pactuacao
-    comp_basico = models.BooleanField(default=False, null=False, blank=False)
-    comp_especializado = models.BooleanField(default=False, null=False, blank=False)
-    comp_estrategico = models.BooleanField(default=False, null=False, blank=False)
-    comp_basico_programa = models.CharField(max_length=60, null=True, blank=False)
-    comp_especializado_grupo = models.CharField(max_length=60, null=True, blank=False)
-    comp_estrategico_programa = models.CharField(max_length=60, null=True, blank=False)
+    comp_basico = models.BooleanField(default=False, null=True, blank=True)
+    comp_especializado = models.BooleanField(default=False, null=True, blank=True)
+    comp_estrategico = models.BooleanField(default=False, null=True, blank=True)
 
     #outros
-    disp_farmacia_popular = models.BooleanField(default=False, null=False, blank=False)
-    hospitalar = models.BooleanField(default=False, null=False, blank=False)
+    disp_farmacia_popular = models.BooleanField(default=False, null=True, blank=True)
+    hospitalar = models.BooleanField(default=False, null=True, blank=True)
     
     #outros sistemas
-    sigtap_possui = models.BooleanField(default=False, null=False, blank=False)
-    sigtap_codigo = models.CharField(max_length=10, null=True, blank=False)
-    sigtap_nome = models.CharField(max_length=60, null=True, blank=False)
-    sismat_possui = models.BooleanField(default=False, null=False, blank=False)
-    sismat_codigo = models.CharField(max_length=10, null=True, blank=False)
-    sismat_nome = models.CharField(max_length=60, null=True, blank=False)
-    catmat_possui = models.BooleanField(default=False, null=False, blank=False)
-    catmat_codigo = models.CharField(max_length=10, null=True, blank=False)
-    catmat_nome = models.CharField(max_length=60, null=True, blank=False)
-    obm_possui = models.BooleanField(default=False, null=False, blank=False)
-    obm_codigo = models.CharField(max_length=10, null=True, blank=False)
-    obm_nome = models.CharField(max_length=60, null=True, blank=False)
+    sigtap_possui = models.BooleanField(default=False, null=True, blank=True)
+    sigtap_codigo = models.CharField(max_length=10, null=True, blank=True)
+    sigtap_nome = models.CharField(max_length=60, null=True, blank=True)
+    sismat_possui = models.BooleanField(default=False, null=True, blank=True)
+    sismat_codigo = models.CharField(max_length=10, null=True, blank=True)
+    sismat_nome = models.CharField(max_length=60, null=True, blank=True)
+    catmat_possui = models.BooleanField(default=False, null=True, blank=True)
+    catmat_codigo = models.CharField(max_length=10, null=True, blank=True)
+    catmat_nome = models.CharField(max_length=60, null=True, blank=True)
+    obm_possui = models.BooleanField(default=False, null=True, blank=True)
+    obm_codigo = models.CharField(max_length=10, null=True, blank=True)
+    obm_nome = models.CharField(max_length=60, null=True, blank=True)
     
     #observações gerais
     observacoes_gerais = models.TextField(null=True, blank=True)
@@ -149,9 +147,17 @@ class ProdutosFarmaceuticos(models.Model):
     def __str__(self):
         return f"Produto Farmacêutico: {self.produto} - ID ({self.id})"
 
-
 class TagProdutos(models.Model):
     tag = models.CharField(max_length=255, unique=True)
 
+    def __str__(self):
+        return f"Tag: {self.tag} - ID ({self.id})"
 
-#python manage.py runscript apps.produtos.scripts.import_tag_produtos
+class ListaATC(models.Model):
+    codigo = models.CharField(max_length=10, unique=True)
+    nivel = models.CharField(max_length=2)
+    descricao = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"ATC: {self.codigo} - {self.nivel} - {self.descricao} - ID ({self.id}) )"
+
