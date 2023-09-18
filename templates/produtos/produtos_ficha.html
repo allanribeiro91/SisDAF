@@ -1,0 +1,382 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/produtos_ficha.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fas fa-pills"></i>Produtos DAF / Produtos Farmacêuticos / Ficha do Produto
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tab-voltar">
+            <a href="{% url 'produtos' %}" style="color: black;">
+                <i class="fas fa-arrow-left"></i> 
+            </a>
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" id="tabMeusDados">Dados Gerais</button>
+        </div>
+    </div>
+
+    <div class="area-scroll">
+        <!-- form denominacoes_genericas -->
+        <form id="produtoForm" method="POST" data-post-url="{% if form.instance.id %}{% url 'produtos_ficha' form.instance.id %}{% else %}{% url 'novo_produto' %}{% endif %}">
+            {% csrf_token %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                    <i class="fas fa-trash-alt"></i>
+                    Deletar
+                </button>
+                <button class="btn btn-primary me-md-2" type="submit" id="btnPrint" style="font-size: 12px; margin-left: 10px; margin-right: 10px; background-color: rgb(4, 124, 0);border-color: rgb(4, 124, 0);">
+                    <i class="fas fa-print me-1"></i>
+                    Imprimir
+                </button>
+                <button class="btn btn-primary me-md-2" type="submit" id="btnSave" style="font-size: 12px;">
+                    <i class="fas fa-save me-1"></i>
+                    Salvar
+                </button>
+            </div>
+        
+        
+            <div class="horizontal-sections">
+                <div class="section-log">
+                    <h3>Log</h3>
+                    <div class="grid-log">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ produto.registro_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Data do Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ produto.usuario_registro.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável pelo Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ produto.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Última Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ produto.usuario_atualizacao.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" id="log_edicoes" name="log_edicoes" readonly value="{{ produto.log_n_edicoes }}">
+                            <label for="floatingInput">Nº Edições</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caracterização do Produto -->
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Dados do Produto Farmacêutico</h3>
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="id" name="id" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                            <label for="floatingInput">ID</label>
+                        </div>
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="produto" name="produto" readonly value="{{ form.instance.produto|default_if_none:'' }}">
+                            <label for="produto">Produto Farmacêutico</label>
+                        </div>                  
+                    </div>
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="tipo_produto" name="tipo_produto" readonly value="{{ form.instance.denominacao.tipo_produto|default_if_none:'' }}">
+                            <label for="tipo_produto">Tipo de Produto</label>
+                        </div>
+                        
+                        
+                        <div class="form-floating">
+                            <select class="form-select" id="denominacao" aria-label="Floating label select example" name="denominacao">
+                                <option value="" disabled {% if not form.instance.denominacao %}selected{% endif %}>Selecione uma denominação</option>
+                                {% for id, denominacao, tipo_produto in denominacoes_genericas %}
+                                <option value="{{ id }}" data-tipo_produto="{{ tipo_produto }}" {% if form.instance.denominacao_id == id %}selected{% endif %}>{{ denominacao }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="denominacao">Denominação Genérica</label>
+                        </div>    
+                    
+                        <div class="form-floating">
+                            <select class="form-select" id="forma_farmaceutica" aria-label="Floating label select example" name="forma_farmaceutica">
+                                <option value="" disabled {% if not form.instance.forma_farmaceutica %}selected{% endif %}>Não Informado</option>
+                                {% for value, display in FORMA_FARMACEUTICA %}
+                                <option value="{{ value }}" {% if form.instance.forma_farmaceutica == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="forma_farmaceutica">Forma Farmacêutica</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="oncologico" aria-label="Floating label select example" name="oncologico">
+                                <option value="" disabled {% if not form.instance.oncologico %}selected{% endif %}>Não</option>
+                                {% for value, display in YES_NO %}
+                                <option value="{{ value }}" {% if form.instance.oncologico == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="oncologico">Oncológico</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="biologico" aria-label="Floating label select example" name="biologico">
+                                <option value="" disabled {% if not form.instance.biologico %}selected{% endif %}>Não</option>
+                                {% for value, display in YES_NO %}
+                                <option value="{{ value }}" {% if form.instance.biologico == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="biologico">Biológico</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="classificacao_aware" aria-label="Floating label select example" name="classificacao_aware">
+                                <option value="" disabled {% if not form.instance.aware %}selected{% endif %}>Não Informado</option>
+                                {% for value, display in CLASSIFICACAO_AWARE %}
+                                <option value="{{ value }}" {% if form.instance.aware == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="classificacao_aware">AWaRe</label>
+                        </div>
+                        <div class="form-floating">                            
+                            <select class="form-select" id="atc_codigo" aria-label="Floating label select example" name="atc_codigo">
+                                <option value="" disabled {% if not form.instance.atc %}selected{% endif %}>Não Informado</option>
+                                {% for cod_atc, descricao in lista_atc %}
+                                <option value="{{ cod_atc }}" data-descricao="{{ descricao }}" {% if form.instance.atc == cod_atc %}selected{% endif %}>{{ cod_atc }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="atc_codigo">Código ATC</label>
+                        </div>
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="atc_descricao" name="atc_descricao" readonly value="{{ form.instance.atc_descricao|default_if_none:'' }}">
+                            <label for="floatingInput">ATC</label>
+                        </div>  
+
+                    </div>
+                    
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating">
+                            <select class="form-select" id="concentracao_tipo" aria-label="Floating label select example" name="concentracao_tipo">
+                                <option value="" disabled {% if not form.instance.concentracao_tipo %}selected{% endif %}>Não Informado</option>
+                                {% for value, display in CONCENTRACAO_TIPO %}
+                                <option value="{{ value }}" {% if form.instance.concentracao_tipo == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="floatingSelect">Concentração</label>
+                        </div>
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="concentracao" name="concentracao" readonly value="{{ form.instance.concentracao|default_if_none:'' }}">
+                            <label for="floatingInput">Concentração/Composição</label>
+                        </div>
+                           
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status de Incorporação no SUS -->
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Incorporação no SUS</h3>
+                    <div class="grid" style="font-size: 14px;">
+                        
+                        <div class="form-floating">
+                            <select class="form-select" id="status_incorporacao" aria-label="Floating label select example" name="status_incorporacao">
+                                <option value="" disabled {% if not form.instance.incorp_status %}selected{% endif %}>Não Informado</option>
+                                {% for value, display in STATUS_INCORPORACAO %}
+                                <option value="{{ value }}" {% if form.instance.incorp_status == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="status_incorporacao">Status</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="date" class="form-control" id="data_incorporacao" name="data_incorporacao" value="{% if form.incorp_data.value %}{{ form.incorp_data.value|date:'Y-m-d' }}{% endif %}">
+                            <label for="floatingInput">Data Incorporação</label>
+                        </div> 
+
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="portaria_incorporacao" name="portaria_incorporacao" value="{{ form.instance.incorp_portaria|default_if_none:'' }}">
+                            <label for="floatingInput">Portaria de Incorporação</label>
+                        </div>  
+                        
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="portaria_incorporacao_link" name="portaria_incorporacao_link" value="{{ form.instance.incorp_link|default_if_none:'' }}">
+                            <label for="floatingInput">Link Portaria Incorporação</label>
+                        </div> 
+                    </div>
+                    
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating mb-3">
+                            <input type="date" class="form-control" id="data_incorporacao" name="data_exclusao" value="{% if form.exclusao_data.value %}{{ form.exclusao_data.value|date:'Y-m-d' }}{% endif %}">
+                            <label for="floatingInput">Data de Exclusão</label>
+                        </div>
+
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="portaria_exclusao" name="portaria_exclusao" value="{{ form.instance.exclusao_portaria|default_if_none:'' }}">
+                            <label for="floatingInput">Portaria de Incorporação</label>
+                        </div>  
+
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="portaria_exclusao_link" name="portaria_exclusao_link" value="{{ form.instance.exclusao_link|default_if_none:'' }}">
+                            <label for="floatingInput">Link Portaria Exclusão</label>
+                        </div> 
+                    </div>  
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Pactuação na Política de Assistência Farmacêutica</h3>
+                <div class="grid" style="flex-grow: 1; font-size: 14px !important;">
+                    <div class="unidades-ficha">
+                        <span style="font-size: 12px;">Componente da Assistência Farmacêutica</span></br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="comp_basico" name="comp_basico" {% if form.instance.comp_basico %}checked{% endif %}>
+                            <label class="form-check-label" for="comp_basico">Básico</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="comp_especializado" name="comp_especializado" {% if form.instance.comp_especializado %}checked{% endif %}>
+                            <label class="form-check-label" for="comp_especializado">Especializado</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="comp_estrategico" name="comp_estrategico" {% if form.instance.comp_estrategico %}checked{% endif %}>
+                            <label class="form-check-label" for="comp_estrategico">Estratégico</label>
+                        </div>
+                    </div>
+                    <div class="unidades-ficha">
+                        <span style="font-size: 12px;">Disponível</span></br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="disp_farmacia_popular" name="disp_farmacia_popular" {% if form.instance.disp_farmacia_popular %}checked{% endif %}>
+                            <label class="form-check-label" for="disp_farmacia_popular">Farmácia Popular</label>
+                        </div>                                    
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="hospitalar" name="hospitalar" {% if form.instance.hospitalar %}checked{% endif %}>
+                            <label class="form-check-label" for="hospitalar">Hospitalar</label>
+                        </div>       
+                    </div>  
+                </div>
+                <div class="grid" style="flex-grow: 1; font-size: 14px !important;">
+                    <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#tagsModal" style="font-size: 18px !important; background-color: None; border-color:None;">
+                        <i class="fas fa-tag"></i>
+                        Tags
+                    </button>
+                    <div class="form-floating mb-3 full-width">
+                        <span style="font-size: 12px;">Programas/Condições Clínicas/Doenças</span>
+                        <input type="text" class="form-control" id="tags" name="tags" value="{{ tags_selecionadas|join_tags }}" readonly style="padding-top: 10px !important;">
+                    </div>
+                    
+                    
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Outros Sistemas</h3>
+                <div class="grid" style="font-size: 14px; align-items: center;">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="sigtap_codigo" name="sigtap_codigo" readonly style="width: 150px;">{{ form.instance.sigtap_codigo|default_if_none:'' }}
+                        <label for="sigtap_codigo">SIGTAP - Código</label>
+                    </div>
+                    <div class="form-floating mb-3 full-width" style="max-width: 78%;">
+                        <input type="text" class="form-control" id="sigtap_nome" readonly name="sigtap_nome">{{ form.instance.sigtap_nome|default_if_none:'' }}
+                        <label for="sigtap_nome">SIGTAP - Nome</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="sigtap_possui" name="sigtap_possui" {% if form.instance.sigtap_possui %}checked{% endif %}>
+                        <label class="form-check-label" for="sigtap_possui">Não possui SIGTAP</label>
+                    </div>
+                </div>
+                <div class="grid" style="font-size: 14px; align-items: center;">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="sismat_codigo" readonly name="sismat_codigo" style="width: 150px;">{{ form.instance.sismat_codigo|default_if_none:'' }}
+                        <label for="sismat_codigo">SISMAT - Código</label>
+                    </div>
+                    <div class="form-floating mb-3 full-width" style="max-width: 78%;">
+                        <input type="text" class="form-control" id="sismat_nome" readonly name="sismat_nome">{{ form.instance.sismat_nome|default_if_none:'' }}
+                        <label for="sismat_nome">SISMAT - Nome</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="sismat_possui" name="sismat_possui" {% if form.instance.sismat_possui %}checked{% endif %}>
+                        <label class="form-check-label" for="sismat_possui">Não possui SISMAT</label>
+                    </div>
+                </div>
+                <div class="grid" style="font-size: 14px; align-items: center;">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="catmat_codigo" readonly name="catmat_codigo" style="width: 150px;">{{ form.instance.catmat_codigo|default_if_none:'' }}
+                        <label for="catmat_codigo">CATMAT - Código</label>
+                    </div>
+                    <div class="form-floating mb-3 full-width" style="max-width: 78%;">
+                        <input type="text" class="form-control" id="catmat_nome" readonly name="catmat_nome">{{ form.instance.catmat_nome|default_if_none:'' }}
+                        <label for="catmat_nome">CATMAT - Nome</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="catmat_possui" name="catmat_possui" {% if form.instance.catmat_possui %}checked{% endif %}>
+                        <label class="form-check-label" for="catmat_possui">Não pssui CATMAT</label>
+                    </div>
+                </div>
+                <div class="grid" style="font-size: 14px; align-items: center;">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="obm_codigo" readonly name="obm_codigo" style="width: 150px;">{{ form.instance.obm_codigo|default_if_none:'' }}
+                        <label for="obm_codigo">OBM - Código</label>
+                    </div>
+                    <div class="form-floating mb-3 full-width" style="max-width: 78%;">
+                        <input type="text" class="form-control" id="obm_nome" readonly name="obm_nome">{{ form.instance.obm_nome|default_if_none:'' }}
+                        <label for="obm_nome">OBM - Nome</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="obm_possui" name="obm_possui" {% if form.instance.obm_possui %}checked{% endif %}>
+                        <label class="form-check-label" for="obm_possui">Não possui OBM</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Observações Gerais</h3>
+                <div class="grid" style="font-size: 14px;">
+                    <div class="form-floating mb-3 full-width">
+                        <textarea class="form-control auto-expand" id="observacoes" name="observacoes" rows="1">{{ form.instance.observacoes_gerais|default_if_none:'' }}</textarea>
+                        <label for="observacoes">Observações</label>
+                    </div> 
+                </div>
+            </div>
+        </form>
+    </div>
+    
+
+    
+    <script>
+        $(document).ready(function() {
+    // Manipulador de eventos para o botão "Tags"
+        $("button[data-bs-target='#tagsModal']").on('click', function() {
+                var tags_produtos = {{ tags_produtos|safe }};  // Usando a variável JSON
+                var tags_selecionadas = {{ tags_selecionadas|safe }};
+
+                var content = "";
+                var colCount = 0;
+                var itemsPerColumn = Math.ceil(tags_produtos.length / 3);  // Dividindo por 3
+
+                tags_produtos.forEach(function(tag, index) {
+                    var isChecked = tags_selecionadas.some(function(selectedTag) {
+                        return selectedTag.tag_id == tag[0];
+                    });
+
+                    if (index % itemsPerColumn == 0) {
+                        if (colCount > 0) {
+                            content += "</div>";  // fechar a coluna anterior
+                        }
+                        content += "<div class='tags-column col'>";
+                        colCount++;
+                    }
+                    content += "<input type='checkbox' class='form-check-input' id='tag" + tag[0] + "' name='tag" + tag[0] + "' data-id='" + tag[0] + "' value='" + tag[1] + "'" + (isChecked ? " checked" : "") + "> <label for='tag" + tag[0] + "'>" + tag[1] + "</label><br>";
+                });
+                content += "</div>";  // fechar a última coluna
+
+                $(".modal-body").html(content);
+            });
+        });
+
+    </script>
+    <script src="{% static 'js/produtos.js' %}"></script>
+
+{% endblock %}
