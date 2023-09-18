@@ -1,0 +1,31 @@
+{% load static %}
+    <!-- Barra Lateral Esquerda -->
+    <div class="sidebar">
+
+        <div>
+            <a class="tab {% if request.resolver_match.url_name == 'home' %}active-tab{% endif %}" href="{% url 'home' %}">Home</a>
+        </div>
+        <div>
+            {% with current_url=request.resolver_match.url_name %}
+            <a class="tab {% if current_url in 'produtos,produtos_ficha,novo_produto,denominacoes,denominacoes_ficha,nova_denominacao' %}active-tab{% endif %}" href="{% url 'produtos' %}">Produtos DAF</a>
+            {% endwith %}    
+        </div>
+        <div>
+            <a class="tab {% if request.resolver_match.url_name == 'fornecedores' %}active-tab{% endif %}" href="{% url 'fornecedores' %}">Fornecedores</a>
+        </div>
+        <div>
+            <a class="tab {% if request.resolver_match.url_name == 'unidades_saude' %}active-tab{% endif %}" href="{% url 'unidades_saude' %}">Unidades de Saúde</a>
+        </div>
+        <div>
+            <a class="tab {% if request.resolver_match.url_name == 'processos_aquisitivos' %}active-tab{% endif %}" href="{% url 'processos_aquisitivos' %}">Processos Aquisitivos</a>
+        </div>
+        <div>
+            <a class="tab {% if request.resolver_match.url_name == 'contratos' %}active-tab{% endif %}" href="{% url 'contratos' %}">Contratos</a>
+        </div>
+
+        <!-- Adicione o botão abaixo -->
+        <div id="toggleButton" class="toggle-button"><i class="fas fa-arrow-left"></i></div>
+        
+
+    </div>
+    <script src="{% static 'js/_sidebar.js' %}"></script>
