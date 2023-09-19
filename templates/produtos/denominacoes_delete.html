@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="denominacoes_delete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 <div class="modal-dialog" role="document">
     <div class="modal-content">
     <div class="modal-header">
@@ -14,7 +14,7 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Fechar</button>
-        <button type="button" class="btn btn-primary" id="apagarRegistro" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Apagar Registro</button>
+        <button type="button" class="btn btn-primary" id="apagarDenominacao" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Apagar Registro</button>
     </div>
     </div>
 </div>
@@ -23,7 +23,7 @@
 <script>
     document.querySelectorAll('.closeModalButton').forEach(button => {
         button.addEventListener('click', function() {
-            $('#deleteConfirmationModal').modal('hide');
+            $('#denominacoes_delete').modal('hide');
         });
     });
 </script>

@@ -30,13 +30,13 @@
         <form id="produtoForm" method="POST" data-post-url="{% if form.instance.id %}{% url 'produtos_ficha' form.instance.id %}{% else %}{% url 'novo_produto' %}{% endif %}">
             {% csrf_token %}
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#produtos_delete" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
                     <i class="fas fa-trash-alt"></i>
                     Deletar
                 </button>
                 <!--
                 <button class="btn btn-primary me-md-2" type="submit" id="btnPrint" style="font-size: 12px; margin-left: 10px; margin-right: 10px; background-color: rgb(4, 124, 0);border-color: rgb(4, 124, 0);">
-                    <a href="{% url 'produto_exportar_pdf' form.instance.id %}" style="text-decoration: none !important; color: white;">
+                    <a href=" url 'produto_exportar_pdf' form.instance.id " style="text-decoration: none !important; color: white;">
                         <i class="fas fa-print me-1"></i>
                         Imprimir
                     </a>
@@ -262,10 +262,11 @@
                     </div>  
                 </div>
                 <div class="grid" style="flex-grow: 1; font-size: 14px !important;">
-                    <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#tagsModal" style="font-size: 18px !important; background-color: None; border-color:None;">
+                    <button type="button" class="btn open-tags-modal" style="font-size: 18px !important; background-color: None; border-color:None;">
                         <i class="fas fa-tag"></i>
                         Tags
                     </button>
+                    
                     <div class="form-floating mb-3 full-width">
                         <span style="font-size: 12px;">Programas/Condições Clínicas/Doenças</span>
                         <input type="text" class="form-control" id="tags" name="tags" value="{{ tags_selecionadas|join_tags }}" readonly style="padding-top: 10px !important;">
@@ -350,9 +351,17 @@
 
     
     <script>
-        $(document).ready(function() {
-    // Manipulador de eventos para o botão "Tags"
-        $("button[data-bs-target='#tagsModal']").on('click', function() {
+       $(document).ready(function() {
+            // Manipulador de eventos para o botão "Tags"
+            $(".open-tags-modal").on('click', function(event) {
+                var instanceId = $("#id").val();  // Pegando o valor do input com id="id"
+
+                // Se instanceId for vazio, retorne
+                if (!instanceId) {
+                    alert('Salve o produto primeiro!')
+                    return;
+                }
+
                 var tags_produtos = {{ tags_produtos|safe }};  // Usando a variável JSON
                 var tags_selecionadas = {{ tags_selecionadas|safe }};
 
@@ -377,11 +386,19 @@
                 content += "</div>";  // fechar a última coluna
 
                 $(".modal-body").html(content);
+
+                // Abre o modal manualmente
+                var modal = new bootstrap.Modal(document.getElementById('tagsModal'));
+                modal.show();
             });
         });
 
-    </script>
-    <script src="{% static 'js/produtos.js' %}"></script>
+
+</script>
+
+{% include 'produtos/produtos_tags.html' %}
+
+<script src="{% static 'js/produtos.js' %}"></script>
     
 
 {% endblock %}

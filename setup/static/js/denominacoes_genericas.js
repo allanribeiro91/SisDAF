@@ -1,8 +1,8 @@
-let currentPage = 1;
+
 
 //Deletar
 $(document).ready(function() {
-    $('#apagarRegistro').on('click', function() {
+    $('#apagarDenominacao').on('click', function() {
         const denominacaoId = $('#id').val();  // Pega o ID da denominação do campo de input
     
         if (!denominacaoId) { //Trata-se de um novo registro que ainda não foi salvo
@@ -27,119 +27,128 @@ $(document).ready(function() {
             }
         });
     });
-});
 
-//Acessar ficha
-$(document).ready(function() {
-    fetchAndRenderTableData();
-
-    //Mudar de página com delegação de eventos
-    $('.table tbody').on('click', 'tr', function() {
+        //Mudar de página com delegação de eventos
+    denominacaoFetchAndRenderTableData();
+    $('#tabdenominacao  tbody').on('click', 'tr', function() {
+        console.log('denominacaoFetchAndRenderTableData')
         const denominacaoId = $(this).attr('data-id').toString();
         window.location.href = `/produtosdaf/denominacoes/ficha/${denominacaoId}/`;
     });
-});
 
-//Limpar Filtros
-$('.limpar-filtro').on('click', function() {
-    console.log('limpar filtros')
-    $('#tipo_produto').val('');
-    $('#denominacao').val('');
-    $('#basico').prop('checked', false);
-    $('#especializado').prop('checked', false);
-    $('#estrategico').prop('checked', false);
-    $('#farmacia_popular').prop('checked', false);
-    $('#hospitalar').prop('checked', false);
-    fetchAndRenderTableData();
-});
 
-//Filtrar
-$('#tipo_produto, #denominacao').change(function() {
-    console.log('filtrar: tipo_produto, denominacao')
-    fetchAndRenderTableData();
-});
+    //Limpar Filtros
+    $('.limpar-filtro').on('click', function() {
+        console.log('limpar filtros')
+        $('#tipo_produto').val('');
+        $('#denominacao').val('');
+        $('#basico').prop('checked', false);
+        $('#especializado').prop('checked', false);
+        $('#estrategico').prop('checked', false);
+        $('#farmacia_popular').prop('checked', false);
+        $('#hospitalar').prop('checked', false);
+        denominacaoFetchAndRenderTableData();
+    });
 
-//Fitlrar unidades
-$('#basico, #especializado, #estrategico, #farmacia_popular, #hospitalar').change(function() {
-    console.log('filtrar: unidades')
-    fetchAndRenderTableData();
-});
+    //Filtrar
+    $('#tipo_produto, #denominacao').change(function() {
+        console.log('filtrar: tipo_produto, denominacao')
+        denominacaoFetchAndRenderTableData();
+    });
 
-//Renderizar tabela
-function fetchAndRenderTableData(page = 1) {
-    console.log('fetchAndRenderTableData')
-    var selectedTipo = $('#tipo_produto').val();
-    var denominacao = $('#denominacao').val();
-    
-    var dataToSend = {
-        'tipo_produto': selectedTipo,
-        'denominacao': denominacao,
-    };
-    
-    if ($('#basico').prop('checked')) {
-        dataToSend.basico = true;
-    }
-    if ($('#especializado').prop('checked')) {
-        dataToSend.especializado = true;
-    }
-    if ($('#estrategico').prop('checked')) {
-        dataToSend.estrategico = true;
-    }
-    if ($('#farmacia_popular').prop('checked')) {
-        dataToSend.farmacia_popular = true;
-    }
-    if ($('#hospitalar').prop('checked')) {
-        dataToSend.hospitalar = true;
-    }
+    //Fitlrar unidades
+    $('#basico, #especializado, #estrategico, #farmacia_popular, #hospitalar').change(function() {
+        console.log('filtrar: unidades')
+        denominacaoFetchAndRenderTableData();
+    });
 
-    $.ajax({
-        url: "/produtosdaf/denominacoes/filtro/",
-        data: { ...dataToSend, page: page },
-        dataType: 'json',
-        success: function(data) {
-            updateTable(data.data);
-            $('#numeroDenominacoes').text(data.numero_denominacoes.toLocaleString('pt-BR').replace(/,/g, '.'));
-            $('#currentPage').text(data.current_page);
-            $('#nextPage').prop('disabled', !data.has_next);
-            $('#previousPage').prop('disabled', !data.has_previous);
-            currentPage = data.current_page;
+    let denominacaoCurrentPage = 1;
+
+    //Próxima página
+    $('#denominacaoNextPage').on('click', function() {
+        denominacaoFetchAndRenderTableData(denominacaoCurrentPage + 1);
+    });
+
+    //Página anterior
+    $('#denominacaoPreviousPage').on('click', function() {
+        denominacaoFetchAndRenderTableData(denominacaoCurrentPage - 1);
+    });
+
+   
+    //Renderizar tabela
+    function denominacaoFetchAndRenderTableData(page = 1) {
+        var selectedTipo = $('#tipo_produto').val();
+        var denominacao = $('#denominacao').val();
+        
+        var dataToSend = {
+            'tipo_produto': selectedTipo,
+            'denominacao': denominacao,
+        };
+        
+        if ($('#basico').prop('checked')) {
+            dataToSend.basico = true;
         }
-    });
-}
+        if ($('#especializado').prop('checked')) {
+            dataToSend.especializado = true;
+        }
+        if ($('#estrategico').prop('checked')) {
+            dataToSend.estrategico = true;
+        }
+        if ($('#farmacia_popular').prop('checked')) {
+            dataToSend.farmacia_popular = true;
+        }
+        if ($('#hospitalar').prop('checked')) {
+            dataToSend.hospitalar = true;
+        }
 
-//Próxima página
-$('#nextPage').on('click', function() {
-    fetchAndRenderTableData(currentPage + 1);
+        $.ajax({
+            url: "/produtosdaf/denominacoes/filtro/",
+            data: { ...dataToSend, page: page },
+            dataType: 'json',
+            success: function(data) {
+                updateTable(data.data);
+                $('#numeroDenominacoes').text(data.numero_denominacoes.toLocaleString('pt-BR').replace(/,/g, '.'));
+                $('#denominacaoCurrentPage').text(data.current_page);
+                $('#denominacaoNextPage').prop('disabled', !data.has_next);
+                $('#denominacaoPreviousPage').prop('disabled', !data.has_previous);
+                denominacaoCurrentPage = data.current_page;
+            }
+        });
+    }
+
+
+
+
+    //Atualizar tabela
+    function updateTable(denominacoes) {
+        console.log('updateTable')
+        var $tableBody = $('.table tbody');
+        $tableBody.empty(); // Limpar as linhas existentes
+
+        denominacoes.forEach(denominacao => {
+            var row = `
+                <tr data-id="${denominacao.id}">
+                    <td>${denominacao.id}</td>
+                    <td>${denominacao.tipo_produto}</td>
+                    <td>${denominacao.denominacao}</td>
+                    <td style="text-align: center;">${denominacao.unidade_basico ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
+                    <td style="text-align: center;">${denominacao.unidade_especializado ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
+                    <td style="text-align: center;">${denominacao.unidade_estrategico ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
+                    <td style="text-align: center;">${denominacao.unidade_farm_popular ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
+                    <td style="text-align: center;">${denominacao.hospitalar ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
+                </tr>
+            `;
+            $tableBody.append(row);
+        });
+    }
+
 });
 
-//Página anterior
-$('#previousPage').on('click', function() {
-    fetchAndRenderTableData(currentPage - 1);
-});
 
 
-//Atualizar tabela
-function updateTable(denominacoes) {
-    console.log('updateTable')
-    var $tableBody = $('.table tbody');
-    $tableBody.empty(); // Limpar as linhas existentes
 
-    denominacoes.forEach(denominacao => {
-        var row = `
-            <tr data-id="${denominacao.id}">
-                <td>${denominacao.id}</td>
-                <td>${denominacao.tipo_produto}</td>
-                <td>${denominacao.denominacao}</td>
-                <td style="text-align: center;">${denominacao.unidade_basico ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${denominacao.unidade_especializado ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${denominacao.unidade_estrategico ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${denominacao.unidade_farm_popular ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${denominacao.hospitalar ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-            </tr>
-        `;
-        $tableBody.append(row);
-    });
-}
+
+
 
 //Exportar dados
 document.querySelector('#exportarBtn').addEventListener('click', function() {
@@ -188,11 +197,12 @@ document.querySelector('#exportarBtn').addEventListener('click', function() {
 
 
 //Salvar dados
-document.getElementById('btnSave').addEventListener('click', function(e) {
+document.getElementById('btnSaveDenominacao').addEventListener('click', function(e) {
     e.preventDefault();  // Evita o envio padrão do formulário
 
     let formData = new FormData(document.getElementById('denominacaoForm'));
-    
+    console.log('SALVAR DENOMINAÇÃO')
+
     fetch("{% if form.instance.id %}{% url 'denominacoes_ficha' form.instance.id %}{% else %}{% url 'nova_denominacao' %}{% endif %}", {
         method: 'POST',
         body: formData,
@@ -203,12 +213,17 @@ document.getElementById('btnSave').addEventListener('click', function(e) {
     .then(response => response.json())
     .then(data => {
         // Atualize os campos do log com os dados retornados
+        const denominacaoId = data.id;
         document.getElementById('log_data_registro').value = data.registro_data;
         document.getElementById('log_responsavel_registro').value = data.usuario_registro;
         document.getElementById('lot_ult_atualizacao').value = data.ult_atual_data;
         document.getElementById('log_responsavel_atualizacao').value = data.usuario_atualizacao;
         document.getElementById('log_edicoes').value = data.log_n_edicoes;
+        
+        window.location.href = `/produtosdaf/denominacoes/ficha/${denominacaoId}/`;
     });
+    
+
 });
 
 

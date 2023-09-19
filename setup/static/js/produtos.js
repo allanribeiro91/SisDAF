@@ -1,36 +1,58 @@
 let currentPage = 1;
 
-//Mudar o nome do produto
-document.addEventListener("DOMContentLoaded", function() {
-    console.log("Mudar nome!");
-    let denominacaoSelect = document.getElementById("denominacao");
-    let concentracaoInput = document.getElementById("concentracao");
-    let formaFarmaceuticaSelect = document.getElementById("forma_farmaceutica");
-    let concentracaoTipoSelect = document.getElementById("concentracao_tipo");
-    let produtoInput = document.getElementById("produto"); // Este é o campo "Produto Farmacêutico"
-
-    function updateProduto() {
-        let denominacao = denominacaoSelect.options[denominacaoSelect.selectedIndex].text;
-        let concentracao = (concentracaoTipoSelect.value === "mostrar_nome") ? concentracaoInput.value : "";
-        let formaFarmaceutica = formaFarmaceuticaSelect.options[formaFarmaceuticaSelect.selectedIndex].text;
-
-        produtoInput.value = `${denominacao} ${concentracao} (${formaFarmaceutica})`.trim();
-    }
-
-    denominacaoSelect.addEventListener("change", updateProduto);
-    concentracaoInput.addEventListener("input", updateProduto);
-    formaFarmaceuticaSelect.addEventListener("change", updateProduto);
-    concentracaoTipoSelect.addEventListener("change", updateProduto);
-});
-
 $(document).ready(function() {
+    //Deletar
+    $('#apagarProduto').on('click', function() {
+        const produtoId = $('#id').val();  // Pega o ID da denominação do campo de input
+    
+        if (!produtoId) { //Trata-se de um novo registro que ainda não foi salvo
+            window.location.href = `/produtosdaf/produtos`;
+            return; // Sai da função
+        }
+        $.ajax({
+            url: `/produtosdaf/produtos/deletar/${produtoId}/`,
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')  // Pega o token CSRF para autenticação
+            },
+            success: function(response) {
+                // Redireciona para a lista de denominações após a deleção bem-sucedida
+                //alert(response.message);
+                window.location.href = `/produtosdaf/produtos`;
+            },
+            error: function(error) {
+                // Aqui você pode adicionar qualquer lógica que deseja executar se houver um erro ao tentar deletar a denominação.
+                alert('Ocorreu um erro ao tentar deletar o produto. Por favor, tente novamente.');
+            }
+        });
+    });
+
+
+    //Mudar de página com delegação de eventos
+    $('#tabproduto tbody').on('click', 'tr', function() {
+        fetchAndRenderTableData();
+        const produtoId = $(this).attr('data-id').toString();
+        window.location.href = `/produtosdaf/produtos/ficha/${produtoId}/`;
+    });
+
+    //Mostrar descricao do atc
+    $('#atc_codigo').change(function() {
+        var descricao = $(this).find(':selected').data('descricao');
+        $('#atc_descricao').val(descricao || '');
+    });
+
+    //Tipo de produto da denominacao generica
+    $('#denominacao').change(function() {
+        var tipo_produto = $(this).find(':selected').data('tipo_produto');
+        $('#tipo_produto').val(tipo_produto || '');
+    });
+
+    //Salvar Tags
     $.ajaxSetup({
         headers: {
             'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
         }
     });
-
-    //Salvar Tags
     $("#salvarTags").click(function() {
         console.log('Clique detectado - salvartags');
         var selectedTags = [];
@@ -65,94 +87,45 @@ $(document).ready(function() {
             }
         });
     });
-});
 
 
+    //Limpar Filtros
+    $('.limpar-filtro').on('click', function() {
+        $('#tipo_produto').val('');
+        $('#produto').val('');
+        $('#comp_basico').prop('checked', false);
+        $('#comp_especializado').prop('checked', false);
+        $('#comp_estrategico').prop('checked', false);
+        $('#disp_farmacia_popular').prop('checked', false);
+        $('#hospitalar').prop('checked', false);
+        fetchAndRenderTableData();
+    });
 
+    //Próxima página
+    $('#nextPage').on('click', function() {
+        console.log('próxima página')
+        fetchAndRenderTableData(currentPage + 1);
+    });
 
-//Concentracao
-document.addEventListener("DOMContentLoaded", function() {
-    let concentracaoTipoSelect = document.getElementById("concentracao_tipo");
-    let concentracaoInput = document.getElementById("concentracao");
+    //Página anterior
+    $('#previousPage').on('click', function() {
+        console.log('página anterior')
+        fetchAndRenderTableData(currentPage - 1);
+    });
 
-    function updateConcentracaoReadonly() {
-        if (concentracaoTipoSelect.value === "mostrar_nome" || concentracaoTipoSelect.value === "mostrar_nao") {
-            concentracaoInput.removeAttribute("readonly");
-        } else {
-            concentracaoInput.setAttribute("readonly", "");
-            concentracaoInput.value = "";
-        }
-    }
+    //Filtrar
+    $('#tipo_produto, #produto').change(function() {
+        fetchAndRenderTableData();
+    });
 
-    // Chama a função para definir o estado inicial
-    updateConcentracaoReadonly();
-
-    // Adiciona um ouvinte de evento para atualizar o atributo readonly sempre que o valor do dropdown mudar
-    concentracaoTipoSelect.addEventListener("change", updateConcentracaoReadonly);
-});
-
-//Deletar
-$(document).ready(function() {
-    $('#apagarRegistro').on('click', function() {
-        const produtoId = $('#id').val();  // Pega o ID da denominação do campo de input
-    
-        if (!produtoId) { //Trata-se de um novo registro que ainda não foi salvo
-            window.location.href = `/produtosdaf/produtos`;
-            return; // Sai da função
-        }
-        
-        $.ajax({
-            url: `/produtosdaf/produtos/deletar/${produtoId}/`,
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')  // Pega o token CSRF para autenticação
-            },
-            success: function(response) {
-                // Redireciona para a lista de denominações após a deleção bem-sucedida
-                //alert(response.message);
-                window.location.href = `/produtosdaf/produtos`;
-            },
-            error: function(error) {
-                // Aqui você pode adicionar qualquer lógica que deseja executar se houver um erro ao tentar deletar a denominação.
-                alert('Ocorreu um erro ao tentar deletar o produto. Por favor, tente novamente.');
-            }
-        });
+    //Filtrar unidades
+    $('#comp_basico, #comp_especializado, #comp_estrategico, #disp_farmacia_popular, #hospitalar').change(function() {
+        fetchAndRenderTableData();
     });
 });
 
-//Acessar ficha
-$(document).ready(function() {
-    console.log('ler');
-    fetchAndRenderTableData();
 
-    //Mudar de página com delegação de eventos
-    $('.table tbody').on('click', 'tr', function() {
-        const produtoId = $(this).attr('data-id').toString();
-        window.location.href = `/produtosdaf/produtos/ficha/${produtoId}/`;
-    });
-});
 
-//Limpar Filtros
-$('.limpar-filtro').on('click', function() {
-    $('#tipo_produto').val('');
-    $('#produto').val('');
-    $('#basico').prop('checked', false);
-    $('#especializado').prop('checked', false);
-    $('#estrategico').prop('checked', false);
-    $('#farmacia_popular').prop('checked', false);
-    $('#hospitalar').prop('checked', false);
-    fetchAndRenderTableData();
-});
-
-//Filtrar
-$('#tipo_produto, #produto').change(function() {
-    fetchAndRenderTableData();
-});
-
-//Filtrar unidades
-$('#comp_basico, #comp_especializado, #comp_estrategico, #disp_farmacia_popular, #hospitalar').change(function() {
-    fetchAndRenderTableData();
-});
 
 //Renderizar tabela
 function fetchAndRenderTableData(page = 1) {
@@ -196,15 +169,7 @@ function fetchAndRenderTableData(page = 1) {
     });
 }
 
-//Próxima página
-$('#nextPage').on('click', function() {
-    fetchAndRenderTableData(currentPage + 1);
-});
 
-//Página anterior
-$('#previousPage').on('click', function() {
-    fetchAndRenderTableData(currentPage - 1);
-});
 
 //Atualizar tabela
 function updateTable(produtos) {
@@ -308,22 +273,6 @@ document.getElementById('btnSave').addEventListener('click', function(e) {
 
 
 
-//////////Comportamentos da ficha do produto
-//Mostrar descricao do atc
-$(document).ready(function() {
-    $('#atc_codigo').change(function() {
-        var descricao = $(this).find(':selected').data('descricao');
-        $('#atc_descricao').val(descricao || '');
-    });
-});
-
-//Tipo de produto da denominacao generica
-$(document).ready(function() {
-    $('#denominacao').change(function() {
-        var tipo_produto = $(this).find(':selected').data('tipo_produto');
-        $('#tipo_produto').val(tipo_produto || '');
-    });
-});
 
 
 
@@ -334,60 +283,6 @@ $(document).ready(function() {
 
 
 
-document.addEventListener("DOMContentLoaded", function() {
-    const buttons = document.querySelectorAll('.tab-button');
-    
-    buttons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove o atributo "active" de todos os botões
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Adiciona o atributo "active" ao botão clicado
-            this.classList.add('active');
-        });
-    });
-});
-
-//Expandir área de observações
-document.addEventListener('DOMContentLoaded', function() {
-    const textareas = document.querySelectorAll('.auto-expand');
-
-    textareas.forEach(textarea => {
-        textarea.addEventListener('input', function() {
-            this.style.height = 'auto'; // Reset height to auto
-            this.style.height = this.scrollHeight + 'px'; // Set height to scrollHeight
-        });
-    });
-});
-
-
-//Outros nomes (outros sistemas)
-document.addEventListener("DOMContentLoaded", function() {
-    function toggleReadonly(checkboxId, inputId1, inputId2) {
-        let checkbox = document.getElementById(checkboxId);
-        let input1 = document.getElementById(inputId1);
-        let input2 = document.getElementById(inputId2);
-
-        checkbox.addEventListener("change", function() {
-            if (checkbox.checked) {
-                input1.setAttribute("readonly", "");
-                input2.setAttribute("readonly", "");
-                input1.value = "";
-                input2.value = "";
-            } else {
-                input1.removeAttribute("readonly");
-                input2.removeAttribute("readonly");
-            }
-        });
-    }
-
-    toggleReadonly("sigtap_possui", "sigtap_codigo", "sigtap_nome");
-    toggleReadonly("sismat_possui", "sismat_codigo", "sismat_nome");
-    toggleReadonly("catmat_possui", "catmat_codigo", "catmat_nome");
-    toggleReadonly("obm_possui", "obm_codigo", "obm_nome");
-});
 
 
 

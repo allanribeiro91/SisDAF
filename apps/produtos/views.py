@@ -18,7 +18,7 @@ import json
 
 @login_required
 def produtos(request):
-    produtos = ProdutosFarmaceuticos.objects.filter(del_status=False)
+    produtos = ProdutosFarmaceuticos.objects.filter(del_status=False).order_by('produto')
     numero_produtos = produtos.count()
     conteudo = {
         'produtos': produtos,
@@ -26,7 +26,6 @@ def produtos(request):
         'numero_produtos': numero_produtos,
     }
     return render(request, 'produtos/produtos.html', conteudo)
-
 
 @login_required
 def produtos_ficha(request, product_id=None):
@@ -86,7 +85,7 @@ def produtos_ficha(request, product_id=None):
             #Salvar o produto
             produto = produto_form.save(commit=False)
             produto.save(current_user=request.user.usuario_relacionado)
-            tags
+            messages.success(request, "Dados atualizados com sucesso!")
             
             #Retornar log
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -163,7 +162,7 @@ def get_filtros_produtos(request):
     if hospitalar:
         filters['hospitalar'] = 1
     
-    produtos = ProdutosFarmaceuticos.objects.filter(**filters)
+    produtos = ProdutosFarmaceuticos.objects.filter(**filters).order_by('produto')
     numero_produtos = produtos.count()
     
     page = int(request.GET.get('page', 1))
@@ -365,7 +364,7 @@ def produto_exportar_pdf(request, product_id):
 
 @login_required
 def denominacoes(request):
-    denominacoes = DenominacoesGenericas.objects.filter(del_status=False)
+    denominacoes = DenominacoesGenericas.objects.filter(del_status=False).order_by('denominacao')
     numero_denominacoes = denominacoes.count()
     context = {
         'denominacoes': denominacoes,
@@ -373,8 +372,6 @@ def denominacoes(request):
         'numero_denominacoes': numero_denominacoes,
     }
     return render(request, 'produtos/denominacoes.html', context)
-
-
 
 @login_required
 def denominacoes_ficha(request, denominacao_id=None):
@@ -412,6 +409,7 @@ def denominacoes_ficha(request, denominacao_id=None):
             else:
                 return redirect('nova_denominacao')
 
+        #Formulário é válido
         if denominacao_form.is_valid():
             #Verificar se já existe a denominação na base [
             nome_denominacao = denominacao_form.cleaned_data.get('denominacao')
@@ -441,6 +439,7 @@ def denominacoes_ficha(request, denominacao_id=None):
                     'ult_atual_data': denominacao.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S'),
                     'usuario_atualizacao': denominacao.usuario_atualizacao.dp_nome_completo,
                     'log_n_edicoes': denominacao.log_n_edicoes,
+                    'id': denominacao.id,
                 })           
             
         else:
@@ -455,7 +454,6 @@ def denominacoes_ficha(request, denominacao_id=None):
         'TIPO_PRODUTO': TIPO_PRODUTO,
     })
 
-
 @login_required
 def delete_denominacao(request, denominacao_id):
     try:
@@ -466,7 +464,6 @@ def delete_denominacao(request, denominacao_id):
     except DenominacoesGenericas.DoesNotExist:
         messages.error(request, "Denominação não encontrada.")    
     return redirect('denominacoes')
-
 
 @login_required
 def get_filtros_denominacoes(request):
@@ -495,7 +492,7 @@ def get_filtros_denominacoes(request):
     if hospitalar:
         filters['hospitalar'] = 1
     
-    denominacoes = DenominacoesGenericas.objects.filter(**filters)
+    denominacoes = DenominacoesGenericas.objects.filter(**filters).order_by('denominacao')
     numero_denominacoes = denominacoes.count()
     
     page = int(request.GET.get('page', 1))
@@ -514,7 +511,6 @@ def get_filtros_denominacoes(request):
         'has_previous': denominacoes_paginados.has_previous(),
         'current_page': page
     })
-
 
 @login_required
 def exportar_denominacoes(request):
