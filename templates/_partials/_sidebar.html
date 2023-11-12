@@ -1,0 +1,37 @@
+{% load static %}
+    <!-- Barra Lateral Esquerda -->
+    <div class="sidebar">
+
+        <div>
+            <a class="tab {% if request.resolver_match.url_name == 'home' %}active-tab{% endif %}" href="{% url 'home' %}">Home</a>
+        </div>
+        <div>
+            {% with current_url=request.resolver_match.url_name %}
+            <a class="tab {% if current_url in 'produtos,produtos_ficha,novo_produto,denominacoes,denominacoes_ficha,nova_denominacao' %}active-tab{% endif %}" href="{% url 'produtos' %}">Produtos DAF</a>
+            {% endwith %}    
+        </div> 
+        
+        <div>
+            {% with current_url=request.resolver_match.url_name %}
+            <a class="tab {% if current_url in 'fornecedores, fornecedores_faq, fornecedor_faq_novo, fornecedor_faq_ficha, fornecedor_novo, fornecedor_ficha' %}active-tab{% endif %}" href="{% url 'fornecedores' %}">Fornecedores</a>
+            {% endwith %}
+        </div>
+
+        <div>
+            {% with current_url=request.resolver_match.url_name %}
+            <a class="tab {% if current_url in 'proaq, proaq_ficha_dados_gerais, proaq_ficha_evolucao, proaq_ficha_evolucao_nova, nova_tramitacao, proaq_ficha_tramitacoes, novo_proaq' %}active-tab{% endif %}" href="{% url 'proaq' %}">Processos Aquisitivos</a>
+            {% endwith %}
+        </div>
+        <div>
+            {% with current_url=request.resolver_match.url_name %}
+            <a class="tab {% if current_url in 'contratos, contrato_novo, arps, arp_nova' %}active-tab{% endif %}" href="{% url 'contratos' %}">Contratos</a>
+            {% endwith %}
+        </div>
+        
+
+        <!-- Adicione o botão abaixo -->
+        <div id="toggleButton" class="toggle-button"><i class="fas fa-arrow-left"></i></div>
+        
+
+    </div>
+    <script src="{% static 'js/_sidebar.js' %}"></script>

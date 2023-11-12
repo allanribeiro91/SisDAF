@@ -1,0 +1,107 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/proaq_ficha.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\denominacoes_genericas.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fa-solid fa-folder-tree"></i>&nbsp;Processos Aquisitivos / Ficha do Processo Aquisitivo
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tab-voltar">
+            <a href="{% url 'proaq' %}" style="color: black;">
+                <i class="fas fa-arrow-left"></i> 
+            </a>
+        </div>
+        <div class="tabs">
+            <button class="tab-button" id="proaq_ficha_dados_gerais">Dados Gerais</button>
+            <button class="tab-button" id="proaq_ficha_evolucao">Evolução Processual</button>
+            <button class="tab-button active" id="proaq_ficha_tramitacoes">Tramitações</button>
+        </div>
+    </div>
+
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button class="btn btn-primary me-md-2" type="submit" id="btnNovaTramitacao" style="font-size: 12px; background-color: green; border-color: green;">
+            <i class="fas fa-plus" style="font-size: 14px;"></i> 
+            &nbsp;Nova Tramitação
+        </button>
+    </div>
+
+
+    <div class="section-tabela">
+        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabProcessosAquisitivos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo de Produto</th>
+                    <th>Denominação Genérica</th>
+                    <th style="text-align: center;">Básico</th>
+                    <th style="text-align: center;">Especializado</th>
+                    <th style="text-align: center;">Estratégico</th>
+                    <th style="text-align: center;">Farm. Popular</th>
+                    <th style="text-align: center;">Hospitalar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in denominacoes %}
+                <tr data-id="{{ item.id }}">
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.tipo_produto }}</td>
+                    <td>{{ item.denominacao }}</td>
+                    <td style="text-align: center;">
+                        {% if item.unidade_basico %}
+                            <span class="bold-blue">Sim</span>
+                        {% else %}
+                            Não
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        {% if item.unidade_especializado %}
+                            <span class="bold-blue">Sim</span>
+                        {% else %}
+                            Não
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        {% if item.unidade_estrategico %}
+                            <span class="bold-blue">Sim</span>
+                        {% else %}
+                            Não
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        {% if item.unidade_farm_popular %}
+                            <span class="bold-blue">Sim</span>
+                        {% else %}
+                            Não
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        {% if item.hospitalar %}
+                            <span class="bold-blue">Sim</span>
+                        {% else %}
+                            Não
+                        {% endif %}
+                    </td>                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>  
+        </div>
+        <div id="pagination">
+            <button id="denominacaoPreviousPage" class="page" disabled>Anterior </button>
+            <span id="denominacaoCurrentPage">1</span>
+            <button id="denominacaoNextPage" class="page">Próximo</button>
+        </div>
+    <script src="{% static 'js/denominacoes_genericas.js' %}"></script>
+    <script src="{% static 'js/processos_aquisitivos.js' %}"></script>
+
+{% endblock %}

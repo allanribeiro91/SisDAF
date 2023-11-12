@@ -1,0 +1,55 @@
+<!-- Modal -->
+{% load static %}
+<style>
+    .tags-column {
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width {
+        max-width: 80%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="proaqProdutosModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Produtos do Processo Aquisitivo</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Os produtos serão carregadas aqui pelo script -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" id="selectAll" style="background-color: rgb(243, 117, 0); border-color: rgb(243, 117, 0);">Selecionar Todos</button>
+                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="salvarProaqProduto" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#proaqProdutosModal').modal('hide');
+        });
+    });
+
+
+    // Quando o botão 'Selecionar Todos' é clicado
+    $("#selectAll").on('click', function(event) {
+        var allChecked = $('#proaqProdutosModal .modal-body input[type="checkbox"]:not(:checked)').length == 0;
+        $('#proaqProdutosModal .modal-body input[type="checkbox"]').prop('checked', !allChecked);
+    });
+</script>
+
+<script src="{% static 'js/processos_aquisitvos.js' %}"></script>

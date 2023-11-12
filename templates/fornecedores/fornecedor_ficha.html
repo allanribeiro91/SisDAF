@@ -1,0 +1,277 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/fornecedores_ficha.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fa-solid fa-warehouse"></i>&nbsp;Fornecedores / Ficha do Fornecedor
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tab-voltar">
+            <a href="{% url 'fornecedores' %}" style="color: black;">
+                <i class="fas fa-arrow-left"></i> 
+            </a>
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" id="fornecedor_ficha_dados_gerais">Dados Gerais</button>
+        </div>
+    </div>
+
+    <div class="area-scroll">
+        <!-- form denominacoes_genericas -->
+            <form id="fornecedorForm" method="POST" data-post-url="{% if form.instance.id %}{% url 'fornecedor_ficha' form.instance.id %}{% else %}{% url 'fornecedor_novo' %}{% endif %}">
+            {% csrf_token %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#fornecedor_delete" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                    <i class="fas fa-trash-alt"></i>
+                    Deletar
+                </button>
+                
+                <button class="btn btn-primary me-md-2" type="submit" id="btnSaveFornecedor" style="font-size: 12px;">
+                    <i class="fas fa-save me-1"></i> 
+                    Salvar
+                </button>
+            </div>
+            
+            <div class="horizontal-sections">
+                <div class="section-log">
+                    <h3>Log</h3>
+                    <div class="grid-log">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" id="id_fornecedor" name="id_fornecedor" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                            <label for="floatingInput">ID</label>
+                        </div>                        
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ fornecedor.registro_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Data do Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ fornecedor.usuario_registro.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável pelo Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ fornecedor.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Última Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ fornecedor.usuario_atualizacao.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" name="log_edicoes" readonly value="{{ fornecedor.log_n_edicoes }}">
+                            <label for="floatingInput">Nº Edições</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Dados do Fornecedor</h3>
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}">
+                            <label for="floatingInput">CNPJ*</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="hierarquia" aria-label="Floating label select example" name="hierarquia">
+                                <option value="" disabled {% if not form.instance.hierarquia %}selected{% endif %}>Não informado</option>
+                                {% for value, display in lista_cnpj_hierarquia %}
+                                <option value="{{ value }}" {% if form.instance.hierarquia == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="floatingSelect">Hierarquia</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="porte" aria-label="Floating label select example" name="porte">
+                                <option value="" disabled {% if not form.instance.porte %}selected{% endif %}>Não informado</option>
+                                {% for value, display in lista_cnpj_porte %}
+                                <option value="{{ value }}" {% if form.instance.porte == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="floatingSelect">Porte*</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="tipo_direito" aria-label="Floating label select example" name="tipo_direito">
+                                <option value="" disabled {% if not form.instance.tipo_direito %}selected{% endif %}>Não informado</option>
+                                {% for value, display in lista_tipo_direito %}
+                                <option value="{{ value }}" {% if form.instance.tipo_direito == value %}selected{% endif %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="floatingSelect">Tipo de Direito*</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="date" class="form-control" id="data_abertura" name="data_abertura" value="{% if form.data_abertura.value %}{{ form.data_abertura.value|date:'Y-m-d' }}{% endif %}">
+                            <label for="floatingInput">Data de Abertura</label>
+                        </div>    
+                        <div class="form-floating">
+                            <select class="form-select" id="natjuridica_codigo" aria-label="Floating label select example" name="natjuridica_codigo">
+                                <option value="" disabled {% if not form.instance.natjuridica_codigo %}selected{% endif %}>Não informado</option>
+                                {% for value in lista_naturezajuridica %}
+                                <option value="{{ value }}" {% if form.instance.natjuridica_codigo == value %}selected{% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="floatingSelect">Código</label>
+                        </div>
+                        <div class="form-floating full-width">
+                            <input type="text" class="form-control" id="natjuridica_descricao" name="natjuridica_descricao" readonly value="{{ form.instance.natjuridica_descricao|default_if_none:'' }}">
+                            <label for="floatingSelect">Descrição da Natureza Jurídica</label>
+                        </div>
+                    </div>
+
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="razao_social" name="razao_social" value="{{ form.instance.razao_social|default_if_none:'' }}">
+                            <label for="floatingInput">Razão Social*</label>
+                        </div>
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" value="{{ form.instance.nome_fantasia|default_if_none:'' }}">
+                            <label for="floatingInput">Nome Fantasia</label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Atividade Empresarial</h3>
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating">
+                            <select class="form-select" id="ativ_principal_cod" aria-label="Floating label select example" name="ativ_principal_cod">
+                                <option value="" disabled {% if not form.instance.ativ_principal_cod %}selected{% endif %}>Não informado</option>
+                                {% for value in lista_cnae %}
+                                <option value="{{ value }}" {% if form.instance.ativ_principal_cod == value %}selected{% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="floatingSelect">Atividade Principal</label>
+                        </div>
+                                            
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="ativ_principal_descricao" name="ativ_principal_descricao" readonly value="{{ form.instance.ativ_principal_descricao|default_if_none:'' }}">
+                            <label for="floatingInput">Descrição da Atividade Principal</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Endereço</h3>
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="end_cep" name="end_cep" value="{{ form.instance.end_cep|default_if_none:'' }}">
+                            <label for="floatingInput">CEP</label>
+                        </div>
+                        <div class="form-floating">
+                            <select class="form-select" id="end_uf" aria-label="Floating label select example" name="end_uf">
+                                <option value="" disabled {% if not form.instance.end_uf %}selected{% endif %}>Não informado</option>
+                                {% for value in lista_ufs %}
+                                <option value="{{ value }}" {% if form.instance.end_uf == value %}selected{% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="floatingSelect">UF*</label>
+                        </div>
+                        <div class="form-floating" style="width: 25%;">
+                            <select class="form-select" id="end_municipio" aria-label="Floating label select example" name="end_municipio">
+                                <option value="" disabled {% if not form.instance.end_municipio %}selected{% endif %}>Não informado</option>
+                                {% for value in lista_municipios %}
+                                    <option value="{{ value }}" {% if form.instance.end_municipio == value %}selected{% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>                        
+                            <label for="floatingSelect">Município</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="end_bairro" name="end_bairro" value="{{ form.instance.end_bairro|default_if_none:'' }}">
+                            <label for="floatingInput">Bairro</label>
+                        </div>
+                        <div class="form-floating mb-3 full-width">
+                            <input type="text" class="form-control" id="end_logradouro" name="end_logradouro" value="{{ form.instance.end_logradouro|default_if_none:'' }}">
+                            <label for="floatingInput">Logradouro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="end_numero" name="end_numero" value="{{ form.instance.end_numero|default_if_none:'' }}">
+                            <label for="floatingInput">Número</label>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Observações Gerais</h3>
+                <div class="grid" style="font-size: 14px;">
+                    <div class="form-floating mb-3 full-width">
+                        <textarea class="form-control auto-expand" id="observacoes_gerais" name="observacoes_gerais" rows="1" style="padding-top: 10px; height: 120px;">{{ form.instance.observacoes_gerais|default_if_none:'Sem observações.' }}</textarea>
+                    </div> 
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            var produtos = [];  // Para armazenar os produtos buscados
+            var denominacaoLabel = "Não Informado";  // Valor inicial
+            var produtosSelecionados = {{ produtos_selecionados|safe }};
+
+            console.log(produtosSelecionados)
+
+            // Quando uma denominação genérica é selecionada
+            $('#id_denominacao').change(function() {
+                denominacaoLabel = $("#id_denominacao option:selected").text();
+                if (denominacaoLabel) {
+                    var urlBase = '/proaq_produtos_por_denominacao/';
+                    var url = urlBase + denominacaoLabel + '/';
+                    $.ajax({
+                        url: url,
+                        success: function(data) {
+                            produtos = data;
+                            console.log(produtos);
+                        }
+                    });
+                }
+            });
+
+            // Quando o botão é clicado
+            $(".open-proaq-produtos-modal").on('click', function(event) {
+                
+                if (denominacaoLabel == "Não Informado") {
+                    alert("Por favor, selecione uma denominação genérica válida.");
+                    return;  // Não prossiga com a exibição do modal
+                }
+                
+                var modalBody = $('#proaqProdutosModal .modal-body');
+                modalBody.empty();  // Limpe o corpo do modal
+
+                // Carregue os produtos no modal
+                produtos.forEach(function(produto, index) {
+                    var content = "<div class='form-check'>";
+                    var isChecked = produtosSelecionados.some(function(p) { return p.produto_id === produto.id; }) ? "checked" : "";
+                    content += "<input type='checkbox' class='form-check-input' id='" + produto.id + "' name='" + produto.id + "' value='" + produto.id + "' " + isChecked + ">";
+                    content += "<label class='form-check-label' for='produto" + produto.id + "'>" + produto.produto + "</label>";
+                    content += "</div>";
+                    modalBody.append(content);
+                });
+                
+                $('#proaqProdutosModal').modal('show');  // Mostre o modal
+            });
+
+            $('#id_denominacao').change();
+        });
+ 
+    </script>
+
+    <script type="text/javascript">
+        var filtrar_dados = "{% url 'fornecedor_ficha_filtrar_dados' %}";
+    </script>
+    <script src="{% static 'js/fornecedores.js' %}"></script>
+
+{% endblock %}

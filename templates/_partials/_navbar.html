@@ -1,0 +1,43 @@
+{% load static %}
+    <!-- Barra Superior -->
+    <div class="top-bar">        
+        <img src="{% static 'assets/logo/logo_sisdaf_negativo.png' %}" alt="Logo SisDAF" class="top-logo">
+        
+        <div class="logo-text">
+            <span class="sisdaf-title">SisDAF</span>
+            <span class="version-info">SECTICS/MS</span>
+        </div>
+        <div class="alert-container">  <!-- Contêiner para o alerta -->
+            {% include '_partials/_alertas.html' %}  
+        </div>
+        <div class="unidade-info">
+            <span class="user-label">Unidade DAF</span>
+            <span class="user-name">Gabinete</span>
+        </div>
+        <div class="user-info">
+            <span class="user-label">Usuário</span>
+            <span class="user-name">{{ request.user.usuario_relacionado.primeiro_ultimo_nome  }}</span>
+        </div>
+        <div class="profile-pic" id="profile-pic">
+            <!-- <img src="{% if request.user.usuario_relacionado.foto_usuario %}{{ request.user.usuario_relacionado.foto_usuario.url }}{% else %}{% static 'assets/imagens/user.png' %}{% endif %}" alt="User Profile Pic" id="profile-pic-img"> -->
+            <img src="{% static 'assets/imagens/user.png' %}" alt="User Profile Pic" id="profile-pic-img">
+        </div>
+        <div class="dropdown" id="dropdown">
+            <a href="{% url 'meusdados' %}">
+                <i class="fas fa-user"></i>
+                &nbsp;Meus Dados</a>
+            <!-- <a href="">
+                <i class="fas fa-key"></i>
+                &nbsp;Alterar Senha</a>
+            <a href="">
+                <i class="fas fa-history"></i>
+                &nbsp;Meus Logs</a>
+            <a href="">
+                <i class="fas fa-info-circle"></i>
+                &nbsp;Ajuda</a> -->
+            <a href="{% url 'logout' %}">
+                <i class="fas fa-sign-out-alt"></i>
+                &nbsp;Sair</a>
+        </div>
+    </div>
+    <script src="{% static 'js/_navbar.js' %}"></script>

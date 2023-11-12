@@ -1,0 +1,129 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="stylesheet" href="{% static '\styles\fornecedores.css' %}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fas fa-warehouse"></i>&nbsp;Fornecedores / FAQ
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab-button" id="fornecedores" onclick="location.href='{% url 'fornecedores' %}'">Fornecedores</button>
+            <button class="tab-button active" id="fornecedores_faq" onclick="location.href='{% url 'fornecedores_faq' %}'">FAQ</button>
+        </div>
+    </div>
+
+    <div class="horizontal-sections">
+        
+        <div class="section numbers">
+            <div class="filter-title">
+                Total de Perguntas
+            </div>
+            <div id="numeroFornecedoresFaq" class="total-geral">{{ total_fornecedores_faq }}</div>
+        </div>
+        
+        <div class="section filter">
+            <div class="filter-title">
+                Filtros
+            </div>
+            
+            <!-- Tópico -->
+            <div class="form-floating tipo-fornecedor" style="width: 310px;">
+                <select class="form-select" aria-label="Floating label select example" name="filtro_faq_topico" id="filtro_faq_topico">
+                    <option value=""></option>
+                    {% for value, display in lista_topico %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Tópico</label>
+            </div>   
+            
+            <!-- Contexto -->
+            <div class="form-floating  fornecedor">
+                <input type="text" class="form-control" id="filtro_faq_contexto" name="filtro_faq_contexto">
+                <label for="floatingInput">Contexto</label>
+            </div>
+
+            <!-- Resposta -->
+            <div class="form-floating  fornecedor">
+                <input type="text" class="form-control" id="filtro_faq_resposta" name="filtro_faq_resposta">
+                <label for="floatingInput">Resposta</label>
+            </div>
+    
+            <button class="custom-btn limpar-filtro-fornecedores-faq">
+                <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
+                <span style="font-size: 10px;">Limpar Filtros</span>
+            </button>
+        </div>
+
+        <div class="section funcionalidades">
+            <div style="font-size: 12px; font-weight: bold;">
+                Funcionalidades
+            </div>
+            <div class="btn-container">
+                <a href="{% url 'fornecedor_faq_novo' %}" style="text-decoration: none;">
+                    <button class="custom-btn" id="inserir_fornecedor_faq">
+                        <div class="icon-container">
+                            <i class="fa fa-plus-circle" style="font-size: 1.5vw"></i>
+                            <span>Inserir</span>
+                        </div>
+                    </button>
+                </a>
+                <button class="custom-btn" id="exportarFornecedoresFaq">
+                    <div class="icon-container">
+                        <i class="fa fa-download" style="font-size: 1.5vw"></i>
+                        <span>Exportar</span>
+                    </div>                    
+                </button>
+                
+            </div>   
+        </div>
+        
+    </div>
+
+    <div class="section-tabela">
+        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabFornecedoresFaq">
+            <thead>
+                <tr>
+                    
+                    <th class="col-faq-id">ID</th>
+                    <th class="col-faq-topico">Tópico</th>
+                    <th class="col-faq-contexto">Contexto</th>
+                    <th class="col-faq-resposta">Resposta</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in tab_fornecedores_faq %}
+                <tr data-id="{{ item.id }}">
+                    <td class="col-faq-id">{{ item.id }}</td>
+                    <td class="col-faq-topico">
+                        {% for value, display in lista_topico %}
+                            {% if item.topico == value %}
+                                {{ display }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td class="col-faq-contexto">{{ item.contexto|capfirst }}</td>
+                    <td class="col-faq-resposta">{{ item.resposta|capfirst }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>  
+        </div>
+        <div id="pagination">
+            <button id="denominacaoPreviousPage" class="page" disabled>Anterior </button>
+            <span id="denominacaoCurrentPage">1</span>
+            <button id="denominacaoNextPage" class="page">Próximo</button>
+        </div>
+    </div>
+    
+    <script src="{% static 'js/fornecedores_faq.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,456 @@
+from django.shortcuts import render, redirect
+from django.core.paginator import Paginator, EmptyPage
+from django.contrib import auth, messages
+from django.urls import reverse
+from apps.main.models import CustomLog
+from django.http import JsonResponse, HttpResponse
+from apps.fornecedores.models import Fornecedores, UF_Municipio, CNPJ_NATUREZA_JURIDICA, CNPJ_CNAE, Fornecedores_Faq
+from apps.fornecedores.forms import FornecedoresForm, FornecedoresFaqForm
+from setup.choices import CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
+from datetime import datetime
+from io import BytesIO
+import json
+
+def fornecedores(request):
+    tab_fornecedores = Fornecedores.objects.filter(del_status=False).order_by('nome_fantasia')
+    total_fornecedores = tab_fornecedores.count()
+    lista_ufs = UF_Municipio.objects.values_list('uf_sigla', flat=True).distinct().order_by('uf_sigla')
+    conteudo = {
+         'tab_fornecedores': tab_fornecedores,
+         'total_fornecedores': total_fornecedores,
+         'lista_cnpj_hierarquia': CNPJ_HIERARQUIA,
+         'lista_cnpj_porte': CNPJ_PORTE,
+         'lista_tipo_direito': TIPO_DIREITO,
+         'lista_ufs': lista_ufs,
+    }
+    return render(request, 'fornecedores/fornecedores.html', conteudo)
+
+
+def fornecedor_ficha(request, fornecedor_id=None):
+    
+    if fornecedor_id:
+         try:
+             fornecedor = Fornecedores.objects.get(id=fornecedor_id)
+         except Fornecedores.DoesNotExist:
+             messages.error(request, "Fornecedor não encontrado.")
+             return redirect('fornecedores')
+    else:
+         fornecedor = None
+    
+    #salvar
+    if request.method == 'POST':
+        if fornecedor:
+            fornecedor_form = FornecedoresForm(request.POST, instance=fornecedor)
+            novo_fornecedor = False
+        else:
+            fornecedor_form = FornecedoresForm(request.POST)
+            novo_fornecedor = True
+
+        #Conferir campos obrigatórios
+        fields = [
+            ('cnpj', "O CNPJ é obrigatório!"),
+            ('razao_social', "A razão social é obrigatória!"),
+            ('porte', "O porte é obrigatório!"),
+            ('tipo_direito', "O tipo de direito é obrigatório!"),
+            ('end_uf', 'A UF é obrigatória!')
+        ]
+        for field_name, error_message in fields:
+            valor = request.POST.get(field_name)
+            if valor == "Não informado" or valor == None:
+                messages.error(request, error_message)
+                if fornecedor:
+                    return JsonResponse({
+                    'redirect_url': reverse('fornecedor_ficha', args=[fornecedor.id]),
+                    })
+                else:
+                    return JsonResponse({
+                    'redirect_url': reverse('fornecedor_novo'),
+                    'data': request.POST,
+                    })
+
+        #Verificar se houve alteração no formulário
+        if not fornecedor_form.has_changed():
+            messages.error(request, "Dados não foram salvos. Não houve mudanças.")
+            if fornecedor:
+                return JsonResponse({
+                    'redirect_url': reverse('fornecedor_ficha', args=[fornecedor.id]),
+                })
+            else:
+                #return redirect('fornecedor_novo')
+                return JsonResponse({
+                    'redirect_url': reverse('fornecedor_novo'),
+                })
+
+        if fornecedor_form.is_valid():
+            #Verificar se já existe o fornecedor na base
+            cnpj = fornecedor_form.cleaned_data.get('cnpj')
+            cnpj_existente = Fornecedores.objects.filter(cnpj=cnpj)
+            
+            #Se estivermos atualizando um fornecedor existente, excluímos esse fornecedor da verificação
+            if fornecedor:
+                cnpj_existente = cnpj_existente.exclude(id=fornecedor.id)
+
+            if cnpj_existente.exists():
+                messages.error(request, "Já existe um fornecedor com esse CNPJ. Não foi possível salvar.")
+                if fornecedor:
+                    return JsonResponse({
+                        'redirect_url': reverse('fornecedor_ficha', args=[fornecedor.id]),
+                    })
+                else:
+                    return JsonResponse({
+                        'redirect_url': reverse('fornecedor_novo'),
+                    })
+
+            #Salvar o produto
+            fornecedor = fornecedor_form.save(commit=False)
+            fornecedor.save(current_user=request.user.usuario_relacionado)
+            if novo_fornecedor:
+                messages.success(request, "Novo fornecedor registrado com sucesso!")
+            else:
+                messages.success(request, "Dados atualizados com sucesso!")
+            
+
+            
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'redirect_url': reverse('fornecedor_ficha', args=[fornecedor.id]),
+                })
+   
+        else:
+            messages.error(request, "Formulário inválido")
+            print("Erro formulário fornecedor")
+            print(fornecedor_form.errors)
+
+    #novo
+    form = FornecedoresForm(instance=fornecedor)
+    lista_naturezajuridica = CNPJ_NATUREZA_JURIDICA.objects.values_list('codigo', flat=True).distinct().order_by('codigo')
+    lista_cnae = CNPJ_CNAE.objects.values_list('subclasse_codigo', flat=True).distinct().order_by('subclasse_codigo')
+    lista_ufs = UF_Municipio.objects.values_list('uf_sigla', flat=True).distinct().order_by('uf_sigla')
+    uf = form.instance.end_uf
+    lista_municipios = UF_Municipio.objects.filter(uf_sigla=uf).values_list('municipio', flat=True).order_by('municipio')
+    
+    return render(request, 'fornecedores/fornecedor_ficha.html', {
+        'fornecedor': fornecedor,
+        'form': form,
+        'lista_cnpj_hierarquia': CNPJ_HIERARQUIA,
+        'lista_cnpj_porte': CNPJ_PORTE,
+        'lista_tipo_direito': TIPO_DIREITO,
+        'lista_ufs': lista_ufs,
+        'lista_naturezajuridica': lista_naturezajuridica,
+        'lista_cnae': lista_cnae,
+        'lista_municipios': lista_municipios,
+    })
+
+
+def fornecedor_ficha_filtrar_dados(request):
+    tipo = request.GET.get('tipo')
+    
+    if tipo == 'natjuridica':
+        codigo = request.GET.get('codigo')
+        nat_juridica = CNPJ_NATUREZA_JURIDICA.objects.get(codigo=codigo)
+        return JsonResponse({'valor': nat_juridica.natureza_juridica})
+
+    elif tipo == 'ativ_principal':
+        codigo = request.GET.get('codigo')
+        atividade_principal = CNPJ_CNAE.objects.get(subclasse_codigo=codigo)
+        return JsonResponse({'valor': atividade_principal.subclasse_descricao})
+
+    elif tipo == 'end_uf':
+        uf = request.GET.get('uf')
+        municipios = UF_Municipio.objects.filter(uf_sigla=uf).values('id', 'municipio')
+        return JsonResponse({'municipios': list(municipios)})
+
+    else:
+        return JsonResponse({'error': 'Tipo não reconhecido'}, status=400)
+
+def fornecedor_delete(request, fornecedor_id=None):
+    try:
+        fornecedor = Fornecedores.objects.get(id=fornecedor_id)
+        fornecedor.soft_delete(request.user.usuario_relacionado)
+        messages.error(request, "Fornecedor deletado com sucesso.")
+        return JsonResponse({"message": "Fornecedor deletado com sucesso!"})
+    except Fornecedores.DoesNotExist:
+        messages.error(request, "Fornecedor não encontrado.")    
+    return redirect('fornecedores')
+
+def fornecedores_filtro(request):
+    hierarquia = request.GET.get('hierarquia', None)
+    cnpj_porte = request.GET.get('cnpj_porte', None)
+    tipo_direito = request.GET.get('tipo_direito', None)
+    uf_fornecedor = request.GET.get('uf_fornecedor', None)
+    fornecedor = request.GET.get('fornecedor', None)
+
+    filters = {}
+    filters['del_status'] = False
+    if hierarquia:
+        filters['hierarquia'] = hierarquia
+    if cnpj_porte:
+        filters['porte'] = cnpj_porte
+    if tipo_direito:
+        filters['tipo_direito'] = tipo_direito
+    if uf_fornecedor:
+        filters['end_uf'] = uf_fornecedor
+    if fornecedor:
+        filters['nome_fantasia__icontains'] = fornecedor
+    
+    tab_fornecedores = Fornecedores.objects.filter(**filters).order_by('nome_fantasia')
+    total_fornecedores = tab_fornecedores.count()
+    
+    page = int(request.GET.get('page', 1))
+    paginator = Paginator(tab_fornecedores, 100)  # Mostra 100 fornecedores por página
+    try:
+        fornecedores_paginados = paginator.page(page)
+    except EmptyPage:
+        fornecedores_paginados = paginator.page(paginator.num_pages)
+
+    data = list(fornecedores_paginados.object_list.values())
+    
+    return JsonResponse({
+        'data': data,
+        'total_fornecedores': total_fornecedores,
+        'has_next': fornecedores_paginados.has_next(),
+        'has_previous': fornecedores_paginados.has_previous(),
+        'current_page': page
+    })
+
+
+def fornecedores_exportar(request):
+    print("Exportar Fornecedores")
+    
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        hierarquia = data.get('hierarquia')
+        cnpj_porte = data.get('cnpj_porte')
+        tipo_direito = data.get('tipo_direito')
+        uf_fornecedor = data.get('uf_fornecedor')
+        fornecedor = data.get('fornecedor_nome')
+    
+        print('Hierarquia: ', hierarquia)
+        print(cnpj_porte)
+        print(tipo_direito)
+        print(uf_fornecedor)
+        print(fornecedor)
+
+        filters = {}
+        filters['del_status'] = False
+        if hierarquia:
+            filters['hierarquia'] = hierarquia
+        if cnpj_porte:
+            filters['porte'] = cnpj_porte
+        if tipo_direito:
+            filters['tipo_direito'] = tipo_direito
+        if uf_fornecedor:
+            filters['end_uf'] = uf_fornecedor
+        if fornecedor:
+            filters['nome_fantasia__icontains'] = fornecedor
+        
+        fornecedores = Fornecedores.objects.filter(**filters)
+        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Criar um workbook e adicionar uma planilha
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "fornecedores"
+
+        headers = [
+        'ID', 'Usuário Registro', 'Usuário Atualização', 'Data de Registro', 'Data da Última Atualização',
+        'N Edições', 'CNPJ', 'Razão Social', 'Nome Fantasia', 'Hierarquia', 'Porte', 'Tipo de Direito',
+        'Data de Abertura', 'Código NatJud', 'Natureza Jurídica', 'Código AtivPri', 'Atividade Principal',
+        'CEP', 'UF', 'Município', 'Logradouro', 'Número', 'Bairro', 'Observações Gerais', 'Data Exportação'
+        ]
+
+        for col_num, header in enumerate(headers, 1):
+            col_letter = get_column_letter(col_num)
+            ws['{}1'.format(col_letter)] = header
+            ws.column_dimensions[col_letter].width = 25
+
+        # Adicionar dados da tabela
+        for row_num, fornecedor in enumerate(fornecedores, 2):
+            ws.cell(row=row_num, column=1, value=fornecedor.id)
+            ws.cell(row=row_num, column=2, value=str(fornecedor.usuario_registro.primeiro_ultimo_nome()))
+            ws.cell(row=row_num, column=3, value=str(fornecedor.usuario_atualizacao.primeiro_ultimo_nome()))
+            registro_data = fornecedor.registro_data.replace(tzinfo=None)
+            ult_atual_data = fornecedor.ult_atual_data.replace(tzinfo=None)
+            ws.cell(row=row_num, column=4, value=registro_data)
+            ws.cell(row=row_num, column=5, value=ult_atual_data)
+            ws.cell(row=row_num, column=6, value=fornecedor.log_n_edicoes)
+            ws.cell(row=row_num, column=7, value=fornecedor.cnpj)
+            ws.cell(row=row_num, column=8, value=fornecedor.razao_social)
+            ws.cell(row=row_num, column=9, value=fornecedor.nome_fantasia)
+            ws.cell(row=row_num, column=10, value=fornecedor.hierarquia)
+            ws.cell(row=row_num, column=11, value=fornecedor.porte)
+            ws.cell(row=row_num, column=12, value=fornecedor.tipo_direito)
+            ws.cell(row=row_num, column=13, value=fornecedor.data_abertura)
+            ws.cell(row=row_num, column=14, value=fornecedor.natjuridica_codigo)
+            ws.cell(row=row_num, column=15, value=fornecedor.natjuridica_descricao)
+            ws.cell(row=row_num, column=16, value=fornecedor.ativ_principal_cod)
+            ws.cell(row=row_num, column=17, value=fornecedor.ativ_principal_descricao)
+            ws.cell(row=row_num, column=18, value=fornecedor.end_cep)
+            ws.cell(row=row_num, column=19, value=fornecedor.end_uf)
+            ws.cell(row=row_num, column=20, value=fornecedor.end_municipio)
+            ws.cell(row=row_num, column=21, value=fornecedor.end_logradouro)
+            ws.cell(row=row_num, column=22, value=fornecedor.end_numero)
+            ws.cell(row=row_num, column=23, value=fornecedor.end_bairro)
+            ws.cell(row=row_num, column=24, value=fornecedor.observacoes_gerais)
+            ws.cell(row=row_num, column=25, value=current_date_str)
+        
+        output = BytesIO()
+        wb.save(output)
+        output.seek(0)  # Reposition to the start of the stream
+
+        # Registrar a ação no CustomLog
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Fornecedores",
+            item_id=0,
+            item_descricao="Exportação da lista de fornecedores",
+            acao="Exportação",
+            observacoes=f"Usuário {request.user.username} exportou lista de fornecedores em {current_date_str}."
+        )
+        log_entry.save()
+
+        # Configurar a resposta
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="exportar_fornecedores.xlsx"'
+        response.write(output.getvalue())
+        return response
+    
+
+def fornecedores_faq(request):
+    tab_fornecedores_faq = Fornecedores_Faq.objects.filter(del_status=False).order_by('topico')
+    total_fornecedores_faq = tab_fornecedores_faq.count()
+    conteudo = {
+         'tab_fornecedores_faq': tab_fornecedores_faq,
+         'total_fornecedores_faq': total_fornecedores_faq,
+         'lista_topico': FAQ_FORNECEDOR_TOPICO,
+    }
+    return render(request, 'fornecedores/fornecedores_faq.html', conteudo)
+
+
+def fornecedor_faq_ficha(request, faq_id=None):
+    if faq_id:
+         try:
+             faq = Fornecedores_Faq.objects.get(id=faq_id)
+         except Fornecedores_Faq.DoesNotExist:
+             messages.error(request, "FAQ não encontrado.")
+             return redirect('fornecedores_faq')
+    else:
+         faq = None
+    print(faq)
+    #salvar
+    if request.method == 'POST':
+        
+        if faq:
+            faq_form = FornecedoresFaqForm(request.POST, instance=faq)
+            novo_faq = False
+        else:
+            faq_form = FornecedoresFaqForm(request.POST)
+            novo_faq = True
+
+        #Conferir campos obrigatórios
+        fields = [
+            ('topico', "O Tópico/Assunto é obrigatório!"),
+            ('contexto', "O Contexto é obrigatório!"),
+            ('resposta', "A Resposta é obrigatória!"),
+        ]
+        for field_name, error_message in fields:
+            valor = request.POST.get(field_name)
+            print('valor= ', valor)
+            if valor == "Não informado" or valor == None or valor == '':
+                messages.error(request, error_message)
+                if faq:
+                    return JsonResponse({
+                        'redirect_url': reverse('fornecedor_faq_ficha', args=[faq.id]),
+                    })
+                else:
+                    return JsonResponse({
+                        'redirect_url': reverse('fornecedor_faq_novo'),
+                        'data': request.POST,
+                    })
+
+        #Verificar se houve alteração no formulário
+        if not faq_form.has_changed():
+            messages.error(request, "Dados não foram salvos. Não houve mudanças.")
+            if faq:
+                return JsonResponse({
+                    'redirect_url': reverse('fornecedor_faq_ficha', args=[faq.id]),
+                })
+            else:
+                #return redirect('fornecedor_novo')
+                return JsonResponse({
+                    'redirect_url': reverse('fornecedor_faq_novo'),
+                })
+
+        if faq_form.is_valid():
+            #Salvar o produto
+            faq = faq_form.save(commit=False)
+            faq.save(current_user=request.user.usuario_relacionado)
+            if novo_faq:
+                messages.success(request, "Novo FAQ registrado com sucesso!")
+            else:
+                messages.success(request, "Dados atualizados com sucesso!")
+            
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'redirect_url': reverse('fornecedor_faq_ficha', args=[faq.id]),
+                })
+        else:
+            messages.error(request, "Formulário inválido")
+            print("Erro formulário FAQ")
+            print(faq_form.errors)
+
+    #novo
+    form = FornecedoresFaqForm(instance=faq)
+    
+    return render(request, 'fornecedores/fornecedor_faq_ficha.html', {
+        'lista_topico': FAQ_FORNECEDOR_TOPICO,
+        'fornecedor_faq': faq,
+        'form': form,
+    })
+
+def fornecedor_faq_filtrar_dados(request):
+    topico = request.GET.get('topico', None)
+    contexto = request.GET.get('contexto', None)
+    resposta = request.GET.get('resposta', None)
+    print('Topico: ', topico)
+    filters = {}
+    filters['del_status'] = False
+    if topico:
+        filters['topico'] = topico
+    if contexto:
+        filters['contexto__icontains'] = contexto
+    if resposta:
+        filters['resposta__icontains'] = resposta
+    
+    tab_fornecedores_faq = Fornecedores_Faq.objects.filter(**filters).order_by('topico')
+    total_fornecedores_faq = tab_fornecedores_faq.count()
+    
+    page = int(request.GET.get('page', 1))
+    paginator = Paginator(tab_fornecedores_faq, 100)  # Mostra 100 faqs por página
+    try:
+        faq_paginados = paginator.page(page)
+    except EmptyPage:
+        faq_paginados = paginator.page(paginator.num_pages)
+
+    data = list(faq_paginados.object_list.values())
+
+    # # Adicionando os dados calculados
+    # for faq in data:
+    #     obj = Fornecedores_Faq.objects.get(id=faq['id'])
+    #     proaq['get_status_label'] = obj.get_status_label()
+    #     proaq['get_unidade_daf_label'] = obj.get_unidade_daf_label()
+    #     proaq['get_modalidade_aquisicao_label'] = obj.get_modalidade_aquisicao_label()
+    #     proaq['get_denominacao_nome'] = obj.get_denominacao_nome()
+    #     proaq['get_usuario_nome'] = obj.get_usuario_nome()
+    
+    return JsonResponse({
+        'data': data,
+        'total_fornecedores_faq': total_fornecedores_faq,
+        'has_next': faq_paginados.has_next(),
+        'has_previous': faq_paginados.has_previous(),
+        'current_page': page
+    })
