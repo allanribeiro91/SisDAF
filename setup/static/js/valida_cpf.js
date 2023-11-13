@@ -37,9 +37,7 @@ function formatCPF(cpf) {
 
 // Função para validar o CPF
 function isValidCPF(cpf) {
-    
-    
-    
+
     cpf = cpf.replace(/\D/g, ''); // Remove todos os não dígitos
 
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {

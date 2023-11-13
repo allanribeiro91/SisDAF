@@ -1,5 +1,30 @@
 $(document).ready(function() {
     
+    
+    //Mudar de aba
+    $('#fornecedor_ficha_representantes').click(function() {
+        var id_fornecedor = window.location.pathname.split('/').filter(function(e){ return e }).pop();
+        // if(id_fornecedor=='novo'){
+        //     id_proaq='nova'
+        // }
+        window.location.href = '/fornecedores/representantes/' + id_fornecedor + '/';
+    });
+
+    $('#fornecedor_ficha_dados_gerais').click(function() {
+        var id_fornecedor = window.location.pathname.split('/').filter(function(e){ return e }).pop();
+        // if(id_fornecedor=='novo'){
+        //     id_proaq='nova'
+        // }
+        window.location.href = '/fornecedores/ficha/' + id_fornecedor + '/';
+    });
+
+    $('#btnNovoRepresentante').click(function() {
+        document.getElementById('representanteFornecedorForm').reset();
+        
+        var modal = new bootstrap.Modal(document.getElementById('representanteFornecedorModal'));
+        modal.show();
+    });
+
     //Deletar
     $('#deletar_fornecedor').on('click', function() {
         const fornecedorId = $('#id_fornecedor').val(); 
@@ -332,6 +357,8 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('temporaryFormData');
     }
 });
+
+
 
 
 

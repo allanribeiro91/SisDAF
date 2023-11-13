@@ -170,3 +170,15 @@ FAQ_FORNECEDOR_TOPICO = [
     ('processo_incorporacao','Processo de Incorporação'),
     ('outro','Outro'),
 ]
+
+CARGOS_FUNCOES = [
+    ('representante_comercial','Representante Comercial'),
+    ('assessor_tecnico', 'Assessor Técnico'),
+    ('gerente','Gerente'),
+    ('coordenador','Coordenador'),
+    ('diretor','Diretor'),
+    ('vice_presidente','Vice-Presidente'),
+    ('presidente','Presidente'),
+    ('outro','Outro'),
+    ('nao_informado','Não Informado'),
+]

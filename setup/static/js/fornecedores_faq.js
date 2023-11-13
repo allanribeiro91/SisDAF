@@ -8,74 +8,70 @@ $(document).ready(function() {
     });
 
 
-    // //Deletar
-    // $('#deletar_fornecedor').on('click', function() {
-    //     const fornecedorId = $('#id_fornecedor').val(); 
+    //Deletar
+    $('#deletar_fornecedor_faq').on('click', function() {
+        const faqId = $('#id_fornecedor_faq').val(); 
     
-    //     if (!fornecedorId) { //Trata-se de um novo registro que ainda não foi salvo
-    //         window.location.href = `/fornecedores/`;
-    //         return; // Sai da função
-    //     }
-    //     $.ajax({
-    //         url: `/fornecedores/ficha/deletar/${fornecedorId}/`,
-    //         method: 'POST',
-    //         headers: {
-    //             'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')  // Pega o token CSRF para autenticação
-    //         },
-    //         success: function(response) {
-    //             // Redireciona para a lista de denominações após a deleção bem-sucedida
-    //             //alert(response.message);
-    //             window.location.href = `/fornecedores/`;
-    //         },
-    //         error: function(error) {
-    //             // Aqui você pode adicionar qualquer lógica que deseja executar se houver um erro ao tentar deletar o fornecedor.
-    //             alert('Ocorreu um erro ao tentar deletar o fornecedor. Por favor, tente novamente.');
-    //         }
-    //     });
-    // });
+        if (!faqId) { //Trata-se de um novo registro que ainda não foi salvo
+            window.location.href = `/fornecedores/faq/`;
+            return; // Sai da função
+        }
+        $.ajax({
+            url: `/fornecedores/faq/ficha/deletar/${faqId}/`,
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')  // Pega o token CSRF para autenticação
+            },
+            success: function(response) {
+                // Redireciona para a lista de denominações após a deleção bem-sucedida
+                //alert(response.message);
+                window.location.href = `/fornecedores/faq/`;
+            },
+            error: function(error) {
+                // Aqui você pode adicionar qualquer lógica que deseja executar se houver um erro ao tentar deletar o fornecedor.
+                alert('Ocorreu um erro ao tentar deletar o fornecedor. Por favor, tente novamente.');
+            }
+        });
+    });
 
-    // //Exportar dados
-    // $('#exportarFornecedores').on('click', function() {
-    //     // Coleta valores dos campos
-    //     const hierarquia = document.querySelector('#hierarquia').value;
-    //     const cnpj_porte = document.querySelector('#cnpj_porte').value;
-    //     const tipo_direito = document.querySelector('#tipo_direito').value;
-    //     const uf_fornecedor = document.querySelector('#uf_fornecedor').value;
-    //     const fornecedor_nome = document.querySelector('#fornecedor_nome').value;
-    //     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    //Exportar dados
+    $('#exportarFornecedoresFaq').on('click', function() {
+        // Coleta valores dos campos
+        const topico = document.querySelector('#filtro_faq_topico').value;
+        const contexto = document.querySelector('#filtro_faq_contexto').value;
+        const resposta = document.querySelector('#filtro_faq_resposta').value;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    //     // Define dados a serem enviados
-    //     const data = {
-    //         hierarquia: hierarquia,
-    //         cnpj_porte: cnpj_porte,
-    //         tipo_direito: tipo_direito,
-    //         uf_fornecedor: uf_fornecedor,
-    //         fornecedor_nome: fornecedor_nome,
-    //     };
+        // Define dados a serem enviados
+        const data = {
+            topico: topico,
+            contexto: contexto,
+            resposta: resposta,
+        };
 
-    //     console.log('Exportar Fornecedores')
+        console.log('Exportar Fornecedores FAQs')
 
-    //     // Envia solicitação AJAX para o servidor
-    //     fetch('exportar/', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'X-CSRFToken': csrfToken
-    //         },
-    //         body: JSON.stringify(data)
-    //     })
-    //     .then(response => response.blob()) // Trata a resposta como um Blob
-    //     .then(blob => {
-    //         // Inicia o download do arquivo
-    //         const a = document.createElement('a');
-    //         const url = URL.createObjectURL(blob);
-    //         a.href = url;
-    //         a.download = 'fornecedores_daf.xlsx';
-    //         document.body.appendChild(a);
-    //         a.click();
-    //         document.body.removeChild(a);
-    //     });
-    // });
+        // Envia solicitação AJAX para o servidor
+        fetch('exportar/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.blob()) // Trata a resposta como um Blob
+        .then(blob => {
+            // Inicia o download do arquivo
+            const a = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            a.href = url;
+            a.download = 'fornecedores_faqs_daf.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+    });
 
     
     // // Evento para o campo "natjuridica_codigo"

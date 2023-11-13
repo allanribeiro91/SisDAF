@@ -250,7 +250,6 @@ def proaq_ficha_tramitacoes(request, tramitacao_id=None, proaq_id=None):
         if proaq_tramitacao:
             proaq_tramitacao_form = ProaqTramitacaoForm(request.POST, instance=proaq_tramitacao)
             nova_tramitacao = False
-            
         else:
             proaq_tramitacao_form = ProaqTramitacaoForm(request.POST)
             nova_tramitacao = True

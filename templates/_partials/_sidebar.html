@@ -13,7 +13,7 @@
         
         <div>
             {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in 'fornecedores, fornecedores_faq, fornecedor_faq_novo, fornecedor_faq_ficha, fornecedor_novo, fornecedor_ficha' %}active-tab{% endif %}" href="{% url 'fornecedores' %}">Fornecedores</a>
+            <a class="tab {% if current_url in 'fornecedores, fornecedor_representante_novo, fornecedores_representantes, fornecedores_faq, fornecedor_faq_novo, fornecedor_faq_ficha, fornecedor_novo, fornecedor_ficha' %}active-tab{% endif %}" href="{% url 'fornecedores' %}">Fornecedores</a>
             {% endwith %}
         </div>
 

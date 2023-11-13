@@ -1,0 +1,185 @@
+<!-- Modal -->
+{% load static %}
+<style>
+    .tags-column {
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width.representante-fornecedor {
+        max-width: 80%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;  /* Alinha os itens ao topo */
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-dialog {
+        height: auto;
+        min-height: 90%; /* Ou qualquer valor que funcione melhor */
+    }
+    
+    /* .modal-content.representante-fornecedor{
+        height: 80%;
+    } */
+
+    .modal-body {
+        min-height: 350px; /* Ajuste o valor de acordo com a necessidade */
+        height: auto; /* Ou use 'height: 100%;' para forçar a expansão */
+    }
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="representanteFornecedorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width representante-fornecedor" role="document">
+        <div class="modal-content representante-fornecedor">
+            
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Representante do Fornecedor</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+
+            
+            <form id="representanteFornecedorForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="fornecedor" id="id_fornecedor" value="{{ id_fornecedor }}">
+                    <div class="horizontal-sections-modal">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 10px;">
+                                
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" style="width: 60px;" class="form-control log_data" id="id_representante_fornecedor" name="id_representante_fornecedor" readonly>
+                                    <label for="floatingInput">ID</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="repforn_log_data_registro" name="log_data_registro" readonly>
+                                    <label for="floatingInput">Data do Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="repforn_log_responsavel_registro" name="log_responsavel_registro" readonly>
+                                    <label for="floatingInput">Responsável pelo Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="repforn_lot_ult_atualizacao" name="log_data_registro" readonly>
+                                    <label for="floatingInput">Última Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="repforn_log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly>
+                                    <label for="floatingInput">Responsável Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_edicoes" id="repforn_log_edicoes" name="log_edicoes" readonly>
+                                    <label for="floatingInput">Nº Edições</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-sections-modal">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="repforn_cpf" name="cpf"  value="{{ form.instance.cpf|default_if_none:'' }}" style="width: 150px !important;">
+                                    <label for="floatingInput">CPF</label>
+                                </div>
+                                <div class="form-floating mb-3 full-width">
+                                    <input type="text" class="form-control" id="repforn_nome_completo" name="nome_completo" value="{{ form.instance.nome_completo|default_if_none:'' }}">
+                                    <label for="floatingInput">Nome Completo</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" id="repforn_data_nascimento" name="data_nascimento" style="width: 180px !important;" value="{% if form.data_nascimento.value %}{{ form.data_nascimento.value|date:'Y-m-d' }}{% endif %}">
+                                    <label for="data">Data de Nascimento</label>
+                                </div>
+                                <div class="form-floating">
+                                    <select class="form-select" id="repforn_genero_sexual" aria-label="Floating label select example" name="genero_sexual" style="width: 180px !important;">
+                                        <option value="" disabled {% if not form.instance.genero_sexual %}selected{% endif %}>Não Informado</option>
+                                        {% for value, display in lista_genero_sexual %}
+                                        <option value="{{ value }}" {% if form.instance.genero_sexual == value %}selected{% endif %}>{{ display }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Gênero Sexual</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-sections-modal">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating">
+                                    <select class="form-select" id="repforn_cargo" aria-label="Floating label select example" name="cargo" style="width: 220px !important;">
+                                        <option value="" disabled {% if not form.instance.cargo %}selected{% endif %}>Não Informado</option>
+                                        {% for value, display in lista_cargos %}
+                                        <option value="{{ value }}" {% if form.instance.cargo == value %}selected{% endif %}>{{ display }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Cargo/Função</label>
+                                </div>
+                                <div class="form-floating mb-3 full-width">
+                                    <input type="text" class="form-control" id="repforn_cargo_outro" name="cargo_outro" readonly value="{{ form.instance.cargo_outro|default_if_none:''}}">
+                                    <label for="floatingInput">Outro Cargo/Função</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="repforn_telefone" name="telefone" value="{{ form.instance.telefone|default_if_none:''}}"  style="width: 160px !important;">
+                                    <label for="floatingInput">Telefone</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="repforn_celular" name="celular" value="{{ form.instance.celular|default_if_none:''}}"  style="width: 160px !important;">
+                                    <label for="floatingInput">Celular</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="repforn_email" name="email" value="{{ form.instance.email|default_if_none:''}}" style="width: 320px !important;">
+                                    <label for="floatingInput">Email</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="repforn_linkedin" name="linkedin" value="{{ form.instance.linkedin|default_if_none:''}}"  style="width: 320px !important;">
+                                    <label for="floatingInput">LinkedIn</label>
+                                </div>             
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-sections-modal">
+                        <div class="section" style="border: 0px !important; height: 100%;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3 full-width">
+                                    <textarea class="form-control auto-expand" id="observacoes_gerais" name="observacoes_gerais" rows="1" style="height: 100%;">{{ form.instance.observacoes_gerais|default_if_none:'' }}</textarea>
+                                    <label  for="observacoes">Observações</label><br>    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary closeModalButton" data-bs-toggle="modal" data-bs-target="#proaq_tramitacoes_delete" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Deletar</button>
+                    <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnSalvarRepresentante" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+                </div>
+            </form>
+            
+            
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#representanteFornecedorModal').modal('hide');
+        });
+    });
+
+</script>
+<script src="{% static 'js/fornecedores_representantes.js' %}"></script>

@@ -219,3 +219,45 @@ select[name="numero_processo"] {
 }
 
 
+.area-scroll{
+    overflow-y: auto;
+}
+
+.fixed-size-table th:nth-child(3),
+.fixed-size-table td:nth-child(3) {
+    width: 50%; 
+}
+
+.section-tabela {
+    margin: 10px 10px 10px 10px;
+    padding: 0px 10px 10px 10px;
+    background-color: #FFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 5px;
+    width: 98.9%;
+    max-height: 85vh; /* ajuste este valor conforme necessário */
+    overflow-y: auto;
+  }
+
+table tbody tr:hover {
+    cursor: pointer;
+}
+
+/*--colunas--*/
+.representante-id {
+    width: 3% !important;
+}
+.representante-nome {
+    width: 30% !important;
+    text-align: left;
+}
+.representante-cargo {
+    width: 20% !important;
+}
+.representante-celular {
+    width: 15% !important;
+}
+.representante-email {
+    width: 25% !important;
+    text-align: left;
+}

@@ -1,7 +1,7 @@
 from django.db import models
 from apps.usuarios.models import Usuario
 from django.utils import timezone
-from setup.choices import CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO
+from setup.choices import CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO, GENERO_SEXUAL, CARGOS_FUNCOES
 
 class CNPJ_CNAE(models.Model):
     codigo = models.IntegerField(null=False, blank=False)
@@ -136,6 +136,62 @@ class Fornecedores_Faq(models.Model):
                 self.usuario_registro = user
                 self.usuario_atualizacao = user
         super(Fornecedores_Faq, self).save(*args, **kwargs)
+
+
+    def soft_delete(self, user):
+        """
+        Realiza uma "deleção lógica" do registro.
+        """
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+
+
+class Fornecedores_Representantes(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fornecedor_representante_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fornecedor_representante_edicao')
+    fornecedor = models.ForeignKey(Fornecedores, on_delete=models.DO_NOTHING, related_name='fornecedor_representante')
+
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados do Representante
+    cpf = models.CharField(max_length=14, null=True, blank=True)
+    nome_completo = models.CharField(max_length=100, null=False, blank=False)
+    data_nascimento = models.DateField(null=True, blank=True)
+    genero_sexual = models.CharField(max_length=20, choices=GENERO_SEXUAL, null=True, blank=True)
+    cargo = models.CharField(max_length=30, choices=CARGOS_FUNCOES, null=True, blank=True)
+    cargo_outro = models.CharField(max_length=100, null=True, blank=True)
+    telefone = models.CharField(max_length=14, null=True, blank=True)
+    celular = models.CharField(max_length=15, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    linkedin = models.URLField(null=True, blank=True)
+    
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='fornecedor_representante_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)  # Obtenha o usuário atual e remova-o dos kwargs
+
+        # Se o objeto já tem um ID, então ele já existe no banco de dados
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(Fornecedores_Representantes, self).save(*args, **kwargs)
 
 
     def soft_delete(self, user):

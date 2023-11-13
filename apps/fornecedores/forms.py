@@ -1,6 +1,6 @@
 from django import forms
-from apps.fornecedores.models import Fornecedores, Fornecedores_Faq
-from setup.choices import CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO
+from apps.fornecedores.models import Fornecedores, Fornecedores_Faq, Fornecedores_Representantes
+from setup.choices import CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, GENERO_SEXUAL, CARGOS_FUNCOES
 
 class FornecedoresForm(forms.ModelForm):    
     cnpj = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control'}))
@@ -81,3 +81,66 @@ class FornecedoresFaqForm(forms.ModelForm):
             return "Sem observações."
         
         return observacoes
+
+
+class FornecedoresRepresentantesForm(forms.ModelForm):
+    fornecedor = forms.ModelChoiceField(
+        queryset=Fornecedores.objects.all(), 
+        required=True, 
+    )
+    cpf = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    nome_completo = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    data_nascimento = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        label='Data de Nascimento'
+    )
+    genero_sexual = forms.ChoiceField(
+        required=False,
+        choices=GENERO_SEXUAL,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    cargo = forms.ChoiceField(
+        required=False,
+        choices=CARGOS_FUNCOES,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    cargo_outro = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    telefone = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    celular = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+    linkedin = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={'class': 'form-control'})
+    )
+    observacoes_gerais = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control'}),
+        label='Observações Gerais'
+    )
+
+    class Meta:
+        model = Fornecedores_Representantes
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
