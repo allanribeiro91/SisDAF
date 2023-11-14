@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
@@ -42,47 +43,59 @@ def produtos_ficha(request, product_id=None):
              messages.error(request, "Produto não encontrado.")
              return redirect('produtos')
     else:
-         produto = None  # Preparando para criar um novo produto
-
+         produto = None
+    
     if request.method == 'POST':
         if produto:
             produto_form = ProdutosFarmaceuticosForm(request.POST, instance=produto)
         else:
             produto_form = ProdutosFarmaceuticosForm(request.POST)
-
+        
         #Conferir se produto e tipo de produto foram preenchidos
         nome_produto = request.POST.get('produto')
         tipo_produto = request.POST.get('tipo_produto')
         if not nome_produto or not tipo_produto:
             messages.error(request, "O nome do produto é obrigatório!")
             if produto:
-                return redirect('produtos_ficha', product_id=produto.id)
+                return JsonResponse({
+                    'redirect_url': reverse('produtos_ficha', args=[product_id]),
+                })
             else:
-                return redirect('novo_produto')
-
+                return JsonResponse({
+                    'redirect_url': reverse('novo_produto'),
+                })
+        
         #Verificar se houve alteração no formulário
         if not produto_form.has_changed():
             messages.error(request, "Dados não foram salvos. Não houve mudanças.")
             if produto:
-                return redirect('produtos_ficha', product_id=produto.id)
+                return JsonResponse({
+                    'redirect_url': reverse('produtos_ficha', args=[product_id]),
+                })
             else:
-                return redirect('novo_produto')
-
+                return JsonResponse({
+                    'redirect_url': reverse('novo_produto'),
+                })
+        
         if produto_form.is_valid():
-            #Verificar se já existe a denominação na base
+            #Verificar se já existe a produto na base
             nome_produto = produto_form.cleaned_data.get('produto')
             produto_existente = ProdutosFarmaceuticos.objects.filter(produto=nome_produto)
             
-            #Se estivermos atualizando uma denominação existente, excluímos essa denominação da verificação
+            #Se estivermos atualizando um produto existente, excluímos essa denominação da verificação
             if produto:
                 produto_existente = produto_existente.exclude(id=produto.id)
 
             if produto_existente.exists():
                 messages.error(request, "Já existe um produto com esse nome. Não foi possível salvar.")
                 if produto:
-                    return redirect('produtos_ficha', product_id=produto.id)
+                    return JsonResponse({
+                        'redirect_url': reverse('produtos_ficha', args=[product_id]),
+                    })
                 else:
-                    return redirect('novo_produto')
+                    return JsonResponse({
+                        'redirect_url': reverse('novo_produto'),
+                    })
 
             #Salvar o produto
             produto = produto_form.save(commit=False)
@@ -97,6 +110,7 @@ def produtos_ficha(request, product_id=None):
                     'ult_atual_data': produto.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S'),
                     'usuario_atualizacao': produto.usuario_atualizacao.dp_nome_completo,
                     'log_n_edicoes': produto.log_n_edicoes,
+                    'redirect_url': reverse('produtos_ficha', args=[product_id]),
                 })
    
         else:

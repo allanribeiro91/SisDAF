@@ -249,7 +249,7 @@ function updateTable(produtos) {
 
 
 //Salvar dados
-document.getElementById('btnSave').addEventListener('click', function(e) {
+document.getElementById('btnSalvarProduto').addEventListener('click', function(e) {
     e.preventDefault(); // Evita o envio padrão do formulário
     
     let postURL = document.getElementById('produtoForm').getAttribute('data-post-url');
@@ -268,14 +268,102 @@ document.getElementById('btnSave').addEventListener('click', function(e) {
         }
     })
 
-    .then(response => response.json())
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('Erro ao salvar produto farmacêutico.');
+        }
+    })
     .then(data => {
-        // Atualize os campos do log com os dados retornados
-        document.getElementById('log_data_registro').value = data.registro_data;
-        document.getElementById('log_responsavel_registro').value = data.usuario_registro;
-        document.getElementById('lot_ult_atualizacao').value = data.ult_atual_data;
-        document.getElementById('log_responsavel_atualizacao').value = data.usuario_atualizacao;
-        document.getElementById('log_edicoes').value = data.log_n_edicoes;
+        if (data.redirect_url) {
+            window.location.href = data.redirect_url;
+        }
+    })
+    .catch(error => {
+        console.log(error);
     });
 });
 
+
+document.addEventListener('DOMContentLoaded', function() {
+    var sistemas = [
+        { possui: 'sigtap_possui', codigo: 'sigtap_codigo', nome: 'sigtap_nome' },
+        { possui: 'sismat_possui', codigo: 'sismat_codigo', nome: 'sismat_nome' },
+        { possui: 'catmat_possui', codigo: 'catmat_codigo', nome: 'catmat_nome' },
+        { possui: 'obm_possui', codigo: 'obm_codigo', nome: 'obm_nome' }
+    ];
+
+    // Função para atualizar os campos com base no estado do checkbox
+    function updateFields(system) {
+        var checkbox = document.getElementById(system.possui);
+        var codigoField = document.getElementById(system.codigo);
+        var nomeField = document.getElementById(system.nome);
+
+        if (checkbox.checked) {
+            // Se checkbox está marcado, limpa os valores e torna os campos readonly
+            codigoField.value = '';
+            nomeField.value = '';
+            codigoField.setAttribute('readonly', true);
+            nomeField.setAttribute('readonly', true);
+        } else {
+            // Se checkbox não está marcado, remove o atributo readonly
+            codigoField.removeAttribute('readonly');
+            nomeField.removeAttribute('readonly');
+        }
+    }
+
+    sistemas.forEach(function(system) {
+        var checkbox = document.getElementById(system.possui);
+        // Evento para lidar com a mudança do checkbox
+        checkbox.addEventListener('change', function() {
+            updateFields(system);
+        });
+
+        // Atualiza os campos ao carregar a página com base no estado inicial do checkbox
+        updateFields(system);
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    var denominacaoSelect = document.getElementById('denominacao');
+    var concentracaoInput = document.getElementById('concentracao');
+    var formaFarmaceuticaSelect = document.getElementById('forma_farmaceutica');
+    var produtoInput = document.getElementById('produto');
+    var concentracaoTipoSelect = document.getElementById('concentracao_tipo');
+
+    function updateProdutoValue() {
+        var denominacaoText = denominacaoSelect.options[denominacaoSelect.selectedIndex].text;
+        var concentracaoValue = concentracaoInput.value;
+        var formaFarmaceuticaText = formaFarmaceuticaSelect.options[formaFarmaceuticaSelect.selectedIndex].text;
+        var showConcentracao = concentracaoTipoSelect.options[concentracaoTipoSelect.selectedIndex].text === 'Mostrar no nome';
+
+        var produtoValue = denominacaoText;
+        if (showConcentracao && concentracaoValue) {
+            produtoValue += ' ' + concentracaoValue;
+        }
+        produtoValue += ' (' + formaFarmaceuticaText + ')';
+        produtoInput.value = produtoValue;
+    }
+
+    function handleConcentracaoTipoChange() {
+        var concentracaoTipoValue = concentracaoTipoSelect.value;
+        if (concentracaoTipoValue === 'nao_informado' || concentracaoTipoValue === 'nao_se_aplica') {
+            concentracaoInput.value = '';
+            concentracaoInput.setAttribute('readonly', true);
+        } else {
+            concentracaoInput.removeAttribute('readonly');
+        }
+        updateProdutoValue();
+    }
+
+    // Event listener for changes
+    denominacaoSelect.addEventListener('change', updateProdutoValue);
+    concentracaoInput.addEventListener('input', updateProdutoValue);
+    formaFarmaceuticaSelect.addEventListener('change', updateProdutoValue);
+    concentracaoTipoSelect.addEventListener('change', handleConcentracaoTipoChange);
+
+    // Call the function to set the initial state
+    handleConcentracaoTipoChange();
+});

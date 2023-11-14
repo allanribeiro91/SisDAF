@@ -231,3 +231,5 @@ function openModal(representanteId, fornecedorId) {
             console.log(error);
         });
 }
+
+

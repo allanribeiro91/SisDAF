@@ -8,7 +8,6 @@ class CustomLog(models.Model):
     Modelo para registrar atividades personalizadas na aplicação.
     Cada entrada representa uma ação realizada por um usuário em um determinado módulo.
     """
-    
     timestamp = models.DateTimeField(auto_now_add=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='log_usuario')
     modulo = models.CharField(max_length=140, null=False, blank=False)
@@ -25,7 +24,6 @@ class UserAccessLog(models.Model):
     Modelo para registrar cada vez que um usuário acessa a aplicação.
     Cada entrada representa um acesso único de um usuário.
     """
-    
     usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='acesso_usuario')
     timestamp = models.DateTimeField(auto_now_add=True)
 

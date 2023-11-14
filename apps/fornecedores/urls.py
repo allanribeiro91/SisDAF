@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from apps.fornecedores.views import fornecedores, fornecedores_filtro, fornecedores_exportar, fornecedor_ficha, fornecedor_ficha_filtrar_dados, fornecedor_delete
 from apps.fornecedores.views import fornecedores_faq, fornecedor_faq_ficha, fornecedor_faq_filtrar_dados, fornecedor_faq_delete, fornecedores_faq_exportar
-from apps.fornecedores.views import fornecedor_representante_delete, fornecedores_representante_exportar, fornecedores_representantes, representante_dados
+from apps.fornecedores.views import fornecedor_representante_delete, fornecedores_representantes, representante_dados
+from apps.fornecedores.views import fornecedor_comunicacao_delete, fornecedores_comunicacoes, comunicacao_dados, fornecedor_usuarios_por_unidade
 
 urlpatterns = [
 
@@ -17,10 +18,14 @@ urlpatterns = [
     #REPRESENTANTES DO FORNECEDOR
     path('fornecedores/representantes/deletar/<int:representante_id>/', fornecedor_representante_delete, name='fornecedor_representante_delete'),
     path('fornecedores/representantes/<int:id_fornecedor>/', fornecedores_representantes, name='fornecedores_representantes'),
-    path('fornecedores/representantes/exportar/', fornecedores_representante_exportar, name='fornecedores_representante_exportar'),
-    # path('fornecedores/representantes/novo/', fornecedores_representantes, name='fornecedor_representante_novo'),
     path('fornecedores/representantes/<int:representante_id>/dados/', representante_dados, name='representante_dados'),
     
+    #COMUNICACOES COM O FORNECEDOR
+    path('fornecedores/comunicacoes/deletar/<int:comunicacao_id>/', fornecedor_comunicacao_delete, name='fornecedor_comunicacao_delete'),
+    path('fornecedores/comunicacoes/<int:id_fornecedor>/', fornecedores_comunicacoes, name='fornecedores_comunicacoes'),
+    path('fornecedores/comunicacoes/<int:comunicacao_id>/dados/', comunicacao_dados, name='comunicacao_dados'),
+    path('fornecedores/usuarios_unidadedaf/<str:unidade>/', fornecedor_usuarios_por_unidade, name='fornecedor_usuarios_por_unidade'),
+
     #DADOS DO FORNECEDOR
     path('fornecedores/ficha/deletar/<int:fornecedor_id>/', fornecedor_delete, name='fornecedor_delete'),
     path('fornecedores/ficha/filtrar_dados', fornecedor_ficha_filtrar_dados, name='fornecedor_ficha_filtrar_dados'),

@@ -6,7 +6,8 @@ from apps.main.models import CustomLog
 from django.http import JsonResponse, HttpResponse
 from apps.fornecedores.models import Fornecedores, UF_Municipio, CNPJ_NATUREZA_JURIDICA, CNPJ_CNAE, Fornecedores_Faq, Fornecedores_Representantes
 from apps.fornecedores.forms import FornecedoresForm, FornecedoresFaqForm, FornecedoresRepresentantesForm
-from setup.choices import CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO, CARGOS_FUNCOES, GENERO_SEXUAL
+from apps.usuarios.models import Usuario
+from setup.choices import UNIDADE_DAF2, CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO, CARGOS_FUNCOES, GENERO_SEXUAL, TIPO_COMUNICACAO, STATUS_ENVIO_COMUNICACAO
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from datetime import datetime
@@ -247,7 +248,7 @@ def fornecedores_exportar(request):
             filters['nome_fantasia__icontains'] = fornecedor
         
         fornecedores = Fornecedores.objects.filter(**filters)
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
 
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()
@@ -317,7 +318,6 @@ def fornecedores_exportar(request):
         response.write(output.getvalue())
         return response
     
-
 
 
 
@@ -537,8 +537,6 @@ def fornecedores_faq_exportar(request):
 
 
 
-
-
 #FORNECEDORES REPRESENTANTES
 def fornecedores_representantes(request, id_fornecedor=None):
 
@@ -619,88 +617,13 @@ def fornecedores_representantes(request, id_fornecedor=None):
 
 def fornecedor_representante_delete(request, representante_id=None):
     try:
-        faq = Fornecedores_Faq.objects.get(id=faq_id)
-        faq.soft_delete(request.user.usuario_relacionado)
-        messages.error(request, "FAQ deletado com sucesso.")
-        return JsonResponse({"message": "Fornecedor deletado com sucesso!"})
-    except Fornecedores_Faq.DoesNotExist:
-        messages.error(request, "FAQ não encontrado.")    
-    return redirect('fornecedores_faq')
-
-def fornecedores_representante_exportar(request):
-    print("Exportar FAQs Fornecedores")
-    
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        topico = data.get('topico')
-        contexto = data.get('contexto')
-        resposta = data.get('resposta')
-
-        filters = {}
-        filters['del_status'] = False
-        if topico:
-            filters['topico'] = topico
-        if contexto:
-            filters['contexto__icontains'] = contexto
-        if resposta:
-            filters['resposta__icontains'] = resposta
-        
-        faqs = Fornecedores_Faq.objects.filter(**filters)
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-        # Criar um workbook e adicionar uma planilha
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "fornecedores_faqs"
-
-        headers = [
-        'ID', 'Usuário Registro', 'Usuário Atualização', 'Data de Registro', 'Data da Última Atualização',
-        'N Edições', 'Tópico', 'Outro Tópico', 'Contexto', 'Resposta', 'Observações Gerais', 'Data Exportação'
-        ]
-
-        for col_num, header in enumerate(headers, 1):
-            col_letter = get_column_letter(col_num)
-            ws['{}1'.format(col_letter)] = header
-            ws.column_dimensions[col_letter].width = 25
-
-        # Adicionar dados da tabela
-        for row_num, faq in enumerate(faqs, 2):
-            ws.cell(row=row_num, column=1, value=faq.id)
-            ws.cell(row=row_num, column=2, value=str(faq.usuario_registro.primeiro_ultimo_nome()))
-            ws.cell(row=row_num, column=3, value=str(faq.usuario_atualizacao.primeiro_ultimo_nome()))
-            registro_data = faq.registro_data.replace(tzinfo=None)
-            ult_atual_data = faq.ult_atual_data.replace(tzinfo=None)
-            ws.cell(row=row_num, column=4, value=registro_data)
-            ws.cell(row=row_num, column=5, value=ult_atual_data)
-            ws.cell(row=row_num, column=6, value=faq.log_n_edicoes)
-            ws.cell(row=row_num, column=7, value=faq.topico)
-            ws.cell(row=row_num, column=8, value=faq.topico_outro)
-            ws.cell(row=row_num, column=9, value=faq.contexto)
-            ws.cell(row=row_num, column=10, value=faq.resposta)
-            ws.cell(row=row_num, column=11, value=faq.observacoes_gerais)
-            ws.cell(row=row_num, column=12, value=current_date_str)
-        
-        output = BytesIO()
-        wb.save(output)
-        output.seek(0)  # Reposition to the start of the stream
-
-        # Registrar a ação no CustomLog
-        log_entry = CustomLog(
-            usuario=request.user.usuario_relacionado,
-            modulo="Fornecedores_FAQs",
-            item_id=0,
-            item_descricao="Exportação da lista de faqs dos fornecedores",
-            acao="Exportação",
-            observacoes=f"Usuário {request.user.username} exportou lista de faqs dos fornecedores em {current_date_str}."
-        )
-        log_entry.save()
-
-        # Configurar a resposta
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename="exportar_fornecedores.xlsx"'
-        response.write(output.getvalue())
-        return response
-
+        representante = Fornecedores_Representantes.objects.get(id=representante_id)
+        representante.soft_delete(request.user.usuario_relacionado)
+        messages.error(request, "Representante deletado com sucesso.")
+        return JsonResponse({"message": "Representante deletado com sucesso!"})
+    except Fornecedores_Representantes.DoesNotExist:
+        messages.error(request, "Representante não encontrado.")
+        return JsonResponse({"message": "Representante não encontrado."})   
 
 def representante_dados(request, representante_id):
     try:
@@ -727,3 +650,124 @@ def representante_dados(request, representante_id):
         return JsonResponse(data)
     except Fornecedores_Representantes.DoesNotExist:
         return JsonResponse({'error': 'Representante não encontrado'}, status=404)
+
+
+#FORNECEDORES COMUNICACOES
+def fornecedores_comunicacoes(request, id_fornecedor=None):
+
+    if request.method == 'POST':
+        
+        id_representante = request.POST.get('id_representante')
+
+        if id_representante:
+            try:
+                representante = Fornecedores_Representantes.objects.get(id=id_representante)
+            except Fornecedores_Representantes.DoesNotExist:
+                messages.error(request, "Representante não encontrado.")
+                return redirect('fornecedores')
+        else:
+            representante = None
+
+        if representante:
+            representante_form = FornecedoresRepresentantesForm(request.POST, instance=representante)
+            novo_representante = False
+        else:
+            representante_form = FornecedoresRepresentantesForm(request.POST)
+            novo_representante = True
+        
+        #Verificar se houve alteração no formulário
+        if not representante_form.has_changed():
+            messages.error(request, "Dados não foram salvos. Não houve mudanças.")
+            return redirect('fornecedores_representantes', id_fornecedor=id_fornecedor)
+        
+        fornecedor_instance = Fornecedores.objects.get(id=id_fornecedor)
+        representante_form.instance.fornecedor = fornecedor_instance
+        
+        if representante_form.is_valid():
+            #Verificar se já existe registro dessa tramitacao
+            cpf = representante_form.cleaned_data.get('cpf')
+            cpf_existente = Fornecedores_Representantes.objects.filter(cpf=cpf, fornecedor=fornecedor_instance)
+
+            #Se estivermos atualizando um processo existente, excluímos esse processo da verificação
+            # if cpf:
+            #     if representante:
+            #         cpf_existente = cpf_existente.exclude(id=representante.id)
+                
+            #     if cpf_existente.exists():
+            #         messages.error(request, "Já existe um representante com esse CPF. Não foi possível salvar.")
+            #         return redirect('fornecedores_representantes', id_fornecedor=id_fornecedor)
+            
+            #Salvar a tramitação
+            representante = representante_form.save(commit=False)
+            representante.save(current_user=request.user.usuario_relacionado)
+            
+            if novo_representante:
+                messages.success(request, "Novo representante registrado com sucesso!")
+            else:
+                messages.success(request, "Dados atualizados com sucesso!")
+
+            #Retornar log
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'redirect_url': reverse('fornecedores_representantes', args=[id_fornecedor]),
+                })
+        else:
+            messages.error(request, "Preencha os campos obrigatórios.")
+            print("Erro formulário representante do fornecedor.")
+            print(representante_form.errors)
+    
+    if id_fornecedor:
+        fornecedor_instance = Fornecedores.objects.get(id=id_fornecedor)
+        tab_fornecedores_representantes = Fornecedores_Representantes.objects.filter(del_status=False, fornecedor=fornecedor_instance).order_by('nome_completo')
+    else:
+        tab_fornecedores_representantes = None
+
+    conteudo = {
+        'tab_fornecedores_representantes': tab_fornecedores_representantes,
+        'lista_topicos': FAQ_FORNECEDOR_TOPICO,
+        'lista_tipo_comunicacao': TIPO_COMUNICACAO,
+        'lista_status_envio': STATUS_ENVIO_COMUNICACAO,
+        'lista_unidade_daf': UNIDADE_DAF2,
+        'id_fornecedor': id_fornecedor,
+    }
+    return render(request, 'fornecedores/fornecedor_comunicacoes.html', conteudo)
+
+def fornecedor_comunicacao_delete(request, representante_id=None):
+    try:
+        representante = Fornecedores_Representantes.objects.get(id=representante_id)
+        representante.soft_delete(request.user.usuario_relacionado)
+        messages.error(request, "Representante deletado com sucesso.")
+        return JsonResponse({"message": "Representante deletado com sucesso!"})
+    except Fornecedores_Representantes.DoesNotExist:
+        messages.error(request, "Representante não encontrado.")
+        return JsonResponse({"message": "Representante não encontrado."})   
+
+def comunicacao_dados(request, representante_id):
+    try:
+        representante = Fornecedores_Representantes.objects.get(id=representante_id)
+        print('Data do Registro ', representante.registro_data)
+        data = {
+            'id_representante': representante.id,
+            'log_data_registro': representante.registro_data.strftime('%d/%m/%Y %H:%M:%S') if representante.registro_data else '',
+            'log_responsavel_registro': str(representante.usuario_atualizacao.dp_nome_completo),
+            'lot_ult_atualizacao': representante.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if representante.ult_atual_data else '',
+            'log_responsavel_atualizacao': str(representante.usuario_atualizacao.dp_nome_completo),
+            'log_edicoes': representante.log_n_edicoes,
+            'cpf': representante.cpf if representante.cpf else '',
+            'nome_completo': representante.nome_completo,
+            'data_nascimento': representante.data_nascimento.strftime('%d/%m/%Y') if representante.data_nascimento else '',
+            'genero_sexual': representante.genero_sexual,
+            'cargo': representante.cargo,
+            'telefone': representante.telefone,
+            'celular': representante.celular,
+            'email': representante.email,
+            'linkedin': representante.linkedin,
+            'observacoes': representante.observacoes_gerais if representante.observacoes_gerais else '',
+        }
+        return JsonResponse(data)
+    except Fornecedores_Representantes.DoesNotExist:
+        return JsonResponse({'error': 'Representante não encontrado'}, status=404)
+
+def fornecedor_usuarios_por_unidade(request, unidade):
+    usuarios = Usuario.usuarios_por_unidade(unidade)
+    return JsonResponse(usuarios, safe=False)

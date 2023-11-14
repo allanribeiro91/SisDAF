@@ -1,0 +1,225 @@
+<!-- Modal -->
+{% load static %}
+<style>
+    .tags-column {
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width.representante-fornecedor {
+        max-width: 90%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;  /* Alinha os itens ao topo */
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-dialog {
+        height: auto;
+        min-height: 90%;
+    }
+    
+    .modal-content.comunicacao-fornecedor{
+        height: 100%;
+    }
+
+    .modal-body {
+        min-height: 350px;
+        height: 100%;
+    }
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="comunicacaoFornecedorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width representante-fornecedor" role="document">
+        <div class="modal-content comunicacao-fornecedor">
+            
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Registro de Comunicação com o Fornecedor</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+
+            
+            <form id="comunicacaoFornecedorForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="fornecedor" id="id_fornecedor" value="{{ id_fornecedor }}">
+                    <div class="horizontal-sections-modal">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 10px;">
+                                
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" style="width: 60px;" class="form-control log_data" id="id_representante_fornecedor" name="id_representante_fornecedor" readonly>
+                                    <label for="floatingInput">ID</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="comunicforn_log_data_registro" name="log_data_registro" readonly>
+                                    <label for="floatingInput">Data do Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="comunicforn_log_responsavel_registro" name="log_responsavel_registro" readonly>
+                                    <label for="floatingInput">Responsável pelo Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="comunicforn_lot_ult_atualizacao" name="log_data_registro" readonly>
+                                    <label for="floatingInput">Última Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="comunicforn_log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly>
+                                    <label for="floatingInput">Responsável Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_edicoes" id="comunicforn_log_edicoes" name="log_edicoes" readonly>
+                                    <label for="floatingInput">Nº Edições</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-sections-modal">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating">
+                                    <select class="form-select" id="comunicforn_unidade_daf" aria-label="Floating label select example" name="unidade_daf" style="width: 180px !important;">
+                                        <option value="" disabled {% if not form.instance.unidade_daf %}selected{% endif %}>Não Informado</option>
+                                        {% for value, display in lista_unidade_daf %}
+                                        <option value="{{ value }}" {% if form.instance.unidade_daf == value %}selected{% endif %}>{{ display }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Unidade DAF*</label>
+                                </div>
+                                <div class="form-floating">
+                                    <select class="form-select" id="comunicforn_tipo_comunicacao" aria-label="Floating label select example" name="tipo_comunicacao" style="width: 180px !important;">
+                                        <option value="" disabled {% if not form.instance.tipo_comunicacao %}selected{% endif %}>Não Informado</option>
+                                        {% for value, display in lista_tipo_comunicacao %}
+                                        <option value="{{ value }}" {% if form.instance.tipo_comunicacao == value %}selected{% endif %}>{{ display }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Tipo de Comunicação*</label>
+                                </div>
+                                <div class="form-floating">
+                                    <select class="form-select" id="comunicforn_topico_comunicacao" aria-label="Floating label select example" name="topico_comunicacao" style="width: 270px !important;">
+                                        <option value="" disabled {% if not form.instance.topico_comunicacao %}selected{% endif %}>Não Informado</option>
+                                        {% for value, display in lista_topicos %}
+                                        <option value="{{ value }}" {% if form.instance.topico_comunicacao == value %}selected{% endif %}>{{ display }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Tópico da Comunicação*</label>
+                                </div>
+                                <div class="form-floating mb-3 full-width">
+                                    <input type="text" class="form-control" id="comunicforn_assunto" name="assunto" value="{{ form.instance.assunto|default_if_none:'' }}">
+                                    <label for="floatingInput">Assunto</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-sections-modal" style="margin-bottom: 20px; height: 120%;">
+                        <div class="section" style="border: 0px !important; margin-bottom: 20px;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3 full-width">
+                                    <textarea class="form-control auto-expand" id="comunicforn_demanda_original" name="demanda_original" rows="1" style="height: 170%;">{{ form.instance.demanda_original|default_if_none:'' }}</textarea>
+                                    <label  for="observacoes">Demanda Original</label><br>    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-sections-modal">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3 full-width">
+                                    <textarea class="form-control auto-expand" id="comunicforn_destinatario" name="destinatario" rows="1" >{{ form.instance.destinatario|default_if_none:'' }}</textarea>
+                                    <label  for="observacoes">Destinatário - Informe para qual endereço físico ou digital (email) a mensagem foi encaminhada</label><br>    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-sections-modal" style="margin-bottom: 20px; height: 120%;">
+                        <div class="section" style="border: 0px !important; height: 100%;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3 full-width">
+                                    <textarea class="form-control auto-expand" id="comunicforn_mensagem_encaminhada" name="mensagem_encaminhada" rows="1" style="height: 170%;">{{ form.instance.mensagem_encaminhada|default_if_none:'' }}</textarea>
+                                    <label  for="observacoes">Mensagem Encaminhada</label><br>    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-sections-modal">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating">
+                                    <select class="form-select" id="comunicforn_status_envio" aria-label="Floating label select example" name="status_envio" style="width: 180px !important;">
+                                        <option value="" disabled {% if not form.instance.status_envio %}selected{% endif %}>Não Informado</option>
+                                        {% for value, display in lista_status_envio %}
+                                        <option value="{{ value }}" {% if form.instance.status_envio == value %}selected{% endif %}>{{ display }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Status do Envio*</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" id="comunicforn_data_envio" name="data_envio" style="width: 180px !important;" value="{% if form.data_nascimento.value %}{{ form.data_nascimento.value|date:'Y-m-d' }}{% endif %}">
+                                    <label for="data">Data do Envio</label>
+                                </div>
+                                <div class="form-floating">
+                                    <select class="form-select" id="comunicforn_responsavel" disabled aria-label="Floating label select example" name="responsavel_resposta" style="width: 350px !important;">
+                                        <option value="" disabled {% if not form.instance.responsavel_resposta %}selected{% endif %}></option>
+                                        {% for value, display in lista_genero_sexual %}
+                                        <option value="{{ value }}" {% if form.instance.responsavel_resposta == value %}selected{% endif %}>{{ display }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Responsável pela Resposta</label>
+                                </div>
+                                <div class="form-floating mb-3 full-width">
+                                    <input type="text" class="form-control" id="comunicforn_responsavel_outro" name="outro_responsavel" readonly value="{{ form.instance.outro_responsavel|default_if_none:'' }}">
+                                    <label for="floatingInput">Outro Responsável</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-sections-modal">
+                        <div class="section" style="border: 0px !important; height: 100%;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3 full-width">
+                                    <textarea class="form-control auto-expand" id="comunicforn_observacoes" name="observacoes_gerais" rows="1" style="height: 100%;">{{ form.instance.observacoes_gerais|default_if_none:'' }}</textarea>
+                                    <label  for="observacoes">Observações</label><br>    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary closeModalButton" data-bs-toggle="modal" data-bs-target="#fornecedor_representante_delete" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Deletar</button>
+                    <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnSalvarComunicacao" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+                </div>
+            </form>
+            
+            
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#representanteFornecedorModal').modal('hide');
+        });
+    });
+
+</script>
+<script src="{% static 'js/fornecedores_representantes.js' %}"></script>

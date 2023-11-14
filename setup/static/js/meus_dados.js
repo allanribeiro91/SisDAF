@@ -1,3 +1,56 @@
+//Exportar dados
+$('#btnExportarAcessos').on('click', function() {
+
+    console.log('Exportar Acessos')
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Envia solicitação AJAX para o servidor
+    fetch('exportar/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+    })
+    .then(response => response.blob()) // Trata a resposta como um Blob
+    .then(blob => {
+        // Inicia o download do arquivo
+        const a = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = 'acessos_sisdaf.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+});
+
+$('#btnExportarLogs').on('click', function() {
+
+    console.log('Exportar Logs')
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Envia solicitação AJAX para o servidor
+    fetch('exportar/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+    })
+    .then(response => response.blob()) // Trata a resposta como um Blob
+    .then(blob => {
+        // Inicia o download do arquivo
+        const a = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = 'logs_sisdaf.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+});
+
 document.addEventListener("DOMContentLoaded", function() {
     const tipoVinculo = document.getElementById('tipo_vinculo');
     const orgaoOrigem = document.getElementById('orgao_origem');
@@ -30,6 +83,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // Adiciona um ouvinte de evento para verificar cada vez que o valor do dropdown muda
     tipoVinculo.addEventListener('change', checkFields);
     orgaoOrigem.addEventListener('change', checkFields);
+
+    
 });
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -83,3 +138,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+

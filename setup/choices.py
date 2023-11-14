@@ -182,3 +182,19 @@ CARGOS_FUNCOES = [
     ('outro','Outro'),
     ('nao_informado','Não Informado'),
 ]
+
+TIPO_COMUNICACAO = [
+    ('email','Email'),
+    ('oficio','Ofício'),
+    ('ligacao_telefonica','Ligação Telefônica'),
+    ('whatsapp','Whatsapp'),
+    ('carta', 'Carta'),
+    ('outro','Outro'),
+    ('nao_informado','Não Informado'),
+]
+
+STATUS_ENVIO_COMUNICACAO = [
+    ('nao_enviado','Não Enviado'),
+    ('enviado','Enviado'),
+    ('nao_informado','Não Informado'),
+]

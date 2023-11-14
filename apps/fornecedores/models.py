@@ -1,7 +1,7 @@
 from django.db import models
 from apps.usuarios.models import Usuario
 from django.utils import timezone
-from setup.choices import CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO, GENERO_SEXUAL, CARGOS_FUNCOES
+from setup.choices import UNIDADE_DAF2, CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO, CARGOS_FUNCOES, GENERO_SEXUAL, TIPO_COMUNICACAO, STATUS_ENVIO_COMUNICACAO
 
 class CNPJ_CNAE(models.Model):
     codigo = models.IntegerField(null=False, blank=False)
@@ -98,7 +98,6 @@ class Fornecedores(models.Model):
         self.del_usuario = user
         self.save()
 
-
 class Fornecedores_Faq(models.Model):
     #relacionamento
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fornecedor_faq_registro')
@@ -147,7 +146,6 @@ class Fornecedores_Faq(models.Model):
         self.del_usuario = user
         self.save()
 
-
 class Fornecedores_Representantes(models.Model):
     #relacionamento
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fornecedor_representante_registro')
@@ -192,6 +190,62 @@ class Fornecedores_Representantes(models.Model):
                 self.usuario_registro = user
                 self.usuario_atualizacao = user
         super(Fornecedores_Representantes, self).save(*args, **kwargs)
+
+
+    def soft_delete(self, user):
+        """
+        Realiza uma "deleção lógica" do registro.
+        """
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+
+class Fornecedores_Comunicacoes(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fornecedor_comunicacao_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fornecedor_comunicacao_edicao')
+    fornecedor = models.ForeignKey(Fornecedores, on_delete=models.DO_NOTHING, related_name='fornecedor_comunicacao')
+
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados do Representante
+    unidade_daf = models.CharField(max_length=15, choices=UNIDADE_DAF2, null=False, blank=False)
+    tipo_comunicacao = models.CharField(max_length=25, choices=TIPO_COMUNICACAO, null=False, blank=False)
+    topico_comunicacao = models.CharField(max_length=40, choices=FAQ_FORNECEDOR_TOPICO, null=True, blank=True)
+    assunto = models.CharField(max_length=200, null=True, blank=True)
+    demanda_original = models.TextField(null=True, blank=True)
+    destinatario = models.TextField(null=True, blank=True)
+    mensagem_encaminhada = models.TextField(null=True, blank=True)
+    status_envio = models.CharField(max_length=40, choices=STATUS_ENVIO_COMUNICACAO, null=True, blank=True)
+    data_envio = models.DateField(null=True, blank=True)
+    responsavel_resposta = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fornecedor_comunicacao_responsavel')
+    outro_responsavel = models.CharField(max_length=80, null=True, blank=True)
+    
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='fornecedor_comunicacao_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)  # Obtenha o usuário atual e remova-o dos kwargs
+
+        # Se o objeto já tem um ID, então ele já existe no banco de dados
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(Fornecedores_Comunicacoes, self).save(*args, **kwargs)
 
 
     def soft_delete(self, user):

@@ -170,11 +170,6 @@ $(document).ready(function() {
         loadUsuarios($(this).val());
     });
 
-
-
-
-
-
 });
 
 $(document).ready(function(){

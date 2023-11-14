@@ -49,7 +49,7 @@ class Usuario(models.Model):
     del_cpf = models.CharField(max_length=14, null=True, blank=True)
 
     def __str__(self):
-        return f"Usuário: {self.dp_nome_completo} ({self.dp_cpf})"
+        return f"{self.dp_nome_completo} ({self.dp_cpf})"
     
     def primeiro_ultimo_nome(self):
         partes_nome = self.dp_nome_completo.split()
@@ -74,8 +74,6 @@ class Usuario(models.Model):
         lista_usuarios = [{'id': usuario.id, 'nome': usuario.dp_nome_completo} for usuario in usuarios]
         
         return lista_usuarios
-
-
 
 class Alocacao(models.Model):
     # relacionamento

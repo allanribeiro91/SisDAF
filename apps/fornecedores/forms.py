@@ -1,6 +1,6 @@
 from django import forms
-from apps.fornecedores.models import Fornecedores, Fornecedores_Faq, Fornecedores_Representantes
-from setup.choices import CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, GENERO_SEXUAL, CARGOS_FUNCOES
+from apps.fornecedores.models import Fornecedores, Fornecedores_Faq, Fornecedores_Representantes, Fornecedores_Comunicacoes
+from setup.choices import UNIDADE_DAF2, CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO, CARGOS_FUNCOES, GENERO_SEXUAL, TIPO_COMUNICACAO, STATUS_ENVIO_COMUNICACAO
 
 class FornecedoresForm(forms.ModelForm):    
     cnpj = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control'}))
@@ -139,6 +139,81 @@ class FornecedoresRepresentantesForm(forms.ModelForm):
 
     class Meta:
         model = Fornecedores_Representantes
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
+
+
+class FornecedoresComunicacoesForm(forms.ModelForm):
+    unidade_daf = forms.ChoiceField(
+        choices=UNIDADE_DAF2,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Unidade DAF'
+    )
+    tipo_comunicacao = forms.ChoiceField(
+        choices=TIPO_COMUNICACAO,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Tipo de Comunicação'
+    )
+    topico_comunicacao = forms.ChoiceField(
+        choices=FAQ_FORNECEDOR_TOPICO,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False,
+        label='Tópico de Comunicação'
+    )
+    assunto = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False,
+        label='Assunto'
+    )
+    demanda_original = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control'}),
+        required=False,
+        label='Demanda Original'
+    )
+    destinatario = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control'}),
+        required=False,
+        label='Destinatário'
+    )
+    mensagem_encaminhada = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control'}),
+        required=False,
+        label='Mensagem Encaminhada'
+    )
+    status_envio = forms.ChoiceField(
+        choices=STATUS_ENVIO_COMUNICACAO,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False,
+        label='Status do Envio'
+    )
+    data_envio = forms.DateField(
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        required=False,
+        label='Data de Envio'
+    )
+    responsavel_resposta = forms.CharField(
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False,
+        label='Responsável pela Resposta'
+    )
+    outro_responsavel = forms.CharField(
+        max_length=80,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False,
+        label='Outro Responsável'
+    )
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control'}),
+        required=False,
+        label='Observações Gerais'
+    )
+
+    class Meta:
+        model = Fornecedores_Comunicacoes
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):

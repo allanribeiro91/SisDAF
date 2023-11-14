@@ -51,7 +51,6 @@ def login(request):
 
     return render(request, 'main/login.html', {'form': form})
 
-
 @login_required
 def home(request):
     tot_denominacaoes = DenominacoesGenericas.objects.filter(del_status=False).count()

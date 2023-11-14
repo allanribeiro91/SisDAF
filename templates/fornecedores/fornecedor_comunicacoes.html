@@ -8,7 +8,7 @@
     
     <!-- Caminho da Área de Trabalho -->
     <div class="breadcrumb2">
-        <i class="fa-solid fa-warehouse"></i>&nbsp;Fornecedores / Ficha do Fornecedor / Representantes
+        <i class="fa-solid fa-warehouse"></i>&nbsp;Fornecedores / Ficha do Fornecedor / Registro de Comunicações
     </div>
 
     <!-- Barra Superior -->
@@ -21,15 +21,15 @@
         </div>
         <div class="tabs">
             <button class="tab-button" id="fornecedor_ficha_dados_gerais">Dados Gerais</button>
-            <button class="tab-button active" id="fornecedor_ficha_representantes">Representantes</button>
-            <button class="tab-button" id="fornecedor_ficha_comunicacoes">Registro de Comunicações</button>
+            <button class="tab-button" id="fornecedor_ficha_representantes">Representantes</button>
+            <button class="tab-button active" id="fornecedor_ficha_comunicacoes">Registro de Comunicações</button>
         </div>
     </div>
 
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button class="btn btn-primary me-md-2" type="submit" id="btnNovoRepresentante" style="font-size: 12px; background-color: green; border-color: green;">
+        <button class="btn btn-primary me-md-2" type="submit" id="btnNovaComunicacao" style="font-size: 12px; background-color: green; border-color: green;">
             <i class="fas fa-plus" style="font-size: 14px;"></i> 
-            &nbsp;Novo Representante
+            &nbsp;Nova Comunicação
         </button>
     </div>
 
@@ -39,10 +39,11 @@
             <thead>
                 <tr>
                     <th class="representante-id">ID</th>
-                    <th class="representante-nome">Nome Completo</th>
-                    <th class="representante-cargo">Cargo</th>
-                    <th class="representante-celular">Celular</th>
-                    <th class="representante-email">Email</th>
+                    <th class="representante-nome">Status</th>
+                    <th class="representante-nome">Data de Envio</th>
+                    <th class="representante-cargo">Responsável</th>
+                    <th class="representante-celular">Tipo</th>
+                    <th class="representante-email">Assunto</th>
                 </tr>
             </thead>
             <tbody>
@@ -69,9 +70,7 @@
         </table>  
     </div>
     
-    
 
-    
     <script src="{% static 'js/fornecedores.js' %}"></script>
     
     

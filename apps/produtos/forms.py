@@ -81,6 +81,7 @@ class ProdutosFarmaceuticosForm(forms.ModelForm):
             'biologico': forms.Select(attrs={'class':'form-select'}),
             'aware': forms.Select(attrs={'class':'form-control'}),
             'atc': forms.Select(attrs={'class':'form-control'}),
+            'atc_codigo': forms.TextInput(attrs={'class':'form-control'}),
             'incorp_status': forms.Select(attrs={'class':'form-control'}),
             'incorp_data': forms.DateInput(
                 format='%d/%m/%Y',

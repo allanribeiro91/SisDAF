@@ -82,7 +82,7 @@ class ProdutosFarmaceuticos(models.Model):
     oncologico = models.BooleanField(default=False, null=True, blank=True)
     biologico = models.BooleanField(default=False, null=True, blank=True)
     aware = models.CharField(max_length=20, choices=CLASSIFICACAO_AWARE, null=True, blank=True)
-    atc = models.CharField(max_length=10, null=True, blank=True)
+    atc = models.CharField(max_length=20, null=True, blank=True)
     atc_descricao = models.CharField(max_length=100, null=True, blank=True)
     
     #incorporacao SUS
