@@ -1,41 +1,5 @@
 $(document).ready(function() {
     
-    // Chame as funções quando o campo "Unidade DAF" é alterado
-    $('#comunicforn_unidade_daf').change(function() {
-        console.log('teste')
-        checkUnidadeDaf();
-        loadUsuarios($(this).val());
-    });
-
-    // Função para verificar o estado do campo "Unidade DAF" e habilitar/desabilitar "Responsável Técnico"
-    function checkUnidadeDaf() {
-        var unidadeDaf = $('#comunicforn_unidade_daf').val();
-        if (unidadeDaf != 'nao_informado') {
-            $('#comunicforn_responsavel').prop('disabled', false);
-        } else {
-            $('#comunicforn_responsavel').prop('disabled', true);
-        }
-    }
-
-    // Função para carregar usuários baseado na unidade
-    function loadUsuarios(unidade, selectedUserId) {
-        var urlBase = '/fornecedores/usuarios_unidadedaf/'
-        if (unidade != 'nao_informado') {
-            $.ajax({
-                url: urlBase + unidade + '/',
-                success: function(data) {
-                    var responsavelSelect = $('#comunicforn_responsavel');
-                    responsavelSelect.empty();
-                    responsavelSelect.append('<option value="" disabled>Não Informado</option>');
-                    $.each(data, function(index, usuario) {
-                        var selected = usuario.id == selectedUserId ? 'selected' : '';
-                        responsavelSelect.append('<option value="' + usuario.id + '" ' + selected + '>' + usuario.nome + '</option>');
-                    });
-                    responsavelSelect.prop('disabled', false);
-                }
-            });
-        }
-    }
 
     //Mudar de aba
     $('#fornecedor_ficha_representantes').click(function() {

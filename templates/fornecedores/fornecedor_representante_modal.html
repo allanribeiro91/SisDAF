@@ -163,7 +163,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary closeModalButton" data-bs-toggle="modal" data-bs-target="#fornecedor_representante_delete" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Deletar</button>
-                    <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                    <button type="button" class="btn btn-secondary closeModalButton" id='btnCancelarRepresentante' data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
                     <button type="submit" class="btn btn-primary" id="btnSalvarRepresentante" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
                 </div>
             </form>
@@ -174,12 +174,11 @@
 </div>
 
    
-<script>
-    document.querySelectorAll('.closeModalButton').forEach(button => {
-        button.addEventListener('click', function() {
-            $('#representanteFornecedorModal').modal('hide');
-        });
-    });
-
+<!-- <script>
+    // document.querySelectorAll('.closeModalButton').forEach(button => {
+    //     button.addEventListener('click', function() {
+    //         $('#representanteFornecedorModal').modal('hide');
+    //     });
+    // });
 </script>
-<script src="{% static 'js/fornecedores_representantes.js' %}"></script>
+<script src="{% static 'js/fornecedores_representantes.js' %}"></script> -->

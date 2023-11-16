@@ -261,3 +261,35 @@ table tbody tr:hover {
     width: 25% !important;
     text-align: left;
 }
+
+
+/*--colunas--*/
+.comunicacao-id {
+    width: 3% !important;
+}
+.comunicacao-unidadedaf {
+    width: 10% !important;
+    text-align: left;
+}
+.comunicacao-tipo {
+    width: 10% !important;
+}
+.comunicacao-topico {
+    width: 10% !important;
+}
+.comunicacao-assunto {
+    width: 25% !important;
+    text-align: left;
+}
+.comunicacao-responsavel {
+    width: 15% !important;
+    text-align: left;
+}
+.comunicacao-status {
+    width: 8% !important;
+    text-align: left;
+}
+.comunicacao-dataenvio {
+    width: 8% !important;
+    text-align: left;
+}

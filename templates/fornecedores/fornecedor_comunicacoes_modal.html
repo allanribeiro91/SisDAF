@@ -59,7 +59,7 @@
                             <div class="grid" style="font-size: 10px;">
                                 
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" style="width: 60px;" class="form-control log_data" id="id_representante_fornecedor" name="id_representante_fornecedor" readonly>
+                                    <input type="text" style="width: 60px;" class="form-control log_data" id="id_comunicacao_fornecedor" name="id_comunicacao_fornecedor" readonly>
                                     <label for="floatingInput">ID</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
@@ -183,7 +183,7 @@
                                     <label for="floatingSelect">Responsável pela Resposta</label>
                                 </div>
                                 <div class="form-floating mb-3 full-width">
-                                    <input type="text" class="form-control" id="comunicforn_responsavel_outro" name="outro_responsavel" readonly value="{{ form.instance.outro_responsavel|default_if_none:'' }}">
+                                    <input type="text" class="form-control" id="comunicforn_responsavel_outro" name="outro_responsavel" readonly >
                                     <label for="floatingInput">Outro Responsável</label>
                                 </div>
                             </div>
@@ -202,7 +202,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary closeModalButton" data-bs-toggle="modal" data-bs-target="#fornecedor_representante_delete" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Deletar</button>
+                    <button type="button" class="btn btn-secondary closeModalButton" data-bs-toggle="modal" data-bs-target="#fornecedor_comunicacao_delete" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Deletar</button>
                     <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
                     <button type="submit" class="btn btn-primary" id="btnSalvarComunicacao" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
                 </div>
@@ -217,9 +217,9 @@
 <script>
     document.querySelectorAll('.closeModalButton').forEach(button => {
         button.addEventListener('click', function() {
-            $('#representanteFornecedorModal').modal('hide');
+            $('#comunicacaoFornecedorModal').modal('hide');
         });
     });
 
 </script>
-<script src="{% static 'js/fornecedores_representantes.js' %}"></script>
+

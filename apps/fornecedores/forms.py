@@ -1,4 +1,5 @@
 from django import forms
+from apps.usuarios.models import Usuario
 from apps.fornecedores.models import Fornecedores, Fornecedores_Faq, Fornecedores_Representantes, Fornecedores_Comunicacoes
 from setup.choices import UNIDADE_DAF2, CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO, CARGOS_FUNCOES, GENERO_SEXUAL, TIPO_COMUNICACAO, STATUS_ENVIO_COMUNICACAO
 
@@ -195,10 +196,10 @@ class FornecedoresComunicacoesForm(forms.ModelForm):
         required=False,
         label='Data de Envio'
     )
-    responsavel_resposta = forms.CharField(
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        required=False,
-        label='Responsável pela Resposta'
+    responsavel_resposta = forms.ModelChoiceField(
+        queryset=Usuario.objects.all(), 
+        required=False, 
+        widget=forms.Select(attrs={'class':'form-control'})
     )
     outro_responsavel = forms.CharField(
         max_length=80,
@@ -215,6 +216,11 @@ class FornecedoresComunicacoesForm(forms.ModelForm):
     class Meta:
         model = Fornecedores_Comunicacoes
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def __init__(self, *args, **kwargs):
+        super(FornecedoresComunicacoesForm, self).__init__(*args, **kwargs)
+        # Adiciona uma opção vazia no início do dropdown
+        self.fields['responsavel_resposta'].choices = [(None, 'Nenhum')] + list(self.fields['responsavel_resposta'].choices) + [('outro', 'Outro')]
 
     def clean_observacoes_gerais(self):
         observacoes = self.cleaned_data.get('observacoes_gerais')

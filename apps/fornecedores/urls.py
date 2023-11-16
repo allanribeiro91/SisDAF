@@ -3,7 +3,7 @@ from django.urls import path
 from apps.fornecedores.views import fornecedores, fornecedores_filtro, fornecedores_exportar, fornecedor_ficha, fornecedor_ficha_filtrar_dados, fornecedor_delete
 from apps.fornecedores.views import fornecedores_faq, fornecedor_faq_ficha, fornecedor_faq_filtrar_dados, fornecedor_faq_delete, fornecedores_faq_exportar
 from apps.fornecedores.views import fornecedor_representante_delete, fornecedores_representantes, representante_dados
-from apps.fornecedores.views import fornecedor_comunicacao_delete, fornecedores_comunicacoes, comunicacao_dados, fornecedor_usuarios_por_unidade
+from apps.fornecedores.views import fornecedor_comunicacao_delete, fornecedores_comunicacoes, comunicacao_dados, fornecedor_usuarios_por_unidade, fornecedor_comunicacao_exportar
 
 urlpatterns = [
 
@@ -24,6 +24,7 @@ urlpatterns = [
     path('fornecedores/comunicacoes/deletar/<int:comunicacao_id>/', fornecedor_comunicacao_delete, name='fornecedor_comunicacao_delete'),
     path('fornecedores/comunicacoes/<int:id_fornecedor>/', fornecedores_comunicacoes, name='fornecedores_comunicacoes'),
     path('fornecedores/comunicacoes/<int:comunicacao_id>/dados/', comunicacao_dados, name='comunicacao_dados'),
+    path('fornecedores/comunicacoes/exportar/<int:id_fornecedor>/', fornecedor_comunicacao_exportar, name='fornecedor_comunicacao_exportar'),
     path('fornecedores/usuarios_unidadedaf/<str:unidade>/', fornecedor_usuarios_por_unidade, name='fornecedor_usuarios_por_unidade'),
 
     #DADOS DO FORNECEDOR

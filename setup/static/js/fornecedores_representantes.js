@@ -30,6 +30,23 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// Quando a página é carregada
+document.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('openModalAfterReload') === 'true') {
+        const representanteId = localStorage.getItem('representanteId');
+        const id_fornecedor = localStorage.getItem('id_fornecedor');
+        console.log('ID Representante' + representanteId)
+
+        openModal(representanteId, id_fornecedor);
+
+        // Limpa o localStorage
+        localStorage.removeItem('openModalAfterReload');
+        localStorage.removeItem('comunicacaoId');
+        localStorage.removeItem('id_fornecedor');
+    }
+});
+
+
 // Função para validar o CPF
 function isValidCPF(cpf) {
 
@@ -171,6 +188,12 @@ document.getElementById('btnSalvarRepresentante').addEventListener('click', func
     })
     .then(data => {
         if (data.redirect_url) {
+            // Antes de recarregar a página
+            var representanteId = data.representante_id;
+            localStorage.setItem('representanteId', representanteId);
+            localStorage.setItem('id_fornecedor', id_fornecedor);
+            localStorage.setItem('openModalAfterReload', 'true');
+            //Recarregar a páigna
             window.location.href = data.redirect_url;
         }
     })
@@ -216,12 +239,21 @@ function openModal(representanteId, fornecedorId) {
             document.getElementById('repforn_nome_completo').value = data.nome_completo;
             document.getElementById('repforn_data_nascimento').value = data.data_nascimento;
             document.getElementById('repforn_genero_sexual').value = data.genero_sexual;
-            document.getElementById('repforn_cargo').value = data.cargo;
+            let cargo = data.cargo;
+            document.getElementById('repforn_cargo').value = cargo;
+            document.getElementById('repforn_cargo_outro').value = data.cargo_outro;
             document.getElementById('repforn_telefone').value = data.telefone;
             document.getElementById('repforn_celular').value = data.celular;
             document.getElementById('repforn_email').value = data.email;
             document.getElementById('repforn_linkedin').value = data.linkedin;
             document.getElementById('observacoes_gerais').value = data.observacoes;
+        
+            //
+            if(cargo == 'outro') {
+                document.getElementById('repforn_cargo_outro').removeAttribute('readonly')
+            } else {
+                document.getElementById('repforn_cargo_outro').setAttribute('readonly', true)
+            }
 
             // Abrir o modal
             const modal = new bootstrap.Modal(document.getElementById('representanteFornecedorModal'));
@@ -232,4 +264,23 @@ function openModal(representanteId, fornecedorId) {
         });
 }
 
+
+// document.getElementById('btnCancelarRepresentante').addEventListener('click', function() {
+//     var modalElement = document.getElementById('representanteFornecedorModal');
+//     var myModal = bootstrap.Modal.getInstance(modalElement);
+//     myModal.hide();
+//     window.location.reload();
+// });
+
+
+// Função para fechar o modal e recarregar a página
+function closeModalAndReload() {
+    var modalElement = document.getElementById('representanteFornecedorModal');
+    var myModal = bootstrap.Modal.getInstance(modalElement);
+    myModal.hide();
+    //window.location.reload();
+}
+
+// Adicionando o mesmo evento de clique ao botão
+document.getElementById('btnCancelarRepresentante').addEventListener('click', closeModalAndReload);
 

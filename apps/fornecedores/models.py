@@ -222,7 +222,7 @@ class Fornecedores_Comunicacoes(models.Model):
     mensagem_encaminhada = models.TextField(null=True, blank=True)
     status_envio = models.CharField(max_length=40, choices=STATUS_ENVIO_COMUNICACAO, null=True, blank=True)
     data_envio = models.DateField(null=True, blank=True)
-    responsavel_resposta = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fornecedor_comunicacao_responsavel')
+    responsavel_resposta = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fornecedor_comunicacao_responsavel', null=True, blank=True)
     outro_responsavel = models.CharField(max_length=80, null=True, blank=True)
     
     #observações gerais

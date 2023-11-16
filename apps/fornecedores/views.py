@@ -4,8 +4,8 @@ from django.contrib import auth, messages
 from django.urls import reverse
 from apps.main.models import CustomLog
 from django.http import JsonResponse, HttpResponse
-from apps.fornecedores.models import Fornecedores, UF_Municipio, CNPJ_NATUREZA_JURIDICA, CNPJ_CNAE, Fornecedores_Faq, Fornecedores_Representantes
-from apps.fornecedores.forms import FornecedoresForm, FornecedoresFaqForm, FornecedoresRepresentantesForm
+from apps.fornecedores.models import Fornecedores, Fornecedores_Comunicacoes, UF_Municipio, CNPJ_NATUREZA_JURIDICA, CNPJ_CNAE, Fornecedores_Faq, Fornecedores_Representantes
+from apps.fornecedores.forms import FornecedoresForm, FornecedoresFaqForm, FornecedoresRepresentantesForm, FornecedoresComunicacoesForm
 from apps.usuarios.models import Usuario
 from setup.choices import UNIDADE_DAF2, CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREITO, FAQ_FORNECEDOR_TOPICO, CARGOS_FUNCOES, GENERO_SEXUAL, TIPO_COMUNICACAO, STATUS_ENVIO_COMUNICACAO
 from openpyxl import Workbook
@@ -585,7 +585,8 @@ def fornecedores_representantes(request, id_fornecedor=None):
             #Salvar a tramitação
             representante = representante_form.save(commit=False)
             representante.save(current_user=request.user.usuario_relacionado)
-            
+            representante_id = representante.id
+
             if novo_representante:
                 messages.success(request, "Novo representante registrado com sucesso!")
             else:
@@ -595,6 +596,7 @@ def fornecedores_representantes(request, id_fornecedor=None):
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'redirect_url': reverse('fornecedores_representantes', args=[id_fornecedor]),
+                    'representante_id': representante_id,
                 })
         else:
             messages.error(request, "Preencha os campos obrigatórios.")
@@ -641,6 +643,7 @@ def representante_dados(request, representante_id):
             'data_nascimento': representante.data_nascimento.strftime('%d/%m/%Y') if representante.data_nascimento else '',
             'genero_sexual': representante.genero_sexual,
             'cargo': representante.cargo,
+            'cargo_outro': representante.cargo_outro,
             'telefone': representante.telefone,
             'celular': representante.celular,
             'email': representante.email,
@@ -657,73 +660,70 @@ def fornecedores_comunicacoes(request, id_fornecedor=None):
 
     if request.method == 'POST':
         
-        id_representante = request.POST.get('id_representante')
+        id_comunicacao = request.POST.get('id_comunicacao')
 
-        if id_representante:
+        if id_comunicacao:
             try:
-                representante = Fornecedores_Representantes.objects.get(id=id_representante)
-            except Fornecedores_Representantes.DoesNotExist:
-                messages.error(request, "Representante não encontrado.")
+                comunicacao = Fornecedores_Comunicacoes.objects.get(id=id_comunicacao)
+            except Fornecedores_Comunicacoes.DoesNotExist:
+                messages.error(request, "Comunicação não encontrada.")
                 return redirect('fornecedores')
         else:
-            representante = None
+            comunicacao = None
 
-        if representante:
-            representante_form = FornecedoresRepresentantesForm(request.POST, instance=representante)
-            novo_representante = False
+        if comunicacao:
+            comunicacao_form = FornecedoresComunicacoesForm(request.POST, instance=comunicacao)
+            nova_comunicacao = False
         else:
-            representante_form = FornecedoresRepresentantesForm(request.POST)
-            novo_representante = True
+            comunicacao_form = FornecedoresComunicacoesForm(request.POST)
+            nova_comunicacao = True
         
         #Verificar se houve alteração no formulário
-        if not representante_form.has_changed():
+        if not comunicacao_form.has_changed():
             messages.error(request, "Dados não foram salvos. Não houve mudanças.")
-            return redirect('fornecedores_representantes', id_fornecedor=id_fornecedor)
+            return redirect('fornecedores_comunicacoes', id_fornecedor=id_fornecedor)
         
         fornecedor_instance = Fornecedores.objects.get(id=id_fornecedor)
-        representante_form.instance.fornecedor = fornecedor_instance
+        comunicacao_form.instance.fornecedor = fornecedor_instance
         
-        if representante_form.is_valid():
-            #Verificar se já existe registro dessa tramitacao
-            cpf = representante_form.cleaned_data.get('cpf')
-            cpf_existente = Fornecedores_Representantes.objects.filter(cpf=cpf, fornecedor=fornecedor_instance)
+        # #Responsavel
+        responsavel = request.POST.get('responsavel_resposta')
+        print(responsavel)
+        if responsavel == 'outro':
+            #comunicacao_form.instance.responsavel_resposta = responsavel
+            comunicacao_form.instance.responsavel_resposta = None
 
-            #Se estivermos atualizando um processo existente, excluímos esse processo da verificação
-            # if cpf:
-            #     if representante:
-            #         cpf_existente = cpf_existente.exclude(id=representante.id)
-                
-            #     if cpf_existente.exists():
-            #         messages.error(request, "Já existe um representante com esse CPF. Não foi possível salvar.")
-            #         return redirect('fornecedores_representantes', id_fornecedor=id_fornecedor)
-            
-            #Salvar a tramitação
-            representante = representante_form.save(commit=False)
-            representante.save(current_user=request.user.usuario_relacionado)
-            
-            if novo_representante:
-                messages.success(request, "Novo representante registrado com sucesso!")
+        if comunicacao_form.is_valid():
+
+            #Salvar a comunicacao
+            comunicacao = comunicacao_form.save(commit=False)
+            comunicacao.save(current_user=request.user.usuario_relacionado)
+            comunicacao_id = comunicacao.id
+
+            if nova_comunicacao:
+                messages.success(request, "Nova comunicação registrada com sucesso!")
             else:
                 messages.success(request, "Dados atualizados com sucesso!")
 
             #Retornar log
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
-                    'redirect_url': reverse('fornecedores_representantes', args=[id_fornecedor]),
+                    'redirect_url': reverse('fornecedores_comunicacoes', args=[id_fornecedor]),
+                    'comunicacao_id': comunicacao_id,
                 })
         else:
             messages.error(request, "Preencha os campos obrigatórios.")
             print("Erro formulário representante do fornecedor.")
-            print(representante_form.errors)
+            print(comunicacao_form.errors)
     
     if id_fornecedor:
         fornecedor_instance = Fornecedores.objects.get(id=id_fornecedor)
-        tab_fornecedores_representantes = Fornecedores_Representantes.objects.filter(del_status=False, fornecedor=fornecedor_instance).order_by('nome_completo')
+        tab_fornecedores_comunicacoes = Fornecedores_Comunicacoes.objects.filter(del_status=False, fornecedor=fornecedor_instance).order_by('-data_envio')
     else:
-        tab_fornecedores_representantes = None
+        tab_fornecedores_comunicacoes = None
 
     conteudo = {
-        'tab_fornecedores_representantes': tab_fornecedores_representantes,
+        'tab_fornecedores_comunicacoes': tab_fornecedores_comunicacoes,
         'lista_topicos': FAQ_FORNECEDOR_TOPICO,
         'lista_tipo_comunicacao': TIPO_COMUNICACAO,
         'lista_status_envio': STATUS_ENVIO_COMUNICACAO,
@@ -732,42 +732,146 @@ def fornecedores_comunicacoes(request, id_fornecedor=None):
     }
     return render(request, 'fornecedores/fornecedor_comunicacoes.html', conteudo)
 
-def fornecedor_comunicacao_delete(request, representante_id=None):
+def fornecedor_comunicacao_delete(request, comunicacao_id=None):
     try:
-        representante = Fornecedores_Representantes.objects.get(id=representante_id)
-        representante.soft_delete(request.user.usuario_relacionado)
-        messages.error(request, "Representante deletado com sucesso.")
-        return JsonResponse({"message": "Representante deletado com sucesso!"})
-    except Fornecedores_Representantes.DoesNotExist:
-        messages.error(request, "Representante não encontrado.")
-        return JsonResponse({"message": "Representante não encontrado."})   
+        comunicacao = Fornecedores_Comunicacoes.objects.get(id=comunicacao_id)
+        comunicacao.soft_delete(request.user.usuario_relacionado)
+        messages.error(request, "Comunicação deletada com sucesso.")
+        return JsonResponse({"message": "Comunicação deletada com sucesso!"})
+    except Fornecedores_Comunicacoes.DoesNotExist:
+        messages.error(request, "Comunicação não encontrada.")
+        return JsonResponse({"message": "Comunicação não encontrada."})   
 
-def comunicacao_dados(request, representante_id):
+def comunicacao_dados(request, comunicacao_id):
     try:
-        representante = Fornecedores_Representantes.objects.get(id=representante_id)
-        print('Data do Registro ', representante.registro_data)
+        item = Fornecedores_Comunicacoes.objects.get(id=comunicacao_id)
+        if item.responsavel_resposta is None:
+            if not item.outro_responsavel:
+                responsavel_resposta = "Não Informado"
+            else:
+                responsavel_resposta = "Outro"
+        else:
+            responsavel_resposta = str(item.responsavel_resposta.dp_nome_completo)
         data = {
-            'id_representante': representante.id,
-            'log_data_registro': representante.registro_data.strftime('%d/%m/%Y %H:%M:%S') if representante.registro_data else '',
-            'log_responsavel_registro': str(representante.usuario_atualizacao.dp_nome_completo),
-            'lot_ult_atualizacao': representante.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if representante.ult_atual_data else '',
-            'log_responsavel_atualizacao': str(representante.usuario_atualizacao.dp_nome_completo),
-            'log_edicoes': representante.log_n_edicoes,
-            'cpf': representante.cpf if representante.cpf else '',
-            'nome_completo': representante.nome_completo,
-            'data_nascimento': representante.data_nascimento.strftime('%d/%m/%Y') if representante.data_nascimento else '',
-            'genero_sexual': representante.genero_sexual,
-            'cargo': representante.cargo,
-            'telefone': representante.telefone,
-            'celular': representante.celular,
-            'email': representante.email,
-            'linkedin': representante.linkedin,
-            'observacoes': representante.observacoes_gerais if representante.observacoes_gerais else '',
+            'id_comunicacao': item.id,
+            'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
+            'log_responsavel_registro': str(item.usuario_atualizacao.dp_nome_completo),
+            'lot_ult_atualizacao': item.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if item.ult_atual_data else '',
+            'log_responsavel_atualizacao': str(item.usuario_atualizacao.dp_nome_completo),
+            'log_edicoes': item.log_n_edicoes,
+            'unidade_daf': item.unidade_daf,
+            'tipo_comunicacao': item.tipo_comunicacao,
+            'topico_comunicacao': item.topico_comunicacao,
+            'assunto': item.assunto,
+            'demanda_original': item.demanda_original,
+            'destinatario': item.destinatario,
+            'mensagem_encaminhada': item.mensagem_encaminhada,
+            'status_envio': item.status_envio,
+            'data_envio': item.data_envio.strftime('%Y-%m-%d') if item.data_envio else '',
+            'responsavel_resposta': responsavel_resposta,
+            'outro_responsavel': item.outro_responsavel,
+            'observacoes': item.observacoes_gerais if item.observacoes_gerais else '',
         }
         return JsonResponse(data)
-    except Fornecedores_Representantes.DoesNotExist:
-        return JsonResponse({'error': 'Representante não encontrado'}, status=404)
+    except Fornecedores_Comunicacoes.DoesNotExist:
+        return JsonResponse({'error': 'Comunicação não encontrada'}, status=404)
 
 def fornecedor_usuarios_por_unidade(request, unidade):
     usuarios = Usuario.usuarios_por_unidade(unidade)
     return JsonResponse(usuarios, safe=False)
+
+def fornecedor_comunicacao_exportar(request, id_fornecedor):
+    data = json.loads(request.body)
+
+    #fornecedor = Fornecedores.objects.get(id=fornecedor_id)
+    print('Fornecedor ', id_fornecedor)
+    filters = {}
+    filters['del_status'] = False
+    #filters['fornecedor_id'] = id_fornecedor
+    
+    comunicacoes = Fornecedores_Comunicacoes.objects.filter(**filters)
+    current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+
+    # Criar um workbook e adicionar uma planilha
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "fornecedores_comunicacoes"
+
+    headers = [
+    'ID', 'Usuário Registro', 'Usuário Atualização', 'Data de Registro', 'Data da Última Atualização', 'N Edições',
+    'CNPJ', 'Fornecedor',
+    'Unidade DAF', 'Tipo de Comunicação', 'Tópico da Comunicação', 'Assunto', 
+    'Demanda Original', 'Destinatário', 'Mensagem Encaminhada',
+    'Status do Envio', 'Data do Envio', 'Responsável pela Resposta', 'Outro Responsável',
+    'Observações Gerais', 'Data Exportação'
+    ]
+
+    for col_num, header in enumerate(headers, 1):
+        col_letter = get_column_letter(col_num)
+        ws['{}1'.format(col_letter)] = header
+        ws.column_dimensions[col_letter].width = 20
+
+    # Adicionar dados da tabela
+    for row_num, item in enumerate(comunicacoes, 2):
+        registro_data = item.registro_data.replace(tzinfo=None).strftime('%d/%m/%Y %H:%M:%S')
+        ult_atual_data = item.ult_atual_data.replace(tzinfo=None).strftime('%d/%m/%Y %H:%M:%S')
+        data_envio = item.data_envio
+        if data_envio:
+            data_envio.strftime('%d/%m/%Y')
+        responsavel_resposta = item.responsavel_resposta
+        outro_responsavel = item.outro_responsavel
+        if item.responsavel_resposta:
+            responsavel_resposta = item.responsavel_resposta.dp_nome_completo
+        elif item.responsavel_resposta == None and outro_responsavel != '':
+            responsavel_resposta == 'Outro'
+        else:
+            responsavel_resposta == 'Não Informado'
+        fornecedor = item.fornecedor.nome_fantasia
+        cnpj = item.fornecedor.cnpj
+
+        ws.cell(row=row_num, column=1, value=item.id)
+        ws.cell(row=row_num, column=2, value=str(item.usuario_registro.primeiro_ultimo_nome()))
+        ws.cell(row=row_num, column=3, value=str(item.usuario_atualizacao.primeiro_ultimo_nome()))
+        ws.cell(row=row_num, column=4, value=registro_data)
+        ws.cell(row=row_num, column=5, value=ult_atual_data)
+        ws.cell(row=row_num, column=6, value=item.log_n_edicoes)
+
+        ws.cell(row=row_num, column=7, value=cnpj)
+        ws.cell(row=row_num, column=8, value=fornecedor)
+        ws.cell(row=row_num, column=9, value=item.unidade_daf)
+        ws.cell(row=row_num, column=10, value=item.tipo_comunicacao)
+        ws.cell(row=row_num, column=11, value=item.topico_comunicacao)
+        ws.cell(row=row_num, column=12, value=item.assunto)
+
+        ws.cell(row=row_num, column=13, value=item.demanda_original)
+        ws.cell(row=row_num, column=14, value=item.destinatario)
+        ws.cell(row=row_num, column=15, value=item.mensagem_encaminhada)
+
+        ws.cell(row=row_num, column=16, value=item.status_envio)
+        ws.cell(row=row_num, column=17, value=data_envio)
+        ws.cell(row=row_num, column=18, value=responsavel_resposta)
+        ws.cell(row=row_num, column=19, value=outro_responsavel)
+
+        ws.cell(row=row_num, column=20, value=item.observacoes_gerais)
+        ws.cell(row=row_num, column=21, value=current_date_str)
+    
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)  # Reposition to the start of the stream
+
+    # Registrar a ação no CustomLog
+    log_entry = CustomLog(
+        usuario=request.user.usuario_relacionado,
+        modulo="Fornecedores_Comunicações",
+        item_id=0,
+        item_descricao="Exportação dos registros de comunicação do fornecedor.",
+        acao="Exportação",
+        observacoes=f"Usuário {request.user.username} exportou registros de comunicações com o fornecedor {fornecedor} ({cnpj}) em {current_date_str}."
+    )
+    log_entry.save()
+
+    # Configurar a resposta
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="exportar_fornecedores.xlsx"'
+    response.write(output.getvalue())
+    return response
