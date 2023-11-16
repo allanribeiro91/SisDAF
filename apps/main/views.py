@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth, messages
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from setup.choices import UNIDADE_DAF2
 from setup.funcoes import valida_cpf
 
 
@@ -58,9 +59,16 @@ def home(request):
     tot_fornecedores = Fornecedores.objects.filter(del_status=0).count()
     tot_proaqs = ProaqDadosGerais.objects.filter(del_status=False).count()
     tot_contratos = 0
-
-    print("Total de Denominações: ", tot_denominacaoes)
     usuario = request.user.usuario_relacionado
+    
+    # Obter a alocação ativa do usuário
+    alocacao_ativa = usuario.alocacao.filter(is_ativo=True).first()
+    if alocacao_ativa:
+        unidade_daf_codigo = alocacao_ativa.unidade
+        unidade_daf = dict(UNIDADE_DAF2).get(unidade_daf_codigo, 'Não Informado')
+    else:
+        unidade_daf = 'Não Informado'  # Ou algum valor padrão, se apropriado
+    
     conteudo ={
         'usuario': usuario,
         'tot_denominacoes': tot_denominacaoes,
@@ -68,6 +76,7 @@ def home(request):
         'tot_fornecedores': tot_fornecedores,
         'tot_proaqs': tot_proaqs,
         'tot_contratos': tot_contratos,
+        'unidade_daf': unidade_daf,
     }
     return render(request, 'main/home.html', conteudo)
 

@@ -1,3 +1,38 @@
+//Exportar dados
+$('#btnExportarRepresentantes').on('click', function() {
+
+    console.log('Exportar Representantes')
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var fornecedorId = window.location.pathname.split('/').filter(function(e){ return e }).pop();
+
+    // // Define dados a serem enviados
+    const data = {
+        fornecedorId: fornecedorId,
+    };
+
+    // Envia solicitação AJAX para o servidor
+    fetch(`/fornecedores/representantes/exportar/${fornecedorId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.blob()) // Trata a resposta como um Blob
+    .then(blob => {
+        // Inicia o download do arquivo
+        const a = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = 'representantes_fornecedor.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+});
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const cpfInput = document.getElementById("repforn_cpf");
 

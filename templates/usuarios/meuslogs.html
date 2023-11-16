@@ -43,7 +43,7 @@
                     <th class="log-data">Data/Hora</th>
                     <th class="log-modulo">Módulo</th>
                     <th class="log-acao">Ação</th>
-                    <th class="log-descricao">Descrição</th>
+                    <th class="log-descricao">Detalhamento</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,7 +54,7 @@
                     <td class="log-data">{{ item.timestamp|date:"d/m/Y H:i:s" }}</td>
                     <td class="log-modulo">{{ item.modulo }}</td>
                     <td class="log-acao">{{ item.acao }}</td>
-                    <td class="log-descricao">{{ item.item_descricao }}</td>
+                    <td class="log-descricao">{{ item.observacoes }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

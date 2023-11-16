@@ -1,6 +1,6 @@
 <!-- Modal -->
-<div class="modal fade" id="fornecedor_representante_delete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog delete-representante" role="document">
+<div class="modal fade" id="proaq_delete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog delete-comunicacao" role="document">
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Atenção!</h5>
@@ -10,11 +10,11 @@
         </div>
         <div class="modal-body">
             <p style="text-align: center;"><i class="fas fa-exclamation-triangle" style="font-size: 100px; color:rgb(255, 174, 0);"></i></p>
-            <p style="text-align: center; font-size: 20px;">Tem certeza que deseja deletar este<br> <b>Representante do Fornecedor?</b></p>
+            <p style="text-align: center; font-size: 20px;">Tem certeza que deseja deletar este<br> <b>Processo Aquisitivo?</b></p>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Fechar</button>
-            <button type="button" class="btn btn-primary" id="btnDeletarRepresentante" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Apagar Registro</button>
+            <button type="button" class="btn btn-primary" id="btnDeletarProaq" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Apagar Registro</button>
         </div>
         </div>
     </div>
@@ -23,31 +23,32 @@
 <script>
     document.querySelectorAll('.closeModalButton').forEach(button => {
         button.addEventListener('click', function() {
-            $('#fornecedor_representante_delete').modal('hide');
+            $('#proaq_delete').modal('hide');
         });
     });
 
-    $('#btnDeletarRepresentante').on('click', function() {
-        const representanteId = $('#id_representante_fornecedor').val();  // Pega o ID da tramitacao
-
-        if (!representanteId) { //Trata-se de um novo registro que ainda não foi salvo
+    $('#btnDeletarProaq').on('click', function() {
+        const proaqId = $('#id_proaq').val();  // Pega o ID da tramitacao
+        
+        if (!proaqId) { //Trata-se de um novo registro que ainda não foi salvo
             window.location.reload();
             return; // Sai da função
         }
 
-        console.log('Representante ID: ' + representanteId)
+        console.log('Proaq ID: ' + proaqId)
 
         $.ajax({
-            url: `/fornecedores/representantes/deletar/${representanteId}/`,
+            url: `/proaq/ficha/dadosgerais/deletar/${proaqId}/`,
             method: 'POST',
             headers: {
                 'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                window.location.reload();
+                window.location.href = response.redirect_url;
+                //window.location.reload();
             },
             error: function(error) {
-                alert('Ocorreu um erro ao tentar deletar a tramitação. Por favor, tente novamente.');
+                alert('Ocorreu um erro ao tentar deletar a comunicação. Por favor, tente novamente.');
             }
         });
     });

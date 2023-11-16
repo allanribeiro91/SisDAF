@@ -549,3 +549,16 @@ def proaq_tramitacao_delete(request, tramitacao_id=None):
     except ProaqTramitacao	.DoesNotExist:
         messages.error(request, "Tramitação não encontrada.")    
     return redirect('proaq')
+
+def proaq_dados_gerais_delete(request, proaq_id=None):
+    try:
+        proaq = ProaqDadosGerais.objects.get(id=proaq_id)
+        proaq.soft_delete(request.user.usuario_relacionado)
+        messages.error(request, "Processo Aquisitivo deletado com sucesso.")
+        return JsonResponse({
+            "message": "Processo Aquisitivo deletado com sucesso!",
+            'redirect_url': '/proaq/',
+            })
+    except ProaqDadosGerais.DoesNotExist:
+        messages.error(request, "Processo Aquisitivo não encontrado.")
+        return JsonResponse({"message": "Processo Aquisitivo não encontrado."}) 

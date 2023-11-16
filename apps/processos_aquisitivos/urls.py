@@ -1,6 +1,6 @@
 from django.urls import path
 from apps.processos_aquisitivos.views import proaq, proaq_ficha_dados_gerais, proaq_ficha_evolucao, proaq_ficha_tramitacoes, proaq_filtro, tramitacao_dados
-from apps.processos_aquisitivos.views import proaq_usuarios_por_unidade, proaq_produtos_por_denominacao, salvar_proaq_produto, proaq_exportar, proaq_tramitacao_delete
+from apps.processos_aquisitivos.views import proaq_dados_gerais_delete, proaq_usuarios_por_unidade, proaq_produtos_por_denominacao, salvar_proaq_produto, proaq_exportar, proaq_tramitacao_delete
 
 urlpatterns = [
     
@@ -23,6 +23,7 @@ urlpatterns = [
     path('proaq/ficha/evolucao/nova/', proaq_ficha_evolucao, name='proaq_ficha_evolucao_nova'),
     
     path('proaq/ficha/dadosgerais/<int:proaq_id>/', proaq_ficha_dados_gerais, name='proaq_ficha_dados_gerais'),
+    path('proaq/ficha/dadosgerais/deletar/<int:proaq_id>/', proaq_dados_gerais_delete, name='proaq_dados_gerais_delete'),
     path('proaq/filtro/', proaq_filtro, name='proaq_filtro'),
     path('proaq/', proaq, name='proaq'),
 ]

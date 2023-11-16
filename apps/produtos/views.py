@@ -102,6 +102,18 @@ def produtos_ficha(request, product_id=None):
             produto.save(current_user=request.user.usuario_relacionado)
             messages.success(request, "Dados atualizados com sucesso!")
             
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Produtos Farmacêuticos_Produtos",
+                item_id=0,
+                item_descricao="Salvar edição produto farmacêutico.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o produto farmacêutico {produto.produto} ({produto.id}) em {current_date_str}."
+            )
+            log_entry.save()
+
             #Retornar log
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -146,6 +158,19 @@ def delete_produto(request, product_id):
         produto = ProdutosFarmaceuticos.objects.get(id=product_id)
         produto.soft_delete(request.user.usuario_relacionado)
         messages.error(request, "Produto deletado com sucesso.")
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Produtos Farmacêuticos",
+            item_id=0,
+            item_descricao="Deleção de produto farmacêutico.",
+            acao="Deleção",
+            observacoes=f"Usuário {request.user.username} deletou o produto farmacêutico {produto.produto} ({produto.id}) em {current_date_str}."
+        )
+        log_entry.save()
+
         return JsonResponse({"message": "Produto deletado com sucesso!"})
     except ProdutosFarmaceuticos.DoesNotExist:
         messages.error(request, "Produto não encontrado.")    
@@ -306,7 +331,7 @@ def exportar_produtos(request):
         # Registrar a ação no CustomLog
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
-            modulo="Produtos Farmacêuticos",
+            modulo="Produtos Farmacêuticos_Produtos",
             item_id=0,
             item_descricao="Exportação de produtos farmacêuticos",
             acao="Exportação",
@@ -364,6 +389,19 @@ def salvar_tags(request, product_id):
             print("Chamando soft_delete para tag_id:", tag_id)
             if tag_instance:
                 tag_instance.soft_delete(usuario_instance)
+
+        # Registrar a ação no CustomLog
+        tags_nomes_para_log = [tag['value'] for tag in tags_selecionadas_list]
+        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Produtos Farmacêuticos_Produtos_Tags",
+            item_id=0,
+            item_descricao="Salvar edição de tags de produto farmacêutico.",
+            acao="Salvar",
+            observacoes=f"Usuário {request.user.username} salvou tags ({', '.join(tags_nomes_para_log)}) do produto farmacêutico {produto.produto} ({produto.id}) em {current_date_str}."
+        )
+        log_entry.save()
 
         messages.success(request, f"Tags atualizadas com sucesso!")
         return JsonResponse({"status": "success"})
@@ -461,6 +499,18 @@ def denominacoes_ficha(request, denominacao_id=None):
             denominacao.save(current_user=request.user.usuario_relacionado)
             messages.success(request, f"Dados atualizados com sucesso!")
             
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Produtos Farmacêuticos_Denominações Genéricas",
+                item_id=0,
+                item_descricao="Salvar edição denominação genérica.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou a denominação genéria {denominacao.denominacao} ({denominacao.id}) em {current_date_str}."
+            )
+            log_entry.save()
+
             #Retornar log
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -490,6 +540,19 @@ def delete_denominacao(request, denominacao_id):
         denominacao = DenominacoesGenericas.objects.get(id=denominacao_id)
         denominacao.soft_delete(request.user.usuario_relacionado)
         messages.error(request, "Denominação deletada com sucesso!")
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Produtos Farmacêuticos_Denominações Genéricas",
+            item_id=0,
+            item_descricao="Deleção de denominação genérica.",
+            acao="Deleção",
+            observacoes=f"Usuário {request.user.username} deletou a denominação genéria {denominacao.denominacao} ({denominacao.id}) em {current_date_str}."
+        )
+        log_entry.save()
+
         return JsonResponse({"message": "Denominação deletada com sucesso!"})
     except DenominacoesGenericas.DoesNotExist:
         messages.error(request, "Denominação não encontrada.")    

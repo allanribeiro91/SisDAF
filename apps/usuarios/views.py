@@ -54,10 +54,10 @@ def meuslogs_exportar(request):
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()
         ws = wb.active
-        ws.title = "acessos_sisdaf"
+        ws.title = "logs_sisdaf"
 
         headers = [
-        'ID', 'Usuário', 'CPF', 'Data do Log', 'Módulo SisDAF', 'Ação', 'Descrição da ação', 'Data Exportação'
+        'ID', 'Usuário', 'CPF', 'Data do Log', 'Módulo SisDAF', 'Ação', 'Descrição da ação', 'Detalhamento', 'Data Exportação'
         ]
 
         for col_num, header in enumerate(headers, 1):
@@ -75,7 +75,8 @@ def meuslogs_exportar(request):
             ws.cell(row=row_num, column=5, value=log.modulo)
             ws.cell(row=row_num, column=6, value=log.acao)
             ws.cell(row=row_num, column=7, value=log.item_descricao)
-            ws.cell(row=row_num, column=8, value=current_date_str)
+            ws.cell(row=row_num, column=8, value=log.observacoes)
+            ws.cell(row=row_num, column=9, value=current_date_str)
         
         output = BytesIO()
         wb.save(output)

@@ -113,7 +113,17 @@ def fornecedor_ficha(request, fornecedor_id=None):
             else:
                 messages.success(request, "Dados atualizados com sucesso!")
             
-
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Fornecedores_Fornecedores",
+                item_id=0,
+                item_descricao="Salvar edição de fornecedor.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o fornecedor {fornecedor.nome_fantasia} ({fornecedor.cnpj}) em {current_date_str}."
+            )
+            log_entry.save()
             
             #Retornar
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -172,6 +182,19 @@ def fornecedor_delete(request, fornecedor_id=None):
         fornecedor = Fornecedores.objects.get(id=fornecedor_id)
         fornecedor.soft_delete(request.user.usuario_relacionado)
         messages.error(request, "Fornecedor deletado com sucesso.")
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Fornecedores_Fornecedores",
+            item_id=0,
+            item_descricao="Deleção de fornecedor.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o fornecedor {fornecedor.nome_fantasia} ({fornecedor.cnpj}) em {current_date_str}."
+        )
+        log_entry.save()
+
         return JsonResponse({"message": "Fornecedor deletado com sucesso!"})
     except Fornecedores.DoesNotExist:
         messages.error(request, "Fornecedor não encontrado.")    
@@ -396,6 +419,18 @@ def fornecedor_faq_ficha(request, faq_id=None):
             else:
                 messages.success(request, "Dados atualizados com sucesso!")
             
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Fornecedores_FAQs",
+                item_id=0,
+                item_descricao="Salvar edição de FAQ.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o FAQ (ID {faq.id}, Tópico: {faq.topico}, Contexto: {faq.contexto}) em {current_date_str}."
+            )
+            log_entry.save()
+
             #Retornar
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -454,6 +489,19 @@ def fornecedor_faq_delete(request, faq_id=None):
         faq = Fornecedores_Faq.objects.get(id=faq_id)
         faq.soft_delete(request.user.usuario_relacionado)
         messages.error(request, "FAQ deletado com sucesso.")
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Fornecedores_FAQs",
+            item_id=0,
+            item_descricao="Deleção de FAQ.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o FAQ (ID {faq.id}, Tópico: {faq.topico}, Contexto: {faq.contexto}) em {current_date_str}."
+        )
+        log_entry.save()
+
         return JsonResponse({"message": "Fornecedor deletado com sucesso!"})
     except Fornecedores_Faq.DoesNotExist:
         messages.error(request, "FAQ não encontrado.")    
@@ -592,6 +640,18 @@ def fornecedores_representantes(request, id_fornecedor=None):
             else:
                 messages.success(request, "Dados atualizados com sucesso!")
 
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Fornecedores_Fornecedor_Representantes",
+                item_id=0,
+                item_descricao="Salvar edição de Representante do Fornecedor.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o Representante (ID {representante.id}, Nome: {representante.nome_completo}, Fornecedor: {representante.fornecedor.cnpj}) em {current_date_str}."
+            )
+            log_entry.save()
+
             #Retornar log
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -622,6 +682,19 @@ def fornecedor_representante_delete(request, representante_id=None):
         representante = Fornecedores_Representantes.objects.get(id=representante_id)
         representante.soft_delete(request.user.usuario_relacionado)
         messages.error(request, "Representante deletado com sucesso.")
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Fornecedores_Fornecedor_Representantes",
+            item_id=0,
+            item_descricao="Deleção de Representante do Fornecedor.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o Representante (ID {representante.id}, Nome: {representante.nome_completo}, Fornecedor: {representante.fornecedor.cnpj}) em {current_date_str}."
+        )
+        log_entry.save()
+
         return JsonResponse({"message": "Representante deletado com sucesso!"})
     except Fornecedores_Representantes.DoesNotExist:
         messages.error(request, "Representante não encontrado.")
@@ -653,6 +726,91 @@ def representante_dados(request, representante_id):
         return JsonResponse(data)
     except Fornecedores_Representantes.DoesNotExist:
         return JsonResponse({'error': 'Representante não encontrado'}, status=404)
+
+def fornecedor_representantes_exportar(request, id_fornecedor):
+    data = json.loads(request.body)
+
+    #fornecedor = Fornecedores.objects.get(id=fornecedor_id)
+    print('Fornecedor ', id_fornecedor)
+    filters = {}
+    filters['del_status'] = False
+    filters['fornecedor_id'] = id_fornecedor
+    
+    representantes = Fornecedores_Representantes.objects.filter(**filters)
+    current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+
+    # Criar um workbook e adicionar uma planilha
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "fornecedores_comunicacoes"
+
+    headers = [
+    'ID', 'Usuário Registro', 'Usuário Atualização', 'Data de Registro', 'Data da Última Atualização', 'N Edições',
+    'CNPJ', 'Fornecedor',
+    'CPF', 'Nome Completo', 'Data de Nascimento', 'Gênero Sexual',
+    'Cargo/Função', 'Outro Cargo/Função', 'Telefone', 'Celular', 'Email', 'LinkedIn',
+    'Observações Gerais', 'Data Exportação'
+    ]
+
+    for col_num, header in enumerate(headers, 1):
+        col_letter = get_column_letter(col_num)
+        ws['{}1'.format(col_letter)] = header
+        ws.column_dimensions[col_letter].width = 20
+
+    # Adicionar dados da tabela
+    for row_num, item in enumerate(representantes, 2):
+        registro_data = item.registro_data.replace(tzinfo=None).strftime('%d/%m/%Y %H:%M:%S')
+        ult_atual_data = item.ult_atual_data.replace(tzinfo=None).strftime('%d/%m/%Y %H:%M:%S')
+        data_nascimento = item.data_nascimento
+        if data_nascimento:
+            data_nascimento.strftime('%d/%m/%Y')
+        fornecedor = item.fornecedor.nome_fantasia
+        cnpj = item.fornecedor.cnpj
+
+        ws.cell(row=row_num, column=1, value=item.id)
+        ws.cell(row=row_num, column=2, value=str(item.usuario_registro.primeiro_ultimo_nome()))
+        ws.cell(row=row_num, column=3, value=str(item.usuario_atualizacao.primeiro_ultimo_nome()))
+        ws.cell(row=row_num, column=4, value=registro_data)
+        ws.cell(row=row_num, column=5, value=ult_atual_data)
+        ws.cell(row=row_num, column=6, value=item.log_n_edicoes)
+
+        ws.cell(row=row_num, column=7, value=cnpj)
+        ws.cell(row=row_num, column=8, value=fornecedor)
+        ws.cell(row=row_num, column=9, value=item.cpf)
+        ws.cell(row=row_num, column=10, value=item.nome_completo)
+        ws.cell(row=row_num, column=11, value=data_nascimento)
+        ws.cell(row=row_num, column=12, value=item.genero_sexual)
+
+        ws.cell(row=row_num, column=13, value=item.cargo)
+        ws.cell(row=row_num, column=14, value=item.cargo_outro)
+        ws.cell(row=row_num, column=15, value=item.telefone)
+        ws.cell(row=row_num, column=16, value=item.celular)
+        ws.cell(row=row_num, column=17, value=item.email)
+        ws.cell(row=row_num, column=18, value=item.linkedin)
+
+        ws.cell(row=row_num, column=19, value=item.observacoes_gerais)
+        ws.cell(row=row_num, column=20, value=current_date_str)
+    
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)  # Reposition to the start of the stream
+
+    # Registrar a ação no CustomLog
+    log_entry = CustomLog(
+        usuario=request.user.usuario_relacionado,
+        modulo="Fornecedores_Representantes",
+        item_id=0,
+        item_descricao="Exportação dos dados dos representantes do fornecedor.",
+        acao="Exportação",
+        observacoes=f"Usuário {request.user.username} exportou dados dos representantes do fornecedor {fornecedor} ({cnpj}) em {current_date_str}."
+    )
+    log_entry.save()
+
+    # Configurar a resposta
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="exportar_fornecedores.xlsx"'
+    response.write(output.getvalue())
+    return response
 
 
 #FORNECEDORES COMUNICACOES
@@ -787,7 +945,7 @@ def fornecedor_comunicacao_exportar(request, id_fornecedor):
     print('Fornecedor ', id_fornecedor)
     filters = {}
     filters['del_status'] = False
-    #filters['fornecedor_id'] = id_fornecedor
+    filters['fornecedor_id'] = id_fornecedor
     
     comunicacoes = Fornecedores_Comunicacoes.objects.filter(**filters)
     current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
