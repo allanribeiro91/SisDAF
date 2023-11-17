@@ -198,3 +198,45 @@ STATUS_ENVIO_COMUNICACAO = [
     ('enviado','Enviado'),
     ('nao_informado','Não Informado'),
 ]
+
+LISTA_UFS_SIGLAS = [
+    ('AC', 'AC'),
+    ('AL', 'AL'),
+    ('AM', 'AM'),
+    ('AP', 'AP'),
+    ('BA', 'BA'),
+    ('CE', 'CE'),
+    ('DF', 'DF'),
+    ('ES', 'ES'),
+    ('GO', 'GO'),
+    ('MA', 'MA'),
+    ('MG', 'MG'),
+    ('MS', 'MS'),
+    ('MT', 'MT'),
+    ('PA', 'PA'),
+    ('PB', 'PB'),
+    ('PE', 'PE'),
+    ('PI', 'PI'),
+    ('PR', 'PR'),
+    ('RJ', 'RJ'),
+    ('RN', 'RN'),
+    ('RO', 'RO'),
+    ('RR', 'RR'),
+    ('RS', 'RS'),
+    ('SC', 'SC'),
+    ('SE', 'SE'),
+    ('SP', 'SP'),
+    ('TO', 'TO'),
+]
+
+LISTA_TRIMESTRES = [
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (4, 4),
+]
+
+LISTA_ANOS = [
+    (2022, 2022),
+    (2023, 2023),
+]

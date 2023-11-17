@@ -1,0 +1,224 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/prog_especializado_ficha.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fa-solid fa-folder-tree"></i>&nbsp;Programação / Componente Especializado / Ficha da Programação / Fase 1 - Programação
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tab-voltar">
+            <a href="{% url 'proaq' %}" style="color: black;">
+                <i class="fas fa-arrow-left"></i> 
+            </a>
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" id="proaq_ficha_dados_gerais">Fase 1 - Programação</button>
+            <button class="tab-button" id="proaq_ficha_evolucao">Fase 2 - Complementação</button>
+            <button class="tab-button" id="proaq_ficha_tramitacoes">Distribuições</button>
+        </div>
+    </div>
+
+    <!-- form denominacoes_genericas -->
+        <form id="proaqForm" method="POST" data-post-url="{% if form.instance.id %}{% url 'proaq_ficha_dados_gerais' form.instance.id %}{% else %}{% url 'novo_proaq' %}{% endif %}">
+        {% csrf_token %}
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#proaq_delete" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                <i class="fas fa-trash-alt"></i>
+                Deletar
+            </button>
+            
+            <button class="btn btn-primary me-md-2" type="submit" id="btnSaveProaq" style="font-size: 12px;">
+                <i class="fas fa-save me-1"></i> 
+                Salvar
+            </button>
+        </div>
+        
+        <div class="horizontal-sections">
+            <div class="section-log">
+                <h3>Log</h3>
+                <div class="grid-log">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control log_responsavel" id="id_proaq" name="id_proaq" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                        <label for="floatingInput">ID</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ proaq_dados_gerais.registro_data|date:"d/m/Y H:i:s" }}">
+                        <label for="floatingInput">Data do Registro</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ proaq_dados_gerais.usuario_registro.dp_nome_completo }}">
+                        <label for="floatingInput">Responsável pelo Registro</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ proaq_dados_gerais.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                        <label for="floatingInput">Última Atualização</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ proaq_dados_gerais.usuario_atualizacao.dp_nome_completo }}">
+                        <label for="floatingInput">Responsável Atualização</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" name="log_edicoes" readonly value="{{ proaq_dados_gerais.log_n_edicoes }}">
+                        <label for="floatingInput">Nº Edições</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="horizontal-sections">
+            <div class="section">
+                <h3>Identificação da Programação</h3>
+                <div class="grid">
+                    <div class="form-floating mb-3" >
+                        <input type="text" class="form-control identificacao_ano_tri" id="fase1_identificacao_ano" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                        <label for="fase1_identificacao_ano">Ano</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control identificacao_ano_tri" id="fase1_identificacao_trimestre" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                        <label for="fase1_identificacao_trimestre">Trimestre</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control identificacao_responsavel" id="fase1_identificacao_responsavel" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                        <label for="fase1_identificacao_responsavel">Técnico Responsável</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control identificacao_fase" id="fase1_identificacao_fase" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                        <label for="fase1_identificacao_fase">Fase</label>
+                    </div>
+                    <div class="form-floating mb-3 full-width">
+                        <input type="text" class="form-control identificacao_produto" id="fase1_identificacao_produto" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                        <label for="fase1_identificacao_produto">Produto</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button class="btn btn-primary me-md-2" type="submit" id="btnParametros" style="font-size: 12px; background-color: rgb(107, 19, 123); border-color: rgb(61, 2, 72);">
+                <i class="fas fa-wrench me-1"></i> 
+                Parâmetros
+            </button>
+        </div>
+
+        <div class="section">
+            <h3>Dados da Fase de Programação</h3>
+            <table class="table table-bordered table-hover fixed-size-table" style="font-size: 14px; border-style: groove !important; border-width: 1px !important;" id="tabProgramacoesEspecializado">
+                <thead>
+                    <tr>
+                        <th class="col-tabprog-id" style="text-align: center; background-color: rgb(225, 225, 225);">ID</th>
+                        <th class="col-tabprog-ses" style="text-align: center; background-color: rgb(225, 225, 225);">SES</th>
+                        <th class="col-tabprog-total" style="text-align: center; background-color: rgb(225, 225, 225);">Solicitado</th>
+                        <!-- <th class="col-tabprog-parametro" style="text-align: center; background-color: rgb(225, 225, 225);">Parâmetro Recom.</th>
+                        <th class="col-tabprog-total" style="text-align: center; background-color: rgb(225, 225, 225);">Recomendação</th> -->
+                        <th class="col-tabprog-parametro" style="text-align: center; background-color: rgb(198, 233, 255);">Parâmetro Aprovação</th>
+                        <th class="col-tabprog-total" style="text-align: center; background-color: rgb(198, 233, 255);">Aprovado</th>
+                        <th class="col-tabprog-percentual" style="text-align: center; background-color: rgb(198, 233, 255);">% a Mais</th>
+                        <th class="col-tabprog-total" style="text-align: center; background-color: rgb(225, 225, 225);">Aprovado Final</th>
+                        <th class="col-tabprog-observacoes" style="text-align: center; background-color: rgb(225, 225, 225);">Observações</th>
+                    </tr>
+                </thead>
+                <tbody >
+                    <tr>
+                        <td class="col-tabprog-id">1</td>
+                        <td class="col-tabprog-ses">AC</td>
+                        <td class="col-tabprog-total">0</td>
+                        <!-- <td class="col-tabprog-parametro">Anexo A</td>
+                        <td class="col-tabprog-total">0</td> -->
+                        <!-- <td class="col-tabprog-parametro">Anexo A</td> -->
+                        <td class="col-tabprog-parametro">
+                            <select name="parametroAprovacao" style="border: none; padding: 6px; width: 100%;">
+                                <option value="Anexo A">Anexo A</option>
+                                <option value="Lista de Pacientes">Lista de Pacientes</option>
+                            </select>
+                        </td>
+                        <td class="col-tabprog-total"><input type="number" style="border: none; padding: 6px; text-align: right !important;" value="0"></td>
+                        <td class="col-tabprog-percentual"><input type="number" style="width: 100%; border: none; padding: 6px; text-align: right !important;" value="0"></td>
+                        <td class="col-tabprog-total">0</td>
+                        <td class="col-tabprog-observacoes">
+                            <textarea class="observacoes" rows="1" style="padding: 6px; vertical-align: middle !important;"></textarea>
+                        </td>
+                    </tr>
+                    
+                </tbody>
+            </table>  
+        </div>
+        
+        <div class="section">
+            <h3>Observações Gerais</h3>
+            <div class="grid" style="font-size: 14px;">
+                <div class="form-floating mb-3 full-width">
+                    <textarea class="form-control auto-expand" id="observacoes_gerais" name="observacoes_gerais" rows="1" style="padding-top: 10px; height: 200px;">{{ form.instance.observacoes_gerais|default_if_none:'' }}</textarea>
+                </div> 
+            </div>
+        </div>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            var produtos = [];  // Para armazenar os produtos buscados
+            var denominacaoLabel = "Não Informado";  // Valor inicial
+            var produtosSelecionados = {{ produtos_selecionados|safe }};
+
+            console.log(produtosSelecionados)
+
+            // Quando uma denominação genérica é selecionada
+            $('#id_denominacao').change(function() {
+                denominacaoLabel = $("#id_denominacao option:selected").text();
+                if (denominacaoLabel) {
+                    var urlBase = '/proaq_produtos_por_denominacao/';
+                    var url = urlBase + denominacaoLabel + '/';
+                    $.ajax({
+                        url: url,
+                        success: function(data) {
+                            produtos = data;
+                            console.log(produtos);
+                        }
+                    });
+                }
+            });
+
+            // Quando o botão é clicado
+            $(".open-proaq-produtos-modal").on('click', function(event) {
+                
+                if (denominacaoLabel == "Não Informado") {
+                    alert("Por favor, selecione uma denominação genérica válida.");
+                    return;  // Não prossiga com a exibição do modal
+                }
+                
+                var modalBody = $('#proaqProdutosModal .modal-body');
+                modalBody.empty();  // Limpe o corpo do modal
+
+                // Carregue os produtos no modal
+                produtos.forEach(function(produto, index) {
+                    var content = "<div class='form-check'>";
+                    var isChecked = produtosSelecionados.some(function(p) { return p.produto_id === produto.id; }) ? "checked" : "";
+                    content += "<input type='checkbox' class='form-check-input' id='" + produto.id + "' name='" + produto.id + "' value='" + produto.id + "' " + isChecked + ">";
+                    content += "<label class='form-check-label' for='produto" + produto.id + "'>" + produto.produto + "</label>";
+                    content += "</div>";
+                    modalBody.append(content);
+                });
+                
+                $('#proaqProdutosModal').modal('show');  // Mostre o modal
+            });
+
+            $('#id_denominacao').change();
+        });
+ 
+    </script>
+
+    <script type="text/javascript">
+        var initialUnidade = "{{ form.instance.unidade_daf }}";
+        var initialResponsavelTecnico = "{{ form.instance.responsavel_tecnico.id }}";
+    </script>
+
+    <script src="{% static 'js/processos_aquisitivos.js' %}"></script>
+
+{% endblock %}

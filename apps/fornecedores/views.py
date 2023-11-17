@@ -114,7 +114,7 @@ def fornecedor_ficha(request, fornecedor_id=None):
                 messages.success(request, "Dados atualizados com sucesso!")
             
             # Registrar a ação no CustomLog
-            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Fornecedores_Fornecedores",
@@ -184,7 +184,7 @@ def fornecedor_delete(request, fornecedor_id=None):
         messages.error(request, "Fornecedor deletado com sucesso.")
 
         # Registrar a ação no CustomLog
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Fornecedores_Fornecedores",
@@ -420,7 +420,7 @@ def fornecedor_faq_ficha(request, faq_id=None):
                 messages.success(request, "Dados atualizados com sucesso!")
             
             # Registrar a ação no CustomLog
-            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Fornecedores_FAQs",
@@ -491,7 +491,7 @@ def fornecedor_faq_delete(request, faq_id=None):
         messages.error(request, "FAQ deletado com sucesso.")
 
         # Registrar a ação no CustomLog
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Fornecedores_FAQs",
@@ -526,7 +526,7 @@ def fornecedores_faq_exportar(request):
             filters['resposta__icontains'] = resposta
         
         faqs = Fornecedores_Faq.objects.filter(**filters)
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()
@@ -641,7 +641,7 @@ def fornecedores_representantes(request, id_fornecedor=None):
                 messages.success(request, "Dados atualizados com sucesso!")
 
             # Registrar a ação no CustomLog
-            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Fornecedores_Fornecedor_Representantes",
@@ -863,6 +863,18 @@ def fornecedores_comunicacoes(request, id_fornecedor=None):
             else:
                 messages.success(request, "Dados atualizados com sucesso!")
 
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Fornecedores_Comunicação",
+                item_id=0,
+                item_descricao="Salvar edição de comunicação com o fornecedor.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou a comunicacao (ID: {comunicacao.id}) com o fornecedor {comunicacao.fornecedor.nome_fantasia} (CNPJ: {comunicacao.fornecedor.cnpj}) em {current_date_str}."
+            )
+            log_entry.save()
+
             #Retornar log
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -895,6 +907,19 @@ def fornecedor_comunicacao_delete(request, comunicacao_id=None):
         comunicacao = Fornecedores_Comunicacoes.objects.get(id=comunicacao_id)
         comunicacao.soft_delete(request.user.usuario_relacionado)
         messages.error(request, "Comunicação deletada com sucesso.")
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Fornecedores_Comunicação",
+            item_id=0,
+            item_descricao="Deleção de comunicação com o fornecedor.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou a comunicacao (ID: {comunicacao.id}) com o fornecedor {comunicacao.fornecedor.nome_fantasia} (CNPJ: {comunicacao.fornecedor.cnpj}) em {current_date_str}."
+        )
+        log_entry.save()
+        
         return JsonResponse({"message": "Comunicação deletada com sucesso!"})
     except Fornecedores_Comunicacoes.DoesNotExist:
         messages.error(request, "Comunicação não encontrada.")
@@ -1020,7 +1045,7 @@ def fornecedor_comunicacao_exportar(request, id_fornecedor):
     # Registrar a ação no CustomLog
     log_entry = CustomLog(
         usuario=request.user.usuario_relacionado,
-        modulo="Fornecedores_Comunicações",
+        modulo="Fornecedores_Comunicação",
         item_id=0,
         item_descricao="Exportação dos registros de comunicação do fornecedor.",
         acao="Exportação",

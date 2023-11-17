@@ -32,7 +32,8 @@ def import_from_excel(file_path):
 
 def run():
     # Caminho do arquivo que você quer importar
-    file_path = r"G:\Meu Drive\Django\SisDAF\dados\DIM_DENOMINACAO_GENERICA.xlsx"
+    #file_path = r"G:\Meu Drive\Django\SisDAF\dados\DIM_DENOMINACAO_GENERICA.xlsx"
+    file_path = r"C:\Users\aribe\OneDrive\Área de Trabalho\SisDAF\dados\dim_denominacao_generica.xlsx"
     import_from_excel(file_path)
 
 #python manage.py runscript apps.produtos.scripts.import_denominacoes_genericas

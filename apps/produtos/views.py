@@ -103,14 +103,14 @@ def produtos_ficha(request, product_id=None):
             messages.success(request, "Dados atualizados com sucesso!")
             
             # Registrar a ação no CustomLog
-            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Produtos Farmacêuticos_Produtos",
                 item_id=0,
                 item_descricao="Salvar edição produto farmacêutico.",
                 acao="Salvar",
-                observacoes=f"Usuário {request.user.username} salvou o produto farmacêutico {produto.produto} ({produto.id}) em {current_date_str}."
+                observacoes=f"Usuário {request.user.username} salvou o produto farmacêutico {produto.produto} (ID: {produto.id}) em {current_date_str}."
             )
             log_entry.save()
 
@@ -160,14 +160,14 @@ def delete_produto(request, product_id):
         messages.error(request, "Produto deletado com sucesso.")
 
         # Registrar a ação no CustomLog
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Produtos Farmacêuticos",
             item_id=0,
             item_descricao="Deleção de produto farmacêutico.",
             acao="Deleção",
-            observacoes=f"Usuário {request.user.username} deletou o produto farmacêutico {produto.produto} ({produto.id}) em {current_date_str}."
+            observacoes=f"Usuário {request.user.username} deletou o produto farmacêutico {produto.produto} (ID: {produto.id}) em {current_date_str}."
         )
         log_entry.save()
 
@@ -257,7 +257,7 @@ def exportar_produtos(request):
             filters['hospitalar'] = hospitalar
         
         produtos = ProdutosFarmaceuticos.objects.filter(**filters)
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()
@@ -392,14 +392,14 @@ def salvar_tags(request, product_id):
 
         # Registrar a ação no CustomLog
         tags_nomes_para_log = [tag['value'] for tag in tags_selecionadas_list]
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Produtos Farmacêuticos_Produtos_Tags",
             item_id=0,
             item_descricao="Salvar edição de tags de produto farmacêutico.",
             acao="Salvar",
-            observacoes=f"Usuário {request.user.username} salvou tags ({', '.join(tags_nomes_para_log)}) do produto farmacêutico {produto.produto} ({produto.id}) em {current_date_str}."
+            observacoes=f"Usuário {request.user.username} salvou tags ({', '.join(tags_nomes_para_log)}) do produto farmacêutico {produto.produto} (ID: {produto.id}) em {current_date_str}."
         )
         log_entry.save()
 
@@ -411,21 +411,22 @@ def salvar_tags(request, product_id):
 
 @login_required
 def produto_exportar_pdf(request, product_id):
-    #Buscar o produto
-    produto = ProdutosFarmaceuticos.objects.get(id=product_id)
+    pass
+#     #Buscar o produto
+#     produto = ProdutosFarmaceuticos.objects.get(id=product_id)
 
-    # Renderizar o template com os produtos
-    html_string = render_to_string('templates/_outputs/output_ficha_produto.html', {'produto': produto})
+#     # Renderizar o template com os produtos
+#     html_string = render_to_string('templates/_outputs/output_ficha_produto.html', {'produto': produto})
 
-    # Gerar o PDF
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="produtos.pdf"'
-    html = HTML(string=html_string)
-    pisa_status = pisa.CreatePDF(html_string, dest=response)
+#     # Gerar o PDF
+#     # response = HttpResponse(content_type='application/pdf')
+#     # response['Content-Disposition'] = 'attachment; filename="produtos.pdf"'
+#     # html = HTML(string=html_string)
+#     # pisa_status = pisa.CreatePDF(html_string, dest=response)
 
-    if pisa_status.err:
-        return HttpResponse('Tivemos alguns erros ao gerar o PDF <pre>' + html_string + '</pre>')
-    return response
+#     # if pisa_status.err:
+#     #     return HttpResponse('Tivemos alguns erros ao gerar o PDF <pre>' + html_string + '</pre>')
+#     # return response
 
 
 
@@ -500,14 +501,14 @@ def denominacoes_ficha(request, denominacao_id=None):
             messages.success(request, f"Dados atualizados com sucesso!")
             
             # Registrar a ação no CustomLog
-            current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Produtos Farmacêuticos_Denominações Genéricas",
                 item_id=0,
                 item_descricao="Salvar edição denominação genérica.",
                 acao="Salvar",
-                observacoes=f"Usuário {request.user.username} salvou a denominação genéria {denominacao.denominacao} ({denominacao.id}) em {current_date_str}."
+                observacoes=f"Usuário {request.user.username} salvou a denominação genéria {denominacao.denominacao} (ID: {denominacao.id}) em {current_date_str}."
             )
             log_entry.save()
 
@@ -542,14 +543,14 @@ def delete_denominacao(request, denominacao_id):
         messages.error(request, "Denominação deletada com sucesso!")
 
         # Registrar a ação no CustomLog
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Produtos Farmacêuticos_Denominações Genéricas",
             item_id=0,
             item_descricao="Deleção de denominação genérica.",
             acao="Deleção",
-            observacoes=f"Usuário {request.user.username} deletou a denominação genéria {denominacao.denominacao} ({denominacao.id}) em {current_date_str}."
+            observacoes=f"Usuário {request.user.username} deletou a denominação genéria {denominacao.denominacao} (ID: {denominacao.id}) em {current_date_str}."
         )
         log_entry.save()
 
@@ -636,7 +637,7 @@ def exportar_denominacoes(request):
         
 
         denominacoes = DenominacoesGenericas.objects.filter(**filters)
-        current_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()

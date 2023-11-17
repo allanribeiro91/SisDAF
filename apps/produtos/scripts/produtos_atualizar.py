@@ -10,3 +10,5 @@ def set_fields_to_false():
 
 def run():
     set_fields_to_false()
+
+#python manage.py runscript apps.produtos.scripts.produtos_atualizar

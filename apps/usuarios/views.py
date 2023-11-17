@@ -49,7 +49,7 @@ def meuslogs_exportar(request):
     if request.method == 'POST':
         usuario = request.user.usuario_relacionado
         tab_logs = CustomLog.objects.filter(usuario=usuario).order_by('-timestamp')
-        current_date_str = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()
@@ -114,7 +114,7 @@ def meusacessos_exportar(request):
     if request.method == 'POST':
         usuario = request.user.usuario_relacionado
         tab_acessos = UserAccessLog.objects.filter(usuario=usuario).order_by('-timestamp')
-        current_date_str = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()

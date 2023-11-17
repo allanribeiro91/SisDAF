@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'apps.processos_aquisitivos.apps.ProcessosAquisitivosConfig',
     'apps.fornecedores.apps.FornecedoresConfig',
     'apps.contratos.apps.ContratosConfig',
+    'apps.programacao.apps.ProgramacaoConfig',
 ]
 
 MIDDLEWARE = [

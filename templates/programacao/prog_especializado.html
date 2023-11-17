@@ -1,0 +1,195 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="stylesheet" href="{% static '\styles\programacao.css' %}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fas fa-warehouse"></i>&nbsp;Programação / Componente Especializado
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab-button" id="tab_basico" onclick="location.href='{% url 'prog_basico' %}'">Básico</button>
+            <button class="tab-button active" id="tab_especializado" onclick="location.href='{% url 'prog_especializado' %}'">Especializado</button>
+            <button class="tab-button" id="tab_estrategico" onclick="location.href='{% url 'prog_estrategico' %}'">Estratégico</button>
+        </div>
+    </div>
+
+    <div class="sub-barra-superior">
+        <!-- Abas -->
+        <div class="sub-tabs">
+            <button class="sub-tab-button active" id="tab_basico" onclick="location.href='{% url 'prog_basico' %}'">Programações</button>
+            <button class="sub-tab-button " id="tab_especializado" onclick="location.href='{% url 'prog_especializado' %}'">Parâmetros</button>
+            <button class="sub-tab-button" id="tab_estrategico" onclick="location.href='{% url 'prog_estrategico' %}'">Relatórios</button>
+        </div>
+    </div>
+
+    <div class="horizontal-sections">
+        
+        <div class="section numbers">
+            <div class="filter-title">
+                Total de Programações
+            </div>
+            <div id="numeroFornecedores" class="total-geral">{{ total_programacoes }}</div>
+        </div>
+        
+        <div class="section filter">
+            <div class="filter-title">
+                Filtros
+            </div>
+            
+            <!-- Hierarquia -->
+            <div class="form-floating filtro-data-ses">
+                <select class="form-select" aria-label="Floating label select example" name="filtro_ano" id="filtro_ano">
+                    <option value=""></option>
+                    {% for value, display in lista_anos %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Ano</label>
+            </div>
+
+            <!-- Trimestre -->
+            <div class="form-floating filtro-data-ses">
+                <select class="form-select" aria-label="Floating label select example" name="filtro_trimestre" id="filtro_trimestre">
+                    <option value=""></option>
+                    {% for value, display in lista_trimestres %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="filtro_trimestre">Trimestre</label>
+            </div>
+
+            <!-- Técnico -->
+            <div class="form-floating filtro-data-ses">
+                <select class="form-select" aria-label="Floating label select example" name="filtro_trimestre" id="filtro_trimestre">
+                    <option value=""></option>
+                    {% for value, display in lista_trimestres %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="filtro_trimestre">Técnico</label>
+            </div>
+
+             <!-- SES -->
+             <div class="form-floating filtro-data-ses">
+                <select class="form-select" aria-label="Floating label select example" name="filtro_ses" id="filtro_ses">
+                    <option value="Todas">Todas</option>
+                    {% for value, display in lista_ses %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">SES</label>
+            </div>
+            
+            <!-- UF -->
+            <div class="form-floating filtro-produto">
+                <select class="form-select" aria-label="Floating label select example" name="filtro_produto" id="filtro_produto">
+                    <option value=""></option>
+                    {% for value in lista_ufs %}
+                    <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Produto</label>
+            </div>   
+            
+            <!-- Pendência -->
+            <div class="pendencia">
+                <span>Pendência</span></br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="pendencia_distribuicao" value=1>
+                    <label class="form-check-label" style="cursor: pointer;" for="pendencia_distribuicao">Distribuição</label> <!-- Corrigido aqui -->
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="pendencia_entrega" value=1>
+                    <label class="form-check-label" style="cursor: pointer;" for="pendencia_entrega">Entrega</label> <!-- Corrigido aqui -->
+                </div>
+            </div>
+    
+            <button class="custom-btn limpar-filtro" id="limpar_filtro_progespecializado">
+                <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
+                <span style="font-size: 10px;">Limpar Filtros</span>
+            </button>
+        </div>
+
+        <div class="section funcionalidades">
+            <div style="font-size: 12px; font-weight: bold;">
+                Funcionalidades
+            </div>
+            <div class="btn-container">
+                <a href="{% url 'fornecedor_novo' %}" style="text-decoration: none;">
+                    <button class="custom-btn" id="inserir_fornecedor">
+                        <div class="icon-container">
+                            <i class="fa fa-info-circle" style="font-size: 1.5vw"></i>
+                            <span>Ajuda</span>
+                        </div>
+                    </button>
+                </a>
+                <button class="custom-btn" id="exportarFornecedores">
+                    <div class="icon-container">
+                        <i class="fa fa-download" style="font-size: 1.5vw"></i>
+                        <span>Exportar</span>
+                    </div>                    
+                </button>
+                
+            </div>   
+        </div>
+        
+    </div>
+
+    <div class="section-tabela">
+        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabProgramacoesEspecializado">
+            <thead>
+                <tr>
+                    <th class="col-id">ID</th>
+                    <th class="col-data">Ano</th>
+                    <th class="col-data">Trimestre</th>
+                    <th class="col-ses">Técnico</th>
+                    <th class="col-ses">SES</th>
+                    <th class="col-produto">Produto</th>
+                    <th class="col-total">Total Aprovado</th>
+                    <th class="col-total">Total Distribuído</th>
+                    <th class="col-total">Total Entregue</th>
+                    <th class="col-total">Pendência Dist.</th>
+                    <th class="col-total">Pendência Entr.</th>
+                    <th class="col-resex">Resex</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-id">1</td>
+                    <td class="col-data">2023</td>
+                    <td class="col-data">4</td>
+                    <th class="col-ses" style="font-weight: normal;">ABC</th>
+                    <td class="col-ses">Todas</td>
+                    <td class="col-produto">Abatacepte 125 mg</td>
+                    <td class="col-total">1.200.000</td>
+                    <td class="col-total">1.100.000</td>
+                    <td class="col-total">950.000</td>
+                    <td class="col-total">100.000</td>
+                    <td class="col-total">150.000</td>
+                    <td class="col-resex">
+                        <button class="btn btn-outline-primary btn-sm" style="border: none; padding: 4px; margin: 0px;">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>  
+        </div>
+        <div id="pagination">
+            <button id="denominacaoPreviousPage" class="page" disabled>Anterior </button>
+            <span id="denominacaoCurrentPage">1</span>
+            <button id="denominacaoNextPage" class="page">Próximo</button>
+        </div>
+    </div>
+    
+    <script src="{% static 'js/prog_especializado.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="stylesheet" href="{% static '\styles\fornecedores.css' %}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fas fa-warehouse"></i>&nbsp;Programação / Componente Estratégico
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab-button" id="tab_basico" onclick="location.href='{% url 'prog_basico' %}'">Básico</button>
+            <button class="tab-button" id="tab_especializado" onclick="location.href='{% url 'prog_especializado' %}'">Especializado</button>
+            <button class="tab-button active" id="tab_estrategico" onclick="location.href='{% url 'prog_estrategico' %}'">Estratégico</button>
+        </div>
+    </div>
+
+    <div class="horizontal-sections">
+        
+        <div class="section numbers">
+            <div class="filter-title">
+                Total de Programações
+            </div>
+            <div id="numeroFornecedores" class="total-geral">{{ total_fornecedores }}</div>
+        </div>
+        
+        <div class="section filter">
+            <div class="filter-title">
+                Filtros
+            </div>
+            
+            <!-- Hierarquia -->
+            <div class="form-floating tipo-fornecedor">
+                <select class="form-select" aria-label="Floating label select example" name="hierarquia" id="hierarquia">
+                    <option value=""></option>
+                    {% for value, display in lista_cnpj_hierarquia %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Hierarquia</label>
+            </div>
+
+            <!-- Porte -->
+            <div class="form-floating tipo-fornecedor">
+                <select class="form-select" aria-label="Floating label select example" name="cnpj_porte" id="cnpj_porte">
+                    <option value=""></option>
+                    {% for value, display in lista_cnpj_porte %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Porte</label>
+            </div>
+
+             <!-- Tipo de Direito -->
+             <div class="form-floating tipo-fornecedor">
+                <select class="form-select" aria-label="Floating label select example" name="tipo_direito" id="tipo_direito">
+                    <option value=""></option>
+                    {% for value, display in lista_tipo_direito %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Direito</label>
+            </div>
+            
+            <!-- UF -->
+            <div class="form-floating tipo-fornecedor">
+                <select class="form-select" aria-label="Floating label select example" name="uf_fornecedor" id="uf_fornecedor">
+                    <option value=""></option>
+                    {% for value in lista_ufs %}
+                    <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">UF</label>
+            </div>   
+            
+            <!-- Fornecedor -->
+            <div class="form-floating  fornecedor">
+                <input type="text" class="form-control" id="fornecedor_nome" name="fornecedor_nome">
+                <label for="floatingInput">Fornecedor</label>
+            </div>
+    
+            <button class="custom-btn limpar-filtro-fornecedores">
+                <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
+                <span style="font-size: 10px;">Limpar Filtros</span>
+            </button>
+        </div>
+
+        <div class="section funcionalidades">
+            <div style="font-size: 12px; font-weight: bold;">
+                Funcionalidades
+            </div>
+            <div class="btn-container">
+                <a href="{% url 'fornecedor_novo' %}" style="text-decoration: none;">
+                    <button class="custom-btn" id="inserir_fornecedor">
+                        <div class="icon-container">
+                            <i class="fa fa-plus-circle" style="font-size: 1.5vw"></i>
+                            <span>Inserir</span>
+                        </div>
+                    </button>
+                </a>
+                <button class="custom-btn" id="exportarFornecedores">
+                    <div class="icon-container">
+                        <i class="fa fa-download" style="font-size: 1.5vw"></i>
+                        <span>Exportar</span>
+                    </div>                    
+                </button>
+                
+            </div>   
+        </div>
+        
+    </div>
+
+    <div class="section-tabela">
+        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabFornecedores">
+            <thead>
+                <tr>
+                    
+                    <th class="col-cnpj">CNPJ</th>
+                    <th class="col-fornecedor">Fornecedor</th>
+                    <th class="col-hierarquia">Hierarquia</th>
+                    <th class="col-porte">Porte</th>
+                    <th class="col-direito">Direito</th>
+                    <th class="col-uf">UF</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in tab_fornecedores %}
+                <tr data-id="{{ item.id }}">
+                    <td class="col-cnpj">{{ item.cnpj }}</td>
+                    <td class="col-fornecedor">{{ item.nome_fantasia }}</td>
+                    <td class="col-hierarquia">{{ item.hierarquia|capfirst }}</td>
+                    <td class="col-porte">{{ item.get_porte_display }}</td>
+                    <td class="col-direito">{{ item.tipo_direito|capfirst }}</td>
+                    <td class="col-uf">{{ item.end_uf }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>  
+        </div>
+        <div id="pagination">
+            <button id="denominacaoPreviousPage" class="page" disabled>Anterior </button>
+            <span id="denominacaoCurrentPage">1</span>
+            <button id="denominacaoNextPage" class="page">Próximo</button>
+        </div>
+    </div>
+    
+    <script src="{% static 'js/fornecedores.js' %}"></script>
+
+{% endblock %}

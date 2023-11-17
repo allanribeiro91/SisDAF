@@ -62,7 +62,6 @@ class DenominacoesGenericas(models.Model):
     def __str__(self):
         return f"Denominação Genérica: {self.denominacao} - ID ({self.id})"
 
-
 class ProdutosFarmaceuticos(models.Model):
     #relacionamento
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_registro_produto')

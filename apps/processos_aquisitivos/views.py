@@ -97,6 +97,18 @@ def proaq_ficha_dados_gerais(request, proaq_id=None):
                 messages.success(request, "Dados atualizados com sucesso!")
                 print("Dado atualizado")
 
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Processo Aquisitivo_Dados Gerais",
+                item_id=0,
+                item_descricao="Salvar edição de processo aquisitivo.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o processo aquisitivo (ID: {proaq_dados_gerais.id}) da unidade daf {proaq_dados_gerais.unidade_daf} e denominação genérica {proaq_dados_gerais.denominacao.denominacao} em {current_date_str}."
+            )
+            log_entry.save()
+
             #Retornar log
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -196,7 +208,17 @@ def proaq_ficha_evolucao(request, proaq_id=None):
             if fase_num_str not in received_fases:
                 fase.soft_delete(usuario_atualizacao)
 
-
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Processo Aquisitivo_Evolução",
+            item_id=0,
+            item_descricao="Salvou evolução de processo aquisitivo.",
+            acao="Salvar",
+            observacoes=f"Usuário {request.user.username} salvou evolução o processo aquisitivo (ID: {proaq.id}) da unidade daf {proaq.unidade_daf} e denominação genérica {proaq.denominacao.denominacao} em {current_date_str}."
+        )
+        log_entry.save()
 
         #Retornar
         messages.success(request, "Dados atualizados com sucesso!")
@@ -285,6 +307,18 @@ def proaq_ficha_tramitacoes(request, tramitacao_id=None, proaq_id=None):
             else:
                 messages.success(request, "Dados atualizados com sucesso!")
                 print("Dado atualizado")
+
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Processo Aquisitivo_Tramitação",
+                item_id=0,
+                item_descricao="Salvou tramitação de processo aquisitivo.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou tramitação (ID: {proaq_tramitacao.id}) do processo aquisitivo (ID: {proaq_tramitacao.proaq.id}) da unidade daf {proaq_tramitacao.proaq.unidade_daf} e denominação genérica {proaq_tramitacao.proaq.denominacao.denominacao} em {current_date_str}."
+            )
+            log_entry.save()
 
             #Retornar log
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -545,6 +579,19 @@ def proaq_tramitacao_delete(request, tramitacao_id=None):
         tramitacao = ProaqTramitacao.objects.get(id=tramitacao_id)
         tramitacao.soft_delete(request.user.usuario_relacionado)
         messages.error(request, "Tramitação deletada com sucesso!")
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Processo Aquisitivo_Tramitação",
+            item_id=0,
+            item_descricao="Deleção de tramitação de processo aquisitivo.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou tramitação (ID: {tramitacao.id}) do processo aquisitivo (ID: {tramitacao.proaq.id}) da unidade daf {tramitacao.proaq.unidade_daf} e denominação genérica {tramitacao.proaq.denominacao.denominacao} em {current_date_str}."
+        )
+        log_entry.save()
+
         return JsonResponse({"message": "Tramitação deletada com sucesso!"})
     except ProaqTramitacao	.DoesNotExist:
         messages.error(request, "Tramitação não encontrada.")    
@@ -555,6 +602,19 @@ def proaq_dados_gerais_delete(request, proaq_id=None):
         proaq = ProaqDadosGerais.objects.get(id=proaq_id)
         proaq.soft_delete(request.user.usuario_relacionado)
         messages.error(request, "Processo Aquisitivo deletado com sucesso.")
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Processo Aquisitivo_Dados Gerais",
+            item_id=0,
+            item_descricao="Deleção de processo aquisitivo.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o processo aquisitivo (ID: {proaq.id}) da unidade daf {proaq.unidade_daf} e denominação genérica {proaq.denominacao.denominacao} em {current_date_str}."
+        )
+        log_entry.save()
+        
         return JsonResponse({
             "message": "Processo Aquisitivo deletado com sucesso!",
             'redirect_url': '/proaq/',

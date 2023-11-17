@@ -170,7 +170,11 @@ $(document).ready(function() {
         });
     });
 
-    //Renderizar tabela
+
+   
+
+
+//Renderizar tabela
 function fetchAndRenderTableData(page = 1) {
     console.log('fetchAndRenderTableData')
     var selectedTipo = $('#tipo_produto').val();
@@ -285,45 +289,6 @@ document.getElementById('btnSalvarProduto').addEventListener('click', function(e
     });
 });
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    var sistemas = [
-        { possui: 'sigtap_possui', codigo: 'sigtap_codigo', nome: 'sigtap_nome' },
-        { possui: 'sismat_possui', codigo: 'sismat_codigo', nome: 'sismat_nome' },
-        { possui: 'catmat_possui', codigo: 'catmat_codigo', nome: 'catmat_nome' },
-        { possui: 'obm_possui', codigo: 'obm_codigo', nome: 'obm_nome' }
-    ];
-
-    // Função para atualizar os campos com base no estado do checkbox
-    function updateFields(system) {
-        var checkbox = document.getElementById(system.possui);
-        var codigoField = document.getElementById(system.codigo);
-        var nomeField = document.getElementById(system.nome);
-
-        if (checkbox.checked) {
-            // Se checkbox está marcado, limpa os valores e torna os campos readonly
-            codigoField.value = '';
-            nomeField.value = '';
-            codigoField.setAttribute('readonly', true);
-            nomeField.setAttribute('readonly', true);
-        } else {
-            // Se checkbox não está marcado, remove o atributo readonly
-            codigoField.removeAttribute('readonly');
-            nomeField.removeAttribute('readonly');
-        }
-    }
-
-    sistemas.forEach(function(system) {
-        var checkbox = document.getElementById(system.possui);
-        // Evento para lidar com a mudança do checkbox
-        checkbox.addEventListener('change', function() {
-            updateFields(system);
-        });
-
-        // Atualiza os campos ao carregar a página com base no estado inicial do checkbox
-        updateFields(system);
-    });
-});
 
 
 document.addEventListener('DOMContentLoaded', function() {

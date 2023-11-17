@@ -79,7 +79,6 @@ class ProaqDadosGerais(models.Model):
     def __str__(self):
         return f"Processo Aquisitivo: {self.numero_processo_sei} - Denominacao: ({self.denominacao}) - ID ({self.id})"
 
-
 class ProaqProdutosManager(models.Manager):
     def active(self):
         return self.filter(del_status=False)
@@ -130,7 +129,6 @@ class ProaqProdutos(models.Model):
     
     objects = ProaqProdutosManager()
 
-
 class ProaqEvolucao(models.Model):
     #relacionamento usuario
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_registro_proaqevolucao')
@@ -180,7 +178,6 @@ class ProaqEvolucao(models.Model):
     def __str__(self):
         return f"Proaq ({self.proaq}) - Fase ({self.fase})"
     
-
 class PROAQ_AREA_MS(models.Model):
     setor = models.CharField(max_length=40, null=False, blank=False)
     orgao_publico = models.BooleanField(null=False, blank=False)
@@ -190,7 +187,6 @@ class PROAQ_AREA_MS(models.Model):
 
 class PROAQ_ETAPA(models.Model):
     etapa = models.CharField(max_length=200, null=False, blank=False)
-
 
 class ProaqTramitacao(models.Model):
     #relacionamento usuario
