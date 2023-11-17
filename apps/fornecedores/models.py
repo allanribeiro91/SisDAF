@@ -6,15 +6,15 @@ from setup.choices import UNIDADE_DAF2, CNPJ_HIERARQUIA, CNPJ_PORTE, TIPO_DIREIT
 class CNPJ_CNAE(models.Model):
     codigo = models.IntegerField(null=False, blank=False)
     secao_codigo = models.CharField(max_length=10, null=False, blank=False)
-    secao_descricao = models.CharField(max_length=100, null=False, blank=False)
+    secao_descricao = models.TextField(null=False, blank=False)
     divisao_codigo = models.CharField(max_length=20, null=False, blank=False)
-    divisao_descricao = models.CharField(max_length=100, null=False, blank=False)
+    divisao_descricao = models.TextField( null=False, blank=False)
     grupo_codigo = models.CharField(max_length=20, null=False, blank=False)
-    grupo_descricao = models.CharField(max_length=100, null=False, blank=False)
+    grupo_descricao = models.TextField(null=False, blank=False)
     classe_codigo = models.CharField(max_length=20, null=False, blank=False)
-    classe_descricao = models.CharField(max_length=100, null=False, blank=False)
+    classe_descricao = models.TextField(null=False, blank=False)
     subclasse_codigo = models.CharField(max_length=20, null=False, blank=False)
-    subclasse_descricao = models.CharField(max_length=100, null=False, blank=False)
+    subclasse_descricao = models.TextField(null=False, blank=False)
 
 class CNPJ_NATUREZA_JURIDICA(models.Model):
     codigo = models.CharField(max_length=10, null=False, blank=False)
