@@ -47,7 +47,7 @@ def run():
     # Caminho do arquivo que você quer importar
     #file_path = r"C:\Users\alan.ribeiro\Desktop\SisDAF\dados\fornecedores.xlsx"
     #file_path = r"C:\Users\aribe\OneDrive\Área de Trabalho\SisDAF\dados\fornecedores.xlsx"
-    file_path = 'dados\fornecedores.xlsx'
+    file_path = 'dados/fornecedores.xlsx'
     import_from_excel(file_path)
 
 
