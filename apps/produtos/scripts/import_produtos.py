@@ -75,7 +75,8 @@ def import_from_excel(file_path):
 def run():
     # Caminho do arquivo que você quer importar
     #file_path = r"G:\Meu Drive\Django\SisDAF\dados\produto_daf.xlsx"
-    file_path = r"C:\Users\aribe\OneDrive\Área de Trabalho\SisDAF\dados\produto_daf.xlsx"
+    #file_path = r"C:\Users\aribe\OneDrive\Área de Trabalho\SisDAF\dados\produto_daf.xlsx"
+    file_path = 'dados/produto_daf.xlsx'
     import_from_excel(file_path)
 
 

@@ -17,7 +17,8 @@ def import_from_excel(file_path):
 
 def run():
     # Caminho do arquivo que você quer importar
-    file_path = r"C:\Users\alan.ribeiro\Desktop\SisDAF\dados\proaq_area_ms.xlsx"
+    #file_path = r"C:\Users\alan.ribeiro\Desktop\SisDAF\dados\proaq_area_ms.xlsx"
+    file_path = 'dados/proaq_area_ms.xlsx'
     import_from_excel(file_path)
 
 #python manage.py runscript apps.processos_aquisitivos.scripts.import_lista_area_ms

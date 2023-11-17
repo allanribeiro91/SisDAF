@@ -16,7 +16,8 @@ def import_from_excel(file_path):
 def run():
     # Caminho do arquivo que você quer importar
     #file_path = r"G:\Meu Drive\Django\SisDAF\dados\tags_produtos.xlsx"
-    file_path = r"C:\Users\aribe\OneDrive\Área de Trabalho\SisDAF\dados\tags_produtos.xlsx"
+    #file_path = r"C:\Users\aribe\OneDrive\Área de Trabalho\SisDAF\dados\tags_produtos.xlsx"
+    file_path = 'dados/tags_produtos.xlsx'
     import_from_excel(file_path)
 
 #python manage.py runscript apps.produtos.scripts.import_tags_produtos

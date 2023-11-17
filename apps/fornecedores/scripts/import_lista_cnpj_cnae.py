@@ -24,7 +24,8 @@ def import_from_excel(file_path):
 
 def run():
     # Caminho do arquivo que você quer importar
-    file_path = r"C:\Users\alan.ribeiro\Desktop\SisDAF\dados\lista_cnpj_cnae.xlsx"
+    # file_path = r"C:\Users\alan.ribeiro\Desktop\SisDAF\dados\lista_cnpj_cnae.xlsx"
+    file_path = 'dados/lista_cnpj_cnae.xlsx'
     import_from_excel(file_path)
 
 
