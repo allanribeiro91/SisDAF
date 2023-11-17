@@ -76,7 +76,7 @@ class ProdutosFarmaceuticos(models.Model):
     #dados do produto farmacêutico
     produto = models.CharField(max_length=240, null=False, blank=False)
     concentracao_tipo = models.CharField(max_length=20, choices=CONCENTRACAO_TIPO, null=False, blank=False)
-    concentracao = models.CharField(max_length=120, null=False, blank=False)
+    concentracao = models.CharField(max_length=240, null=False, blank=False)
     forma_farmaceutica = models.CharField(max_length=60, choices=FORMA_FARMACEUTICA, null=False, blank=False)
     oncologico = models.BooleanField(default=False, null=True, blank=True)
     biologico = models.BooleanField(default=False, null=True, blank=True)
