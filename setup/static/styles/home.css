@@ -22,7 +22,7 @@
 
 .presentation-box h2 {
     font-size: 12px;
-    color: #1B2144;
+    color: black;
     margin: 5px 5px;
     font-weight: bold;
 }
@@ -30,7 +30,7 @@
 .presentation-box p {
     font-size: 35px;
     font-weight: normal;
-    color: #1B2144;
+    color: black;
     /* color: rgb(17, 0, 126); */
     margin: 5px 5px 20px;
     text-align: right;

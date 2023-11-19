@@ -202,7 +202,8 @@
     justify-content: center;  /* Centraliza o conteúdo do botão verticalmente */
 }
 
-.custom-btn.limpar-filtro-fornecedores, .custom-btn.limpar-filtro-fornecedores-faq {
+.custom-btn.limpar-filtro-fornecedores, .custom-btn.limpar-filtro-fornecedores-faq,
+.custom-btn.limpar-filtro-arps {
     padding: 6px 5px;
     max-width: 5%;
     border: 0px;
@@ -308,5 +309,42 @@ table tbody tr:hover {
 
 .col-faq-resposta {
     width: 40% !important;
+    text-align: left !important;
+}
+
+
+
+
+/* colunas arp */
+.col-arp-id {
+    width: 2% !important;
+    text-align: left !important;
+}
+.col-arp-status {
+    width: 5% !important;
+    text-align: left !important;
+}
+.col-arp-unidadedaf {
+    width: 5% !important;
+    text-align: left !important;
+}
+.col-arp-processo-sei {
+    width: 7% !important;
+    text-align: left !important;
+}
+.col-arp-doc-sei {
+    width: 5% !important;
+    text-align: left !important;
+}
+.col-arp-data {
+    width: 5% !important;
+    text-align: left !important;
+}
+.col-arp-denominacao {
+    width: 15% !important;
+    text-align: left !important;
+}
+.col-arp-fornecedor {
+    width: 15% !important;
     text-align: left !important;
 }

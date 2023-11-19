@@ -60,7 +60,7 @@ class DenominacoesGenericas(models.Model):
         self.save()
 
     def __str__(self):
-        return f"Denominação Genérica: {self.denominacao} - ID ({self.id})"
+        return f"{self.denominacao} (ID: {self.id})"
 
 class ProdutosFarmaceuticos(models.Model):
     #relacionamento

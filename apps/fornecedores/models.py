@@ -97,6 +97,9 @@ class Fornecedores(models.Model):
         self.del_data = timezone.now()
         self.del_usuario = user
         self.save()
+    
+    def __str__(self):
+        return f"{self.nome_fantasia} ({self.cnpj})"
 
 class Fornecedores_Faq(models.Model):
     #relacionamento

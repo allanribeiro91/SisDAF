@@ -144,22 +144,13 @@ input[name="processo_sei"]{
     width: 180px !important;
 }
 
-select[name="denominacao_generica"] {
-    max-width: 800px !important;
-    text-align: left;
-    font-size: 14px !important;
+.select2-container {
+    width: 100% !important;
 }
 
-
-
-
-select[name="numero_processo"] {
-    width: 100px !important;
-    text-align: left;
-    font-size: 14px !important;
+.select2-selection.select2-selection--single{
+    border: none !important;
 }
-
-
 
 .section-log {
     margin: 5px 5px 10px 10px;
@@ -219,3 +210,5 @@ select[name="numero_processo"] {
 .area-scroll{
     overflow-y: auto;
 }
+
+

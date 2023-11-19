@@ -4,7 +4,6 @@ YES_NO = [
     (False, 'Não'),
 ]
 
-
 COR_PELE = [
     ('branco', 'Branco'),
     ('preto', 'Preto'),

@@ -271,7 +271,7 @@ def fornecedores_exportar(request):
             filters['nome_fantasia__icontains'] = fornecedor
         
         fornecedores = Fornecedores.objects.filter(**filters)
-        current_date_str = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()
@@ -365,7 +365,7 @@ def fornecedor_faq_ficha(request, faq_id=None):
              return redirect('fornecedores_faq')
     else:
          faq = None
-    print(faq)
+    
     #salvar
     if request.method == 'POST':
         
