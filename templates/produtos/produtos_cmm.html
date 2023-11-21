@@ -36,13 +36,21 @@
     </div>
 
     <div class="section-tabela">
-        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabConsumoMedioid">
+        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px; text-align: center; vertical-align: middle;" id="tabConsumoMedioid">
             <thead>
-                <tr>
+                <tr style="vertical-align: middle;">
                     <th class="cmm-id">ID</th>
+                    <th class="cmm-tipo">Tipo</th>
                     <th class="cmm-produto">Produto</th>
-                    <th class="cmm-data">Data</th>
-                    <th class="cmm-valor">CMM</th>
+                    <th class="cmm-data">Data Ref.</th>
+                    <th class="cmm-data">Período Ref.</th>
+                    <th class="cmm-valor">Estoque SES</th>
+                    <th class="cmm-valor">Aprovado Admin.</th>
+                    <th class="cmm-valor">Aprovado Jud.</th>
+                    <th class="cmm-valor">Aprovado Total</th>
+                    <th class="cmm-valor">CMM Admin</th>
+                    <th class="cmm-valor">CMM Jud.</th>
+                    <th class="cmm-valor">CMM Total</th>
                     <th class="cmm-observacoes">Observações</th>
                     <th class="cmm-responsavel">Responsável</th>
                 </tr>
@@ -51,9 +59,17 @@
                 {% for item in tab_cmm %}
                 <tr data-id="{{ item.id }}">
                     <td class="cmm-id">{{ item.id }}</td>
-                    <td class="cmm-produto">{{ item.produto.produto }}</td>
+                    <td class="cmm-tipo">{{ item.tipo_cmm }}</td>
+                    <td class="cmm-produto">{{ item.produto.id }}</td>
                     <td class="cmm-data">{{ item.data_referencia|date:"d/m/Y" }}</td>
-                    <td class="cmm-valor" style="text-align: right !important; padding-right: 30px;">{{ item.cmm_total|intcomma }}</td>
+                    <td class="cmm-data">{{ item.periodo_referencia }}</td>
+                    <td class="cmm-valor" style="text-align: right !important;">{{ item.estoque_ses|floatformat:"0"|intcomma }}</td>
+                    <td class="cmm-valor" style="text-align: right !important; ">{{ item.aprovado_administrativo|floatformat:"0"|intcomma }}</td>
+                    <td class="cmm-valor" style="text-align: right !important; ">{{ item.aprovado_judicial|floatformat:"0"|intcomma }}</td>
+                    <td class="cmm-valor" style="text-align: right !important; ">{{ item.aprovado_total|floatformat:"0"|intcomma }}</td>
+                    <td class="cmm-valor" style="text-align: right !important;">{{ item.cmm_administrativo|floatformat:"1"|intcomma }}</td>
+                    <td class="cmm-valor" style="text-align: right !important;">{{ item.cmm_judicial|floatformat:"1"|intcomma }}</td>
+                    <td class="cmm-valor" style="text-align: right !important;">{{ item.cmm_total|floatformat:"1"|intcomma }}</td>
                     <td class="cmm-observacoes">{{ item.observacoes }}</td>
                     <td class="cmm-responsavel">{{ item.responsavel_dados }}</td>
                 </tr>

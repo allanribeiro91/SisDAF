@@ -98,30 +98,30 @@
     overflow-y: auto;
   }
 
-table tbody tr:hover {
+/* table tbody tr:hover {
     cursor: pointer;
-}
+} */
 
 
 /*--colunas--*/
 .cmm-id {
     width: 3% !important;
 }
+.cmm-tipo {
+    width: 5% !important;
+}
 .cmm-produto {
-    width: 25% !important;
-    text-align: left !important;
+    width: 3% !important;
 }
 .cmm-data {
     width: 5% !important;
-    text-align: center !important;
 }
 .cmm-valor {
-    width: 15% !important;
-    text-align: center !important;
+    width: 8% !important;
 }
 
 .cmm-observacoes {
-    width: 35% !important;
+    width: 20% !important;
     text-align: left !important;
 }
 .cmm-responsavel {

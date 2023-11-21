@@ -153,7 +153,7 @@ class ProdutosFarmaceuticos(models.Model):
         return list(produtos)
 
     def __str__(self):
-        return f"Produto Farmacêutico: {self.produto} - ID ({self.id})"
+        return f"{self.produto} - ID: {self.id}"
 
 class Tags(models.Model):
     tag = models.CharField(max_length=255, unique=True)
