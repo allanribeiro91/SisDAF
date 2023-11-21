@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from apps.produtos.views import produtos, produtos_ficha, get_filtros_produtos, exportar_produtos, delete_produto, salvar_tags, produto_exportar_pdf
+from apps.produtos.views import produtos, produtos_ficha, produtos_cmm, get_filtros_produtos, exportar_produtos, delete_produto, salvar_tags, produto_exportar_pdf
 from apps.produtos.views import denominacoes, denominacoes_ficha, get_filtros_denominacoes, exportar_denominacoes, delete_denominacao
 
 urlpatterns = [
@@ -13,6 +13,7 @@ urlpatterns = [
     path('produtosdaf/denominacoes', denominacoes, name='denominacoes'),
     
     #produtos
+    path('produtosdaf/produtos/ficha/cmm/<int:product_id>/', produtos_cmm, name='produtos_cmm'),
     path('produtosdaf/produtos/pdf/<int:product_id>/', produto_exportar_pdf, name='produto_exportar_pdf'),
     path('produtosdaf/produtos/ficha/novo/', produtos_ficha, name='novo_produto'),
     path('produtosdaf/produtos/ficha/<int:product_id>/', produtos_ficha, name='produtos_ficha'),
@@ -21,4 +22,5 @@ urlpatterns = [
     path('produtosdaf/produtos/exportar/', exportar_produtos, name='exportar_produtos'),
     path('produtosdaf/produtos/salvartags/<int:product_id>/', salvar_tags, name='salvar_tags'),
     path('produtosdaf/produtos', produtos, name='produtos'),
+    
 ]

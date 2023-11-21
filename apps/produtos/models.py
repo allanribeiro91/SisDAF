@@ -220,4 +220,26 @@ class ProdutosTags(models.Model):
     
     objects = ProdutosTagsManager()
 
+class ProdutoConsumoMedio(models.Model):
+    #relacionamento usuario
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_registro_cmm')
 
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+
+    #relacionamento produto
+    produto = models.ForeignKey(ProdutosFarmaceuticos, on_delete=models.DO_NOTHING, related_name='produto_cmm')
+
+    #dados
+    tipo_cmm = models.CharField(max_length=20, null=False, blank=False)
+    data_referencia = models.DateField(null=False, blank=False)
+    periodo_referencia = models.CharField(max_length=10, null=True, blank=True)
+    estoque_ses = models.FloatField(null=False, blank=False)
+    aprovado_administrativo = models.FloatField(null=False, blank=False)
+    aprovado_judicial = models.FloatField(null=False, blank=False)
+    aprovado_total = models.FloatField(null=False, blank=False, default=0)
+    cmm_administrativo = models.FloatField(null=False, blank=False)
+    cmm_judicial = models.FloatField(null=False, blank=False)
+    cmm_total = models.FloatField(null=False, blank=False)
+    observacoes = models.TextField(null=True, blank=True, default='Sem observações.')
+    responsavel_dados = models.CharField(max_length=20, null=False, blank=False)

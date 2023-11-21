@@ -1,5 +1,21 @@
 
 $(document).ready(function() {
+    //Mudar de aba
+    $('#tabMeusDados').click(function() {
+        var id_produto = window.location.pathname.split('/').filter(function(e){ return e }).pop();
+        window.location.href = '/produtosdaf/produtos/ficha/' + id_produto + '/'
+    });
+
+    $('#tabConsumoMedio').click(function() {
+        var id_produto = window.location.pathname.split('/').filter(function(e){ return e }).pop();
+        //alert(id_produto)
+        if(id_produto=='novo'){
+            alert("Não existe registro de consumo médio mensal.")
+        }
+        window.location.href = '/produtosdaf/produtos/ficha/cmm/' + id_produto + '/'
+    });
+    
+    
     //Deletar
     $('#apagarProduto').on('click', function() {
         const produtoId = $('#id').val();  // Pega o ID da denominação do campo de input

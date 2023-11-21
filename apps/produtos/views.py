@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from apps.usuarios.models import Usuario
-from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos, Tags, ListaATC, ProdutosTags
+from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos, Tags, ListaATC, ProdutosTags, ProdutoConsumoMedio
 from apps.produtos.forms import DenominacoesGenericasForm, ProdutosFarmaceuticosForm
 from apps.main.models import CustomLog
 from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO, YES_NO, CLASSIFICACAO_AWARE
@@ -151,6 +151,14 @@ def produtos_ficha(request, product_id=None):
         'YES_NO': YES_NO,
         'CLASSIFICACAO_AWARE': CLASSIFICACAO_AWARE,
     })
+
+def produtos_cmm(request, product_id=None):
+    tab_cmm = ProdutoConsumoMedio.objects.filter(produto=product_id)
+    conteudo = {
+        'tab_cmm': tab_cmm,
+    }
+    
+    return render(request, 'produtos/produtos_cmm.html', conteudo)
 
 @login_required
 def delete_produto(request, product_id):
