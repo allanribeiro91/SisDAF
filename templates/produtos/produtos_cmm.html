@@ -1,5 +1,6 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
+{% load humanize %}
 {% load custom_filters %}
 {% block extra_head %}    
     <link rel="stylesheet" href="{% static 'styles/produtos_cmm.css' %}">
@@ -52,7 +53,7 @@
                     <td class="cmm-id">{{ item.id }}</td>
                     <td class="cmm-produto">{{ item.produto.produto }}</td>
                     <td class="cmm-data">{{ item.data_referencia|date:"d/m/Y" }}</td>
-                    <td class="cmm-valor" style="text-align: right !important; padding-right: 30px;">{{ item.cmm_total }}</td>
+                    <td class="cmm-valor" style="text-align: right !important; padding-right: 30px;">{{ item.cmm_total|intcomma }}</td>
                     <td class="cmm-observacoes">{{ item.observacoes }}</td>
                     <td class="cmm-responsavel">{{ item.responsavel_dados }}</td>
                 </tr>
