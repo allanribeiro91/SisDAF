@@ -239,3 +239,20 @@ LISTA_ANOS = [
     (2022, 2022),
     (2023, 2023),
 ]
+
+FONTES_CONTRATOS_CONSULTORES = [
+    ('fiotec', 'FIOTEC'),
+    ('opas', 'OPAS'),
+    ('outro', 'Outro'),
+    ('', 'Não Informado'),
+]
+
+STATUS_CONTRATOS_CONSULTORES = [
+    ('em_elaboracao', 'Em elaboração'),
+    ('em_analise', 'Em análise'),
+    ('em_execucao', 'Em Execução'),
+    ('finalizado', 'Finalizado'),
+    ('suspenso', 'Suspenso'),
+    ('cancelado', 'Cancelado'),
+    ('', 'Não Informado'),
+]

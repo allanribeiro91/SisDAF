@@ -437,9 +437,12 @@
 
     </script>
 
-{% include 'produtos/produtos_tags.html' %}
+
 
 <script src="{% static 'js/produtos.js' %}"></script>
-    
+
+    <!-- Modais -->
+    {% include 'produtos/produtos_tags.html' %}
+    {% include "produtos/produtos_delete.html" %}
 
 {% endblock %}

@@ -1,22 +1,20 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static '\styles\contratos.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\consultores_tecnicos.css' %}">
 {% endblock %}
 {% block content %}    
     
     <!-- Caminho da Área de Trabalho -->
     <div class="breadcrumb2">
-        <i class="fa-solid fa-file-signature"></i></i>&nbsp;Contratos
+        <i class="fa-solid fa-file-contract"></i></i>&nbsp;Consultores Técnicos
     </div>
 
     <!-- Barra Superior -->
     <div class="barra-superior">
         <!-- Abas -->
         <div class="tabs">
-            <button class="tab-button" id="abaARPS" onclick="location.href='{% url 'arps' %}'">ARPs</button>
-            <button class="tab-button active" id="abaContratos" onclick="location.href='{% url 'contratos' %}'">Contratos</button>
-            <button class="tab-button" id="abaARPS" onclick="location.href='{% url 'arps' %}'">TEDs</button>
+            <button class="tab-button active" id="abaContratos" onclick="location.href=''">Contratos</button>
         </div>
     </div>
 
@@ -91,14 +89,14 @@
                 Funcionalidades
             </div>
             <div class="btn-container">
-                <!--<a href="{% url 'contrato_novo' %}" style="text-decoration: none;">-->
-                    <button class="custom-btn" data-bs-toggle="modal" data-bs-target="#contratoNovoModal" id="inserir_contrato">
+                <a href="{% url 'consultor_contrato_ficha' %}" style="text-decoration: none;">
+                    <button class="custom-btn" id="inserir_contrato">
                         <div class="icon-container">
                             <i class="fa fa-plus-circle" style="font-size: 1.5vw"></i>
                             <span>Inserir</span>
                         </div>
                     </button>
-                <!--</a>-->
+                </a>
                 <button class="custom-btn" id="exportarBtn">
                     <div class="icon-container">
                         <i class="fa fa-download" style="font-size: 1.5vw"></i>

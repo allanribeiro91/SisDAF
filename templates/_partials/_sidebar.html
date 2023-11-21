@@ -26,7 +26,7 @@
             <a class="tab {% if current_url in 'proaq, proaq_ficha_dados_gerais, proaq_ficha_evolucao, proaq_ficha_evolucao_nova, nova_tramitacao, proaq_ficha_tramitacoes, novo_proaq' %}active-tab{% endif %}" href="{% url 'proaq' %}">Processos Aquisitivos</a>
             {% endwith %}
         </div>
-        <!-- <div>
+        <div>
             {% with current_url=request.resolver_match.url_name %}
             <a class="tab {% if current_url in 'contratos, contrato_novo, arps, arp_nova, arp_ficha' %}active-tab{% endif %}" href="{% url 'contratos' %}">Contratos</a>
             {% endwith %}
@@ -36,7 +36,7 @@
             {% with current_url=request.resolver_match.url_name %}
             <a class="tab {% if current_url in 'prog_basico, prog_especializado, prog_estrategico' %}active-tab{% endif %}" href="{% url 'prog_basico' %}">Programação</a>
             {% endwith %}
-        </div> -->
+        </div>
         <!-- <div>
             {% with current_url=request.resolver_match.url_name %}
             <a class="tab {% if current_url in '' %}active-tab{% endif %}" href="">Distribuição</a>
@@ -53,7 +53,11 @@
             <a class="tab {% if current_url in '' %}active-tab{% endif %}" href="">Planejamento</a>
             {% endwith %}
         </div> -->
-        
+        <div>
+            {% with current_url=request.resolver_match.url_name %}
+            <a class="tab {% if current_url in 'consultores_tecnicos' %}active-tab{% endif %}" href="{% url 'consultores_tecnicos' %}">Consultores Técnicos</a>
+            {% endwith %}
+        </div>
 
         <!-- Adicione o botão abaixo -->
         <div id="toggleButton" class="toggle-button"><i class="fas fa-arrow-left"></i></div>

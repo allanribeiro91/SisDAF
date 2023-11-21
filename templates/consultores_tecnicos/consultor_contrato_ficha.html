@@ -1,0 +1,109 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/consultor_contrato_ficha.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fa-solid fa-file-contract"></i>&nbsp;Consultores Técnicos / Ficha do Contrato
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tab-voltar">
+            <a href="{% url 'arps' %}" style="color: black;">
+                <i class="fas fa-arrow-left"></i> 
+            </a>
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" id="arp_ficha_dados_gerais">Dados Gerais</button>
+        </div>
+    </div>
+
+    <div class="area-scroll">
+        <!-- form denominacoes_genericas -->
+            <form id="arpForm" method="POST" data-post-url="{% if form.instance.id %}{% url 'arp_ficha' form.instance.id %}{% else %}{% url 'arp_nova' %}{% endif %}">
+            {% csrf_token %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#arp_delete" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                    <i class="fas fa-trash-alt"></i>
+                    Deletar
+                </button>
+                
+                <button class="btn btn-primary me-md-2" type="submit" id="btnSaveArp" style="font-size: 12px;">
+                    <i class="fas fa-save me-1"></i> 
+                    Salvar
+                </button>
+            </div>
+            
+            <div class="horizontal-sections">
+                <div class="section-log">
+                    <h3>Log</h3>
+                    <div class="grid-log">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" id="id_arp" name="id_arp" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                            <label for="floatingInput">ID</label>
+                        </div>                        
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ arp.registro_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Data do Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ arp.usuario_registro.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável pelo Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ arp.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Última Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ arp.usuario_atualizacao.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" name="log_edicoes" readonly value="{{ arp.log_n_edicoes }}">
+                            <label for="floatingInput">Nº Edições</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Dados Administrativos</h3>
+                    
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating tipo_select">                            
+                            {{ form.status }}
+                            <label>{{ form.status.label }}</label>
+                        </div>
+                        <div class="form-floating tipo_select">                            
+                            {{ form.fonte }}
+                            <label>{{ form.fonte.label }}</label>
+                        </div>
+                        <div class="form-floating" style="width: 200px">                            
+                            {{ form.instrumento_juridico }}
+                            <label>{{ form.instrumento_juridico.label }}</label>
+                        </div>
+                        <div class="form-floating" style="width: 200px">                            
+                            {{ form.n_contrato }}
+                            <label>{{ form.n_contrato.label }}</label>
+                        </div>
+
+                        </div>
+                        <div class="form-floating mb-3">                           
+                            <!-- <input type="date" class="form-control" id="data_publicacao" name="data_publicacao" value="{% if form.data_publicacao.value %}{{ form.data_publicacao.value|date:'Y-m-d' }}{% endif %}">
+                            <label>{{ form.data_publicacao.label }}</label> -->
+                        
+                        </div>
+                    </div>
+                    
+
+                </div>
+            </div>
+
+{% endblock %}
