@@ -55,7 +55,7 @@
         </div> -->
         <div>
             {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in 'consultores_tecnicos' %}active-tab{% endif %}" href="{% url 'consultores_tecnicos' %}">Consultores Técnicos</a>
+            <a class="tab {% if current_url in 'consultores_tecnicos, consultor_contrato_ficha' %}active-tab{% endif %}" href="{% url 'consultores_tecnicos' %}">Consultores Técnicos</a>
             {% endwith %}
         </div>
 

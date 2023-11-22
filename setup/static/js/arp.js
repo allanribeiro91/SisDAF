@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Chama a função imediatamente para definir o estado inicial dos campos
     atualizarInformacoesFornecedor();
+
+    
 });
 
 $(document).ready(function() {
@@ -83,6 +85,7 @@ $(document).ready(function() {
             document.body.removeChild(a);
         });
     });
+    
     
 
 
@@ -193,6 +196,56 @@ $(document).ready(function() {
     }
 });
 
+
+document.getElementById('btnSaveArp').addEventListener('click', function(e) {
+    e.preventDefault(); // Evita o envio padrão do formulário
+    
+    
+    //Verificar preenchimento dos campos
+    let preenchimento_incorreto = verificar_preenchimento_campos()
+    if (preenchimento_incorreto === false) {
+        return;
+    }
+
+    let postURL = document.getElementById('arpForm').getAttribute('data-post-url');
+    let formData = new FormData(document.getElementById('arpForm'));
+    
+    fetch(postURL, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        // Primeiro verifique se a resposta é ok
+        if (!response.ok) {
+            throw new Error('Server response was not ok: ' + response.statusText);
+        }
+        // Tente converter a resposta para JSON
+        return response.json();
+    })
+    .then(data => {
+        // Se chegou aqui, você tem um JSON válido
+        //console.log('Response Data:', data);
+        if (data.data) {
+            // Armazenar os dados no localStorage
+            localStorage.setItem('temporaryFormData', JSON.stringify(data.form));
+        }
+        if (data.redirect_url) {
+            window.location.href = data.redirect_url;
+        } else {
+            throw new Error('No redirect URL in the response');
+        }
+    })
+    .catch(error => {
+        // Isso captura qualquer erro que ocorra no processo de 'fetch' ou 'then'
+        console.error('Fetch operation error:', error);
+    });
+    
+});
+
+
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -281,7 +334,8 @@ function valor_total_item_art() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    
+
+
     formatarValorMonetario('arp_valor_reequilibrio');
     formatarValorMonetario('arp_valor_unitario');
     formatarQuantidade('arp_qtd_registrada')
@@ -305,6 +359,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     
+
+    
 });
 
 
@@ -313,68 +369,38 @@ document.getElementById('arp_valor_total').addEventListener('keydown', function 
     e.preventDefault();
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-});
 
-document.getElementById('btnSaveArp').addEventListener('click', function(e) {
-    e.preventDefault(); // Evita o envio padrão do formulário
+function verificar_preenchimento_campos() {
+    const campos = [
+        { id: 'unidade_daf', mensagem: 'Preencha a Unidade DAF!' },
+        { id: 'arp_processo_sei', mensagem: 'Preencha o Número do Processo SEI!' },
+        { id: 'arp_numero_arp', mensagem: 'Preencha o Número da ARP!' },
+        { id: 'arp_status', mensagem: 'Preencha o Status!' },
+        { id: 'arp_denominacao', mensagem: 'Selecione a Denominação Genérica!' },
+        { id: 'cnpj_fornecedor', mensagem: 'Selecione o Fornecedor!' }
+    ];
 
-    let postURL = document.getElementById('arpForm').getAttribute('data-post-url');
-    let formData = new FormData(document.getElementById('arpForm'));
-
-    console.log('POST URL:', postURL); // Para depuração
-
-    fetch(postURL, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+    let mensagensErro = campos.reduce((mensagens, campo) => {
+        const elemento = document.getElementById(campo.id);
+        if (!elemento || elemento.value === '') {
+            mensagens.push(campo.mensagem);
         }
-    })
-    .then(response => {
-        // Primeiro verifique se a resposta é ok
-        if (!response.ok) {
-            throw new Error('Server response was not ok: ' + response.statusText);
-        }
-        // Tente converter a resposta para JSON
-        return response.json();
-    })
-    .then(data => {
-        // Se chegou aqui, você tem um JSON válido
-        console.log('Response Data:', data);
-        if (data.data) {
-            // Armazenar os dados no localStorage
-            localStorage.setItem('temporaryFormData', JSON.stringify(data.data));
-        }
-        if (data.redirect_url) {
-            window.location.href = data.redirect_url;
-        } else {
-            throw new Error('No redirect URL in the response');
-        }
-    })
-    .catch(error => {
-        // Isso captura qualquer erro que ocorra no processo de 'fetch' ou 'then'
-        console.error('Fetch operation error:', error);
-    });
-});
+        return mensagens;
+    }, []);
 
-document.addEventListener('DOMContentLoaded', function() {
-    let formData = JSON.parse(localStorage.getItem('temporaryFormData'));
-
-    if (formData) {
-        for (let key in formData) {
-            let inputElement = document.getElementById(key);
-            if (inputElement) {
-                inputElement.value = formData[key];
-            }
-        }
-        // Limpar os dados do localStorage após preencher o formulário
-        localStorage.removeItem('temporaryFormData');
+    if (mensagensErro.length > 0) {
+        Swal.fire({
+            title: 'Atenção!',
+            html: mensagensErro.join('<br>'),
+            icon: 'warning',
+            iconColor: 'red',
+            confirmButtonText: 'Ok',
+            confirmButtonColor: 'green',
+        });
+        return false;
     }
-});
 
+    return true;
+}
 
-
-
-
-
+  

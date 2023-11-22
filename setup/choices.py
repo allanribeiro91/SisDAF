@@ -54,6 +54,16 @@ UNIDADE_DAF2 = [
     ('nao_informado', 'Não Informado'),
 ]   
 
+UNIDADE_DAF3 = [
+    ('cgafb', "CGAFB"),
+    ('cgafme', "CGAFME"),
+    ('cgceaf', "CGCEAF"),
+    ('cgfp', "CGFP"),
+    ('cofisc', "COFISC"),
+    ('gabinete', "GABINETE"),
+    ('', 'Não Informado'),
+]   
+
 VINCULO_MS = [
     ('consultor', "Consultor Técnico"),
     ('servidor_federal', "Servidor Federal"),
@@ -129,6 +139,7 @@ STATUS_ARP = [
     ('nao_publicado', "Não Publicado"),
     ('publicado', "Publicado"),
     ('cancelado', "Cancelado"),
+    ('', 'Não Informado')
 ]
 
 STATUS_FASE = [
@@ -254,5 +265,10 @@ STATUS_CONTRATOS_CONSULTORES = [
     ('finalizado', 'Finalizado'),
     ('suspenso', 'Suspenso'),
     ('cancelado', 'Cancelado'),
+    ('', 'Não Informado'),
+]
+
+INSTRUMENTOS_JURIDICOS_CONSULTORES = [
+    ('TC132', 'TC132'),
     ('', 'Não Informado'),
 ]

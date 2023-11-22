@@ -1,6 +1,6 @@
 from django.db import models
 from apps.usuarios.models import Usuario
-from setup.choices import FONTES_CONTRATOS_CONSULTORES, STATUS_CONTRATOS_CONSULTORES
+from setup.choices import FONTES_CONTRATOS_CONSULTORES, STATUS_CONTRATOS_CONSULTORES, INSTRUMENTOS_JURIDICOS_CONSULTORES
 from django.utils import timezone
 
 class ConsultoresContratos(models.Model):
@@ -18,7 +18,7 @@ class ConsultoresContratos(models.Model):
 
     #dados administrativos
     fonte = models.CharField(max_length=20, choices=FONTES_CONTRATOS_CONSULTORES, null=False, blank=False)
-    instrumento_juridico = models.TextField(null=True, blank=True, default='Não Informado')
+    instrumento_juridico = models.CharField(max_length=20, choices=INSTRUMENTOS_JURIDICOS_CONSULTORES, null=False, blank=False)
     n_contrato = models.CharField(max_length=20, null=False, blank=False)
     data_assinatura = models.DateField(null=True, blank=True)
     vigencia = models.DateField(null=True, blank=True)

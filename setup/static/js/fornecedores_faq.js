@@ -217,12 +217,10 @@ function getTopico(topico) {
 // });
 
 document.getElementById('btnSaveFaq').addEventListener('click', function(e) {
-    e.preventDefault(); // Evita o envio padrão do formulário
+    e.preventDefault();
 
     let postURL = document.getElementById('fornecedorFaqForm').getAttribute('data-post-url');
     let formData = new FormData(document.getElementById('fornecedorFaqForm'));
-
-    console.log('POST URL:', postURL); // Para depuração
 
     fetch(postURL, {
         method: 'POST',

@@ -61,29 +61,6 @@ def arp_ficha(request, arp_id=None):
             arp_form = ContratosArpsForm(request.POST)
             nova_arp = True
 
-        #Conferir campos obrigatórios
-        fields = [
-            ('unidade_daf', "A Unidade DAF é obrigatória!"),
-            ('numero_processo_sei', "Número do Processo SEI é obrigatório!"),
-            ('numero_documento_sei', "Número do Documento SEI obrigatório!"),
-            ('numero_arp', "Número do Documento SEI obrigatório!"),
-            ('status', "Status da ARP é obrigatório!"),
-            ('denominacao', "A Denominação Genérica é obrigatória!"),
-        ]
-        for field_name, error_message in fields:
-            valor = request.POST.get(field_name)
-            if valor == "Não informado" or valor == None or valor == '':
-                messages.error(request, error_message)
-                if arp:
-                    return JsonResponse({
-                        'redirect_url': reverse('arp_ficha', args=[arp.id]),
-                    })
-                else:
-                    return JsonResponse({
-                        'redirect_url': reverse('arp_nova'),
-                        'data': request.POST,
-                    })
-
         #Verificar se houve alteração no formulário
         if not arp_form.has_changed():
             messages.error(request, "Dados não foram salvos. Não houve mudanças.")
@@ -104,11 +81,8 @@ def arp_ficha(request, arp_id=None):
 
         #Passar o objeto Fornecedor
         fornecedor_id = request.POST.get('fornecedor')
-        print('Fornecedor ID: ', fornecedor_id)
         fornecedor_instance =  Fornecedores.objects.get(id=fornecedor_id)
         arp_form.instance.fornecedor = fornecedor_instance
-        print('Fornecedor: ', arp_form.instance.fornecedor.id)
-        print(arp_form)
         
         #salvar
         if arp_form.is_valid():
@@ -155,6 +129,29 @@ def arp_ficha(request, arp_id=None):
         'form': form,
         'arp': arp,
     })
+
+def arp_delete(request, arp_id=None):
+    try:
+        arp = ContratosArps.objects.get(id=arp_id)
+        arp.soft_delete(request.user.usuario_relacionado)
+        messages.error(request, "ARP deletado com sucesso.")
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Fornecedores_Fornecedor_Representantes",
+            item_id=0,
+            item_descricao="Deleção de Representante do Fornecedor.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o Representante (ID {representante.id}, Nome: {representante.nome_completo}, Fornecedor: {representante.fornecedor.cnpj}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({"message": "Representante deletado com sucesso!"})
+    except Fornecedores_Representantes.DoesNotExist:
+        messages.error(request, "Representante não encontrado.")
+        return JsonResponse({"message": "Representante não encontrado."})  
 
 def arp_buscar_produtos(request, denominacao=None):
     produtos = ProdutosFarmaceuticos.get_produtos_por_denominacao(denominacao)

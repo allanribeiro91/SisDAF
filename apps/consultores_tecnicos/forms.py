@@ -1,18 +1,18 @@
 from django import forms
 from apps.usuarios.models import Usuario
-from setup.choices import FONTES_CONTRATOS_CONSULTORES, STATUS_CONTRATOS_CONSULTORES
+from setup.choices import FONTES_CONTRATOS_CONSULTORES, STATUS_CONTRATOS_CONSULTORES, INSTRUMENTOS_JURIDICOS_CONSULTORES
 from apps.consultores_tecnicos.models import ConsultoresContratos
 
 class ConsultoresContratosForm(forms.ModelForm):
     status = forms.ChoiceField(
-    choices=STATUS_CONTRATOS_CONSULTORES,
-    widget=forms.Select(attrs={
-        'class': 'form-select',
-        'id': 'consultor_contrato_status',
-    }),
-    initial='',
-    label='Status',
-    required=True,
+        choices=STATUS_CONTRATOS_CONSULTORES,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'consultor_contrato_status',
+        }),
+        initial='',
+        label='Status',
+        required=True,
     )
 
     fonte = forms.ChoiceField(
@@ -24,14 +24,18 @@ class ConsultoresContratosForm(forms.ModelForm):
         initial='',
         label='Fonte',
     )
-    instrumento_juridico = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            
+
+    instrumento_juridico = forms.ChoiceField(
+        choices=INSTRUMENTOS_JURIDICOS_CONSULTORES,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'instrumento_juridico',
         }),
-        # label='Instrumento Jurídico',
-        required=False,
+        initial='',
+        label='Instrumento Jurídico',
+        required=True,
     )
+
     n_contrato = forms.CharField(
         max_length=15,
         widget=forms.TextInput(attrs={
@@ -44,7 +48,7 @@ class ConsultoresContratosForm(forms.ModelForm):
             'class': 'form-control',
             'type': 'date',
         }),
-        label='Data de Assinatura',
+        label='Data da Assinatura',
         required=False,
     )
     vigencia = forms.DateField(
@@ -58,7 +62,8 @@ class ConsultoresContratosForm(forms.ModelForm):
     objeto = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-control',
-            'rows': 3,
+            'rows': 5,
+            'style': 'padding-top: 25px; height: 120px;'
         }),
         label='Objeto',
         required=False,
@@ -66,7 +71,8 @@ class ConsultoresContratosForm(forms.ModelForm):
     metodologia = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-control',
-            'rows': 3,
+            'rows': 5,
+            'style': 'padding-top: 25px; height: 200px;'
         }),
         label='Metodologia',
         required=False,
@@ -88,7 +94,8 @@ class ConsultoresContratosForm(forms.ModelForm):
     observacoes_gerais = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-control',
-            'rows': 3,
+            'rows': 5,
+            'style': 'height: 200px;'
         }),
         label='Observações Gerais',
         required=False,

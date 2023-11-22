@@ -4,7 +4,7 @@ from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import ContratosArps
-from setup.choices import STATUS_ARP, UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_FASE
+from setup.choices import STATUS_ARP, UNIDADE_DAF3, MODALIDADE_AQUISICAO, STATUS_FASE
 
 class CustomSelect2Widget_Fornecedor(Select2Widget):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
@@ -19,21 +19,25 @@ class CustomSelect2Widget_Fornecedor(Select2Widget):
 
 class ContratosArpsForm(forms.ModelForm):
     unidade_daf = forms.ChoiceField(
-        choices=UNIDADE_DAF2,
+        choices=UNIDADE_DAF3,
         widget=forms.Select(attrs={
-            'class': 'form-select'
+            'class': 'form-select',
+            'id': 'unidade_daf',
         }),
         label='Unidade DAF',
-        initial='nao_informado',
+        initial='',
+        required=True,
     )
     numero_processo_sei = forms.CharField(
         max_length=20,
         widget=forms.TextInput(attrs={
             'class': 'form-control', 
             'id': 'arp_processo_sei', 
+            'name': 'numero_processo_sei',
             'style': 'width: 180px !important;'
         }),
         label='Nº Processo SEI',
+        required=True,
     )
     numero_documento_sei = forms.CharField(
         max_length=10,
@@ -43,6 +47,7 @@ class ContratosArpsForm(forms.ModelForm):
             'style': 'width: 180px !important;'
         }),
         label='Documento SEI',
+        required=True,
     )
     numero_arp = forms.CharField(
         max_length=15,
@@ -52,6 +57,7 @@ class ContratosArpsForm(forms.ModelForm):
             'style': 'width: 180px !important;'
         }),
         label='Nº da ARP',
+        required=True,
     )
     status = forms.ChoiceField(
         choices=STATUS_ARP,
@@ -60,6 +66,8 @@ class ContratosArpsForm(forms.ModelForm):
             'id':'arp_status'
         }),
         label='Status',
+        initial='',
+        required=True,
     )
     data_publicacao = forms.DateField(
         widget=forms.DateInput(attrs={
@@ -76,7 +84,8 @@ class ContratosArpsForm(forms.ModelForm):
             'id': 'arp_denominacao', 
         }),
         label='Denominação Genérica',
-        empty_label='Selecione uma denominação genérica'
+        empty_label='Selecione uma denominação genérica',
+        required=False,
     )
     fornecedor = forms.ModelChoiceField(
         queryset=Fornecedores.objects.all().order_by('nome_fantasia'),
@@ -85,7 +94,8 @@ class ContratosArpsForm(forms.ModelForm):
             'id': 'cnpj_fornecedor', 
         }),
         label='Fornecedor',
-        empty_label='Selecione um CNPJ'
+        empty_label='Selecione um CNPJ',
+        required=False,
     )
     observacoes_gerais = forms.CharField(
         widget=forms.Textarea(attrs={

@@ -11,3 +11,6 @@ def consultor_contrato_ficha(request, id_contrato=None):
         'form': form,
     }
     return render(request, 'consultores_tecnicos/consultor_contrato_ficha.html', conteudo)
+
+def consultor_contrato_produtos(request, id_contrato=None):
+    return render(request, 'consultores_tecnicos/consultor_contrato_produtos.html')
