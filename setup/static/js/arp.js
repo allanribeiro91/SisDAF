@@ -45,6 +45,27 @@ $(document).ready(function() {
         modal.show();
     });
 
+    //Deletar
+    $('#btnDeletarArp').on('click', function() {
+        const id_arp = $('#id_arp').val(); 
+        const url_apos_delete = "/contratos/arps/";
+
+        //Trata-se de um novo registro que ainda não foi salvo
+        if (!id_arp) { 
+            window.location.href = url_apos_delete;
+            return; // Sai da função
+        }
+        
+        //parâmetros para deletar
+        const mensagem = "Deletar Ata de Registro de Preços."
+        const url_delete = "/contratos/arp/deletar/" + id_arp + "/"
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+
+    });
+
     //Exportar dados
     $('#exportarARPs').on('click', function() {
         // Coleta valores dos campos       
@@ -90,21 +111,20 @@ $(document).ready(function() {
 
 
     // Buscar produtos
-    var denominacaoLabel = "Não Informado";
-    var selectProduto = $('#arp_produto_farmaceutico'); // Referência para o campo de seleção de produto
+    // var denominacao = "Não Informado";
+    
 
-    // Quando uma denominação genérica é selecionada
-    $('#denominacao_generica').change(function() {
-        denominacaoLabel = $("#denominacao_generica option:selected").text();
-        if (denominacaoLabel) {
-            var urlBase = '/contratos/arp/buscarprodutos/';
-            var url = urlBase + denominacaoLabel + '/';
+    // Antes de abrir o modal, carregar a lista de produtos
+    $('#btnNovoItemARP').on('click', function() {
+        const denominacao = document.getElementById('arp_denominacao').value
+        
+        if (denominacao) {
+            var url = '/contratos/arp/buscarprodutos/' + denominacao + '/';
             $.ajax({
                 url: url,
                 success: function(data) {
                     produtos = data;
-                    console.log(produtos);
-
+                    const selectProduto = $('#arp_produto_farmaceutico');
                     // Limpa as opções existentes
                     selectProduto.empty();
                     
@@ -118,7 +138,7 @@ $(document).ready(function() {
                 }
             });
         }
-    });
+    });   
 
     $('#arp_processo_sei').mask('00000.000000/0000-00');
     
@@ -199,52 +219,155 @@ $(document).ready(function() {
 
 document.getElementById('btnSaveArp').addEventListener('click', function(e) {
     e.preventDefault(); // Evita o envio padrão do formulário
-    
-    
+
     //Verificar preenchimento dos campos
     let preenchimento_incorreto = verificar_preenchimento_campos()
     if (preenchimento_incorreto === false) {
         return;
     }
-
-    let postURL = document.getElementById('arpForm').getAttribute('data-post-url');
-    let formData = new FormData(document.getElementById('arpForm'));
     
-    fetch(postURL, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+    //Enviar para o servidor
+        //definir o caminho
+        let arp_id = document.getElementById('id_arp').value;
+        if (arp_id === '') {
+            postURL = '/contratos/arp/ficha/nova/'
+        } else
+        {
+            postURL = `/contratos/arp/ficha/${arp_id}/`
         }
-    })
+
+        //pegar os dados
+        let formData = new FormData(document.getElementById('arpForm'));
+        
+        //enviar 
+        fetch(postURL, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+    
+    //Retorno do Servidor
     .then(response => {
         // Primeiro verifique se a resposta é ok
         if (!response.ok) {
+            sweetAlert('Dados não foram salvos.', 'error', 'red');
             throw new Error('Server response was not ok: ' + response.statusText);
         }
-        // Tente converter a resposta para JSON
         return response.json();
     })
     .then(data => {
-        // Se chegou aqui, você tem um JSON válido
-        //console.log('Response Data:', data);
-        if (data.data) {
-            // Armazenar os dados no localStorage
-            localStorage.setItem('temporaryFormData', JSON.stringify(data.form));
+        if (data.retorno === "Salvo") {
+            
+            if (data.novo === false) {
+                //logs       
+                document.getElementById('lot_ult_atualizacao').value = data.log_atualizacao_data
+                document.getElementById('log_responsavel_atualizacao').value = data.log_atualizacao_usuario
+                document.getElementById('log_edicoes').value = data.log_edicoes
+
+                //alert
+                sweetAlert('ARP salva com sucesso!', 'success', 'green')
+            } else {
+                localStorage.setItem('showSuccessMessage', 'true');
+                window.location.href = data.redirect_url;
+            }
         }
-        if (data.redirect_url) {
-            window.location.href = data.redirect_url;
-        } else {
-            throw new Error('No redirect URL in the response');
+
+        if (data.retorno === "Não houve mudanças") {
+            //alert
+            sweetAlert('Dados não foram salvos.<br>Não houve mudanças.', 'warning', 'orange')
+        }
+
+        if (data.retorno === "Erro ao salvar") {
+            //alert
+            sweetAlert('Dados não foram salvos.', 'error', 'red')
         }
     })
     .catch(error => {
-        // Isso captura qualquer erro que ocorra no processo de 'fetch' ou 'then'
         console.error('Fetch operation error:', error);
     });
     
 });
 
+
+document.getElementById('btnSalvarItemArp').addEventListener('click', function(e) {
+    e.preventDefault(); // Evita o envio padrão do formulário
+
+    const id_arp = document.getElementById('id_arp').value
+    
+    alert(id_arp)
+    return
+
+    //Verificar preenchimento dos campos
+    // let preenchimento_incorreto = verificar_campos_item_arp()
+    // if (preenchimento_incorreto === false) {
+    //     return;
+    // }
+    
+    //Enviar para o servidor
+        //definir o caminho
+        let id_arp_item = document.getElementById('id_arp_item').value;
+        if (id_arp_item === '') {
+            postURL = '/contratos/arp/item/ficha/novo/'
+        } else
+        {
+            postURL = `/contratos/arp/item/ficha/${id_arp_item}/`
+        }
+        
+        //pegar os dados
+        let formData = new FormData(document.getElementById('arpItemForm'));
+        
+        //enviar 
+        fetch(postURL, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+    
+    //Retorno do Servidor
+    .then(response => {
+        // Primeiro verifique se a resposta é ok
+        if (!response.ok) {
+            sweetAlert('Dados não foram salvos.', 'error', 'red');
+            throw new Error('Server response was not ok: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.retorno === "Salvo") {
+            
+            if (data.novo === false) {
+                //logs       
+                document.getElementById('arp_item_log_ult_atualizacao').value = data.log_atualizacao_data
+                document.getElementById('arp_item_log_responsavel_atualizacao').value = data.log_atualizacao_usuario
+                document.getElementById('arp_item_log_edicoes').value = data.log_edicoes
+
+                //alert
+                sweetAlert('Item da ARP salva com sucesso!', 'success', 'green')
+            } else {
+                localStorage.setItem('showSuccessMessage', 'true');
+                window.location.href = data.redirect_url;
+            }
+        }
+
+        if (data.retorno === "Não houve mudanças") {
+            //alert
+            sweetAlert('Dados não foram salvos.<br>Não houve mudanças.', 'warning', 'orange')
+        }
+
+        if (data.retorno === "Erro ao salvar") {
+            //alert
+            sweetAlert('Dados não foram salvos.', 'error', 'red')
+        }
+    })
+    .catch(error => {
+        console.error('Fetch operation error:', error);
+    });
+    
+});
 
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -335,6 +458,10 @@ function valor_total_item_art() {
 
 document.addEventListener('DOMContentLoaded', function() {
 
+    if (localStorage.getItem('showSuccessMessage') === 'true') {
+        sweetAlert('ARP salva com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('showSuccessMessage'); // Limpar a bandeira
+    }
 
     formatarValorMonetario('arp_valor_reequilibrio');
     formatarValorMonetario('arp_valor_unitario');
@@ -389,17 +516,38 @@ function verificar_preenchimento_campos() {
     }, []);
 
     if (mensagensErro.length > 0) {
-        Swal.fire({
-            title: 'Atenção!',
-            html: mensagensErro.join('<br>'),
-            icon: 'warning',
-            iconColor: 'red',
-            confirmButtonText: 'Ok',
-            confirmButtonColor: 'green',
-        });
+        const campos = mensagensErro.join('<br>')
+        sweetAlertPreenchimento(campos)
         return false;
     }
 
+    return true;
+}
+
+function verificar_campos_item_arp() {
+    const campos = [
+        { id: 'arp_n_item', mensagem: 'Informe o <b>Número</b> do Item!' },
+        { id: 'arp_tipo_cota', mensagem: 'Informe o <b>Tipo de Cota</b>!' },
+        { id: 'arp_empate_ficto', mensagem: 'Informe se o item é <b>Empate Ficto</b>!' },
+        { id: 'arp_produto_farmaceutico', mensagem: 'Informe o <b>Produto Farmacêutico</b>!' },
+        { id: 'arp_valor_unitario', mensagem: 'Informe o <b>Valor Unitário</b>!' },
+        { id: 'arp_qtd_registrada', mensagem: 'Informe a <b>Quantidade Registrada</b>!' }
+    ];
+
+    let mensagensErro = campos.reduce((mensagens, campo) => {
+        const elemento = document.getElementById(campo.id);
+        if (!elemento || elemento.value === '') {
+            mensagens.push(campo.mensagem);
+        }
+        return mensagens;
+    }, []);
+
+    if (mensagensErro.length > 0) {
+        const campos = mensagensErro.join('<br>')
+        sweetAlertPreenchimento(campos)
+        return false;
+    }
+    
     return true;
 }
 

@@ -5,16 +5,22 @@ from django.contrib import auth, messages
 from apps.main.models import CustomLog
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from apps.contratos.models import ContratosArps
-from apps.contratos.forms import ContratosArpsForm
+from apps.contratos.models import ContratosArps, ContratosArpsItens
+from apps.contratos.forms import ContratosArpsForm, ContratosArpsItensForm
 from setup.choices import UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
+from django.utils import timezone
+import pytz
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from datetime import datetime
 from io import BytesIO
 import json
+
+#timezone
+tz = pytz.timezone("America/Sao_Paulo")
+
 
 #CONTRATOS
 def contratos(request):
@@ -28,7 +34,7 @@ def contrato_ficha(request):
 
 #ARPs
 def arps(request):
-    tab_arps = ContratosArps.objects.all().order_by('-data_publicacao')
+    tab_arps = ContratosArps.objects.all().filter(del_status=False).order_by('-data_publicacao')
     denominacoes = DenominacoesGenericas.objects.values_list('id', 'denominacao')
     fornecedores = Fornecedores.objects.values_list('nome_fantasia', flat=True).distinct().order_by('nome_fantasia')
     unidades_daf = [item for item in UNIDADE_DAF2 if item[0] != 'nao_informado']
@@ -63,15 +69,8 @@ def arp_ficha(request, arp_id=None):
 
         #Verificar se houve alteração no formulário
         if not arp_form.has_changed():
-            messages.error(request, "Dados não foram salvos. Não houve mudanças.")
-            if arp:
-                return JsonResponse({
-                    'redirect_url': reverse('arp_ficha', args=[arp.id]),
-                })
-            else:
-                #return redirect('fornecedor_novo')
-                return JsonResponse({
-                    'redirect_url': reverse('arp_nova'),
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
                 })
 
         #Passar o objeto Denominação Genérica
@@ -89,11 +88,16 @@ def arp_ficha(request, arp_id=None):
             #Salvar o produto
             arp = arp_form.save(commit=False)
             arp.save(current_user=request.user.usuario_relacionado)
-            if nova_arp:
-                messages.success(request, "Nova ARP registrada com sucesso!")
-            else:
-                messages.success(request, "Dados atualizados com sucesso!")
             
+            #logs
+            log_id = arp.id
+            log_registro_usuario = arp.usuario_registro.dp_nome_completo
+            log_registro_data = arp.registro_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
+            print('Usuario: ', log_registro_usuario)
+            log_atualizacao_usuario = arp.usuario_atualizacao.dp_nome_completo
+            log_atualizacao_data = arp.ult_atual_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
+            log_edicoes = arp.log_n_edicoes
+
             # Registrar a ação no CustomLog
             current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             log_entry = CustomLog(
@@ -110,48 +114,64 @@ def arp_ficha(request, arp_id=None):
             #Retornar
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
+                    'retorno': 'Salvo',
+                    'log_id': log_id,
+                    'log_registro_usuario': log_registro_usuario,
+                    'log_registro_data': log_registro_data,
+                    'log_atualizacao_usuario': log_atualizacao_usuario,
+                    'log_atualizacao_data': log_atualizacao_data,
+                    'log_edicoes': log_edicoes,
+                    'novo': nova_arp,
                     'redirect_url': reverse('arp_ficha', args=[arp.id]),
                 })
         else:
-            messages.error(request, "Formulário inválido")
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
             print("Erro formulário ARP")
             print(arp_form.errors)
     
-    #Form
+    #Form ARP
     if arp:
-            form = ContratosArpsForm(instance=arp)
+        form = ContratosArpsForm(instance=arp)
     else:
         form = ContratosArpsForm()
             
+    #Form Item da ARP
+    form_item = ContratosArpsItensForm()
+
     return render(request, 'contratos/arp_ficha.html', {
         'YES_NO': YES_NO,
         'TIPO_COTA': TIPO_COTA,
         'form': form,
+        'form_item': form_item,
         'arp': arp,
     })
 
-def arp_delete(request, arp_id=None):
+def arp_delete(request, arp_id=None):   
     try:
         arp = ContratosArps.objects.get(id=arp_id)
         arp.soft_delete(request.user.usuario_relacionado)
-        messages.error(request, "ARP deletado com sucesso.")
 
         # Registrar a ação no CustomLog
         current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
-            modulo="Fornecedores_Fornecedor_Representantes",
+            modulo="Contratos_ARPs",
             item_id=0,
-            item_descricao="Deleção de Representante do Fornecedor.",
+            item_descricao="Deleção de ARP.",
             acao="Deletar",
-            observacoes=f"Usuário {request.user.username} deletou o Representante (ID {representante.id}, Nome: {representante.nome_completo}, Fornecedor: {representante.fornecedor.cnpj}) em {current_date_str}."
+            observacoes=f"Usuário {request.user.username} deletou a ARP (ID {arp.id}, Número: {arp.numero_arp}, Denominação: {arp.denominacao.denominacao}) em {current_date_str}."
         )
         log_entry.save()
 
-        return JsonResponse({"message": "Representante deletado com sucesso!"})
-    except Fornecedores_Representantes.DoesNotExist:
-        messages.error(request, "Representante não encontrado.")
-        return JsonResponse({"message": "Representante não encontrado."})  
+        return JsonResponse({
+            "message": "ARP deletada com sucesso!"
+            })
+    except ContratosArps.DoesNotExist:
+        return JsonResponse({
+            "message": "ARP não encontrada."
+            })  
 
 def arp_buscar_produtos(request, denominacao=None):
     produtos = ProdutosFarmaceuticos.get_produtos_por_denominacao(denominacao)
@@ -296,3 +316,99 @@ def arp_exportar(request):
         response['Content-Disposition'] = 'attachment; filename="exportar_fornecedores.xlsx"'
         response.write(output.getvalue())
         return response
+
+
+
+
+
+#ITENS DAS ARPS
+def arp_item_ficha(request, arp_item_id=None):
+    if arp_item_id:
+        try:
+            item_arp = ContratosArpsItens.objects.get(id=arp_item_id)
+        except ContratosArpsItens.DoesNotExist:
+            messages.error(request, "Item da ARP não encontrada.")
+            return redirect('arps')
+    else:
+        item_arp = None
+    
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if item_arp:
+            item_arp_form = ContratosArpsItensForm(request.POST, instance=item_arp)
+            novo_item_arp = False
+        else:
+            item_arp_form = ContratosArpsItensForm(request.POST)
+            novo_item_arp = True
+
+        #Verificar se houve alteração no formulário
+        if not item_arp_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+
+        #Passar o objeto ARP
+        arp_id = request.POST.get('arp_id')
+        arp_instance = ContratosArps.objects.get(id=arp_id)
+        item_arp_form.instance.produto = arp_instance
+
+        #Passar o objeto Produto Farmacêutico
+        produto_id = request.POST.get('produto')
+        produto_instance = ProdutosFarmaceuticos.objects.get(id=produto_id)
+        item_arp_form.instance.produto = produto_instance
+        
+        #salvar
+        if item_arp_form.is_valid():
+            #Salvar o produto
+            item_arp = item_arp_form.save(commit=False)
+            item_arp.save(current_user=request.user.usuario_relacionado)
+            
+            #logs
+            log_id = item_arp.id
+            log_atualizacao_usuario = item_arp.usuario_atualizacao.dp_nome_completo
+            log_atualizacao_data = item_arp.ult_atual_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
+            log_edicoes = item_arp.log_n_edicoes
+
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Contratos_ARPs_Itens",
+                item_id=0,
+                item_descricao="Salvar edição de Item da ARP.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o Item da ARP (ID {item_arp.id}, Nº Item: {item_arp.numero_item}, Nº ARP: {item_arp.arp.numero_arp}, Produto: {item_arp.produto.produto}) em {current_date_str}."
+            )
+            log_entry.save()
+
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'log_id': log_id,
+                    'log_atualizacao_usuario': log_atualizacao_usuario,
+                    'log_atualizacao_data': log_atualizacao_data,
+                    'log_edicoes': log_edicoes,
+                    'novo': novo_item_arp,
+                    'redirect_url': reverse('arp_ficha', args=[item_arp.id]),
+                })
+        else:
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+            print("Erro formulário ARP")
+            print(arp_form.errors)
+    
+    #Form ARP
+    if item_arp:
+        form_item = ContratosArpsItensForm(instance=item_arp)
+    else:
+        form_item = ContratosArpsItensForm()
+
+    return render(request, 'contratos/arp_ficha.html', {
+        'YES_NO': YES_NO,
+        'TIPO_COTA': TIPO_COTA,
+        'form_item': form_item,
+        'item_arp': item_arp,
+    })

@@ -149,7 +149,7 @@ class ProdutosFarmaceuticos(models.Model):
 
     @classmethod
     def get_produtos_por_denominacao(cls, denominacao):
-        produtos = cls.objects.filter(denominacao__denominacao=denominacao, del_status=False).values('id', 'produto')
+        produtos = cls.objects.filter(denominacao_id=denominacao, del_status=False).values('id', 'produto')
         return list(produtos)
 
     def __str__(self):

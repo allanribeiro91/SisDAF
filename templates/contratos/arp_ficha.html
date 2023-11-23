@@ -26,10 +26,10 @@
 
     <div class="area-scroll">
         <!-- form denominacoes_genericas -->
-            <form id="arpForm" method="POST" data-post-url="{% if form.instance.id %}{% url 'arp_ficha' form.instance.id %}{% else %}{% url 'arp_nova' %}{% endif %}">
+            <form id="arpForm" method="POST">
             {% csrf_token %}
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#arp_delete" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                <button type="button" class="btn btn-danger" id="btnDeletarArp" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
                     <i class="fas fa-trash-alt"></i>
                     Deletar
                 </button>
@@ -57,7 +57,7 @@
                             <label for="floatingInput">Responsável pelo Registro</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ arp.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="lot_ult_atualizacao" readonly value="{{ arp.ult_atual_data|date:"d/m/Y H:i:s" }}">
                             <label for="floatingInput">Última Atualização</label>
                         </div>
                         <div class="form-floating mb-3">
@@ -77,7 +77,7 @@
                     <h3>Dados da ARP*</h3>
                     
                     <div class="grid" style="font-size: 14px;">
-                        <div class="form-floating tipo_select">                            
+                        <div class="form-floating">                            
                             {{ form.unidade_daf }}
                             <label>{{ form.unidade_daf.label }}</label>
                         </div>
@@ -101,11 +101,8 @@
                         <div class="form-floating mb-3">
                             <!-- {{ form.data_publicacao.value|date:'Y-m-d' }}
                             <label>{{ form.data_publicacao.label }}</label> -->
-
-                            
                             <input type="date" class="form-control" id="data_publicacao" name="data_publicacao" value="{% if form.data_publicacao.value %}{{ form.data_publicacao.value|date:'Y-m-d' }}{% endif %}">
                             <label>{{ form.data_publicacao.label }}</label>
-                        
                         </div>
                     </div>
                     <div class="grid" style="font-size: 14px;">
@@ -117,8 +114,7 @@
                             {{ form.fornecedor }}
                             <label>{{ form.fornecedor.label }}</label>
                         </div>
-                    </div>
-
+                    </div>  
                 </div>
             </div>
 
@@ -199,12 +195,15 @@
         // });
     </script>
 
+    <!-- Modal -->
+    {% include "contratos/arp_ficha_modal.html" %}  
+
     <script type="text/javascript">
         var filtrar_dados = "{% url 'fornecedor_ficha_filtrar_dados' %}";
     </script>
     <!-- <script src="{% static 'js/fornecedores.js' %}"></script> -->
     <script src="{% static 'js/arp.js' %}"></script>
 
-    {% include "contratos/arp_ficha_modal.html" %}
+    
 
 {% endblock %}

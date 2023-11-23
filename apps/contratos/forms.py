@@ -1,21 +1,21 @@
 from django import forms
 from django_select2.forms import Select2Widget
 from apps.usuarios.models import Usuario
-from apps.produtos.models import DenominacoesGenericas
+from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from apps.contratos.models import ContratosArps
-from setup.choices import STATUS_ARP, UNIDADE_DAF3, MODALIDADE_AQUISICAO, STATUS_FASE
+from apps.contratos.models import ContratosArps, ContratosArpsItens
+from setup.choices import STATUS_ARP, UNIDADE_DAF3, TIPO_COTA, YES_NO, MODALIDADE_AQUISICAO, STATUS_FASE
 
-class CustomSelect2Widget_Fornecedor(Select2Widget):
-    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super(CustomSelect2Widget_Fornecedor, self).create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
-        if value:
-            fornecedor = Fornecedores.objects.get(pk=value)
-            option['attrs']['data-nome-fantasia'] = fornecedor.nome_fantasia
-            option['attrs']['data-hierarquia'] = fornecedor.hierarquia
-            option['attrs']['data-porte'] = fornecedor.porte
-            option['attrs']['data-tipo-direito'] = fornecedor.tipo_direito
-        return option
+# class CustomSelect2Widget_Fornecedor(Select2Widget):
+#     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+#         option = super(CustomSelect2Widget_Fornecedor, self).create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+#         if value:
+#             fornecedor = Fornecedores.objects.get(pk=value)
+#             option['attrs']['data-nome-fantasia'] = fornecedor.nome_fantasia
+#             option['attrs']['data-hierarquia'] = fornecedor.hierarquia
+#             option['attrs']['data-porte'] = fornecedor.porte
+#             option['attrs']['data-tipo-direito'] = fornecedor.tipo_direito
+#         return option
 
 class ContratosArpsForm(forms.ModelForm):
     unidade_daf = forms.ChoiceField(
@@ -109,6 +109,113 @@ class ContratosArpsForm(forms.ModelForm):
 
     class Meta:
         model = ContratosArps
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
+
+
+class ContratosArpsItensForm(forms.ModelForm):
+    arp = forms.ModelChoiceField(
+        queryset=ContratosArps.objects.none(),
+        widget=Select2Widget(attrs={
+            'class': 'form-select',
+            'id': 'arp',
+        }),
+        label='ARP',
+        required=True,
+    )
+    numero_item = forms.IntegerField(
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'id': 'arp_n_item',
+            'style': 'width: 100px'
+        }),
+        label='Nº do Item',
+        min_value=1,
+        max_value=20,
+        required=True,
+    )
+    tipo_cota = forms.ChoiceField(
+        choices=[('', '')] + TIPO_COTA,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'arp_tipo_cota',
+            'style': 'width: 150px'
+        }),
+        label='Tipo de Cota',
+        initial='',
+        required=True,
+    )
+    empate_ficto = forms.ChoiceField(
+        choices=[('', '')] + YES_NO,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'arp_empate_ficto',
+            'style': 'width: 150px',
+        }),
+        label='Empate Ficto',
+        initial='',
+        required=True,
+    )
+    produto = forms.ModelChoiceField(
+        queryset=ProdutosFarmaceuticos.objects.none(),
+        widget=Select2Widget(attrs={
+            'class': 'form-select',
+            'id': 'arp_produto_farmaceutico',
+        }),
+        label='Produto Farmacêutico',
+        required=True,
+    )
+    valor_unit_homologado = forms.FloatField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'arp_valor_unitario',
+            'style': 'text-align: right'
+        }),
+        label='Valor Unit. Homologado',
+        required=True,
+    )
+    valor_unit_reequilibrio_bool = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input',
+            'id': 'arp_valor_reequilibrio_check',
+        }),
+        label='Reequilíbrio de Valor Unitário',
+        required=False,
+    )
+    valor_unit_reequilibrio = forms.FloatField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'arp_valor_reequilibrio',
+            'style': 'text-align: right',
+            'readonly': 'true'
+        }),
+        label='Valor Unit. Reequilíbrio',
+        required=False,
+    )
+    qtd_registrada = forms.FloatField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'arp_qtd_registrada',
+            'style': 'text-align: right',
+        }),
+        label='Quantidade Registrada',
+        required=False,
+    )
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control auto-expand',
+            'rows': 1,
+            'style': 'padding-top: 10px; height: 80px;',
+            }),
+        required=False,
+        label='Observações Gerais'
+    )
+
+    class Meta:
+        model = ContratosArpsItens
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):
