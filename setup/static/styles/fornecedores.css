@@ -338,10 +338,10 @@ table tbody tr:hover {
 }
 .col-arp-data {
     width: 5% !important;
-    text-align: left !important;
+    text-align: center !important;
 }
 .col-arp-denominacao {
-    width: 15% !important;
+    width: 10% !important;
     text-align: left !important;
 }
 .col-arp-fornecedor {

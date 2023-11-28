@@ -13,5 +13,6 @@ urlpatterns = [
     path('', include('apps.contratos.urls')),
     path('', include('apps.programacao.urls')),
     path('', include('apps.consultores_tecnicos.urls')),
+    path('', include('apps.sobre_sisdaf.urls')),
     path('select2/', include('django_select2.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

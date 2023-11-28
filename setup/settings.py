@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'apps.fornecedores.apps.FornecedoresConfig',
     'apps.contratos.apps.ContratosConfig',
     'apps.programacao.apps.ProgramacaoConfig',
+    'apps.sobre_sisdaf.apps.SobreSisdafConfig',
     'apps.consultores_tecnicos.apps.ConsultoresTecnicosConfig',
 ]
 

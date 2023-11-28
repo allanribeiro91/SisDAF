@@ -3,6 +3,7 @@ from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from setup.choices import STATUS_ARP, UNIDADE_DAF2, TIPO_COTA, MODALIDADE_AQUISICAO, STATUS_FASE
+from datetime import timedelta
 from django.utils import timezone
 
 class ContratosArps(models.Model):
@@ -61,6 +62,36 @@ class ContratosArps(models.Model):
         self.del_usuario = user
         self.save()
 
+    def valor_total_arp(self):
+        total = 0
+        itens = self.arp_item.all()  # Acessa todos os itens relacionados a esta ARP
+        for item in itens:
+            if not item.del_status:  # Se o item não estiver deletado
+                total += item.valor_total()
+        return total
+
+    def qtd_registrada_total_arp(self):
+        total = 0
+        itens = self.arp_item.all()  # Acessa todos os itens relacionados a esta ARP
+        for item in itens:
+            if not item.del_status:  # Se o item não estiver deletado
+                total += item.qtd_registrada()
+        return total
+
+    @property
+    def data_vigencia(self):
+        """Calcula a data de vigência como data_publicacao + 365 dias."""
+        if self.data_publicacao:
+            return self.data_publicacao + timedelta(days=365)
+        return None
+
+    @property
+    def prazo_vigencia(self):
+        """Calcula o prazo de vigência como data_vigencia - data atual."""
+        if self.data_vigencia:
+            return (self.data_vigencia - timezone.now().date()).days
+        return None
+
     def __str__(self):
         return f"ARP: {self.numero_arp} - Denominação: ({self.denominacao}) - ID ({self.id})"
 
@@ -117,6 +148,21 @@ class ContratosArpsItens(models.Model):
         self.del_data = timezone.now()
         self.del_usuario = user
         self.save()
+
+    def valor_total(self):
+        if self.valor_unit_reequilibrio_bool:
+            return self.valor_unit_reequilibrio * self.qtd_registrada
+        else:
+            return self.valor_unit_homologado * self.qtd_registrada
+
+    def qtd_saldo(self):
+        qtd_contratada = 0
+        qtd_saldo = self.qtd_registrada - qtd_contratada
+        return qtd_saldo
+    
+    def qtd_saldo_percentual(self):
+        qtd_saldo_percentual = self.qtd_saldo() / self.qtd_registrada
+        return qtd_saldo_percentual
 
     def __str__(self):
         return f"ARP: {self.arp.numero_arp} - Item: ({self.numero_item}) - Produto ({self.produto.produto})"

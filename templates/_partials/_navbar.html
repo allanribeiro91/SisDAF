@@ -5,11 +5,13 @@
         
         <div class="logo-text">
             <span class="sisdaf-title">SisDAF</span>
-            <span class="version-info">SECTICS/MS</span>
+            <span class="version-info">Versão 0.1 - 27/11/2023</span>
         </div>
+        
         <div class="alert-container">  <!-- Contêiner para o alerta -->
             {% include '_partials/_alertas.html' %}  
         </div>
+        
         <div class="unidade-info" >
             <span class="user-label">Unidade DAF</span>
             <span class="user-name" style="text-transform: uppercase;">{{ request.user.usuario_relacionado.alocacao_ativa.unidade }}</span>
@@ -26,10 +28,10 @@
             <a href="{% url 'meusdados' %}">
                 <i class="fas fa-user"></i>
                 &nbsp;Meus Dados</a>
+            <a href="{% url 'sisdaf_ajuda' %}">
+                <i class="fas fa-info-circle"></i>
+                &nbsp;Sobre o SisDAF</a>
             <!-- <a href="">
-                <i class="fas fa-key"></i>
-                &nbsp;Alterar Senha</a>
-            <a href="">
                 <i class="fas fa-history"></i>
                 &nbsp;Meus Logs</a>
             <a href="">

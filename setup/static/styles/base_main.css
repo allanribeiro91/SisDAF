@@ -5,12 +5,12 @@ body, html {
     background-color: #FAFAFA;
 }
 
+
+
 .main-container {
     display: flex;
     height: calc(100vh - 8vh); /* Subtrai a altura da top-bar */
 }
-
-
 
 .content {
     flex-grow: 1;

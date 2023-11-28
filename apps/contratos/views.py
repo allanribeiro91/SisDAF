@@ -1,4 +1,7 @@
 from django.shortcuts import render, redirect
+from django.db.models import Sum, F, Case, When
+from django.db import models
+from django.http import QueryDict
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage
 from django.contrib import auth, messages
@@ -75,14 +78,24 @@ def arp_ficha(request, arp_id=None):
 
         #Passar o objeto Denominação Genérica
         denominacao_id = request.POST.get('denominacao')
+        if denominacao_id == None:
+            denominacao_id = request.POST.get('arp_denominacao_hidden')
         denominacao_instance = DenominacoesGenericas.objects.get(id=denominacao_id)
-        arp_form.instance.denominacao = denominacao_instance
-
+    
         #Passar o objeto Fornecedor
         fornecedor_id = request.POST.get('fornecedor')
         fornecedor_instance =  Fornecedores.objects.get(id=fornecedor_id)
-        arp_form.instance.fornecedor = fornecedor_instance
         
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['denominacao'] = denominacao_instance
+        modificacoes_post['fornecedor'] = fornecedor_instance
+
+        #Criar o formulário com os dados atualizados
+        arp_form = ContratosArpsForm(modificacoes_post, instance=arp_form.instance)
+
         #salvar
         if arp_form.is_valid():
             #Salvar o produto
@@ -93,7 +106,6 @@ def arp_ficha(request, arp_id=None):
             log_id = arp.id
             log_registro_usuario = arp.usuario_registro.dp_nome_completo
             log_registro_data = arp.registro_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
-            print('Usuario: ', log_registro_usuario)
             log_atualizacao_usuario = arp.usuario_atualizacao.dp_nome_completo
             log_atualizacao_data = arp.ult_atual_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
             log_edicoes = arp.log_n_edicoes
@@ -125,18 +137,47 @@ def arp_ficha(request, arp_id=None):
                     'redirect_url': reverse('arp_ficha', args=[arp.id]),
                 })
         else:
+            print("Erro formulário ARP")
+            print(arp_form.errors)
             return JsonResponse({
                     'retorno': 'Erro ao salvar'
                 })
-            print("Erro formulário ARP")
-            print(arp_form.errors)
-    
+            
     #Form ARP
+    valor_total_arp = 0
+    tab_itens_arp = None
     if arp:
         form = ContratosArpsForm(instance=arp)
+        
+        #Itens da ARP
+        tab_itens_arp = ContratosArpsItens.objects.filter(del_status=False, arp_id=arp.id).order_by('numero_item')
+        
+        #Calculando o valor total para cada item
+        tab_itens_arp = tab_itens_arp.annotate(
+            valor_total=Case(
+                When(valor_unit_reequilibrio_bool=True, then=F('valor_unit_reequilibrio') * F('qtd_registrada')),
+                default=F('valor_unit_homologado') * F('qtd_registrada'),
+                output_field=models.FloatField()
+                )
+            )
+        
+        #valores
+        valor_total_arp = tab_itens_arp.aggregate(total=Sum('valor_total'))['total']
+        if valor_total_arp == None:
+            valor_total_arp = 0
+        
+        qtd_registrada_total_arp = tab_itens_arp.aggregate(total=Sum('qtd_registrada'))['total']
+        if qtd_registrada_total_arp == None:
+            qtd_registrada_total_arp = 0
+        
+        qtd_saldo_total_arp = 0
+        for item in tab_itens_arp:
+            qtd_saldo_total_arp += item.qtd_saldo()
+
+        qtd_saldo_total_arp_percentual = qtd_saldo_total_arp / qtd_registrada_total_arp
     else:
         form = ContratosArpsForm()
-            
+
     #Form Item da ARP
     form_item = ContratosArpsItensForm()
 
@@ -146,6 +187,11 @@ def arp_ficha(request, arp_id=None):
         'form': form,
         'form_item': form_item,
         'arp': arp,
+        'tab_itens_arp': tab_itens_arp,
+        'valor_total_arp': valor_total_arp,
+        'qtd_registrada_total_arp': qtd_registrada_total_arp,
+        'qtd_saldo_total_arp': qtd_saldo_total_arp,
+        'qtd_saldo_total_arp_percentual': qtd_saldo_total_arp_percentual,
     })
 
 def arp_delete(request, arp_id=None):   
@@ -171,7 +217,7 @@ def arp_delete(request, arp_id=None):
     except ContratosArps.DoesNotExist:
         return JsonResponse({
             "message": "ARP não encontrada."
-            })  
+            })
 
 def arp_buscar_produtos(request, denominacao=None):
     produtos = ProdutosFarmaceuticos.get_produtos_por_denominacao(denominacao)
@@ -206,7 +252,7 @@ def arp_filtrar(request):
 
     data = []
     for arp in arp_paginados.object_list:
-        print('Denominacao :', arp.denominacao.denominacao),
+        valor_total = arp.valor_total_arp()
         arp_data = {
             'id': arp.id,
             'status': arp.status,
@@ -214,9 +260,11 @@ def arp_filtrar(request):
             'numero_processo_sei': arp.numero_processo_sei,
             'numero_documento_sei': arp.numero_documento_sei,
             'data_publicacao': arp.data_publicacao.strftime('%d/%m/%Y') if arp.data_publicacao else '',
+            'data_vigencia': arp.data_vigencia.strftime('%d/%m/%Y') if arp.data_publicacao else '',
+            'prazo_vigencia': arp.prazo_vigencia if arp.data_publicacao else '',
             'denominacao': arp.denominacao.denominacao,
-            
-            'fornecedor': arp.fornecedor.nome_fantasia
+            'fornecedor': arp.fornecedor.nome_fantasia,
+            'valor_total_arp': valor_total,
         }
         data.append(arp_data)
 
@@ -271,8 +319,8 @@ def arp_exportar(request):
 
         # Adicionar dados da tabela
         for row_num, arp in enumerate(arps, 2):
-            registro_data = arp.registro_data.replace(tzinfo=None)
-            ult_atual_data = arp.ult_atual_data.replace(tzinfo=None)
+            registro_data = arp.registro_data.replace(tzinfo=None).strftime('%d/%m/%Y %H:%M:%S')
+            ult_atual_data = arp.ult_atual_data.replace(tzinfo=None).strftime('%d/%m/%Y %H:%M:%S')
             data_publicacao = arp.data_publicacao
             if data_publicacao:
                 data_publicacao.strftime('%d/%m/%Y')
@@ -320,7 +368,6 @@ def arp_exportar(request):
 
 
 
-
 #ITENS DAS ARPS
 def arp_item_ficha(request, arp_item_id=None):
     if arp_item_id:
@@ -348,16 +395,47 @@ def arp_item_ficha(request, arp_item_id=None):
                     'retorno': 'Não houve mudanças'
                 })
 
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
         #Passar o objeto ARP
-        arp_id = request.POST.get('arp_id')
+        arp_id = request.POST.get('id_arp')
         arp_instance = ContratosArps.objects.get(id=arp_id)
-        item_arp_form.instance.produto = arp_instance
 
         #Passar o objeto Produto Farmacêutico
         produto_id = request.POST.get('produto')
         produto_instance = ProdutosFarmaceuticos.objects.get(id=produto_id)
-        item_arp_form.instance.produto = produto_instance
-        
+
+        #valor unitario homologado
+        valor_homologado_str  = request.POST.get('valor_unit_homologado')
+        valor_homologado_str = valor_homologado_str.replace('R$', '').replace('.', '')
+        valor_homologado_str = valor_homologado_str.replace(',', '.')
+        valor_unit = float(valor_homologado_str)
+
+        #valor unitario reequilibrio
+        valor_reequilibrio_str  = request.POST.get('valor_unit_reequilibrio')
+        print('valor = ', valor_reequilibrio_str)
+        if valor_reequilibrio_str != "":
+            print('teste')
+            valor_reequilibrio_str = valor_reequilibrio_str.replace('R$', '').replace('.', '')
+            valor_reequilibrio_str = valor_reequilibrio_str.replace(',', '.')
+            valor_reequilibrio = float(valor_reequilibrio_str)
+            modificacoes_post['valor_unit_reequilibrio'] = valor_reequilibrio
+
+        #qtd registrada
+        qtd_registrada_str = request.POST.get('qtd_registrada')
+        qtd_registrada_str = qtd_registrada_str.replace('.', '')
+        qtd_registrada_int = int(qtd_registrada_str)
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['arp'] = arp_instance
+        modificacoes_post['produto'] = produto_instance
+        modificacoes_post['valor_unit_homologado'] = valor_unit
+        modificacoes_post['qtd_registrada'] = qtd_registrada_int
+
+        #Criar o formulário com os dados atualizados
+        item_arp_form = ContratosArpsItensForm(modificacoes_post, instance=item_arp_form.instance)
+
         #salvar
         if item_arp_form.is_valid():
             #Salvar o produto
@@ -391,15 +469,15 @@ def arp_item_ficha(request, arp_item_id=None):
                     'log_atualizacao_data': log_atualizacao_data,
                     'log_edicoes': log_edicoes,
                     'novo': novo_item_arp,
-                    'redirect_url': reverse('arp_ficha', args=[item_arp.id]),
+                    'redirect_url': reverse('arp_ficha', args=[item_arp.arp_id]),
                 })
         else:
+            print("Erro formulário Item da ARP")
+            print(item_arp_form.errors)
             return JsonResponse({
                     'retorno': 'Erro ao salvar'
                 })
-            print("Erro formulário ARP")
-            print(arp_form.errors)
-    
+            
     #Form ARP
     if item_arp:
         form_item = ContratosArpsItensForm(instance=item_arp)
@@ -412,3 +490,55 @@ def arp_item_ficha(request, arp_item_id=None):
         'form_item': form_item,
         'item_arp': item_arp,
     })
+
+def arp_item_formulario(request, arp_item_id=None):
+    try:
+        item = ContratosArpsItens.objects.get(id=arp_item_id)
+        print('qtd: ',float(item.qtd_registrada))
+        produto_id = item.produto_id
+        produto_nome = item.produto.produto
+        data = {
+            'id': item.id,
+            'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
+            'log_responsavel_registro': str(item.usuario_atualizacao.dp_nome_completo),
+            'lot_ult_atualizacao': item.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if item.ult_atual_data else '',
+            'log_responsavel_atualizacao': str(item.usuario_atualizacao.dp_nome_completo),
+            'log_edicoes': item.log_n_edicoes,
+            'numero_item': item.numero_item,
+            'tipo_cota': item.tipo_cota,
+            'empate_ficto': item.empate_ficto,
+            'produto': produto_id,
+            'valor_unit_homologado': item.valor_unit_homologado,
+            'valor_unit_reequilibrio_bool': item.valor_unit_reequilibrio_bool,
+            'valor_unit_reequilibrio': item.valor_unit_reequilibrio,
+            'qtd_registrada': item.qtd_registrada,
+            'observacoes': item.observacoes_gerais if item.observacoes_gerais else '',
+        }
+        return JsonResponse(data)
+    except ContratosArpsItens.DoesNotExist:
+        return JsonResponse({'error': 'Item da ARP não encontrada'}, status=404)
+
+def arp_item_delete(request, arp_item_id=None):   
+    try:
+        item_arp = ContratosArpsItens.objects.get(id=arp_item_id)
+        item_arp.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Contratos_ARPs_Itens",
+            item_id=0,
+            item_descricao="Deleção de Itens da ARP.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o Item da ARP (ID {item_arp.id}, Nº Item: {item_arp.numero_item}, Protudo: {item_arp.produto.produto}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Item da ARP deletada com sucesso!"
+            })
+    except ContratosArps.DoesNotExist:
+        return JsonResponse({
+            "message": "Item da ARP não encontrada."
+            })

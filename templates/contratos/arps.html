@@ -1,5 +1,6 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
+{% load humanize %}
 {% block extra_head %}
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="stylesheet" href="{% static '\styles\fornecedores.css' %}">
@@ -119,9 +120,12 @@
                     <th class="col-arp-unidadedaf">Unidade DAF</th>
                     <th class="col-arp-processo-sei">Nº Processo SEI</th>
                     <th class="col-arp-doc-sei">Doc. SEI</th>
-                    <th class="col-arp-data">Data Publicação</th>
+                    <th class="col-arp-data">Publicação</th>
+                    <th class="col-arp-data">Vigência</th>
+                    <th class="col-arp-data">Prazo (dias)</th>
                     <th class="col-arp-denominacao">Denominação</th>
                     <th class="col-arp-fornecedor">Fornecedor</th>
+                    <th class="col-arp-data" style="text-align: center !important;">Valor Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -133,8 +137,11 @@
                     <td class="col-arp-processo-sei">{{ item.numero_processo_sei }}</td>
                     <td class="col-arp-doc-sei">{{ item.numero_documento_sei }}</td>
                     <td class="col-arp-data">{{ item.data_publicacao|date:"d/m/Y" }}</td>
+                    <td class="col-arp-data">{{ item.data_vigencia|date:"d/m/Y" }}</td>
+                    <td class="col-arp-data">{{ item.prazo_vigencia }}</td>
                     <td class="col-arp-denominacao">{{ item.denominacao.denominacao }}</td>
                     <td class="col-arp-fornecedor">{{ item.fornecedor.nome_fantasia }}</td>
+                    <th class="col-arp-valor" style="font-weight: normal; text-align: right !important;">{{ item.valor_total_arp|floatformat:2|intcomma }}</th>
                 </tr>
                 {% endfor %}
             </tbody>

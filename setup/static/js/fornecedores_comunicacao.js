@@ -32,6 +32,19 @@ $('#btnExportarComunicacoes').on('click', function() {
     });
 });
 
+// document.addEventListener('DOMContentLoaded', function() {
+//     const table = document.getElementById('tabComunicacoes');
+//     table.addEventListener('click', function(event) {
+//       const target = event.target;
+//       if (target.tagName === 'TD') {
+//         const row = target.closest('tr');
+//         const comunicacaoId = row.dataset.id;
+//         const fornecedorId = row.dataset.fornecedorId;
+//         openModal(comunicacaoId, fornecedorId);
+//       }
+//     });
+// });
+
 
 // Quando a página é carregada
 document.addEventListener('DOMContentLoaded', function() {
@@ -47,6 +60,17 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('comunicacaoId');
         localStorage.removeItem('id_fornecedor');
     }
+
+    const table = document.getElementById('tabComunicacoes');
+    table.addEventListener('click', function(event) {
+      const target = event.target;
+      if (target.tagName === 'TD') {
+        const row = target.closest('tr');
+        const comunicacaoId = row.dataset.id;
+        const fornecedorId = row.dataset.fornecedorId;
+        openModal(comunicacaoId, fornecedorId);
+      }
+    });
 });
 
 
@@ -125,18 +149,7 @@ document.getElementById('btnSalvarComunicacao').addEventListener('click', functi
 });
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    const table = document.getElementById('tabComunicacoes');
-    table.addEventListener('click', function(event) {
-      const target = event.target;
-      if (target.tagName === 'TD') {
-        const row = target.closest('tr');
-        const comunicacaoId = row.dataset.id;
-        const fornecedorId = row.dataset.fornecedorId;
-        openModal(comunicacaoId, fornecedorId);
-      }
-    });
-});
+
 
 function openModal(comunicacaoId, fornecedorId) {
     console.log(comunicacaoId);

@@ -137,9 +137,16 @@ STATUS_PROAQ = [
 
 STATUS_ARP = [
     ('nao_publicado', "Não Publicado"),
-    ('publicado', "Publicado"),
+    ('vigente', "Vigente"),
+    ('encerrado', "Encerrado"),
     ('cancelado', "Cancelado"),
     ('', 'Não Informado')
+]
+
+STATUS_SISDAF = [
+    ('ativo', "Ativo"),
+    ('inativo', "Inativo"),
+    ('em_desenvolvimento', "Em Desenvolvimento"),
 ]
 
 STATUS_FASE = [

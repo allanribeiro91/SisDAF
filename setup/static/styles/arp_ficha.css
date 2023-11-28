@@ -212,3 +212,30 @@ input[name="processo_sei"]{
 }
 
 
+/*--colunas--*/
+.col-id {
+    width: 4% !important;
+}
+.col-produto {
+    width: 30% !important;
+    text-align: left;
+}
+
+.col-tipo {
+    width: 7% !important;
+    text-align: left;
+}
+
+.col-valor {
+    width: 10% !important;
+    text-align: right;
+}
+
+.col-saldo {
+    width: 8% !important;
+    text-align: right;
+}
+
+table tbody tr:hover {
+    cursor: pointer;
+}

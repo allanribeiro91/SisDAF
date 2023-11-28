@@ -22,7 +22,8 @@ class ContratosArpsForm(forms.ModelForm):
         choices=UNIDADE_DAF3,
         widget=forms.Select(attrs={
             'class': 'form-select',
-            'id': 'unidade_daf',
+            'id': 'arp_unidade_daf',
+            'name': 'unidade_daf',
         }),
         label='Unidade DAF',
         initial='',
@@ -118,7 +119,7 @@ class ContratosArpsForm(forms.ModelForm):
 
 class ContratosArpsItensForm(forms.ModelForm):
     arp = forms.ModelChoiceField(
-        queryset=ContratosArps.objects.none(),
+        queryset=ContratosArps.objects.all(),
         widget=Select2Widget(attrs={
             'class': 'form-select',
             'id': 'arp',
@@ -160,7 +161,7 @@ class ContratosArpsItensForm(forms.ModelForm):
         required=True,
     )
     produto = forms.ModelChoiceField(
-        queryset=ProdutosFarmaceuticos.objects.none(),
+        queryset=ProdutosFarmaceuticos.objects.all(),
         widget=Select2Widget(attrs={
             'class': 'form-select',
             'id': 'arp_produto_farmaceutico',
@@ -209,6 +210,7 @@ class ContratosArpsItensForm(forms.ModelForm):
             'class': 'form-control auto-expand',
             'rows': 1,
             'style': 'padding-top: 10px; height: 80px;',
+            'id': 'arp_observacoes_gerais'
             }),
         required=False,
         label='Observações Gerais'

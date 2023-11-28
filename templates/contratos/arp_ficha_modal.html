@@ -8,7 +8,7 @@
     }
 
     .custom-modal-width.arp {
-        max-width: 80% !important;  /* ou qualquer largura que você desejar */
+        max-width: 90% !important;  /* ou qualquer largura que você desejar */
         font-size: 16px !important;
     }
 
@@ -28,7 +28,7 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="arpProdutoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="itemARPmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width arp" role="document">
         <div class="modal-content arp-height">
             
@@ -95,13 +95,6 @@
                                 <div class="form-floating full-width">
                                     {{ form_item.produto }}
                                     <label>{{ form_item.produto.label }}</label>
-                                    <!-- <select class="form-select" id="arp_produto_farmaceutico" aria-label="Floating label select example" name="produto_farmaceutico">
-                                        <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
-                                        {% for value in produtos %}
-                                        <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ value }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <label for="produto_farmaceutico">Produto Farmacêutico</label> -->
                                 </div>
                             </div>
                         </div>
@@ -149,7 +142,7 @@
                                 
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="arp_valor_reequilibrio" name="arp_valor_reequilibrio" readonly>
-                                    <label for="arp_valor_reequilibrio">Valor Total Contratado</label>
+                                    <label for="arp_valor_reequilibrio">Valor Contratado</label>
                                 </div>
                                 <div class="form-floating mb-3" style="margin-left: 40px;">
                                     <input type="text" class="form-control" id="arp_valor_reequilibrio" name="arp_valor_reequilibrio" readonly>
@@ -157,7 +150,7 @@
                                 </div>
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="arp_valor_reequilibrio" name="arp_valor_reequilibrio" readonly>
-                                    <label for="arp_valor_reequilibrio">Valor se Contratar o Saldo</label>
+                                    <label for="arp_valor_reequilibrio">Valor do Saldo</label>
                                 </div>
                             </div>
                         </div>
@@ -168,12 +161,7 @@
                         <div class="section" style="border: 0px !important;">
                             <h3>Observações gerais</h3>
                             <div class="grid" style="font-size: 14px;">
-                                <!-- <div class="form-floating mb-3 full-width">
-                                    <textarea class="form-control auto-expand" id="arp_observacoes" name="observacoes" rows="1" style="height: 100%;">{{ form.instance.observacoes_gerais|default_if_none:'' }}</textarea>
-                                    <label  for="arp_observacoes">Observações</label><br>    
-                                </div> -->
                                 <div class="form-floating mb-3 full-width">
-                                    <!-- <textarea class="form-control auto-expand" id="arp_observacoes_gerais" name="observacoes_gerais" rows="1" style="padding-top: 10px; height: 120px;">{{ form.instance.observacoes_gerais|default_if_none:'Sem observações.' }}</textarea> -->
                                     {{ form_item.observacoes_gerais }}
                                 </div> 
                             </div>
@@ -184,7 +172,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnDeletarArp" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-primary" id="btnDeletarItemArp" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
                 <button type="button" class="btn btn-primary" id="btnSalvarItemArp" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
             </div>
         </div>
@@ -195,7 +183,7 @@
 <script>
     document.querySelectorAll('.closeModalButton').forEach(button => {
         button.addEventListener('click', function() {
-            $('#arpProdutoModal').modal('hide');
+            $('#itemARPmodal').modal('hide');
         });
     });
     
