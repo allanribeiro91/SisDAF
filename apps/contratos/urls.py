@@ -2,10 +2,10 @@ from django.contrib import admin
 from django.urls import path
 from apps.contratos.views import contratos, arps, contrato_ficha, arp_ficha, arp_buscar_produtos, arp_filtrar, arp_exportar, arp_delete
 from apps.contratos.views import arp_item_ficha, arp_item_formulario, arp_item_delete
+from apps.contratos.views import buscar_arps
 
 urlpatterns = [
-    path('contratos/contrato/ficha/novo/', contrato_ficha, name='contrato_novo'),
-    path('contratos/contratos/', contratos, name='contratos'),
+    
     
     #ATAS DE REGISTRO DE PREÇOS (ARPs)
     path('contratos/arp/exportar/', arp_exportar, name='arp_exportar'),
@@ -22,4 +22,8 @@ urlpatterns = [
     path('contratos/arp/item/ficha/novo/', arp_item_ficha, name='arp_item_novo'),
     path('contratos/arp/item/deletar/<int:arp_item_id>/', arp_item_delete, name='arp_item_delete'),
     
+    #CONTRATOS
+    path('contratos/contrato/ficha/novo/', contrato_ficha, name='contrato_novo'),
+    path('contratos/contratos/', contratos, name='contratos'),
+    path('contratos/buscararps/<str:unidade_daf>/', buscar_arps, name='buscar_arps'),
 ]

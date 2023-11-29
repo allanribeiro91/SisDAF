@@ -2,7 +2,7 @@ from django.db import models
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from setup.choices import STATUS_ARP, UNIDADE_DAF2, TIPO_COTA, MODALIDADE_AQUISICAO, STATUS_FASE
+from setup.choices import STATUS_ARP, UNIDADE_DAF2, TIPO_COTA, MODALIDADE_AQUISICAO, STATUS_FASE, LEI_LICITACAO
 from datetime import timedelta
 from django.utils import timezone
 
@@ -18,6 +18,7 @@ class ContratosArps(models.Model):
 
     #dados administrativos
     unidade_daf = models.TextField(max_length=15, choices=UNIDADE_DAF2, null=False, blank=False)
+    lei_licitacao = models.TextField(default="lei_8666", max_length=15, choices=LEI_LICITACAO, null=False, blank=False)
     numero_processo_sei = models.TextField(max_length=20, null=False, blank=False)
     numero_documento_sei = models.TextField(max_length=10, null=False, blank=False)
     numero_arp = models.TextField(max_length=15, null=False, blank=False)
@@ -166,3 +167,63 @@ class ContratosArpsItens(models.Model):
 
     def __str__(self):
         return f"ARP: {self.arp.numero_arp} - Item: ({self.numero_item}) - Produto ({self.produto.produto})"
+
+class Contratos(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='contrato_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='contrato_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados administrativos
+    unidade_daf = models.TextField(max_length=15, choices=UNIDADE_DAF2, null=False, blank=False)
+    numero_processo_sei = models.CharField(max_length=20, null=False, blank=False)
+    numero_documento_sei = models.CharField(max_length=10, null=False, blank=False)
+    modalidade_aquisicao = models.TextField(default="nao_informado", choices=MODALIDADE_AQUISICAO, null=False, blank=False)
+
+    #contrato
+    lei_licitacao = models.TextField(max_length=15, choices=LEI_LICITACAO, null=False, blank=False)
+    numero_contrato = models.TextField(max_length=15, null=False, blank=False)
+    status = models.CharField(default="nao_informado", max_length=20, choices=STATUS_ARP, null=False, blank=False)
+    data_publicacao = models.DateField(null=True, blank=True)
+
+    #ARP
+    arp = models.ForeignKey(ContratosArps, on_delete=models.DO_NOTHING, related_name='arp_contrato')
+
+    #denominacao genérica
+    denominacao = models.ForeignKey(DenominacoesGenericas, on_delete=models.DO_NOTHING, related_name='denominacao_contrato')
+
+    #fornecedor
+    fornecedor = models.ForeignKey(Fornecedores, on_delete=models.DO_NOTHING, related_name='fornecedor_contrato')
+    
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True)
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='contrato_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(ContratosArps, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+
+    def __str__(self):
+        return f"Contrato: {self.numero_contrato} - Denominação: ({self.denominacao}) - ID ({self.id})"

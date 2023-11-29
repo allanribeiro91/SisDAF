@@ -21,6 +21,7 @@
         </div>
         <div class="tabs">
             <button class="tab-button active" id="fornecedor_ficha_dados_gerais">Dados Gerais</button>
+            <button class="tab-button" id="fornecedor_ficha_dados_gerais">Anotações</button>
         </div>
     </div>
 
@@ -76,143 +77,70 @@
                 <div class="section">
                     <h3>Dados Gerais</h3>
                     <div class="grid" style="font-size: 14px;">
-                        <div class="form-floating">
-                            <select class="form-select" id="porte" aria-label="Floating label select example" name="porte">
-                                <option value="" disabled {% if not form.instance.porte %}selected{% endif %}>Não informado</option>
-                                {% for value, display in lista_cnpj_porte %}
-                                <option value="{{ value }}" {% if form.instance.porte == value %}selected{% endif %}>{{ display }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="floatingSelect">Unidade DAF</label>
+                        <div class="form-floating">                            
+                            {{ form.unidade_daf }}
+                            <label>{{ form.unidade_daf.label }}</label>
                         </div>
-                        <div class="form-floating">
-                            <select class="form-select" id="denominacao" aria-label="Floating label select example" name="denominacao">
-                                <option value="" disabled {% if not form.instance.denominacao %}selected{% endif %}>Selecione uma denominação</option>
-                                {% for id, denominacao, tipo_produto in denominacoes_genericas %}
-                                <option value="{{ id }}" data-tipo_produto="{{ tipo_produto }}" {% if form.instance.denominacao_id == id %}selected{% endif %}>{{ denominacao }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="denominacao">Denominação Genérica</label>
-                        </div>    
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}">
-                            <label for="floatingInput">Nº do Processo SEI</label>
+                        <div class="form-floating">                            
+                            {{ form.lei_licitacao }}
+                            <label>{{ form.lei_licitacao.label }}</label>
                         </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}">
-                            <label for="floatingInput">Nº do Documento SEI</label>
+                        <div class="form-floating">                            
+                            {{ form.modalidade_aquisicao }}
+                            <label>{{ form.modalidade_aquisicao.label }}</label>
                         </div>
-                        <div class="form-floating">
-                            <select class="form-select" id="porte" aria-label="Floating label select example" name="porte">
-                                <option value="" disabled {% if not form.instance.porte %}selected{% endif %}>Não informado</option>
-                                {% for value, display in lista_cnpj_porte %}
-                                <option value="{{ value }}" {% if form.instance.porte == value %}selected{% endif %}>{{ display }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="floatingSelect">Modalidade de Aquisição</label>
+                        <div class="form-floating">                            
+                            {{ form.arp }}
+                            <label>{{ form.arp.label }}</label>
+                        </div>
+                        <div class="form-floating">                            
+                            {{ form.numero_processo_sei }}
+                            <label>{{ form.numero_processo_sei.label }}</label>
+                        </div>
+                        <div class="form-floating">                            
+                            {{ form.numero_documento_sei }}
+                            <label>{{ form.numero_documento_sei.label }}</label>
+                        </div>
+                        <div class="form-floating">                            
+                            {{ form.numero_contrato }}
+                            <label>{{ form.numero_contrato.label }}</label>
+                        </div>
+                        <div class="form-floating">                            
+                            {{ form.status }}
+                            <label>{{ form.status.label }}</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}">
-                            <label for="floatingInput">Nº da ARP</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="data_abertura" name="data_abertura" value="{% if form.data_abertura.value %}{{ form.data_abertura.value|date:'Y-m-d' }}{% endif %}">
+                            <input type="date" class="form-control" id="data_publicacao" name="data_publicacao" value="{% if form.data_abertura.value %}{{ form.data_abertura.value|date:'Y-m-d' }}{% endif %}">
                             <label for="floatingInput">Data da Publicação</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="data_abertura" name="data_abertura" value="{% if form.data_abertura.value %}{{ form.data_abertura.value|date:'Y-m-d' }}{% endif %}">
+                            <input type="date" class="form-control" id="data_vigencia" readonly>
                             <label for="floatingInput">Data de Vigência</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="prazo_vigencia" name="prazo_vigencia" style="width: 125px;" readonly>
+                            <label>Prazo Vigência</label>
                         </div>
                         
                     </div>
-
                     
-
-                </div>
-            </div>
-            
-            <div class="horizontal-sections">
-                <div class="section">
-                    <h3>Fornecedor</h3>
                     <div class="grid" style="font-size: 14px;">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">CNPJ*</label>
+                        <div class="form-floating mb-3" style="min-width: 35%;">
+                            {{ form.denominacao }}
+                            <label>{{ form.denominacao.label }}</label>
+                            <input type="hidden" name="arp_denominacao_hidden" id="arp_denominacao_hidden">
                         </div>
-                        <div class="form-floating">
-                            <select class="form-select" id="porte" aria-label="Floating label select example" name="porte">
-                                <option value="" disabled {% if not form.instance.porte %}selected{% endif %}>Não informado</option>
-                                {% for value, display in lista_cnpj_porte %}
-                                <option value="{{ value }}" {% if form.instance.porte == value %}selected{% endif %}>{{ display }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="floatingSelect">Nome Fantasia</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">Hierarquia</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">Porte</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">Tipo de Direito</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="horizontal-sections">
-                <div class="section">
-                    <h3>Dados do Contrato</h3>
-                    <div class="grid" style="font-size: 14px;">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">Nº do Contrato</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">Nº do Documento SEI</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="data_abertura" name="data_abertura" value="{% if form.data_abertura.value %}{{ form.data_abertura.value|date:'Y-m-d' }}{% endif %}">
-                            <label for="floatingInput">Data da Publicação</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="data_abertura" name="data_abertura" value="{% if form.data_abertura.value %}{{ form.data_abertura.value|date:'Y-m-d' }}{% endif %}">
-                            <label for="floatingInput">Data de Vigência</label>
-                        </div>
-                        <div class="form-floating">
-                            <select class="form-select" id="porte" aria-label="Floating label select example" name="porte">
-                                <option value="" disabled {% if not form.instance.porte %}selected{% endif %}>Não informado</option>
-                                {% for value, display in lista_cnpj_porte %}
-                                <option value="{{ value }}" {% if form.instance.porte == value %}selected{% endif %}>{{ display }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="floatingSelect">Status do Contrato</label>
-                        </div>
-                        
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">Nº de Itens</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">Nº de Parcelas</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">Valor Total R$</label>
+                        <div class="form-floating mb-3" style="min-width: 35%;">
+                            {{ form.fornecedor }}
+                            <label>{{ form.fornecedor.label }}</label>
                         </div>
                         <div class="form-floating mb-3 full-width">
-                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ form.instance.cnpj|default_if_none:'' }}" readonly>
-                            <label for="floatingInput">Fiscal do Contrato</label>
+                            <input type="text" class="form-control" id="ct_fiscal" readonly>
+                            <label for="ct_fiscal">Fiscal do Contrato</label>
                         </div>
-                        
-                        
-                    </div>
+                    </div>  
+                    
+
                 </div>
             </div>
             

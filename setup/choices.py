@@ -139,6 +139,7 @@ STATUS_ARP = [
     ('nao_publicado', "Não Publicado"),
     ('vigente', "Vigente"),
     ('encerrado', "Encerrado"),
+    ('suspenso', "Suspenso"),
     ('cancelado', "Cancelado"),
     ('', 'Não Informado')
 ]
@@ -153,6 +154,12 @@ STATUS_FASE = [
     ('nao_executado', "Não Executado"),
     ('em_execucao', "Em Execução"),
     ('executado', "Executado"),
+]
+
+LEI_LICITACAO = [
+    ('lei_8666', "Lei 8.666/93"),
+    ('lei_14133', "Lei 14.133/21"),
+    ('nao_informado', "Não Informado"),
 ]
 
 CNPJ_HIERARQUIA = {

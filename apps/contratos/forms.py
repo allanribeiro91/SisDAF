@@ -4,7 +4,8 @@ from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import ContratosArps, ContratosArpsItens
-from setup.choices import STATUS_ARP, UNIDADE_DAF3, TIPO_COTA, YES_NO, MODALIDADE_AQUISICAO, STATUS_FASE
+from apps.contratos.models import Contratos
+from setup.choices import STATUS_ARP, UNIDADE_DAF3, TIPO_COTA, YES_NO, MODALIDADE_AQUISICAO, STATUS_FASE, LEI_LICITACAO
 
 # class CustomSelect2Widget_Fornecedor(Select2Widget):
 #     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
@@ -27,6 +28,16 @@ class ContratosArpsForm(forms.ModelForm):
         }),
         label='Unidade DAF',
         initial='',
+        required=True,
+    )
+    lei_licitacao = forms.ChoiceField(
+        choices=LEI_LICITACAO,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id':'arp_lei_licitacao'
+        }),
+        label='Lei de Licitação',
+        initial='nao_informado',
         required=True,
     )
     numero_processo_sei = forms.CharField(
@@ -218,6 +229,137 @@ class ContratosArpsItensForm(forms.ModelForm):
 
     class Meta:
         model = ContratosArpsItens
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
+
+
+class ContratosForm(forms.ModelForm):
+    unidade_daf = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'ct_unidade_daf',
+            'name': 'unidade_daf',
+            'readonly': 'readonly',
+            'style': 'width: 150px'
+        }),
+        label='Unidade DAF',
+        initial='',
+        required=True,
+    )
+    lei_licitacao = forms.ChoiceField(
+        choices=LEI_LICITACAO,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id':'arp_lei_licitacao'
+        }),
+        label='Lei de Licitação',
+        initial='nao_informado',
+        required=True,
+    )
+    modalidade_aquisicao = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'ct_modalidade_aquisicao',
+            'readonly': 'readonly',
+        }),
+        label='Modalidade de Aquisição',
+        initial='',
+    )
+    numero_processo_sei = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control full-width', 
+            'id': 'ct_processo_sei', 
+            'name': 'numero_processo_sei',
+            
+        }),
+        label='Nº Processo SEI',
+        required=True,
+    )
+    numero_documento_sei = forms.CharField(
+        max_length=10,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'ct_documento_sei',
+            'style': 'width: 150px !important;'
+        }),
+        label='Documento SEI',
+        required=True,
+    )
+    numero_contrato = forms.CharField(
+        max_length=15,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'ct_numero_contrato',
+            'name': 'numero_contrato',
+            'style': 'width: 150px !important;'
+        }),
+        label='Nº do Contrato',
+        required=True,
+    )
+    status = forms.ChoiceField(
+        choices=STATUS_ARP,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id':'ct_status'
+        }),
+        label='Status',
+        initial='',
+        required=True,
+    )
+    data_publicacao = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+        }),
+        required=False,
+        label='Data Publicação'
+    )
+    arp = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'ct_arp',
+            'readonly': 'readonly',
+            'style': 'width: 150px'
+        }),
+        label='Nº da ARP',
+        initial='',
+    )
+    denominacao = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'ct_denominacao',
+            'readonly': 'readonly',
+        }),
+        label='Denominação Genérica',
+        initial='',
+    )
+    fornecedor = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'ct_fornecedor',
+            'readonly': 'readonly',
+        }),
+        label='Fornecedor',
+        initial='',
+    )
+    
+    
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control auto-expand',
+            'rows': 1,
+            'style': 'padding-top: 10px; height: 120px;',
+            }),
+        required=False,
+        label='Observações Gerais'
+    )
+
+    class Meta:
+        model = ContratosArps
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):

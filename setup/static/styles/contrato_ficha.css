@@ -98,6 +98,7 @@
 .grid {
     display: flex;
     justify-content: flex-start;  /* Alinha os itens à esquerda */
+    
     /*align-items: center;  /* Alinha os itens verticalmente */
     flex-wrap: wrap;  /* Permite que os itens ocupem várias linhas */
     gap: 10px;  /* Espaçamento entre os itens */

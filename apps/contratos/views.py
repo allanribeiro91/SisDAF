@@ -9,7 +9,7 @@ from apps.main.models import CustomLog
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import ContratosArps, ContratosArpsItens
-from apps.contratos.forms import ContratosArpsForm, ContratosArpsItensForm
+from apps.contratos.forms import ContratosArpsForm, ContratosArpsItensForm, ContratosForm
 from setup.choices import UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
@@ -27,10 +27,23 @@ tz = pytz.timezone("America/Sao_Paulo")
 
 #CONTRATOS
 def contratos(request):
-    return render(request, 'contratos/contratos.html')
+    lista_modalidades = [('nao_informado', 'Não Informado')] + MODALIDADE_AQUISICAO
+    conteudo = {
+        'lista_unidadesdaf': UNIDADE_DAF2,
+        'lista_modalidades': lista_modalidades,
+    }
+    return render(request, 'contratos/contratos.html', conteudo)
 
 def contrato_ficha(request):
-    return render(request, 'contratos/contrato_ficha.html')
+    form = ContratosForm()
+    return render(request, 'contratos/contrato_ficha.html', {
+        'form': form,
+    })
+
+def buscar_arps(request, unidade_daf=None):
+    arps = ContratosArps.objects.filter(del_status=False, unidade_daf=unidade_daf).order_by('numero_arp')
+    arps_list = list(arps.values('id', 'numero_arp'))  # Convertendo para uma lista de dicionários
+    return JsonResponse({'arps': arps_list})
 
 
 
@@ -146,6 +159,9 @@ def arp_ficha(request, arp_id=None):
     #Form ARP
     valor_total_arp = 0
     tab_itens_arp = None
+    qtd_registrada_total_arp = 0
+    qtd_saldo_total_arp = 0
+    qtd_saldo_total_arp_percentual = 0
     if arp:
         form = ContratosArpsForm(instance=arp)
         
