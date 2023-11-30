@@ -14,7 +14,7 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="contratoNovoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="contratoNovoModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width" role="document">
         <div class="modal-content novo-contrato">
             
@@ -78,9 +78,9 @@
             
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
-                <a href="{% url 'contrato_novo' %}" style="text-decoration: none;">
+                <!-- <a href="{% url 'contrato_novo' %}" style="text-decoration: none;"> -->
                     <button type="button" class="btn btn-primary" id="inserirNovoContrato" style="background-color: rgb(18, 134, 34); border-color: rgb(18, 134, 34);">Inserir Contrato</button>
-                </a>
+                <!-- </a> -->
             </div>
         </div>
     </div>
@@ -90,7 +90,7 @@
 <script>
     document.querySelectorAll('.closeModalButton').forEach(button => {
         button.addEventListener('click', function() {
-            $('#tagsModal').modal('hide');
+            $('#contratoNovoModal').modal('hide');
         });
     });
 </script>

@@ -8,9 +8,9 @@ from django.contrib import auth, messages
 from apps.main.models import CustomLog
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from apps.contratos.models import ContratosArps, ContratosArpsItens
+from apps.contratos.models import ContratosArps, ContratosArpsItens, Contratos
 from apps.contratos.forms import ContratosArpsForm, ContratosArpsItensForm, ContratosForm
-from setup.choices import UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
+from setup.choices import UNIDADE_DAF, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
 from django.utils import timezone
@@ -27,22 +27,115 @@ tz = pytz.timezone("America/Sao_Paulo")
 
 #CONTRATOS
 def contratos(request):
-    lista_modalidades = [('nao_informado', 'Não Informado')] + MODALIDADE_AQUISICAO
+    lista_modalidades = [('', '')] + MODALIDADE_AQUISICAO
+    lista_unidadesdaf = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
     conteudo = {
-        'lista_unidadesdaf': UNIDADE_DAF2,
+        'lista_unidadesdaf': lista_unidadesdaf,
         'lista_modalidades': lista_modalidades,
     }
     return render(request, 'contratos/contratos.html', conteudo)
 
-def contrato_ficha(request):
+def contrato_ficha(request, id_contrato=None):
+    if id_contrato:
+        contrato = Contratos.objects.get(id=id_contrato)
+    else:
+        contrato = None
+
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if contrato:
+            contrato_form = ContratosForm(request.POST, instance=contrato)
+            novo_contrato = False
+        else:
+            contrato_form = ContratosForm(request.POST)
+            novo_contrato = True
+
+        #Verificar se houve alteração no formulário
+        if not contrato_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+
+        #Passar o objeto Denominação Genérica
+        denominacao_id = request.POST.get('denominacao')
+        denominacao_instance = DenominacoesGenericas.objects.get(id=denominacao_id)
+    
+        #Passar o objeto Fornecedor
+        fornecedor_id = request.POST.get('fornecedor')
+        fornecedor_instance =  Fornecedores.objects.get(id=fornecedor_id)
+
+        #Passar a ARP
+        modalidade = request.POST.get('modalidade_aquisicao')
+        if modalidade == 'pregao_comarp':
+            arp_id = request.POST.get('arp')
+            arp_instance = ContratosArps.objects.get(id=arp_id)
+
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['denominacao'] = denominacao_instance
+        modificacoes_post['fornecedor'] = fornecedor_instance
+        modificacoes_post['arp'] = arp_instance
+
+        #Criar o formulário com os dados atualizados
+        contrato_form = ContratosForm(modificacoes_post, instance=contrato_form.instance)
+
+        #salvar
+        if contrato_form.is_valid():
+            #Salvar o produto
+            contrato = contrato_form.save(commit=False)
+            contrato.save(current_user=request.user.usuario_relacionado)
+            
+            #logs
+            log_id = contrato.id
+            log_registro_usuario = contrato.usuario_registro.dp_nome_completo
+            log_registro_data = contrato.registro_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
+            log_atualizacao_usuario = contrato.usuario_atualizacao.dp_nome_completo
+            log_atualizacao_data = contrato.ult_atual_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
+            log_edicoes = contrato.log_n_edicoes
+
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Contratos_Contratos",
+                item_id=0,
+                item_descricao="Salvar edição de Contrato.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o Contrato (ID {contrato.id}, Número do Contrato: {contrato.numero_contrato}, Denominação: {contrato.denominacao.denominacao}) em {current_date_str}."
+            )
+            log_entry.save()
+
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'log_id': log_id,
+                    'log_registro_usuario': log_registro_usuario,
+                    'log_registro_data': log_registro_data,
+                    'log_atualizacao_usuario': log_atualizacao_usuario,
+                    'log_atualizacao_data': log_atualizacao_data,
+                    'log_edicoes': log_edicoes,
+                    'novo': novo_contrato,
+                    'redirect_url': reverse('contrato_ficha', args=[contrato.id]),
+                })
+        else:
+            print("Erro formulário Contrato")
+            print(contrato_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+
     form = ContratosForm()
     return render(request, 'contratos/contrato_ficha.html', {
         'form': form,
     })
 
 def buscar_arps(request, unidade_daf=None):
-    arps = ContratosArps.objects.filter(del_status=False, unidade_daf=unidade_daf).order_by('numero_arp')
-    arps_list = list(arps.values('id', 'numero_arp'))  # Convertendo para uma lista de dicionários
+    arps = ContratosArps.objects.filter(del_status=False, unidade_daf=unidade_daf, status='vigente').order_by('numero_arp')
+    arps_list = list(arps.values('id', 'numero_arp', 'denominacao', 'fornecedor'))  # Convertendo para uma lista de dicionários
     return JsonResponse({'arps': arps_list})
 
 
@@ -53,7 +146,7 @@ def arps(request):
     tab_arps = ContratosArps.objects.all().filter(del_status=False).order_by('-data_publicacao')
     denominacoes = DenominacoesGenericas.objects.values_list('id', 'denominacao')
     fornecedores = Fornecedores.objects.values_list('nome_fantasia', flat=True).distinct().order_by('nome_fantasia')
-    unidades_daf = [item for item in UNIDADE_DAF2 if item[0] != 'nao_informado']
+    unidades_daf = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
     conteudo = {
         'lista_status': STATUS_ARP,
         'lista_unidadesdaf': unidades_daf,
@@ -190,7 +283,8 @@ def arp_ficha(request, arp_id=None):
         for item in tab_itens_arp:
             qtd_saldo_total_arp += item.qtd_saldo()
 
-        qtd_saldo_total_arp_percentual = qtd_saldo_total_arp / qtd_registrada_total_arp
+        if qtd_saldo_total_arp > 0:
+            qtd_saldo_total_arp_percentual = qtd_saldo_total_arp / qtd_registrada_total_arp
     else:
         form = ContratosArpsForm()
 
@@ -381,7 +475,11 @@ def arp_exportar(request):
         response.write(output.getvalue())
         return response
 
-
+def arp_buscar_dados_sei(request, id_arp=None):
+    arp = ContratosArps.objects.filter(id=id_arp)
+    arp_list = list(arp.values('id', 'numero_processo_sei', 'lei_licitacao'))
+    print(arp_list)
+    return JsonResponse({'arp': arp_list})
 
 
 #ITENS DAS ARPS

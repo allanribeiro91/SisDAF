@@ -35,7 +35,7 @@ TIPO_PRODUTO = [
 ]
 
 UNIDADE_DAF = [
-    ('', '--- Selecione ---'),  # Opção vazia
+    ('', 'Não Informado'),  # Opção vazia
     ('cgafb', "CGAFB"),
     ('cgafme', "CGAFME"),
     ('cgceaf', "CGCEAF"),

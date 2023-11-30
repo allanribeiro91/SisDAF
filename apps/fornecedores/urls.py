@@ -4,6 +4,7 @@ from apps.fornecedores.views import fornecedores, fornecedores_filtro, fornecedo
 from apps.fornecedores.views import fornecedores_faq, fornecedor_faq_ficha, fornecedor_faq_filtrar_dados, fornecedor_faq_delete, fornecedores_faq_exportar
 from apps.fornecedores.views import fornecedor_representante_delete, fornecedores_representantes, representante_dados
 from apps.fornecedores.views import fornecedor_representantes_exportar, fornecedor_comunicacao_delete, fornecedores_comunicacoes, comunicacao_dados, fornecedor_usuarios_por_unidade, fornecedor_comunicacao_exportar
+from apps.fornecedores.views import fornecedores_buscar
 
 urlpatterns = [
 
@@ -29,6 +30,7 @@ urlpatterns = [
     path('fornecedores/usuarios_unidadedaf/<str:unidade>/', fornecedor_usuarios_por_unidade, name='fornecedor_usuarios_por_unidade'),
 
     #DADOS DO FORNECEDOR
+    path('fornecedores/buscarfornecedores/', fornecedores_buscar, name='fornecedores_buscar'),
     path('fornecedores/ficha/deletar/<int:fornecedor_id>/', fornecedor_delete, name='fornecedor_delete'),
     path('fornecedores/ficha/filtrar_dados', fornecedor_ficha_filtrar_dados, name='fornecedor_ficha_filtrar_dados'),
     path('fornecedores/ficha/<int:fornecedor_id>/', fornecedor_ficha, name='fornecedor_ficha'),

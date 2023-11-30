@@ -1,4 +1,44 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const select_unidade_daf = document.getElementById('arp_unidade_daf');
+    const select_denominacao = document.getElementById('arp_denominacao');
+
+    select_unidade_daf.addEventListener('change', function(){
+        if (select_unidade_daf.value != '') {
+            ativarDenominacaoGenerica('habilitar')
+            buscarDenominacoes(select_unidade_daf.value)
+        } else {
+            ativarDenominacaoGenerica('desabilitar')
+        }
+    })
+
+    function ativarDenominacaoGenerica(valor) {
+        if (valor == 'habilitar') {
+            select_denominacao.removeAttribute('disabled');
+        } else {
+            select_denominacao.setAttribute('disabled', 'disabled');
+            select_denominacao.value = '';
+        }
+    }
+
+    function buscarDenominacoes(unidadeDaf) {
+        const url = `/produtosdaf/buscardenominacoes/${unidadeDaf}/`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                select_denominacao.innerHTML = '<option value=""></option>';
+
+                data.denominacoes_list.forEach(denominacao => {
+                    const option = document.createElement('option');
+                    option.value = denominacao.id;
+                    option.textContent = denominacao.denominacao + " (ID: " + denominacao.id + ")";
+                    select_denominacao.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Erro ao buscar Denominações:', error));
+    }
+    
+    
+    
     ajustarCampoDenominacao();
     
     var itensRegistrados = [];
@@ -45,13 +85,16 @@ function ajustarCampoDenominacao() {
     var tabelaItens = document.getElementById('tabItensARP');
     var linhasTabela = tabelaItens.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
     var campoDenominacao = document.getElementById('arp_denominacao');
-    
+    var campoUnidadeDaf = document.getElementById('arp_unidade_daf');
 
     // Verifica se a tabela tem 1 ou mais linhas (excluindo a linha do valor total)
     if (linhasTabela.length > 1) {
+        campoUnidadeDaf.setAttribute('disabled', 'disabled');
         campoDenominacao.setAttribute('disabled', 'disabled');
         document.getElementById('arp_denominacao_hidden').value = campoDenominacao.value;
     } else {
+        
+        campoUnidadeDaf.removeAttribute('disabled');
         campoDenominacao.removeAttribute('disabled');
     }
 }

@@ -703,6 +703,19 @@ def exportar_denominacoes(request):
         response.write(output.getvalue())
         return response
 
+@login_required
+def denominacoes_buscar(request, unidade_daf=None):
+    if unidade_daf:
+        print('Buscando denominações para a unidade:', unidade_daf)
+        denominacoes = [d for d in DenominacoesGenericas.objects.all() if unidade_daf in d.componentes_af]
+    else:
+        denominacoes = DenominacoesGenericas.objects.filter(del_status=False).order_by('denominacao')
+
+    # Construindo a lista de dicionários manualmente
+    denominacoes_list = [{'id': d.id, 'denominacao': d.denominacao} for d in denominacoes]
+
+    return JsonResponse({'denominacoes_list': denominacoes_list})
+
 
 
 

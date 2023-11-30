@@ -341,7 +341,10 @@ def fornecedores_exportar(request):
         response.write(output.getvalue())
         return response
     
-
+def fornecedores_buscar(request):
+    fornecedores = Fornecedores.objects.filter(del_status=False).order_by('nome_fantasia')
+    fornecedores_list = list(fornecedores.values('id', 'cnpj', 'nome_fantasia'))
+    return JsonResponse({'fornecedores_list': fornecedores_list})
 
 
 
@@ -811,6 +814,9 @@ def fornecedor_representantes_exportar(request, id_fornecedor):
     response['Content-Disposition'] = 'attachment; filename="exportar_fornecedores.xlsx"'
     response.write(output.getvalue())
     return response
+
+
+
 
 
 #FORNECEDORES COMUNICACOES

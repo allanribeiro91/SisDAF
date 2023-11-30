@@ -5,7 +5,9 @@ from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import ContratosArps, ContratosArpsItens
 from apps.contratos.models import Contratos
-from setup.choices import STATUS_ARP, UNIDADE_DAF3, TIPO_COTA, YES_NO, MODALIDADE_AQUISICAO, STATUS_FASE, LEI_LICITACAO
+from setup.choices import STATUS_ARP, UNIDADE_DAF, TIPO_COTA, YES_NO, MODALIDADE_AQUISICAO, STATUS_FASE, LEI_LICITACAO
+
+UNIDADE_DAF = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
 
 # class CustomSelect2Widget_Fornecedor(Select2Widget):
 #     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
@@ -20,7 +22,7 @@ from setup.choices import STATUS_ARP, UNIDADE_DAF3, TIPO_COTA, YES_NO, MODALIDAD
 
 class ContratosArpsForm(forms.ModelForm):
     unidade_daf = forms.ChoiceField(
-        choices=UNIDADE_DAF3,
+        choices=UNIDADE_DAF,
         widget=forms.Select(attrs={
             'class': 'form-select',
             'id': 'arp_unidade_daf',
@@ -93,7 +95,8 @@ class ContratosArpsForm(forms.ModelForm):
         queryset=DenominacoesGenericas.objects.all().order_by('denominacao'),
         widget=Select2Widget(attrs={
             'class': 'form-select', 
-            'id': 'arp_denominacao', 
+            'id': 'arp_denominacao',
+            'disabled': True, 
         }),
         label='Denominação Genérica',
         empty_label='Selecione uma denominação genérica',
@@ -243,7 +246,8 @@ class ContratosForm(forms.ModelForm):
             'id': 'ct_unidade_daf',
             'name': 'unidade_daf',
             'readonly': 'readonly',
-            'style': 'width: 150px'
+            'style': 'width: 150px',
+            'type': 'hidden',
         }),
         label='Unidade DAF',
         initial='',
@@ -253,7 +257,8 @@ class ContratosForm(forms.ModelForm):
         choices=LEI_LICITACAO,
         widget=forms.Select(attrs={
             'class': 'form-select',
-            'id':'arp_lei_licitacao'
+            'id':'arp_lei_licitacao',
+            'name': 'lei_licitacao',
         }),
         label='Lei de Licitação',
         initial='nao_informado',
@@ -264,6 +269,7 @@ class ContratosForm(forms.ModelForm):
             'class': 'form-control',
             'id': 'ct_modalidade_aquisicao',
             'readonly': 'readonly',
+            'type': 'hidden',
         }),
         label='Modalidade de Aquisição',
         initial='',
@@ -323,16 +329,20 @@ class ContratosForm(forms.ModelForm):
             'class': 'form-control',
             'id': 'ct_arp',
             'readonly': 'readonly',
-            'style': 'width: 150px'
+            'style': 'width: 150px',
+            'type': 'hidden',
+            'name': 'arp',
         }),
         label='Nº da ARP',
         initial='',
     )
-    denominacao = forms.CharField(
-        widget=forms.TextInput(attrs={
+    denominacao = forms.ModelChoiceField(
+        queryset=DenominacoesGenericas.objects.all().order_by('denominacao'),
+        widget=Select2Widget(attrs={
             'class': 'form-control',
             'id': 'ct_denominacao',
             'readonly': 'readonly',
+            'type': 'hidden',
         }),
         label='Denominação Genérica',
         initial='',
@@ -342,12 +352,11 @@ class ContratosForm(forms.ModelForm):
             'class': 'form-control',
             'id': 'ct_fornecedor',
             'readonly': 'readonly',
+            'type': 'hidden',
         }),
         label='Fornecedor',
         initial='',
     )
-    
-    
     observacoes_gerais = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-control auto-expand',
@@ -359,7 +368,7 @@ class ContratosForm(forms.ModelForm):
     )
 
     class Meta:
-        model = ContratosArps
+        model = Contratos
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):

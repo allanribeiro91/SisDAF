@@ -58,6 +58,22 @@ class DenominacoesGenericas(models.Model):
         self.del_data = timezone.now()
         self.del_usuario = user
         self.save()
+    
+    @property
+    def componentes_af(self):        
+        unidades = []
+        if self.unidade_basico:
+            unidades.append("cgafb")
+        if self.unidade_especializado:
+            unidades.append("cgceaf")
+        if self.unidade_estrategico:
+            unidades.append("cgafme")
+        if self.unidade_farm_popular:
+            unidades.append("cgfp")
+        if self.hospitalar:
+            unidades.append("hospitalar")
+        return unidades
+
 
     def __str__(self):
         return f"{self.denominacao} (ID: {self.id})"
