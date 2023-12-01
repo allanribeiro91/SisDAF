@@ -10,15 +10,24 @@ document.addEventListener("DOMContentLoaded", function() {
     const fornecedor = this.getElementById('ct_fornecedor')
     const fornecedor_display = this.getElementById('ct_fornecedor_display')
     const processoSei = this.getElementById('ct_processo_sei')
-    const lei_licitacao = this.getElementById('arp_lei_licitacao')
+    const lei_licitacao = this.getElementById('ct_lei_licitacao')
+    const lei_licitacao_valor = this.getElementById('ct_lei_licitacao_valor')
     const data_publicacao = this.getElementById('data_publicacao')
     const data_vigencia = this.getElementById('data_vigencia')
     const prazo_vigencia = this.getElementById('prazo_vigencia')
     const botao_salvar_contrato = this.getElementById('btnSalvarContrato')
     const contrato_id = this.getElementById('id_contrato').value
+    const botao_deletar_contrato = this.getElementById('btnDeletarContrato')
     
     //Carregar dados
     carregarDados();
+
+    //Verificar se há mensagem de salvamento com sucesso
+    if (localStorage.getItem('showSuccessMessage') === 'true') {
+        sweetAlert('Contrato salvo com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('showSuccessMessage');
+        atualizarDatas();
+    }
     
     //Formatação dos dados
     $('#ct_processo_sei').mask('00000.000000/0000-00');
@@ -27,11 +36,36 @@ document.addEventListener("DOMContentLoaded", function() {
     //Atualizar data de vigência e prazo
     data_publicacao.addEventListener('change', atualizarDatas);
 
+    //Lei de Licitação
+    lei_licitacao.addEventListener('change', leiLicitacao)
+
     //Salvar Contrato 
     botao_salvar_contrato.addEventListener('click', function(event){
         event.preventDefault();
         salvarContrato();
     })
+
+    //Deletar Contrato
+    botao_deletar_contrato.addEventListener('click', deletarContrato)
+    
+
+    function deletarContrato(){
+        const url_apos_delete = "/contratos/contratos/";
+
+        //Trata-se de um novo registro que ainda não foi salvo
+        if (!contrato_id) { 
+            window.location.href = url_apos_delete;
+            return; // Sai da função
+        }
+        
+        //parâmetros para deletar
+        const mensagem = "Deletar Contrato."
+        const url_delete = "/contratos/contrato/deletar/" + contrato_id + "/"
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    }  
 
     //Funções
     function carregarDados() {
@@ -72,7 +106,8 @@ document.addEventListener("DOMContentLoaded", function() {
             fornecedor.value = fornecedor_value;
             fornecedor_display.value = fornecedor_text;
         }
-
+        
+        localStorage.clear();
     }
     
     function buscarDadosSeiArp(id_arp) {
@@ -84,10 +119,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 const arpInfo = data.arp[0]
                 processoSei.value = arpInfo.numero_processo_sei;
                 lei_licitacao.value = arpInfo.lei_licitacao;
+                lei_licitacao_valor.value = arpInfo.lei_licitacao;
                 processoSei.setAttribute('readonly', true);
                 lei_licitacao.setAttribute('disabled', 'disabled');                
             })
             .catch(error => console.error('Erro ao buscar ARP:', error));
+    }
+
+    function leiLicitacao() {
+        lei_licitacao_valor.value = lei_licitacao.value;
     }
 
     function atualizarDatas() {
@@ -185,6 +225,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function verificar_campos_contrato() {
         const campos = [
+            { id: 'ct_lei_licitacao_valor', mensagem: 'Informe a Lei de Licitação!' },
             { id: 'ct_processo_sei', mensagem: 'Informe o Processo SEI!' },
             { id: 'ct_documento_sei', mensagem: 'Informe o Documento SEI!' },
             { id: 'ct_numero_contrato', mensagem: 'Informe o Número do Contrato!' },

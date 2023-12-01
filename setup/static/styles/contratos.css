@@ -270,32 +270,38 @@ table tbody tr:hover {
 
 
 /*--colunas--*/
+/*--colunas--*/
 .col-id {
     width: 2% !important;
 }
-.col-cnpj {
+.col-status {
     width: 6% !important;
     text-align: left !important;
 }
-.col-fornecedor {
-    width: 38% !important;
+.col-unidadedaf {
+    width: 6% !important;
     text-align: left !important;
 }
-.col-hierarquia {
+.col-modalidade {
+    width: 8% !important;
+    text-align: left !important;
+}
+
+.col-contrato {
     width: 6% !important;
     text-align: left !important;
 }
 
-.col-porte {
-    width: 6% !important;
+.col-data {
+    width: 5% !important;
     text-align: left !important;
 }
-.col-direito {
-    width: 6% !important;
+.col-denominacao {
+    width: 20% !important;
     text-align: left !important;
 }
-.col-uf {
-    width: 3% !important;
+.col-fornecedor {
+    width: 20% !important;
     text-align: left !important;
 }
 

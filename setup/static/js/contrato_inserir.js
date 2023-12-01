@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectedText = arpSelect.options[arpSelect.selectedIndex].text;
                 localStorage.setItem('memoria_numeroARP_value', (arpSelect.value))
                 localStorage.setItem('memoria_numeroARP_text', selectedText)
+            } else {
+                localStorage.setItem('memoria_numeroARP_value', '')
+                localStorage.setItem('memoria_numeroARP_text', '')
             }
             
 

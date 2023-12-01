@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from apps.contratos.views import contratos, arps, contrato_ficha, arp_ficha, arp_buscar_produtos, arp_filtrar, arp_exportar, arp_delete
 from apps.contratos.views import arp_item_ficha, arp_item_formulario, arp_item_delete
-from apps.contratos.views import buscar_arps, arp_buscar_dados_sei
+from apps.contratos.views import buscar_arps, arp_buscar_dados_sei, buscar_contrato, contrato_delete
 
 urlpatterns = [
     
@@ -23,8 +23,11 @@ urlpatterns = [
     path('contratos/arp/item/deletar/<int:arp_item_id>/', arp_item_delete, name='arp_item_delete'),
     
     #CONTRATOS
+    path('contratos/contrato/ficha/<int:id_contrato>/', contrato_ficha, name='contrato_ficha'),
     path('contratos/contrato/ficha/novo/', contrato_ficha, name='contrato_novo'),
+    path('contratos/contrato/deletar/<int:id_contrato>/', contrato_delete, name='contrato_delete'),
     path('contratos/contratos/', contratos, name='contratos'),
     path('contratos/buscararps/<str:unidade_daf>/', buscar_arps, name='buscar_arps'),
+    path('contratos/buscarcontrato/<int:id_contrato>/', buscar_contrato, name='buscar_contrato'),
     
 ]

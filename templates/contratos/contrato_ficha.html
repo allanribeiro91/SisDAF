@@ -20,17 +20,17 @@
             </a>
         </div>
         <div class="tabs">
-            <button class="tab-button active" id="fornecedor_ficha_dados_gerais">Dados Gerais</button>
-            <button class="tab-button" id="fornecedor_ficha_dados_gerais">Anotações</button>
+            <button class="tab-button active" id="contrato_ficha_dados_gerais">Dados Gerais</button>
+            <button class="tab-button" id="contrato_ficha_dados_gerais">Anotações</button>
         </div>
     </div>
 
     <div class="area-scroll">
         <!-- form contratos -->
-            <form id="contratoForm" method="POST" data-post-url="{% if form.instance.id %}{% url 'fornecedor_ficha' form.instance.id %}{% else %}{% url 'fornecedor_novo' %}{% endif %}">
+            <form id="contratoForm" method="POST">
             {% csrf_token %}
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#fornecedor_delete" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                <button type="button" class="btn btn-danger" id="btnDeletarContrato" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
                     <i class="fas fa-trash-alt"></i>
                     Deletar
                 </button>
@@ -46,27 +46,27 @@
                     <h3>Log</h3>
                     <div class="grid-log">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_edicoes" id="id_contrato" name="id_fornecedor" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                            <input type="text" class="form-control log_edicoes" id="id_contrato" name="id_contrato" readonly value="{{ form.instance.id|default_if_none:'' }}">
                             <label for="floatingInput">ID</label>
                         </div>                        
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ fornecedor.registro_data|date:"d/m/Y H:i:s" }}">
+                            <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ contrato.registro_data|date:"d/m/Y H:i:s" }}">
                             <label for="floatingInput">Data do Registro</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ fornecedor.usuario_registro.dp_nome_completo }}">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ contrato.usuario_registro.dp_nome_completo }}">
                             <label for="floatingInput">Responsável pelo Registro</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ fornecedor.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ contrato.ult_atual_data|date:"d/m/Y H:i:s" }}">
                             <label for="floatingInput">Última Atualização</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ fornecedor.usuario_atualizacao.dp_nome_completo }}">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ contrato.usuario_atualizacao.dp_nome_completo }}">
                             <label for="floatingInput">Responsável Atualização</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" name="log_edicoes" readonly value="{{ fornecedor.log_n_edicoes }}">
+                            <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" name="log_edicoes" readonly value="{{ contrato.log_n_edicoes }}">
                             <label for="floatingInput">Nº Edições</label>
                         </div>
                     </div>
@@ -79,21 +79,23 @@
                     <div class="grid" style="font-size: 14px;">
                         <div class="form-floating">                            
                             {{ form.unidade_daf }}
-                            <input type="text" id="ct_unidade_daf_display" class="form-control" style="width: 130px;" readonly>
+                            <input type="text" id="ct_unidade_daf_display" class="form-control" style="width: 130px;" value="{% if form.unidade_daf.value %}{{ form.instance.get_unidade_daf_display }}{% endif %}" readonly>
+
                             <label>Unidade DAF</label>
                         </div>
                         <div class="form-floating">                            
                             {{ form.lei_licitacao }}
-                            <label>{{ form.lei_licitacao.label }}</label>
+                            <label>Lei de Licitação</label>
+                            <input type="hidden" id="ct_lei_licitacao_valor" name="ct_lei_licitacao_valor" class="form-control" style="width: 130px;" value="{% if form.instance.lei_licitacao %}{{ form.instance.lei_licitacao }}{% endif %}"  readonly>
                         </div>
                         <div class="form-floating">                            
                             {{ form.modalidade_aquisicao }}
-                            <input type="text" id="ct_modalidade_aquisicao_display" class="form-control" style="width: 200px;" readonly>
+                            <input type="text" id="ct_modalidade_aquisicao_display" class="form-control" style="width: 190px;" value="{% if form.modalidade_aquisicao.value %}{{ form.instance.get_modalidade_aquisicao_display }}{% endif %}" readonly>
                             <label>Modalidade de Aquisição</label>
                         </div>
                         <div class="form-floating">                            
-                            {{ form.arp }}
-                            <input type="text" id="ct_arp_display" class="form-control" style="width: 150px;" readonly>
+                            <input type="hidden" id="ct_arp" name="arp" class="form-control" style="width: 150px;" value="{% if form.instance.arp %}{{ form.instance.arp.id }}{% endif %}" readonly>
+                            <input type="text" id="ct_arp_display" class="form-control" style="width: 140px;" value="{% if form.instance.arp %}{{ form.instance.arp }}{% endif %}" readonly>
                             <label>Nº da ARP</label>
                         </div>
                         <div class="form-floating">                            
@@ -113,15 +115,15 @@
                             <label>{{ form.status.label }}</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="data_publicacao" name="data_publicacao" value="{% if form.data_abertura.value %}{{ form.data_abertura.value|date:'Y-m-d' }}{% endif %}">
+                            <input type="date" class="form-control" id="data_publicacao" name="data_publicacao" value="{% if form.data_publicacao.value %}{{ form.data_publicacao.value|date:'Y-m-d' }}{% endif %}">
                             <label for="floatingInput">Data da Publicação</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="data_vigencia" readonly>
+                            <input type="date" class="form-control" id="data_vigencia" value="{{ contrato.data_vigencia|date:'Y-m-d' }}" readonly>
                             <label for="floatingInput">Data de Vigência</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="prazo_vigencia" name="prazo_vigencia" style="width: 125px;" readonly>
+                            <input type="text" class="form-control" id="prazo_vigencia" name="prazo_vigencia" style="width: 125px;" value="{{ contrato.prazo_vigencia }}"readonly>
                             <label>Prazo Vigência</label>
                         </div>
                         
@@ -129,13 +131,13 @@
                     
                     <div class="grid" style="font-size: 14px;">
                         <div class="form-floating mb-3" style="min-width: 35%;">
-                            {{ form.denominacao }}
-                            <input type="text" id="ct_denominacao_display" class="form-control" readonly>
+                            <input type="hidden" id="ct_denominacao" name="denominacao" class="form-control" value="{% if form.instance.denominacao %}{{ form.instance.denominacao.id }}{% endif %}" readonly>
+                            <input type="text" id="ct_denominacao_display" name="ct_denominacao_display" class="form-control" value="{% if form.instance.denominacao %}{{ form.instance.denominacao }}{% endif %}" readonly>
                             <label>Denominação Genérica</label>
                         </div>
                         <div class="form-floating mb-3" style="min-width: 35%;">
-                            {{ form.fornecedor }}
-                            <input type="text" id="ct_fornecedor_display" class="form-control" readonly>
+                            <input type="hidden" id="ct_fornecedor" name="fornecedor" class="form-control" value="{% if form.instance.fornecedor %}{{ form.instance.fornecedor.id }}{% endif %}" readonly>
+                            <input type="text" id="ct_fornecedor_display" class="form-control" value="{% if form.instance.fornecedor %}{{ form.instance.fornecedor }}{% endif %}" readonly>
                             <label>Fornecedor</label>
                         </div>
                         <div class="form-floating mb-3 full-width">

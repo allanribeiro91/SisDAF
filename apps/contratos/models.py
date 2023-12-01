@@ -191,7 +191,7 @@ class Contratos(models.Model):
     data_publicacao = models.DateField(null=True, blank=True)
 
     #ARP
-    arp = models.ForeignKey(ContratosArps, on_delete=models.DO_NOTHING, related_name='arp_contrato')
+    arp = models.ForeignKey(ContratosArps, on_delete=models.DO_NOTHING, related_name='arp_contrato', null=True, blank=True)
 
     #denominacao genérica
     denominacao = models.ForeignKey(DenominacoesGenericas, on_delete=models.DO_NOTHING, related_name='denominacao_contrato')
@@ -217,13 +217,27 @@ class Contratos(models.Model):
             if user:
                 self.usuario_registro = user
                 self.usuario_atualizacao = user
-        super(ContratosArps, self).save(*args, **kwargs)
+        super(Contratos, self).save(*args, **kwargs)
 
     def soft_delete(self, user):
         self.del_status = True
         self.del_data = timezone.now()
         self.del_usuario = user
         self.save()
+
+    @property
+    def data_vigencia(self):
+        """Calcula a data de vigência como data_publicacao + 365 dias."""
+        if self.data_publicacao:
+            return self.data_publicacao + timedelta(days=365)
+        return None
+
+    @property
+    def prazo_vigencia(self):
+        """Calcula o prazo de vigência como data_vigencia - data atual."""
+        if self.data_vigencia:
+            return (self.data_vigencia - timezone.now().date()).days
+        return None
 
     def __str__(self):
         return f"Contrato: {self.numero_contrato} - Denominação: ({self.denominacao}) - ID ({self.id})"

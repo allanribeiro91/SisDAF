@@ -132,7 +132,7 @@
                 {% for item in tab_arps %}
                 <tr data-id="{{ item.id }}">
                     <td class="col-arp-id">{{ item.id }}</td>
-                    <td class="col-arp-status" style="text-transform: uppercase;">{{ item.status }}</td>
+                    <td class="col-arp-status">{{ item.get_status_display }}</td>
                     <td class="col-arp-unidadedaf" style="text-transform: uppercase;">{{ item.unidade_daf }}</td>
                     <td class="col-arp-processo-sei">{{ item.numero_processo_sei }}</td>
                     <td class="col-arp-doc-sei">{{ item.numero_documento_sei }}</td>

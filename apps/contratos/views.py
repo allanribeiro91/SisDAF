@@ -27,11 +27,16 @@ tz = pytz.timezone("America/Sao_Paulo")
 
 #CONTRATOS
 def contratos(request):
+
     lista_modalidades = [('', '')] + MODALIDADE_AQUISICAO
     lista_unidadesdaf = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
+    
+    tabContratos = Contratos.objects.filter(del_status=False)
+    
     conteudo = {
         'lista_unidadesdaf': lista_unidadesdaf,
         'lista_modalidades': lista_modalidades,
+        'tabContratos': tabContratos,
     }
     return render(request, 'contratos/contratos.html', conteudo)
 
@@ -40,7 +45,7 @@ def contrato_ficha(request, id_contrato=None):
         contrato = Contratos.objects.get(id=id_contrato)
     else:
         contrato = None
-
+    
     #salvar
     if request.method == 'POST':
         #Carregar formulário
@@ -50,7 +55,7 @@ def contrato_ficha(request, id_contrato=None):
         else:
             contrato_form = ContratosForm(request.POST)
             novo_contrato = True
-
+        
         #Verificar se houve alteração no formulário
         if not contrato_form.has_changed():
             return JsonResponse({
@@ -59,6 +64,7 @@ def contrato_ficha(request, id_contrato=None):
 
         #Passar o objeto Denominação Genérica
         denominacao_id = request.POST.get('denominacao')
+        print('Denominação ID: ', denominacao_id)
         denominacao_instance = DenominacoesGenericas.objects.get(id=denominacao_id)
     
         #Passar o objeto Fornecedor
@@ -70,18 +76,24 @@ def contrato_ficha(request, id_contrato=None):
         if modalidade == 'pregao_comarp':
             arp_id = request.POST.get('arp')
             arp_instance = ContratosArps.objects.get(id=arp_id)
+        else:
+            arp_instance = None
 
         #Fazer uma cópia mutável do request.POST
         modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
+        #lei de licitacao
+        lei_licitacao = request.POST.get('ct_lei_licitacao_valor')
 
         #Atualizar os valores no mutable_post
         modificacoes_post['denominacao'] = denominacao_instance
         modificacoes_post['fornecedor'] = fornecedor_instance
         modificacoes_post['arp'] = arp_instance
+        modificacoes_post['lei_licitacao'] = lei_licitacao
 
         #Criar o formulário com os dados atualizados
         contrato_form = ContratosForm(modificacoes_post, instance=contrato_form.instance)
-
+        
         #salvar
         if contrato_form.is_valid():
             #Salvar o produto
@@ -128,16 +140,60 @@ def contrato_ficha(request, id_contrato=None):
                     'retorno': 'Erro ao salvar'
                 })
 
-    form = ContratosForm()
+    if contrato:
+        form = ContratosForm(instance=contrato)
+    else:
+        form = ContratosForm()
+
     return render(request, 'contratos/contrato_ficha.html', {
         'form': form,
+        'contrato': contrato,
     })
+
+def contrato_delete(request, id_contrato=None):   
+    try:
+        contrato = Contratos.objects.get(id=id_contrato)
+        contrato.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Contratos_Contratos",
+            item_id=0,
+            item_descricao="Deleção de Contrato.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o Contrato (ID {contrato.id}, Número: {contrato.numero_contrato}, Denominação: {contrato.denominacao.denominacao}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Contrato deletado com sucesso!"
+            })
+    except ContratosArps.DoesNotExist:
+        return JsonResponse({
+            "message": "Contrato não encontrado."
+            })
 
 def buscar_arps(request, unidade_daf=None):
     arps = ContratosArps.objects.filter(del_status=False, unidade_daf=unidade_daf, status='vigente').order_by('numero_arp')
     arps_list = list(arps.values('id', 'numero_arp', 'denominacao', 'fornecedor'))  # Convertendo para uma lista de dicionários
     return JsonResponse({'arps': arps_list})
 
+def buscar_contrato(request, id_contrato=None):
+    contrato = Contratos.objects.get(id=id_contrato)
+    ct_denominacao_id = contrato.denominacao.id
+    ct_denominacao = str(contrato.denominacao)
+    ct_fornecedor_id = contrato.fornecedor.id
+    ct_fornecedor = str(contrato.fornecedor)
+    contrato_dados = {
+            'denominacao_id': ct_denominacao_id,
+            'denominacao_texto': ct_denominacao,
+            'fornecedor_id': ct_fornecedor_id,
+            'fornecedor_texto': ct_fornecedor,
+        }
+    print(contrato_dados)
+    return JsonResponse({'contrato': contrato_dados})
 
 
 
@@ -656,3 +712,4 @@ def arp_item_delete(request, arp_item_id=None):
         return JsonResponse({
             "message": "Item da ARP não encontrada."
             })
+

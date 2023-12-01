@@ -257,8 +257,7 @@ class ContratosForm(forms.ModelForm):
         choices=LEI_LICITACAO,
         widget=forms.Select(attrs={
             'class': 'form-select',
-            'id':'arp_lei_licitacao',
-            'name': 'lei_licitacao',
+            'id':'ct_lei_licitacao',
         }),
         label='Lei de Licitação',
         initial='nao_informado',
@@ -324,17 +323,18 @@ class ContratosForm(forms.ModelForm):
         required=False,
         label='Data Publicação'
     )
-    arp = forms.CharField(
-        widget=forms.TextInput(attrs={
+    arp = forms.ModelChoiceField(
+        queryset=ContratosArps.objects.all(),
+        widget=Select2Widget(attrs={
             'class': 'form-control',
             'id': 'ct_arp',
             'readonly': 'readonly',
-            'style': 'width: 150px',
             'type': 'hidden',
             'name': 'arp',
         }),
         label='Nº da ARP',
         initial='',
+        required=False,
     )
     denominacao = forms.ModelChoiceField(
         queryset=DenominacoesGenericas.objects.all().order_by('denominacao'),
@@ -347,8 +347,9 @@ class ContratosForm(forms.ModelForm):
         label='Denominação Genérica',
         initial='',
     )
-    fornecedor = forms.CharField(
-        widget=forms.TextInput(attrs={
+    fornecedor = forms.ModelChoiceField(
+        queryset=Fornecedores.objects.all(),
+        widget=Select2Widget(attrs={
             'class': 'form-control',
             'id': 'ct_fornecedor',
             'readonly': 'readonly',
