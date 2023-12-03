@@ -18,7 +18,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const botao_salvar_contrato = this.getElementById('btnSalvarContrato')
     const contrato_id = this.getElementById('id_contrato').value
     const botao_deletar_contrato = this.getElementById('btnDeletarContrato')
-    
+    const botao_nova_parcela = this.getElementById('btnNovaParcela')
+    const modal_inserir_parcela = new bootstrap.Modal(document.getElementById('contratoParcelaModal'))
+    const modal_definir_item_arp = new bootstrap.Modal(document.getElementById('contratoParcelaARP'))
+
     //Carregar dados
     carregarDados();
 
@@ -48,6 +51,8 @@ document.addEventListener("DOMContentLoaded", function() {
     //Deletar Contrato
     botao_deletar_contrato.addEventListener('click', deletarContrato)
     
+    //Inserir Parcela
+    botao_nova_parcela.addEventListener('click', definicao_modal_abrir)
 
     function deletarContrato(){
         const url_apos_delete = "/contratos/contratos/";
@@ -90,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
             arp_display.value = numeroARP_text;
             buscarDadosSeiArp(numeroARP_value);
         } else {
+            if (arp.value == '')
             arp_display.value = "Não se aplica"
         }
 
@@ -248,6 +254,45 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     
         return true;
+    }
+
+    function definicao_modal_abrir() {
+        if (arp_display.value == "Não se aplica") {
+            modal_inserir_parcela.show();
+        } else {
+            
+            modal_definir_item_arp.show();
+            buscarDadosItensARP(arp.value);
+        }
+
+    }
+
+    function buscarDadosItensARP(id_arp) {
+        const url = `/contratos/buscararpsitens/${id_arp}/`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                carregarTabelaItensARP(data.arps_itens)            
+            })
+            .catch(error => console.error('Erro ao buscar ARP:', error));
+    }
+
+    function carregarTabelaItensARP(itensARP) {
+        var tabelaItensArp = $('.itensArp');
+        tabelaItensArp.empty();
+        itensARP.forEach(item => {
+            var row = `
+                <tr data-id-item-arp="${ item.id }">
+                    <td class="col-itemarp-id">${ item.numero_item }</td>
+                    <td class="col-itemarp-tipocota" style="text-transform: capitalize;">${ item.tipo_cota }</td>
+                    <td class="col-itemarp-produto">${ item.produto }</td>
+                    <td class="col-itemarp-qtd">${ item.qtd_registrada.toLocaleString('pt-BR') }</td>
+                    <td class="col-itemarp-qtd">0</td>
+                    <td class="col-itemarp-qtd">${ item.qtd_saldo.toLocaleString('pt-BR') }</td>
+                </tr>
+            `;
+            tabelaItensArp.append(row);
+        });
     }
 
 });

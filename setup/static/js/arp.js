@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const select_unidade_daf = document.getElementById('arp_unidade_daf');
     const select_denominacao = document.getElementById('arp_denominacao');
+    const arp_unidade_daf = document.getElementById('arp_unidade_daf');
+    const arp_unidade_daf_display = document.getElementById('arp_unidade_daf_display');
 
     select_unidade_daf.addEventListener('change', function(){
         if (select_unidade_daf.value != '') {
@@ -10,6 +12,12 @@ document.addEventListener('DOMContentLoaded', function() {
             ativarDenominacaoGenerica('desabilitar')
         }
     })
+
+    arp_unidade_daf.addEventListener('change', unidade_daf_mudanca)
+
+    function unidade_daf_mudanca(){
+        arp_unidade_daf_display.value = arp_unidade_daf.value;
+    }
 
     function ativarDenominacaoGenerica(valor) {
         if (valor == 'habilitar') {

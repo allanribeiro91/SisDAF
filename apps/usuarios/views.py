@@ -86,6 +86,8 @@ def meuslogs_exportar(request):
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Usuário",
+            model='CustomLog',
+            model_id=0,
             item_id=0,
             item_descricao="Exportação da lista de logs (ações) do usuário no SisDAF.",
             acao="Exportação",
@@ -147,6 +149,8 @@ def meusacessos_exportar(request):
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Usuário",
+            model='UserAccessLog',
+            model_id=0,
             item_id=0,
             item_descricao="Exportação da lista de acessos do usuário ao SisDAF.",
             acao="Exportação",

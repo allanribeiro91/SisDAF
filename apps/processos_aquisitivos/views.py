@@ -102,6 +102,8 @@ def proaq_ficha_dados_gerais(request, proaq_id=None):
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Processo Aquisitivo_Dados Gerais",
+                model='ProaqDadosGerais',
+                model_id={proaq_dados_gerais.id},
                 item_id=0,
                 item_descricao="Salvar edição de processo aquisitivo.",
                 acao="Salvar",
@@ -213,6 +215,8 @@ def proaq_ficha_evolucao(request, proaq_id=None):
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Processo Aquisitivo_Evolução",
+            model='ProaqEvolucao',
+            model_id={proaq.id},
             item_id=0,
             item_descricao="Salvou evolução de processo aquisitivo.",
             acao="Salvar",
@@ -313,6 +317,8 @@ def proaq_ficha_tramitacoes(request, tramitacao_id=None, proaq_id=None):
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Processo Aquisitivo_Tramitação",
+                model='ProaqTramitacao',
+                model_id={proaq_tramitacao.id},
                 item_id=0,
                 item_descricao="Salvou tramitação de processo aquisitivo.",
                 acao="Salvar",
@@ -567,6 +573,20 @@ def proaq_exportar(request):
                     tramitacao.data_saida, tramitacao.observacoes, data_exportacao
                 ])
         
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Processo Aquisitivo",
+            model='ProaqDadosGerais',
+            model_id=0,
+            item_id=0,
+            item_descricao="Exportação da lista de processos aquisitivos.",
+            acao="Exportação",
+            observacoes=f"Usuário {request.user.username} exportou dados de Processos Aquisitivos em {current_date_str}."
+        )
+        log_entry.save()
+
         # Salva o workbook em um arquivo Excel
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename=proaq.xlsx'
@@ -585,6 +605,8 @@ def proaq_tramitacao_delete(request, tramitacao_id=None):
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Processo Aquisitivo_Tramitação",
+            model='ProaqTramitacao',
+            model_id={tramitacao.id},
             item_id=0,
             item_descricao="Deleção de tramitação de processo aquisitivo.",
             acao="Deletar",
@@ -608,6 +630,8 @@ def proaq_dados_gerais_delete(request, proaq_id=None):
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Processo Aquisitivo_Dados Gerais",
+            model='ProaqDadosGerais',
+            model_id={proaq.id},
             item_id=0,
             item_descricao="Deleção de processo aquisitivo.",
             acao="Deletar",

@@ -26,7 +26,6 @@ class ContratosArpsForm(forms.ModelForm):
         widget=forms.Select(attrs={
             'class': 'form-select',
             'id': 'arp_unidade_daf',
-            'name': 'unidade_daf',
         }),
         label='Unidade DAF',
         initial='',

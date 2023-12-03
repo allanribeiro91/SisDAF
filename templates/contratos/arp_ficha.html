@@ -82,6 +82,7 @@
                         <div class="form-floating">                            
                             {{ form.unidade_daf }}
                             <label>{{ form.unidade_daf.label }}</label>
+                            <input type="hidden" id="arp_unidade_daf_display" name="unidade_daf" class="form-control" value="{% if form.instance.unidade_daf %}{{ form.instance.unidade_daf }}{% endif %}"  readonly>
                         </div>
                         <div class="form-floating">                            
                             {{ form.lei_licitacao }}

@@ -90,12 +90,12 @@
                         </div>
                         <div class="form-floating">                            
                             {{ form.modalidade_aquisicao }}
-                            <input type="text" id="ct_modalidade_aquisicao_display" class="form-control" style="width: 190px;" value="{% if form.modalidade_aquisicao.value %}{{ form.instance.get_modalidade_aquisicao_display }}{% endif %}" readonly>
+                            <input type="text" id="ct_modalidade_aquisicao_display" class="form-control" style="width: 200px;" value="{% if form.modalidade_aquisicao.value %}{{ form.instance.get_modalidade_aquisicao_display }}{% endif %}" readonly>
                             <label>Modalidade de Aquisição</label>
                         </div>
                         <div class="form-floating">                            
                             <input type="hidden" id="ct_arp" name="arp" class="form-control" style="width: 150px;" value="{% if form.instance.arp %}{{ form.instance.arp.id }}{% endif %}" readonly>
-                            <input type="text" id="ct_arp_display" class="form-control" style="width: 140px;" value="{% if form.instance.arp %}{{ form.instance.arp }}{% endif %}" readonly>
+                            <input type="text" id="ct_arp_display" class="form-control" style="width: 140px;" value="{% if form.instance.arp %}{{ form.instance.arp.numero_arp }}{% endif %}" readonly>
                             <label>Nº da ARP</label>
                         </div>
                         <div class="form-floating">                            
@@ -154,7 +154,7 @@
                 <div class="section">
                     <h3>Parcelas do Contrato</h3>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="font-size: 14px; text-align: right !important;">
-                        <button class="btn btn-primary me-md-2" type="button" data-bs-toggle="modal"  id="btnNovoProduto" data-bs-target="#contratoParcelaModal" style="font-size: 12px; background-color: green; border-color: green;">
+                        <button class="btn btn-primary me-md-2" type="button" id="btnNovaParcela" style="font-size: 12px; background-color: green; border-color: green;">
                             <i class="fas fa-plus" style="font-size: 14px;"></i> 
                             &nbsp;Inserir Parcela
                         </button>
@@ -255,5 +255,6 @@
 
     <!-- Modais -->
     {% include "contratos/contrato_parcela_modal.html" %}
+    {% include "contratos/contrato_parcela_arp_modal.html" %}
 
 {% endblock %}

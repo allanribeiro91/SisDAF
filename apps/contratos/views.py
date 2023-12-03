@@ -113,6 +113,8 @@ def contrato_ficha(request, id_contrato=None):
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Contratos_Contratos",
+                model='Contratos',
+                model_id=contrato.id,
                 item_id=0,
                 item_descricao="Salvar edição de Contrato.",
                 acao="Salvar",
@@ -160,6 +162,8 @@ def contrato_delete(request, id_contrato=None):
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Contratos_Contratos",
+            model='Contratos',
+            model_id=contrato.id,
             item_id=0,
             item_descricao="Deleção de Contrato.",
             acao="Deletar",
@@ -179,6 +183,24 @@ def buscar_arps(request, unidade_daf=None):
     arps = ContratosArps.objects.filter(del_status=False, unidade_daf=unidade_daf, status='vigente').order_by('numero_arp')
     arps_list = list(arps.values('id', 'numero_arp', 'denominacao', 'fornecedor'))  # Convertendo para uma lista de dicionários
     return JsonResponse({'arps': arps_list})
+
+def buscar_arps_itens(request, id_arp=None):
+    arps_itens = ContratosArpsItens.objects.filter(del_status=False, status='vigente', arp_id=id_arp).order_by('numero_item')
+    arps_itens_list = []
+
+    for item in arps_itens:
+        arps_item_data = {
+            'id': item.id,
+            'numero_item': item.numero_item,
+            'tipo_cota': item.tipo_cota,
+            'produto': item.produto.produto,
+            'qtd_registrada': item.qtd_registrada,
+            'qtd_saldo': item.qtd_saldo()
+        }
+        arps_itens_list.append(arps_item_data)
+
+    return JsonResponse({'arps_itens': arps_itens_list})
+
 
 def buscar_contrato(request, id_contrato=None):
     contrato = Contratos.objects.get(id=id_contrato)
@@ -277,6 +299,8 @@ def arp_ficha(request, arp_id=None):
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Contratos_ARPs",
+                model='ContratosARPs',
+                model_id=arp.id,
                 item_id=0,
                 item_descricao="Salvar edição de ARP.",
                 acao="Salvar",
@@ -370,6 +394,8 @@ def arp_delete(request, arp_id=None):
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Contratos_ARPs",
+            model='ContratosARPs',
+            model_id=arp.id,
             item_id=0,
             item_descricao="Deleção de ARP.",
             acao="Deletar",
@@ -518,6 +544,8 @@ def arp_exportar(request):
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Contratos_ARPs",
+            model='ContratosARPs',
+            model_id=0,
             item_id=0,
             item_descricao="Exportação da lista de ARPs",
             acao="Exportação",
@@ -623,6 +651,8 @@ def arp_item_ficha(request, arp_item_id=None):
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
                 modulo="Contratos_ARPs_Itens",
+                model='ContratosARPsItens',
+                model_id=item_arp.id,
                 item_id=0,
                 item_descricao="Salvar edição de Item da ARP.",
                 acao="Salvar",
@@ -698,6 +728,8 @@ def arp_item_delete(request, arp_item_id=None):
         log_entry = CustomLog(
             usuario=request.user.usuario_relacionado,
             modulo="Contratos_ARPs_Itens",
+            model='ContratosARPsItens',
+            model_id=item_arp.id,
             item_id=0,
             item_descricao="Deleção de Itens da ARP.",
             acao="Deletar",
