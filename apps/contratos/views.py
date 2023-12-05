@@ -8,8 +8,8 @@ from django.contrib import auth, messages
 from apps.main.models import CustomLog
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from apps.contratos.models import ContratosArps, ContratosArpsItens, Contratos
-from apps.contratos.forms import ContratosArpsForm, ContratosArpsItensForm, ContratosForm
+from apps.contratos.models import ContratosArps, ContratosArpsItens, Contratos, ContratosObjetos
+from apps.contratos.forms import ContratosArpsForm, ContratosArpsItensForm, ContratosForm, ContratosObjetosForm
 from setup.choices import UNIDADE_DAF, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
@@ -144,12 +144,18 @@ def contrato_ficha(request, id_contrato=None):
 
     if contrato:
         form = ContratosForm(instance=contrato)
+        tab_objetos = ContratosObjetos.objects.filter(contrato_id=id_contrato)
     else:
         form = ContratosForm()
+        tab_objetos = None
 
+    form_ct_objeto = ContratosObjetosForm()
+    
     return render(request, 'contratos/contrato_ficha.html', {
         'form': form,
         'contrato': contrato,
+        'form_objeto': form_ct_objeto,
+        'tab_objetos': tab_objetos,
     })
 
 def contrato_delete(request, id_contrato=None):   
@@ -185,7 +191,7 @@ def buscar_arps(request, unidade_daf=None):
     return JsonResponse({'arps': arps_list})
 
 def buscar_arps_itens(request, id_arp=None):
-    arps_itens = ContratosArpsItens.objects.filter(del_status=False, status='vigente', arp_id=id_arp).order_by('numero_item')
+    arps_itens = ContratosArpsItens.objects.filter(del_status=False, arp__status='vigente', arp__id=id_arp).order_by('numero_item')
     arps_itens_list = []
 
     for item in arps_itens:
@@ -201,7 +207,6 @@ def buscar_arps_itens(request, id_arp=None):
 
     return JsonResponse({'arps_itens': arps_itens_list})
 
-
 def buscar_contrato(request, id_contrato=None):
     contrato = Contratos.objects.get(id=id_contrato)
     ct_denominacao_id = contrato.denominacao.id
@@ -216,6 +221,45 @@ def buscar_contrato(request, id_contrato=None):
         }
     print(contrato_dados)
     return JsonResponse({'contrato': contrato_dados})
+
+def vincular_itens_arp(request, id_arp=None, id_contrato=None):
+    arps_itens = ContratosArpsItens.objects.filter(del_status=False, arp__status='vigente', arp__id=id_arp)
+    contrato = Contratos.objects.get(id=id_contrato)
+
+    #salvar os itens da ARP
+    for item in arps_itens:
+        objeto = ContratosObjetos(
+            usuario_registro=request.user.usuario_relacionado,
+            registro_data=timezone.now(),
+            ult_atual_data=timezone.now(),
+            numero_item=item.numero_item,
+            fator_embalagem=0,
+            qtd_contratada=0,
+            valor_unitario=item.valor_unitario(),
+            produto=item.produto,
+            contrato=contrato,
+            observacoes_gerais='Sem observações.',
+            del_status=False,
+        )
+        objeto.save(current_user=request.user.usuario_relacionado)
+
+    #buscar os objetos do contrato
+    objetos = ContratosObjetos.objects.filter(id=id_contrato)
+    objetos_list = []
+
+    for item in objetos:
+        objeto_data = {
+            'id': item.id,
+            'numero_item': item.numero_item,
+            'produto': item.produto.produto,
+            'fator_embalagem': item.fator_embalagem,
+            'qtd_contratada': item.qtd_contratada,
+            'valor_unitario': item.valor_unitario,
+            'valor_total': item.valor_total(),
+        }
+        objetos_list.append(objeto_data)
+
+    return JsonResponse({'objetos': objetos_list})
 
 
 

@@ -56,7 +56,7 @@
                         <label for="floatingInput">{{ form.dp_nome_completo.label }}</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="date" class="form-control" id="data_nascimento" name="dp_data_nascimento" value="{% if form.dp_data_nascimento.value %}{{ form.dp_data_nascimento.value|date:'Y-m-d' }}{% endif %}">
+                        <input type="date" class="form-control" style="width: 180px !important;" id="data_nascimento" name="dp_data_nascimento" value="{% if form.dp_data_nascimento.value %}{{ form.dp_data_nascimento.value|date:'Y-m-d' }}{% endif %}">
                         <label for="floatingInput">{{ form.dp_data_nascimento.label }}</label>
                     </div>                    
 

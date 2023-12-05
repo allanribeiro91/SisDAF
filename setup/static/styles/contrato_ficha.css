@@ -221,4 +221,25 @@ select[name="numero_processo"] {
 
 
 /*--colunas--*/
+.col-item {
+    width: 2% !important;
+    text-align: left;
+}
+.col-status {
+    width: 7% !important;
+    text-align: left;
+}
+.col-produto {
+    width: 25% !important;
+    text-align: left;
+}
+.col-parcelas {
+    width: 4% !important;
+    text-align: right;
+}
+.col-valor {
+    width: 8% !important;
+    text-align: right;
+}
+
 

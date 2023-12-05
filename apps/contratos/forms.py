@@ -3,22 +3,11 @@ from django_select2.forms import Select2Widget
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from apps.contratos.models import ContratosArps, ContratosArpsItens
+from apps.contratos.models import ContratosArps, ContratosArpsItens, ContratosObjetos
 from apps.contratos.models import Contratos
 from setup.choices import STATUS_ARP, UNIDADE_DAF, TIPO_COTA, YES_NO, MODALIDADE_AQUISICAO, STATUS_FASE, LEI_LICITACAO
 
 UNIDADE_DAF = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
-
-# class CustomSelect2Widget_Fornecedor(Select2Widget):
-#     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-#         option = super(CustomSelect2Widget_Fornecedor, self).create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
-#         if value:
-#             fornecedor = Fornecedores.objects.get(pk=value)
-#             option['attrs']['data-nome-fantasia'] = fornecedor.nome_fantasia
-#             option['attrs']['data-hierarquia'] = fornecedor.hierarquia
-#             option['attrs']['data-porte'] = fornecedor.porte
-#             option['attrs']['data-tipo-direito'] = fornecedor.tipo_direito
-#         return option
 
 class ContratosArpsForm(forms.ModelForm):
     unidade_daf = forms.ChoiceField(
@@ -369,6 +358,78 @@ class ContratosForm(forms.ModelForm):
 
     class Meta:
         model = Contratos
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
+
+
+class ContratosObjetosForm(forms.ModelForm):
+    numero_item = forms.IntegerField(
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'id': 'ctobjeto_nummero_item',
+        }),
+        required=True,
+        label='Item'
+    )
+    fator_embalagem = forms.IntegerField(
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'id': 'ctobjeto_fator_embalagem',
+        }),
+        required=True,
+        label='Fator Embalagem'
+    )
+    qtd_contratada = forms.FloatField(
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'id': 'ctobjeto_qtd_contratada',
+        }),
+        required=True,
+        label='Qtd Contratada'
+    )
+    valor_unitario = forms.FloatField(
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'id': 'ctobjeto_valor_unitario',
+        }),
+        required=True,
+        label='Valor Unitário'
+    )
+    produto = forms.ModelChoiceField(
+        queryset=ProdutosFarmaceuticos.objects.all(),
+        widget=Select2Widget(attrs={
+            'class': 'form-control',
+            'id': 'ctobjeto_produto',
+        }),
+        label='Produto Farmacêutico',
+        initial='',
+        required=True,
+    )
+    contrato = forms.ModelChoiceField(
+        queryset=Contratos.objects.all().order_by('numero_contrato'),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'ctobjeto_contrato',
+        }),
+        label='Contrato',
+        initial='',
+        required=True,
+    )
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control auto-expand',
+            'rows': 1,
+            'style': 'padding-top: 10px; height: 80px;',
+            }),
+        required=False,
+        label='Observações Gerais'
+    )
+
+    class Meta:
+        model = ContratosObjetos
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):

@@ -18,9 +18,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const botao_salvar_contrato = this.getElementById('btnSalvarContrato')
     const contrato_id = this.getElementById('id_contrato').value
     const botao_deletar_contrato = this.getElementById('btnDeletarContrato')
+    const botao_novo_objeto = this.getElementById('btnNovoObjeto')
+    const botao_vincular_itens_arp = this.getElementsByClassName('swal2-confirm swal2-styled swal2-default-outline')
     const botao_nova_parcela = this.getElementById('btnNovaParcela')
     const modal_inserir_parcela = new bootstrap.Modal(document.getElementById('contratoParcelaModal'))
+    const modal_inserir_objeto = new bootstrap.Modal(document.getElementById('contratoObjetoModal'))
     const modal_definir_item_arp = new bootstrap.Modal(document.getElementById('contratoParcelaARP'))
+    const tabela_objetos_contrato = this.getElementById('tabObjetosContrato')
 
     //Carregar dados
     carregarDados();
@@ -31,6 +35,12 @@ document.addEventListener("DOMContentLoaded", function() {
         localStorage.removeItem('showSuccessMessage');
         atualizarDatas();
     }
+    if (localStorage.getItem('objetosInseridos') === 'true') {
+        sweetAlert('Objetos vinculados com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('objetosInseridos');
+        atualizarDatas();
+    }
+
     
     //Formatação dos dados
     $('#ct_processo_sei').mask('00000.000000/0000-00');
@@ -51,6 +61,14 @@ document.addEventListener("DOMContentLoaded", function() {
     //Deletar Contrato
     botao_deletar_contrato.addEventListener('click', deletarContrato)
     
+    //Inserir Objeto
+    botao_novo_objeto.addEventListener('click', inserir_objeto)
+
+    // //Vincular objetos
+    // botao_vincular_itens_arp.addEventListener('click', function() {
+    //     alert('teste')
+    // })
+
     //Inserir Parcela
     botao_nova_parcela.addEventListener('click', definicao_modal_abrir)
 
@@ -254,6 +272,64 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     
         return true;
+    }
+
+    function inserir_objeto() {
+        if (arp.value == '') {
+            modal_inserir_objeto.show()
+            return
+        }
+            
+        if (tabela_objetos_contrato.rows.length == 1) {
+            sweetAlertGenerico(
+                title='Contrato com ARP', 
+                html=(
+                    '<br><p style="text-align: justify;">O presente contrato está vinculado a uma Ata de Registro de Preços.<br>' +
+                    '<br>Clique em <b>"Vincular Itens da ARP"</b> para trazer preencher os objetos do contrato.<br>' +
+                    '<br>Serão vinculados todos os itens da ARP com quantidade igual a zero.<br>' +
+                    '<br>Caso um dos itens não seja contratado, <b>você deverá deixar a quantidade igual a zero.</b></p><br>'
+                    ),
+                icon='info',
+                iconColor='blue',
+                confirmButtonText='Vincular Itens da ARP',
+                confirmButtonColor='green',
+                vincular_objetos)
+        } else {
+                sweetAlert('Itens da ARP já vinculados!', 'warning', 'orange')
+            }
+    }
+
+    function vincular_objetos() {
+        const url = `/contratos/vincularitensarp/${arp.value}-${contrato_id}/`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                carregarTabelaObjetosContrato(data.objetos)            
+            })
+            .catch(error => console.error('Erro ao vincular objetos:', error));
+        
+        localStorage.setItem('objetosInseridos', 'true');
+        //window.location.reload();
+    }
+
+    function carregarTabelaObjetosContrato(objetos) {
+        tabela_objetos_contrato.empty();
+        objetos.forEach(item => {
+            var row = `
+                <tr data-id="${ item.id }">
+                    <td class="col-item">"${ item.numero_item }"</td>
+                    <td class="col-produto">"${ item.produto }"</td>
+                    <td class="col-parcelas">0</td>
+                    <td class="col-valor">"${ item.fator_embalagem }"</td>
+                    <td class="col-valor">"${ item.qtd_contratada }"</td>
+                    <td class="col-valor">"0"</td>
+                    <td class="col-valor">"0"</td>
+                    <td class="col-valor">"${ item.valor_unitario }"</td>
+                    <td class="col-valor">"${ item.valor_total }"</td>
+                </tr>
+            `;
+            tabela_objetos_contrato.append(row);
+        });
     }
 
     function definicao_modal_abrir() {
