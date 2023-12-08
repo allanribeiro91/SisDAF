@@ -45,8 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Erro ao buscar Denominações:', error));
     }
     
-    
-    
     ajustarCampoDenominacao();
     
     var itensRegistrados = [];
@@ -157,17 +155,17 @@ function openModelItemArp(itemArpId) {
         });
 }
 
-function formatarComoMoeda(valor) {
-    // Converte o valor para um número flutuante
-    let numero = parseFloat(valor);
+// function formatarComoMoeda(valor) {
+//     // Converte o valor para um número flutuante
+//     let numero = parseFloat(valor);
 
-    // Formata o número como moeda
-    let formatado = numero.toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
-    return formatado;
-}
+//     // Formata o número como moeda
+//     let formatado = numero.toLocaleString('pt-BR', {
+//         style: 'currency',
+//         currency: 'BRL'
+//     });
+//     return formatado;
+// }
 
 
 $(document).ready(function() {

@@ -25,12 +25,10 @@
         min-height: 500px;
     }
 
-    
-
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="contratoObjetoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="contratoObjetoModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-parcela" role="document">
         <div class="modal-content">
             
@@ -42,31 +40,33 @@
             </div>
             <div class="modal-body">
                 
+            <form id="objetoForm">
+                {% csrf_token %}
                 <div class="horizontal-sections-modal-parcela" >
                     <div class="section" style="border: 0px !important;">
                         <div class="grid" style="font-size: 10px;">
                             <div class="form-floating mb-3" style="font-size: 12px;">
-                                <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
+                                <input type="text" class="form-control log_data" id="objeto_id" style="width: 100px;"  readonly>
                                 <label for="floatingInput">ID</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
-                                <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
+                                <input type="text" class="form-control log_data" id="objeto_log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
                                 <label for="floatingInput">Data do Registro</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
-                                <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
+                                <input type="text" class="form-control log_responsavel" id="objeto_log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
                                 <label for="floatingInput">Responsável pelo Registro</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
-                                <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                                <input type="text" class="form-control log_data" id="objeto_log_ult_atualizacao" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
                                 <label for="floatingInput">Última Atualização</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
-                                <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
+                                <input type="text" class="form-control log_responsavel" id="objeto_log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
                                 <label for="floatingInput">Responsável Atualização</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
-                                <input type="text" class="form-control log_edicoes" id="log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
+                                <input type="text" class="form-control log_edicoes" id="objeto_log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
                                 <label for="floatingInput">Nº Edições</label>
                             </div>
                         </div>
@@ -79,14 +79,16 @@
                             <div class="form-floating mb-3" style="max-width: 100px !important;">
                                 {{ form_objeto.numero_item }}
                                 <label>{{ form_objeto.numero_item.label }}</label>
+                                <input type="hidden" id="ctobjeto_contrato_hidden" name="contrato" readonly>
                             </div>
-                            <div class="form-floating mb-3">
+                            <!-- <div class="form-floating mb-3">
                                 <input type="text" id="ctobjeto_catmat" class="form-control" style="width: 140px;" readonly>
                                 <label>CATMAT</label>
-                            </div>
+                            </div> -->
                             <div class="form-floating mb-3 full-width">
                                 {{ form_objeto.produto }}
                                 <label>{{ form_objeto.produto.label }}</label>
+                                <input type="hidden" id="ctobjeto_produto_hidden" name="ctobjeto_produto_hidden" readonly>
                             </div>
                             
                         </div>
@@ -101,24 +103,28 @@
                                 <label>{{ form_objeto.fator_embalagem.label }}</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="text" id="ctobjeto_parcelas" class="form-control" style="width: 100px;" readonly>
+                                <input type="text" id="ctobjeto_parcelas" class="form-control" style="width: 100px; text-align: right;" readonly>
                                 <label>Parcelas</label>
                             </div>
                             <div class="form-floating mb-3">
-                                {{ form_objeto.qtd_contratada }}
-                                <label>{{ form_objeto.qtd_contratada.label }}</label>
+                                <input type="text" id="ctobjeto_qtd_contratada" class="form-control" style="width: 200px; text-align: right;" readonly>
+                                <label>Qtd Contratada</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="text" id="ctobjeto_qtd_entregue" class="form-control" style="width: 200px;" readonly>
+                                <input type="text" id="ctobjeto_qtd_entregue" class="form-control" style="width: 200px; text-align: right;" readonly>
                                 <label>Qtd Entregue</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="text" id="ctobjeto_qtd_a_entregar" class="form-control" style="width: 200px;" readonly>
+                                <input type="text" id="ctobjeto_qtd_a_entregar" class="form-control" style="width: 200px; text-align: right;" readonly>
                                 <label>Qtd a Entregar</label>
                             </div>
                             <div class="form-floating mb-3">
                                 {{ form_objeto.valor_unitario }}
                                 <label>{{ form_objeto.valor_unitario.label }}</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" id="ctobjeto_valor_total" class="form-control" style="width: 200px; text-align: right;" readonly>
+                                <label>Valor Total</label>
                             </div>
                         </div>
                     </div>
@@ -135,11 +141,12 @@
                     </div>
                 </div>
 
-
+            </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="salvarTags" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+                <button type="button" class="btn btn-primary" id="btnDeletarObjeto" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarObjeto" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
             </div>
         </div>
     </div>
@@ -149,7 +156,7 @@
 <script>
     document.querySelectorAll('.closeModalButton').forEach(button => {
         button.addEventListener('click', function() {
-            $('#tagsModal').modal('hide');
+            $('#contratoObjetoModal').modal('hide');
         });
     });
 </script>

@@ -144,7 +144,7 @@ def contrato_ficha(request, id_contrato=None):
 
     if contrato:
         form = ContratosForm(instance=contrato)
-        tab_objetos = ContratosObjetos.objects.filter(contrato_id=id_contrato)
+        tab_objetos = ContratosObjetos.objects.filter(del_status=False, contrato_id=id_contrato)
     else:
         form = ContratosForm()
         tab_objetos = None
@@ -262,6 +262,154 @@ def vincular_itens_arp(request, id_arp=None, id_contrato=None):
     return JsonResponse({'objetos': objetos_list})
 
 
+#OBJETOS DO CONTRATO
+def contrato_objeto_modal(request, id_objeto=None):
+    try:
+        item = ContratosObjetos.objects.get(id=id_objeto)
+        produto_id = item.produto_id
+        data = {
+            'id': item.id,
+            'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
+            'log_responsavel_registro': str(item.usuario_atualizacao.dp_nome_completo),
+            'lot_ult_atualizacao': item.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if item.ult_atual_data else '',
+            'log_responsavel_atualizacao': str(item.usuario_atualizacao.dp_nome_completo),
+            'log_edicoes': item.log_n_edicoes,
+            'numero_item': item.numero_item,
+            'produto': produto_id,
+            'fator_embalagem': item.fator_embalagem,
+            'valor_unitario': item.valor_unitario,
+            'parcelas': item.numero_parcelas(),
+            'qtd_contratada': item.qtd_contratada(),
+            'qtd_entregue': item.qtd_entregue(),
+            'numero_parcelas': item.numero_parcelas(),
+            'valor_total': item.valor_total(),
+            'observacoes': item.observacoes_gerais if item.observacoes_gerais else '',
+        }
+        return JsonResponse(data)
+    except ContratosArpsItens.DoesNotExist:
+        return JsonResponse({'error': 'Item da ARP não encontrada'}, status=404)
+
+def contrato_objeto_salvar(request, id_objeto=None):
+    if id_objeto:
+        objeto = ContratosObjetos.objects.get(id=id_objeto)
+    else:
+        objeto = None
+    
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if objeto:
+            objeto_form = ContratosObjetosForm(request.POST, instance=objeto)
+            novo_objeto = False
+        else:
+            objeto_form = ContratosObjetosForm(request.POST)
+            novo_objeto = True
+        
+        #Verificar se houve alteração no formulário
+        if not objeto_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+
+        #Passar o objeto Produto
+        produto_id = request.POST.get('ctobjeto_produto_hidden')
+        print('PRODUTO: ', produto_id)
+        produto_instance = ProdutosFarmaceuticos.objects.get(id=produto_id)
+    
+        #Passar o objeto Fornecedor
+        contrato_id = request.POST.get('contrato')
+        print('CONTRATO: ', contrato_id)
+        contrato_instance =  Contratos.objects.get(id=contrato_id)
+
+        #Valor unitario
+        valor_unitario = request.POST.get('valor_unitario')
+        valor_unitario = valor_unitario.replace('R$', '').replace('\xa0', '').replace(',', '.')
+
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['produto'] = produto_instance
+        modificacoes_post['contrato'] = contrato_instance
+        modificacoes_post['valor_unitario'] = valor_unitario
+
+        #Criar o formulário com os dados atualizados
+        objeto_form = ContratosObjetosForm(modificacoes_post, instance=objeto_form.instance)
+        
+        #salvar
+        if objeto_form.is_valid():
+            #Salvar o produto
+            objeto = objeto_form.save(commit=False)
+            objeto.save(current_user=request.user.usuario_relacionado)
+            
+            #logs
+            log_id = objeto.id
+            log_registro_usuario = objeto.usuario_registro.dp_nome_completo
+            log_registro_data = objeto.registro_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
+            log_atualizacao_usuario = objeto.usuario_atualizacao.dp_nome_completo
+            log_atualizacao_data = objeto.ult_atual_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
+            log_edicoes = objeto.log_n_edicoes
+
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Contratos_Contratos_Objetos",
+                model='ContratosObjetos',
+                model_id=objeto.id,
+                item_id=0,
+                item_descricao="Salvar edição de Objeto de Contrato.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o Objeto (ID {objeto.id}, Número do Contrato: {objeto.contrato.numero_contrato}, Produto: {objeto.produto.produto}) em {current_date_str}."
+            )
+            log_entry.save()
+
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'log_id': log_id,
+                    'log_registro_usuario': log_registro_usuario,
+                    'log_registro_data': log_registro_data,
+                    'log_atualizacao_usuario': log_atualizacao_usuario,
+                    'log_atualizacao_data': log_atualizacao_data,
+                    'log_edicoes': log_edicoes,
+                    'novo': novo_objeto,
+                    'redirect_url': reverse('contrato_ficha', args=[objeto.id]),
+                })
+        else:
+            print("Erro formulário Objeto do Contrato")
+            print(objeto_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+
+def contrato_objeto_delete(request, id_objeto=None):    
+    try:
+        objeto = ContratosObjetos.objects.get(id=id_objeto)
+        objeto.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Contratos_Objetos",
+            model='ContratosObjetos',
+            model_id=objeto.id,
+            item_id=0,
+            item_descricao="Deleção de Objeto.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o Objeto (ID {objeto.id}, Nº Item: {objeto.numero_item}, Produto: {objeto.produto.produto}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Objeto do Contrato deletado com sucesso!"
+            })
+    except ContratosArps.DoesNotExist:
+        return JsonResponse({
+            "message": "Objeto do Contrato não encontrada."
+            })
 
 #ARPs
 def arps(request):
@@ -777,7 +925,7 @@ def arp_item_delete(request, arp_item_id=None):
             item_id=0,
             item_descricao="Deleção de Itens da ARP.",
             acao="Deletar",
-            observacoes=f"Usuário {request.user.username} deletou o Item da ARP (ID {item_arp.id}, Nº Item: {item_arp.numero_item}, Protudo: {item_arp.produto.produto}) em {current_date_str}."
+            observacoes=f"Usuário {request.user.username} deletou o Item da ARP (ID {item_arp.id}, Nº Item: {item_arp.numero_item}, Produto: {item_arp.produto.produto}) em {current_date_str}."
         )
         log_entry.save()
 

@@ -15,13 +15,13 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-function sweetAlert(title, icon, iconColor='black', position='center') {
+function sweetAlert(title, icon, iconColor='black', position='center', timer=2000) {
     Swal.fire({
         position: position,
         icon: icon,
         title: title,
         showConfirmButton: false,
-        timer: 2000,
+        timer: timer,
         iconColor: iconColor,
         backdrop: false,
     });

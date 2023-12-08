@@ -369,31 +369,27 @@ class ContratosObjetosForm(forms.ModelForm):
     numero_item = forms.IntegerField(
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
-            'id': 'ctobjeto_nummero_item',
+            'id': 'ctobjeto_numero_item',
         }),
         required=True,
-        label='Item'
+        label='Item',
+        min_value=1,
+        max_value=20,
     )
     fator_embalagem = forms.IntegerField(
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
             'id': 'ctobjeto_fator_embalagem',
+            'style': 'text-align: right;',
         }),
         required=True,
         label='Fator Embalagem'
     )
-    qtd_contratada = forms.FloatField(
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'id': 'ctobjeto_qtd_contratada',
-        }),
-        required=True,
-        label='Qtd Contratada'
-    )
     valor_unitario = forms.FloatField(
-        widget=forms.NumberInput(attrs={
+        widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'ctobjeto_valor_unitario',
+            'style': 'text-align: right;',
         }),
         required=True,
         label='Valor Unitário'
@@ -422,7 +418,8 @@ class ContratosObjetosForm(forms.ModelForm):
         widget=forms.Textarea(attrs={
             'class': 'form-control auto-expand',
             'rows': 1,
-            'style': 'padding-top: 10px; height: 80px;',
+            'style': 'padding-top: 30px; height: 80px;',
+            'id': 'ctobjeto_observacoes'
             }),
         required=False,
         label='Observações Gerais'

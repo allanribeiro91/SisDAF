@@ -1,4 +1,20 @@
 document.addEventListener("DOMContentLoaded", function() {
+    //Verificar se há mensagem de salvamento com sucesso
+    if (localStorage.getItem('showSuccessMessage') === 'true') {
+        sweetAlert('Contrato salvo com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('showSuccessMessage');
+        atualizarDatas();
+    }
+    if (localStorage.getItem('objetosInseridos') === 'true') {
+        sweetAlert('Objetos vinculados com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('objetosInseridos');
+        atualizarDatas();
+    }
+    if (localStorage.getItem('objetoSalvoSucesso') === 'true') {
+        sweetAlert('Objeto salvo com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('objetoSalvoSucesso');
+    }
+    
     const unidadeDaf = this.getElementById('ct_unidade_daf')
     const unidadeDaf_display = this.getElementById('ct_unidade_daf_display') 
     const modalidadeAquisicao = this.getElementById('ct_modalidade_aquisicao')
@@ -25,22 +41,16 @@ document.addEventListener("DOMContentLoaded", function() {
     const modal_inserir_objeto = new bootstrap.Modal(document.getElementById('contratoObjetoModal'))
     const modal_definir_item_arp = new bootstrap.Modal(document.getElementById('contratoParcelaARP'))
     const tabela_objetos_contrato = this.getElementById('tabObjetosContrato')
+    const botao_salvar_objeto = this.getElementById('btnSalvarObjeto')
+    const objeto_valor_unitario = document.getElementById('ctobjeto_valor_unitario')
+    const objeto_produto = document.getElementById('ctobjeto_produto')
+    const objeto_produto_hidden = document.getElementById('ctobjeto_produto_hidden')
+    const botao_deletar_objeto = document.getElementById('btnDeletarObjeto')
+    const objeto_numero_item = document.getElementById('ctobjeto_numero_item')
+    const objeto_id = document.getElementById('objeto_id')
 
     //Carregar dados
     carregarDados();
-
-    //Verificar se há mensagem de salvamento com sucesso
-    if (localStorage.getItem('showSuccessMessage') === 'true') {
-        sweetAlert('Contrato salvo com sucesso!', 'success', 'top-end');
-        localStorage.removeItem('showSuccessMessage');
-        atualizarDatas();
-    }
-    if (localStorage.getItem('objetosInseridos') === 'true') {
-        sweetAlert('Objetos vinculados com sucesso!', 'success', 'top-end');
-        localStorage.removeItem('objetosInseridos');
-        atualizarDatas();
-    }
-
     
     //Formatação dos dados
     $('#ct_processo_sei').mask('00000.000000/0000-00');
@@ -64,14 +74,151 @@ document.addEventListener("DOMContentLoaded", function() {
     //Inserir Objeto
     botao_novo_objeto.addEventListener('click', inserir_objeto)
 
-    // //Vincular objetos
-    // botao_vincular_itens_arp.addEventListener('click', function() {
-    //     alert('teste')
-    // })
+    //Abrir Objeto
+    tabela_objetos_contrato.addEventListener('click', function(event) {
+      const target = event.target;
+      if (target.tagName === 'TD') {
+        const row = target.closest('tr');
+        const objeto_id = row.dataset.id;
+        carregar_lista_produtos();
+        openModalObjeto(objeto_id);
+        
+      }
+    });
+
+    //Salvar objeto
+    botao_salvar_objeto.addEventListener('click', function(e){
+        e.preventDefault(); // Evita o envio padrão do formulário
+        
+        //Verificar se ARP foi salva
+        if (contrato_id == '') {
+            sweetAlertPreenchimento("Salve primeiro o Contrato!");
+            return
+        }
+        
+        //Verificar preenchimento dos campos
+        let preenchimento_incorreto = verificar_campos_objeto()
+        if (preenchimento_incorreto === false) {
+            return;
+        }
+        
+        //Enviar para o servidor
+            //definir o caminho
+            let objeto_id = document.getElementById('objeto_id').value;
+            if (objeto_id === '') {
+                postURL = '/contratos/contrato/objeto/salvar/novo/'
+            } else
+            {
+                postURL = `/contratos/contrato/objeto/salvar/${objeto_id}/`
+            }
+
+            //pegar os dados
+            let formData = new FormData(document.getElementById('objetoForm'));
+            //formData.append('id_arp', id_arp);
+            
+            //enviar 
+            fetch(postURL, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+        
+        //Retorno do Servidor
+        .then(response => {
+            // Primeiro verifique se a resposta é ok
+            if (!response.ok) {
+                sweetAlert('Dados não foram salvos.', 'error', 'red');
+                throw new Error('Server response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.retorno === "Salvo") {
+                
+                localStorage.setItem('objetoSalvoSucesso', 'true');
+                window.location.reload();
+            }
+    
+            if (data.retorno === "Não houve mudanças") {
+                //alert
+                sweetAlert('Dados não foram salvos.<br>Não houve mudanças.', 'warning', 'orange')
+            }
+    
+            if (data.retorno === "Erro ao salvar") {
+                //alert
+                sweetAlert('Dados não foram salvos.', 'error', 'red')
+            }
+        })
+        .catch(error => {
+            console.error('Fetch operation error:', error);
+        });
+    })
+
+    //Formatar moeda
+    objeto_valor_unitario.addEventListener('input', function(){
+        valor = formatoMoeda(objeto_valor_unitario.value)
+        objeto_valor_unitario.value = valor
+    })
+
+    //Produto
+    objeto_produto.addEventListener('change', function() {
+        var produto = objeto_produto.value
+        objeto_produto_hidden.value = produto
+    })
+
+    //Deletar Objeto
+    botao_deletar_objeto.addEventListener('click', function() {
+        if (arp.value != ''){
+            sweetAlert(
+                title='Não é possível deletar este objeto pois este Contrato está vinculado a uma ARP.',
+                icon='warning',
+                )
+            return
+        }
+
+        //parâmetros para deletar
+        const mensagem = "Deletar Objeto do Contrato."
+        const url_delete = "/contratos/contrato/objeto/deletar/" + objeto_id.value + "/"
+        const url_apos_delete = window.location.href;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    })
+
+    // Coletar os números dos itens da tabela e armazenar no array
+    var itensRegistrados = [];
+    document.querySelectorAll('#tabObjetosContrato .col-item').forEach(function(td) {
+        itensRegistrados.push(td.innerText.trim());
+    });
+
+    //Verificar Número do Item do Objeto
+    objeto_numero_item.addEventListener('change', function(){
+        var valorItem = this.value;
+
+        // Verifica se o valor está fora do intervalo permitido
+        if (valorItem < 1 || valorItem > 20) {
+            const mensagem = 'O Número de Item da ARP deve ser entre 1 e 20!'
+            sweetAlertPreenchimento(mensagem)
+            this.value = '';
+            return
+        }
+
+        // Verificar se o valor já existe no array de itens registrados
+        if (itensRegistrados.includes(valorItem)) {
+            const mensagem = 'Número do Objeto = ' + valorItem + '<br>Esse número já foi registrado!<br> Por favor, insira outro!'
+            sweetAlertPreenchimento(mensagem)
+            this.value = '';
+        }
+    })
 
     //Inserir Parcela
     botao_nova_parcela.addEventListener('click', definicao_modal_abrir)
 
+
+    //Funções
     function deletarContrato(){
         const url_apos_delete = "/contratos/contratos/";
 
@@ -90,7 +237,6 @@ document.addEventListener("DOMContentLoaded", function() {
         sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
     }  
 
-    //Funções
     function carregarDados() {
         var unidade_daf_value = localStorage.getItem('memoria_unidadeDaf_value');
         var unidade_daf_text = localStorage.getItem('memoria_unidadeDaf_text');
@@ -276,7 +422,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function inserir_objeto() {
         if (arp.value == '') {
+            document.querySelectorAll('#contratoObjetoModal input').forEach(input => input.value = '');
             modal_inserir_objeto.show()
+            modal_objeto_levar_id_contrato()
+            carregar_lista_produtos()
+            $('#ctobjeto_contrato_hidden').value = contrato_id
             return
         }
             
@@ -335,6 +485,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function definicao_modal_abrir() {
         if (arp_display.value == "Não se aplica") {
             modal_inserir_parcela.show();
+            modal_objeto_levar_id_contrato();
         } else {
             
             modal_definir_item_arp.show();
@@ -369,6 +520,111 @@ document.addEventListener("DOMContentLoaded", function() {
             `;
             tabelaItensArp.append(row);
         });
+    }
+    
+    function openModalObjeto(id_objeto) {
+        fetch(`/contratos/contrato/objeto/${id_objeto}/dados/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar dados do Objeto.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Atualizar os campos do formulário no modal com os dados recebidos
+                $('#objeto_id').val(data.id);
+                $('#objeto_log_data_registro').val(data.log_data_registro);
+                $('#objeto_log_responsavel_registro').val(data.log_responsavel_registro);
+                $('#objeto_log_ult_atualizacao').val(data.lot_ult_atualizacao);
+                $('#objeto_log_responsavel_atualizacao').val(data.log_responsavel_atualizacao);
+                $('#objeto_log_edicoes').val(data.log_edicoes);
+                $('#ctobjeto_numero_item').val(data.numero_item);
+                $('#ctobjeto_fator_embalagem').val(data.fator_embalagem);
+                let produto = data.produto;
+                $('#ctobjeto_produto').val(produto);
+                $('#ctobjeto_produto_hidden').val(produto);
+                $('#ctobjeto_parcelas').val(data.numero_parcelas);
+                $('#ctobjeto_valor_unitario').val(formatarComoMoeda(data.valor_unitario));
+                $('#ctobjeto_qtd_contratada').val(data.qtd_contratada.toLocaleString('pt-BR'));
+                $('#ctobjeto_qtd_entregue').val(data.qtd_entregue.toLocaleString('pt-BR'));
+                $('#qtd_entregue').val(data.qtd_contratada.toLocaleString('pt-BR'));
+                $('#ctobjeto_observacoes').val(data.observacoes);
+    
+                // Abrir o modal
+                const modal = new bootstrap.Modal(document.getElementById('contratoObjetoModal'));
+                modal.show();
+                avaliar_arp_modificar_modal_objeto();
+                modal_objeto_levar_id_contrato();
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    function avaliar_arp_modificar_modal_objeto() {
+
+        if (arp.value != '') {
+            const objeto_numero_item = document.getElementById('ctobjeto_numero_item')
+            const objeto_produto = document.getElementById('ctobjeto_produto')
+            const objeto_valor_unitario = document.getElementById('ctobjeto_valor_unitario')
+
+            objeto_numero_item.setAttribute('readonly', 'true')
+            objeto_produto.setAttribute('disabled', 'disabled')
+            objeto_valor_unitario.setAttribute('readonly', 'true')
+        }
+    }
+
+    function modal_objeto_levar_id_contrato() {
+        const objeto_contrato_id = document.getElementById('ctobjeto_contrato_hidden')
+
+        objeto_contrato_id.value = contrato_id
+    }
+
+    function carregar_lista_produtos(){
+        var url = '/contratos/arp/buscarprodutos/' + denominacaoGenerica.value + '/';
+        $.ajax({
+            url: url,
+            success: function(data) {
+                produtos = data;
+                const selectProduto = $('#ctobjeto_produto');
+                // Limpa as opções existentes
+                selectProduto.empty();
+                
+                // Adiciona a opção padrão
+                selectProduto.append('<option value="" disabled selected>Não Informado</option>');
+                
+                // Adiciona as opções retornadas pela requisição
+                produtos.forEach(function(produto) {
+                    selectProduto.append('<option value="' + produto.id + '">' + produto.produto + '</option>');
+                });
+                
+            }
+        });
+    }
+
+    function verificar_campos_objeto() {
+        const campos = [
+            { id: 'ctobjeto_numero_item', mensagem: 'Informe o <b>Número do Item</b>!' },
+            { id: 'ctobjeto_fator_embalagem', mensagem: 'Informe o <b>Fator Embalagem</b> do Item!' },
+            { id: 'ctobjeto_produto_hidden', mensagem: 'Informe o <b>Produto Farmacêutico</b>!' },
+            { id: 'ctobjeto_valor_unitario', mensagem: 'Informe o <b>Valor Unitário</b>!' },
+        ];
+    
+        let mensagensErro = campos.reduce((mensagens, campo) => {
+            const elemento = document.getElementById(campo.id);
+            if (!elemento || elemento.value === '' || elemento.value == 0) {
+                mensagens.push(campo.mensagem);
+            }
+            return mensagens;
+        }, []);
+    
+        if (mensagensErro.length > 0) {
+            const campos = mensagensErro.join('<br>')
+            sweetAlertPreenchimento(campos)
+            return false;
+        }
+        
+        return true;
     }
 
 });

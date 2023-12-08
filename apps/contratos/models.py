@@ -262,7 +262,6 @@ class ContratosObjetos(models.Model):
     #dados do objeto
     numero_item = models.IntegerField(null=False, blank=False)
     fator_embalagem = models.IntegerField(null=False, blank=False)
-    qtd_contratada = models.FloatField(null=False, blank=False)
     valor_unitario = models.FloatField(null=False, blank=False)
 
     #Produto
@@ -297,8 +296,17 @@ class ContratosObjetos(models.Model):
         self.del_usuario = user
         self.save()
 
+    def qtd_contratada(self):
+        return 0
+
+    def qtd_entregue(self):
+        return 0
+
+    def numero_parcelas(self):
+        return 0
+
     def valor_total(self):
-        return self.valor_unitario * self.qtd_contratada
+        return self.valor_unitario * self.qtd_contratada()
 
     def __str__(self):
         return f"Objeto do contrato: {self.numero_contrato} - Contrato: {self.contrato.numero_contrato} - Produto: ({self.produto.produto}) - ID ({self.id})"
