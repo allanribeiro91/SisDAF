@@ -1,0 +1,63 @@
+<!-- Modal -->
+{% load static %}
+<style>
+
+    .custom-modal-width {
+        max-width: 30%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .modal-content.objeto{
+        min-height: 15vh;
+        height: 30%;
+        
+    }
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="contratoParcelaObjeto" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered  custom-modal-width" role="document">
+        <div class="modal-content objeto">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Nova Parcela</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <div class="grid" style="font-size: 14px; margin: 20px;">
+                    <!-- Objeto -->
+                    <div class="form-floating full-width">
+                        <select class="form-select" id="parcela_selecionar_objeto">
+                            <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
+                            {% for value, display in list_objetos %}
+                            <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="parcela_selecionar_objeto">Selecione o Objeto</label>
+                    </div>
+                    <input type="hidden" id="parcela_objeto_id" name="contrato" readonly>
+
+                </div>
+                    
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="inserirNovaParcela" style="background-color: rgb(18, 134, 34); border-color: rgb(18, 134, 34);">Inserir Parcela</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#contratoParcelaObjeto').modal('hide');
+        });
+    });
+</script>

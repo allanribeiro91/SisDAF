@@ -310,3 +310,60 @@ class ContratosObjetos(models.Model):
 
     def __str__(self):
         return f"Objeto do contrato: {self.numero_contrato} - Contrato: {self.contrato.numero_contrato} - Produto: ({self.produto.produto}) - ID ({self.id})"
+    
+
+class ContratosParcelas(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='contrato_parcela_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='contrato_parcela_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados da parcela
+    numero_parcela = models.IntegerField(null=False, blank=False)
+    qtd_contratada = models.IntegerField(null=False, blank=False)
+    data_previsao_entrega = models.DateField(null=False, blank=False)
+
+    #objeto
+    objeto = models.ForeignKey(ContratosObjetos, on_delete=models.DO_NOTHING, related_name='parcela_objeto', null=False, blank=False)
+
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True)
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='contrato_parcela_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(ContratosObjetos, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+
+    def qtd_entregue(self):
+        return 0
+
+    def valor_unitario(self):
+        return 0
+
+    def valor_total(self):
+        return self.valor_unitario() * self.qtd_contratada
+
+    def __str__(self):
+        return f"Parcela do contrato: {self.numero_parcela} - Contrato: {self.objeto.contrato.numero_contrato} - Produto: ({self.objeto.produto.produto}) - ID ({self.id})"

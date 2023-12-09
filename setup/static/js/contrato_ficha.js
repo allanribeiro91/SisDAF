@@ -37,9 +37,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const botao_novo_objeto = this.getElementById('btnNovoObjeto')
     const botao_vincular_itens_arp = this.getElementsByClassName('swal2-confirm swal2-styled swal2-default-outline')
     const botao_nova_parcela = this.getElementById('btnNovaParcela')
-    const modal_inserir_parcela = new bootstrap.Modal(document.getElementById('contratoParcelaModal'))
+    const modal_parcela = new bootstrap.Modal(document.getElementById('contratoParcelaModal'))
     const modal_inserir_objeto = new bootstrap.Modal(document.getElementById('contratoObjetoModal'))
-    const modal_definir_item_arp = new bootstrap.Modal(document.getElementById('contratoParcelaARP'))
+    const modal_parcela_objeto = new bootstrap.Modal(document.getElementById('contratoParcelaObjeto'))
     const tabela_objetos_contrato = this.getElementById('tabObjetosContrato')
     const botao_salvar_objeto = this.getElementById('btnSalvarObjeto')
     const objeto_valor_unitario = document.getElementById('ctobjeto_valor_unitario')
@@ -48,6 +48,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const botao_deletar_objeto = document.getElementById('btnDeletarObjeto')
     const objeto_numero_item = document.getElementById('ctobjeto_numero_item')
     const objeto_id = document.getElementById('objeto_id')
+    const selecionar_objeto_parcela = document.getElementById('parcela_selecionar_objeto')
+    const parcela_objeto_id = document.getElementById('parcela_objeto_id')
+    const parcela_qtd_contratada = document.getElementById('id_parcela_qtd_contratada')
 
     //Carregar dados
     carregarDados();
@@ -215,8 +218,20 @@ document.addEventListener("DOMContentLoaded", function() {
     })
 
     //Inserir Parcela
-    botao_nova_parcela.addEventListener('click', definicao_modal_abrir)
+    botao_nova_parcela.addEventListener('click', function(){
+        //modal_parcela_objeto.show()
+        modal_parcela.show()
+    })
 
+    //Levar valor do id do objeto
+    selecionar_objeto_parcela.addEventListener('change', function(){
+        parcela_objeto_id.value = selecionar_objeto_parcela.value
+    })
+
+    parcela_qtd_contratada.addEventListener('input', function(){
+        formatoQuantidade(parcela_qtd_contratada)
+    })
+    
 
     //Funções
     function deletarContrato(){
@@ -482,18 +497,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    function definicao_modal_abrir() {
-        if (arp_display.value == "Não se aplica") {
-            modal_inserir_parcela.show();
-            modal_objeto_levar_id_contrato();
-        } else {
-            
-            modal_definir_item_arp.show();
-            buscarDadosItensARP(arp.value);
-        }
-
-    }
-
     function buscarDadosItensARP(id_arp) {
         const url = `/contratos/buscararpsitens/${id_arp}/`;
         fetch(url)
@@ -626,5 +629,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         return true;
     }
+
+    
 
 });

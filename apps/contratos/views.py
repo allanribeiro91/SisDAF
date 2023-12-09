@@ -9,7 +9,7 @@ from apps.main.models import CustomLog
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import ContratosArps, ContratosArpsItens, Contratos, ContratosObjetos
-from apps.contratos.forms import ContratosArpsForm, ContratosArpsItensForm, ContratosForm, ContratosObjetosForm
+from apps.contratos.forms import ContratosArpsForm, ContratosArpsItensForm, ContratosForm, ContratosObjetosForm, ContratosParcelasForm
 from setup.choices import UNIDADE_DAF, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
@@ -142,20 +142,31 @@ def contrato_ficha(request, id_contrato=None):
                     'retorno': 'Erro ao salvar'
                 })
 
+    list_objetos = []
     if contrato:
         form = ContratosForm(instance=contrato)
         tab_objetos = ContratosObjetos.objects.filter(del_status=False, contrato_id=id_contrato)
+        for objeto in tab_objetos:
+            objeto_id = objeto.id
+            item = objeto.numero_item
+            produto = objeto.produto.produto
+            item_produto = f'[Item {item}] {produto}'
+            list_objetos.append((objeto_id, item_produto))
     else:
         form = ContratosForm()
         tab_objetos = None
 
+    #Formulários
     form_ct_objeto = ContratosObjetosForm()
-    
+    form_ct_parcela = ContratosParcelasForm()
+
     return render(request, 'contratos/contrato_ficha.html', {
         'form': form,
         'contrato': contrato,
         'form_objeto': form_ct_objeto,
+        'form_parcela': form_ct_parcela,
         'tab_objetos': tab_objetos,
+        'list_objetos': list_objetos
     })
 
 def contrato_delete(request, id_contrato=None):   

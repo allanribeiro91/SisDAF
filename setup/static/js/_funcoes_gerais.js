@@ -26,3 +26,25 @@ function formatoMoeda(valor) {
     return valor
 
 }
+
+function formatoQuantidade(campo) {
+        
+    campo.addEventListener('input', function (e) {
+        // Impede caracteres não-numéricos de serem digitados
+        var valor = this.value.replace(/[^0-9]/g, '');
+
+        // Converte valor para número
+        var numero = parseInt(valor, 10);
+
+        // Se o valor for NaN, define como 0
+        if (isNaN(numero)) {
+            numero = 0;
+        }
+
+        // Adiciona pontos como separadores de milhar
+        var valorFormatado = numero.toLocaleString('pt-BR');
+
+        // Atualiza o valor do campo
+        this.value = valorFormatado;
+    });
+}

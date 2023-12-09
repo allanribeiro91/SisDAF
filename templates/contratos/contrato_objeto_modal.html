@@ -47,27 +47,27 @@
                         <div class="grid" style="font-size: 10px;">
                             <div class="form-floating mb-3" style="font-size: 12px;">
                                 <input type="text" class="form-control log_data" id="objeto_id" style="width: 100px;"  readonly>
-                                <label for="floatingInput">ID</label>
+                                <label for="objeto_id">ID</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
                                 <input type="text" class="form-control log_data" id="objeto_log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
-                                <label for="floatingInput">Data do Registro</label>
+                                <label for="objeto_log_data_registro">Data do Registro</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
                                 <input type="text" class="form-control log_responsavel" id="objeto_log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
-                                <label for="floatingInput">Responsável pelo Registro</label>
+                                <label for="objeto_log_responsavel_registro">Responsável pelo Registro</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
                                 <input type="text" class="form-control log_data" id="objeto_log_ult_atualizacao" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
-                                <label for="floatingInput">Última Atualização</label>
+                                <label for="objeto_log_ult_atualizacao">Última Atualização</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
                                 <input type="text" class="form-control log_responsavel" id="objeto_log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
-                                <label for="floatingInput">Responsável Atualização</label>
+                                <label for="objeto_log_responsavel_atualizacao">Responsável Atualização</label>
                             </div>
                             <div class="form-floating mb-3" style="font-size: 12px;">
                                 <input type="text" class="form-control log_edicoes" id="objeto_log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
-                                <label for="floatingInput">Nº Edições</label>
+                                <label for="objeto_log_edicoes">Nº Edições</label>
                             </div>
                         </div>
                     </div>

@@ -3,7 +3,7 @@ from django_select2.forms import Select2Widget
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from apps.contratos.models import ContratosArps, ContratosArpsItens, ContratosObjetos
+from apps.contratos.models import ContratosArps, ContratosArpsItens, ContratosObjetos, ContratosParcelas
 from apps.contratos.models import Contratos
 from setup.choices import STATUS_ARP, UNIDADE_DAF, TIPO_COTA, YES_NO, MODALIDADE_AQUISICAO, STATUS_FASE, LEI_LICITACAO
 
@@ -420,6 +420,63 @@ class ContratosObjetosForm(forms.ModelForm):
             'rows': 1,
             'style': 'padding-top: 30px; height: 80px;',
             'id': 'ctobjeto_observacoes'
+            }),
+        required=False,
+        label='Observações Gerais'
+    )
+
+    class Meta:
+        model = ContratosObjetos
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
+
+class ContratosParcelasForm(forms.ModelForm):
+    numero_parcela = forms.IntegerField(
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'id': 'id_numero_parcela',
+        }),
+        required=True,
+        label='Parcela',
+        min_value=1,
+        max_value=10,
+    )
+    qtd_contratada = forms.FloatField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_parcela_qtd_contratada',
+            'style': 'text-align: right',
+        }),
+        label='Quantidade Contratada',
+        required=False,
+    )
+    data_previsao_entrega = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+        }),
+        required=False,
+        label='Previsão de Entrega'
+    )
+    objeto = forms.ModelChoiceField(
+        queryset=ContratosObjetos.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'id_parcela_objeto',
+        }),
+        label='Objeto',
+        initial='',
+        required=True,
+    )
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control auto-expand',
+            'rows': 1,
+            'style': 'padding-top: 30px; height: 80px;',
+            'id': 'id_parcela_observacoes'
             }),
         required=False,
         label='Observações Gerais'
