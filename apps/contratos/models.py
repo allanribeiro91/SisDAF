@@ -5,6 +5,8 @@ from apps.fornecedores.models import Fornecedores
 from setup.choices import STATUS_ARP, UNIDADE_DAF2, TIPO_COTA, MODALIDADE_AQUISICAO, STATUS_FASE, LEI_LICITACAO
 from datetime import timedelta
 from django.utils import timezone
+from django.db.models import Sum
+
 
 class ContratosArps(models.Model):
     #relacionamento
@@ -156,9 +158,15 @@ class ContratosArpsItens(models.Model):
         else:
             return self.valor_unit_homologado * self.qtd_registrada
 
+    def qtd_contratada(self):
+        total = 0
+        for objeto in self.arp_item_objeto.filter(del_status=False):
+            total += objeto.qtd_contratada()
+        return total
+
+
     def qtd_saldo(self):
-        qtd_contratada = 0
-        qtd_saldo = self.qtd_registrada - qtd_contratada
+        qtd_saldo = self.qtd_registrada - self.qtd_contratada()
         return qtd_saldo
     
     def qtd_saldo_percentual(self):
@@ -270,6 +278,9 @@ class ContratosObjetos(models.Model):
     #Contrato
     contrato = models.ForeignKey(Contratos, on_delete=models.DO_NOTHING, related_name='contrato_objeto', null=False, blank=False)
 
+    #ARP Item
+    arp_item = models.ForeignKey(ContratosArpsItens, on_delete=models.DO_NOTHING, related_name='arp_item_objeto', null=False, blank=False)
+
     #observações gerais
     observacoes_gerais = models.TextField(null=True, blank=True)
 
@@ -297,7 +308,7 @@ class ContratosObjetos(models.Model):
         self.save()
 
     def qtd_contratada(self):
-        return 0
+        return self.parcela_objeto.aggregate(Sum('qtd_contratada'))['qtd_contratada__sum'] or 0
 
     def qtd_entregue(self):
         return 0
@@ -330,8 +341,11 @@ class ContratosParcelas(models.Model):
     #objeto
     objeto = models.ForeignKey(ContratosObjetos, on_delete=models.DO_NOTHING, related_name='parcela_objeto', null=False, blank=False)
 
+    #contrato (para facilitar o filtro)
+    contrato = models.ForeignKey(Contratos, on_delete=models.DO_NOTHING, related_name='parcela_contrato', null=False, blank=False)
+
     #observações gerais
-    observacoes_gerais = models.TextField(null=True, blank=True)
+    observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
 
     #delete (del)
     del_status = models.BooleanField(default=False)
@@ -348,7 +362,7 @@ class ContratosParcelas(models.Model):
             if user:
                 self.usuario_registro = user
                 self.usuario_atualizacao = user
-        super(ContratosObjetos, self).save(*args, **kwargs)
+        super(ContratosParcelas, self).save(*args, **kwargs)
 
     def soft_delete(self, user):
         self.del_status = True
@@ -357,10 +371,19 @@ class ContratosParcelas(models.Model):
         self.save()
 
     def qtd_entregue(self):
-        return 0
+        qtd_entregue = 0
+        return qtd_entregue
+    
+    def qtd_a_entregar(self):
+        qtd_a_entregar = self.qtd_contratada - self.qtd_entregue()
+        return qtd_a_entregar
 
     def valor_unitario(self):
-        return 0
+        return self.objeto.valor_unitario
+    
+    def data_ultima_entrega(self):
+        data_ultima_entrega = '10/12/2023'
+        return data_ultima_entrega
 
     def valor_total(self):
         return self.valor_unitario() * self.qtd_contratada

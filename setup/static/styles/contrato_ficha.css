@@ -112,6 +112,10 @@
     font-weight: bold;
 }
 
+.table-hover{
+    cursor: pointer;
+}
+
 h3 {
     margin-top: 5px;
     margin-bottom: 5px;
@@ -222,7 +226,7 @@ select[name="numero_processo"] {
 
 /*--colunas--*/
 .col-item {
-    width: 2% !important;
+    width: 3% !important;
     text-align: left;
 }
 .col-status {
@@ -230,11 +234,15 @@ select[name="numero_processo"] {
     text-align: left;
 }
 .col-produto {
-    width: 25% !important;
+    width: 22% !important;
     text-align: left;
 }
 .col-parcelas {
     width: 4% !important;
+    text-align: right;
+}
+.col-data {
+    width: 7% !important;
     text-align: right;
 }
 .col-valor {

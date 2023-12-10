@@ -41,7 +41,7 @@
             <div class="modal-body">
                 
             <form id="objetoForm">
-                {% csrf_token %}
+                <input type="hidden" name="csrfmiddlewaretoken">{% csrf_token %}
                 <div class="horizontal-sections-modal-parcela" >
                     <div class="section" style="border: 0px !important;">
                         <div class="grid" style="font-size: 10px;">
@@ -80,6 +80,7 @@
                                 {{ form_objeto.numero_item }}
                                 <label>{{ form_objeto.numero_item.label }}</label>
                                 <input type="hidden" id="ctobjeto_contrato_hidden" name="contrato" readonly>
+                                <input type="hidden" id="ctobjeto_arpItem_hidden" name="arp_item" readonly>
                             </div>
                             <!-- <div class="form-floating mb-3">
                                 <input type="text" id="ctobjeto_catmat" class="form-control" style="width: 140px;" readonly>

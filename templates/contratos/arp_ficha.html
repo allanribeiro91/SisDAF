@@ -181,7 +181,7 @@
                                     </td>
                                     <td class="col-valor">{{ item.qtd_registrada|floatformat:0|intcomma }}</td>
                                     <td class="col-valor">{{ item.valor_total|format_number }}</td>
-                                    <td class="col-valor">0</td>
+                                    <td class="col-valor">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
                                     <td class="col-valor">{{ item.qtd_saldo|floatformat:0|intcomma}}</td>
                                     <td class="col-valor">{{ item.qtd_saldo_percentual|format_percent}}</td>
                                 </tr>

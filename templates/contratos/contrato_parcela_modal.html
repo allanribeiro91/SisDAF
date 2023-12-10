@@ -32,12 +32,12 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="contratoParcelaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="contratoParcelaModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-parcela" role="document">
         <div class="modal-content">
             
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Nova Parcela</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Parcela do Contrato</h5>
                 <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -51,7 +51,7 @@
                             <div class="grid" style="font-size: 10px;">
                                 <div class="form-floating mb-3" style="font-size: 12px;">
                                     <input type="text" class="form-control log_data" id="parcela_id" style="width: 100px;"  readonly>
-                                    <label for="objeto_id">ID</label>
+                                    <label for="parcela_id">ID</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
                                     <input type="text" class="form-control log_data" id="parcela_log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
@@ -83,13 +83,14 @@
                                 <div class="form-floating mb-3" style="width: 100px !important;">
                                     {{ form_parcela.numero_parcela }}
                                     <label>{{ form_parcela.numero_parcela.label }}</label>
+                                    <input type="hidden" id="id_parcela_objeto" name="parcela_objeto_hidden" readonly>
                                 </div>
                                 <div class="form-floating mb-3" style="max-width: 100px !important;">
                                     <input type="text" class="form-control" id="id_objeto_item" readonly>
                                     <label>Nº do Item</label>
                                 </div>
                                 <div class="form-floating mb-3 full-width">
-                                    <input type="text" class="form-control" id="id_objeto_item" readonly>
+                                    <input type="text" class="form-control" id="id_objeto_produto" readonly>
                                     <label>Produto Farmacêutico</label>
                                 </div>
                             </div>
@@ -108,7 +109,7 @@
                                     <label>{{ form_parcela.qtd_contratada.label }}</label>
                                 </div>
                                 <div class="form-floating mb-3 full-width">
-                                    <input type="text" id="id_parcela_qtd_contratada" class="form-control" style="width: 200px; text-align: right;" readonly>
+                                    <input type="text" id="id_parcela_qtd_entregue" class="form-control" style="width: 200px; text-align: right;" readonly>
                                     <label>Qtd Entregue</label>
                                 </div>
                                 <div class="form-floating mb-3 full-width">
@@ -116,7 +117,7 @@
                                     <label>Qtd a Entregar</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_total" class="form-control" style="width: 200px; text-align: right;" readonly>
+                                    <input type="text" id="id_parcela_valor_unitario" class="form-control" style="width: 200px; text-align: right;" readonly>
                                     <label>Valor Unitário</label>
                                 </div>
                                 <div class="form-floating mb-3">
@@ -125,7 +126,7 @@
                                 </div>
 
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" style="width: 170px;" id="id_parcela_previsao_entrega">
+                                    <input type="date" class="form-control" style="width: 170px;" id="id_parcela_previsao_entrega" name="data_previsao_entrega">
                                     <label for="id_parcela_previsao_entrega">Previsão de Entrega</label>
                                 </div>
 
@@ -151,7 +152,8 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="salvarTags" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+                <button type="button" class="btn btn-primary" id="btnDeletarParcela" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-primary" id="botaoSalvarParcela" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
             </div>
         </div>
     </div>
@@ -161,7 +163,7 @@
 <script>
     document.querySelectorAll('.closeModalButton').forEach(button => {
         button.addEventListener('click', function() {
-            $('#tagsModal').modal('hide');
+            $('#contratoParcelaModal').modal('hide');
         });
     });
 </script>

@@ -121,6 +121,7 @@
                     <th class="col-status">Status</th>
                     <th class="col-unidadedaf">Unidade DAF</th>
                     <th class="col-modalidade">Mod. Aquisição</th>
+                    <th class="col-contrato">ARP</th>
                     <th class="col-contrato">Nº Contrato</th>
                     <th class="col-data">Publicação</th>
                     <th class="col-data">Vigência</th>
@@ -135,6 +136,7 @@
                     <td class="col-status">{{ item.get_status_display }}</td>
                     <td class="col-unidadedaf" style="text-transform: uppercase;">{{ item.unidade_daf }}</td>
                     <td class="col-modalidade">{{ item.get_modalidade_aquisicao_display }}</td>
+                    <td class="col-contrato">{{ item.arp.numero_arp }}</td>
                     <td class="col-contrato">{{ item.numero_contrato }}</td>
                     <td class="col-data">{{ item.data_publicacao|date:"d/m/Y" }}</td>
                     <td class="col-data">{{ item.data_vigencia|date:"d/m/Y" }}</td>

@@ -1,9 +1,12 @@
 from django.contrib import admin
 from django.urls import path
-from apps.contratos.views import contratos, arps, contrato_ficha, arp_ficha, arp_buscar_produtos, arp_filtrar, arp_exportar, arp_delete
-from apps.contratos.views import arp_item_ficha, arp_item_formulario, arp_item_delete
-from apps.contratos.views import buscar_arps, arp_buscar_dados_sei, buscar_contrato, contrato_delete, buscar_arps_itens, vincular_itens_arp
-from apps.contratos.views import contrato_objeto_modal, contrato_objeto_salvar, contrato_objeto_delete
+from apps.contratos.views import (
+    contratos, arps, contrato_ficha, arp_ficha, arp_buscar_produtos, arp_filtrar, arp_exportar, arp_delete,
+    arp_item_ficha, arp_item_formulario, arp_item_delete,
+    buscar_arps, arp_buscar_dados_sei, buscar_contrato, contrato_delete, buscar_arps_itens, vincular_itens_arp,
+    contrato_objeto_modal, contrato_objeto_salvar, contrato_objeto_delete, buscar_objeto, contrato_parcela_salvar,
+    contrato_parcela_modal
+)
 
 
 urlpatterns = [
@@ -39,4 +42,10 @@ urlpatterns = [
     path('contratos/contrato/objeto/salvar/<int:id_objeto>/', contrato_objeto_salvar, name='contrato_objeto_salvar'),
     path('contratos/contrato/objeto/salvar/novo/', contrato_objeto_salvar, name='contrato_objeto_salvar'),
     path('contratos/contrato/objeto/deletar/<int:id_objeto>/', contrato_objeto_delete, name='contrato_objeto_delete'),
+    path('contratos/buscar_objeto/<int:id_objeto>/', buscar_objeto, name='buscar_objeto'),
+
+    #PARCELAS DO CONTRATO
+    path('contratos/contrato/parcela/<int:id_parcela>/dados/', contrato_parcela_modal, name='contrato_parcela_modal'),
+    path('contratos/contrato/parcela/salvar/<int:id_parcela>/', contrato_parcela_salvar, name='contrato_parcela_salvar'),
+    path('contratos/contrato/parcela/salvar/novo/', contrato_parcela_salvar, name='contrato_parcela_salvar'),
 ]

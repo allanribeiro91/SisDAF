@@ -1,4 +1,34 @@
 document.addEventListener("DOMContentLoaded", function() {
+    //Componentes
+    const data_publicacao = document.getElementById('data_publicacao')
+    const data_vigencia = document.getElementById('data_vigencia')
+    const prazo_vigencia = document.getElementById('prazo_vigencia')
+    
+    //Atualizar data de vigência e prazo
+    data_publicacao.addEventListener('change', atualizarDatas);
+
+    function atualizarDatas() {
+        if (data_publicacao.value) {
+            // Calcula a data de vigência (data_publicacao + 365 dias)
+            let dataPublicacao = new Date(data_publicacao.value);
+            let dataVigencia = new Date(dataPublicacao);
+            dataVigencia.setDate(dataVigencia.getDate() + 365);
+
+            // Formata a data de vigência para o formato apropriado (YYYY-MM-DD)
+            let dataVigenciaFormatada = dataVigencia.toISOString().split('T')[0];
+            data_vigencia.value = dataVigenciaFormatada;
+
+            // Calcula o prazo de vigência (data_vigencia - data_atual)
+            let dataAtual = new Date();
+            let prazoVigencia = Math.round((dataVigencia - dataAtual) / (1000 * 60 * 60 * 24)) + 1;
+            prazo_vigencia.value = prazoVigencia;
+        } else {
+            // Limpa os campos se a data de publicação estiver vazia
+            data_vigencia.value = '';
+            prazo_vigencia.value = '';
+        }
+    }
+    
     //Verificar se há mensagem de salvamento com sucesso
     if (localStorage.getItem('showSuccessMessage') === 'true') {
         sweetAlert('Contrato salvo com sucesso!', 'success', 'top-end');
@@ -14,34 +44,42 @@ document.addEventListener("DOMContentLoaded", function() {
         sweetAlert('Objeto salvo com sucesso!', 'success', 'top-end');
         localStorage.removeItem('objetoSalvoSucesso');
     }
-    
-    const unidadeDaf = this.getElementById('ct_unidade_daf')
-    const unidadeDaf_display = this.getElementById('ct_unidade_daf_display') 
-    const modalidadeAquisicao = this.getElementById('ct_modalidade_aquisicao')
-    const modalidadeAquisicao_display = this.getElementById('ct_modalidade_aquisicao_display')
-    const arp = this.getElementById('ct_arp')
-    const arp_display = this.getElementById('ct_arp_display')
-    const denominacaoGenerica = this.getElementById('ct_denominacao')
-    const denominacaoGenerica_display = this.getElementById('ct_denominacao_display')
-    const fornecedor = this.getElementById('ct_fornecedor')
-    const fornecedor_display = this.getElementById('ct_fornecedor_display')
-    const processoSei = this.getElementById('ct_processo_sei')
-    const lei_licitacao = this.getElementById('ct_lei_licitacao')
-    const lei_licitacao_valor = this.getElementById('ct_lei_licitacao_valor')
-    const data_publicacao = this.getElementById('data_publicacao')
-    const data_vigencia = this.getElementById('data_vigencia')
-    const prazo_vigencia = this.getElementById('prazo_vigencia')
-    const botao_salvar_contrato = this.getElementById('btnSalvarContrato')
-    const contrato_id = this.getElementById('id_contrato').value
-    const botao_deletar_contrato = this.getElementById('btnDeletarContrato')
-    const botao_novo_objeto = this.getElementById('btnNovoObjeto')
-    const botao_vincular_itens_arp = this.getElementsByClassName('swal2-confirm swal2-styled swal2-default-outline')
-    const botao_nova_parcela = this.getElementById('btnNovaParcela')
+    if (localStorage.getItem('ParcelaSalva') === 'true') {
+        sweetAlert('Parcela salva com sucesso!', 'success', 'top-end');
+        let idParcela = localStorage.getItem('id_parcela');
+        localStorage.removeItem('ParcelaSalva');
+        if (idParcela) {
+            localStorage.removeItem('id_parcela');
+            openModalParcela(idParcela)
+        }
+    }
+
+
+    //Componentes
+    const unidadeDaf = document.getElementById('ct_unidade_daf')
+    const unidadeDaf_display = document.getElementById('ct_unidade_daf_display') 
+    const modalidadeAquisicao = document.getElementById('ct_modalidade_aquisicao')
+    const modalidadeAquisicao_display = document.getElementById('ct_modalidade_aquisicao_display')
+    const arp = document.getElementById('ct_arp')
+    const arp_display = document.getElementById('ct_arp_display')
+    const denominacaoGenerica = document.getElementById('ct_denominacao')
+    const denominacaoGenerica_display = document.getElementById('ct_denominacao_display')
+    const fornecedor = document.getElementById('ct_fornecedor')
+    const fornecedor_display = document.getElementById('ct_fornecedor_display')
+    const processoSei = document.getElementById('ct_processo_sei')
+    const lei_licitacao = document.getElementById('ct_lei_licitacao')
+    const lei_licitacao_valor = document.getElementById('ct_lei_licitacao_valor')
+    const botao_salvar_contrato = document.getElementById('btnSalvarContrato')
+    const contrato_id = document.getElementById('id_contrato').value
+    const botao_deletar_contrato = document.getElementById('btnDeletarContrato')
+    const botao_novo_objeto = document.getElementById('btnNovoObjeto')
+    const botao_vincular_itens_arp = document.getElementsByClassName('swal2-confirm swal2-styled swal2-default-outline')
+    const botao_nova_parcela = document.getElementById('btnNovaParcela')
     const modal_parcela = new bootstrap.Modal(document.getElementById('contratoParcelaModal'))
     const modal_inserir_objeto = new bootstrap.Modal(document.getElementById('contratoObjetoModal'))
     const modal_parcela_objeto = new bootstrap.Modal(document.getElementById('contratoParcelaObjeto'))
-    const tabela_objetos_contrato = this.getElementById('tabObjetosContrato')
-    const botao_salvar_objeto = this.getElementById('btnSalvarObjeto')
+    const tabela_objetos_contrato = document.getElementById('tabObjetosContrato')
+    const botao_salvar_objeto = document.getElementById('btnSalvarObjeto')
     const objeto_valor_unitario = document.getElementById('ctobjeto_valor_unitario')
     const objeto_produto = document.getElementById('ctobjeto_produto')
     const objeto_produto_hidden = document.getElementById('ctobjeto_produto_hidden')
@@ -51,6 +89,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const selecionar_objeto_parcela = document.getElementById('parcela_selecionar_objeto')
     const parcela_objeto_id = document.getElementById('parcela_objeto_id')
     const parcela_qtd_contratada = document.getElementById('id_parcela_qtd_contratada')
+    const parcela_numero = document.getElementById('id_numero_parcela')
+    const botao_inserir_nova_parcela = document.getElementById('inserirNovaParcela')
+    const botao_salvar_parcela = document.getElementById('botaoSalvarParcela')
+    const tabela_parcelas_contrato = document.getElementById('tabContratoParcelas')
 
     //Carregar dados
     carregarDados();
@@ -59,8 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
     $('#ct_processo_sei').mask('00000.000000/0000-00');
     $('#ct_documento_sei').mask('000000');
 
-    //Atualizar data de vigência e prazo
-    data_publicacao.addEventListener('change', atualizarDatas);
+    
 
     //Lei de Licitação
     lei_licitacao.addEventListener('change', leiLicitacao)
@@ -91,8 +132,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     //Salvar objeto
     botao_salvar_objeto.addEventListener('click', function(e){
-        e.preventDefault(); // Evita o envio padrão do formulário
-        
+        e.preventDefault();
+
+    
         //Verificar se ARP foi salva
         if (contrato_id == '') {
             sweetAlertPreenchimento("Salve primeiro o Contrato!");
@@ -104,6 +146,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (preenchimento_incorreto === false) {
             return;
         }
+
+        var csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
         
         //Enviar para o servidor
             //definir o caminho
@@ -124,7 +168,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
                 }
             })
         
@@ -196,7 +241,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('#tabObjetosContrato .col-item').forEach(function(td) {
         itensRegistrados.push(td.innerText.trim());
     });
-
+    
     //Verificar Número do Item do Objeto
     objeto_numero_item.addEventListener('change', function(){
         var valorItem = this.value;
@@ -215,12 +260,63 @@ document.addEventListener("DOMContentLoaded", function() {
             sweetAlertPreenchimento(mensagem)
             this.value = '';
         }
-    })
+    });
 
-    //Inserir Parcela
+    //Inserir Parcela - p1
     botao_nova_parcela.addEventListener('click', function(){
-        //modal_parcela_objeto.show()
-        modal_parcela.show()
+        if (itensRegistrados.length > 1) {
+            modal_parcela_objeto.show()
+        } else {
+            sweetAlertPreenchimento("Informe os objetos do contrato!");
+            return
+        }
+    });
+
+    botao_inserir_nova_parcela.addEventListener('click', function(){
+        id_objeto = document.getElementById('parcela_objeto_id').value
+        
+        const url = `/contratos/buscar_objeto/${id_objeto}/`;
+
+        //campos do modal
+        const id_parcela_objeto = document.getElementById('id_parcela_objeto')
+        const id_objeto_item = document.getElementById('id_objeto_item')
+        const id_objeto_produto = document.getElementById('id_objeto_produto')
+        const id_parcela_valor_unitario = document.getElementById('id_parcela_valor_unitario')
+        const id_parcela_fator_embalagem = document.getElementById('id_parcela_fator_embalagem')
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const objeto_json = data.objeto
+                id_parcela_objeto.value = objeto_json.objeto_id;
+                id_objeto_item.value = objeto_json.objeto_numero_item;
+                id_objeto_produto.value = objeto_json.objeto_produto;
+                id_parcela_fator_embalagem.value = objeto_json.objeto_fator_embalagem;
+                id_parcela_valor_unitario.value = formatoMoeda(objeto_json.objeto_valor_unitario);
+            })
+            .catch(error => console.error('Erro ao buscar Objeto:', error));
+        modal_parcela_objeto.hide();
+        limpar_dados_modal_objetos();
+        modal_parcela.show();
+    });
+
+    //limpar dados do modal objeto
+    function limpar_dados_modal_objetos() {
+        const id_numero_parcela = document.getElementById('id_numero_parcela')
+        const id_parcela_qtd_contratada = document.getElementById('id_parcela_qtd_contratada')
+        const id_parcela_previsao_entrega = document.getElementById('id_parcela_previsao_entrega')
+        const ctobjeto_observacoes = document.getElementById('ctobjeto_observacoes')
+        
+        id_numero_parcela.value = ''
+        id_parcela_qtd_contratada.value = ''
+        id_parcela_previsao_entrega.value = ''
+        ctobjeto_observacoes.value = ''
+    }
+
+    //Salvar Parcela
+    botao_salvar_parcela.addEventListener('click', function(e){
+        e.preventDefault();
+        salvarParcela();
     })
 
     //Levar valor do id do objeto
@@ -228,10 +324,36 @@ document.addEventListener("DOMContentLoaded", function() {
         parcela_objeto_id.value = selecionar_objeto_parcela.value
     })
 
+    //Formatar quantidade contratada da parcela
     parcela_qtd_contratada.addEventListener('input', function(){
         formatoQuantidade(parcela_qtd_contratada)
     })
     
+    //Avaliar número da parcela
+    parcela_numero.addEventListener('change', function(){
+        var valorItem = this.value;
+
+        // Verifica se o valor está fora do intervalo permitido
+        if (valorItem < 1 || valorItem > 20) {
+            const mensagem = 'O Número de Parcela deve ser entre 1 e 10!'
+            sweetAlertPreenchimento(mensagem)
+            this.value = '';
+            return
+        }
+    })
+
+    //Abrir Parcela
+    tabela_parcelas_contrato.addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.tagName === 'TD') {
+          const row = target.closest('tr');
+          const parcela_id = row.dataset.id;
+          //carregar_lista_produtos();
+          openModalParcela(parcela_id);
+          
+        }
+      });
+  
 
     //Funções
     function deletarContrato(){
@@ -313,28 +435,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function leiLicitacao() {
         lei_licitacao_valor.value = lei_licitacao.value;
-    }
-
-    function atualizarDatas() {
-        if (data_publicacao.value) {
-            // Calcula a data de vigência (data_publicacao + 365 dias)
-            let dataPublicacao = new Date(data_publicacao.value);
-            let dataVigencia = new Date(dataPublicacao);
-            dataVigencia.setDate(dataVigencia.getDate() + 365);
-
-            // Formata a data de vigência para o formato apropriado (YYYY-MM-DD)
-            let dataVigenciaFormatada = dataVigencia.toISOString().split('T')[0];
-            data_vigencia.value = dataVigenciaFormatada;
-
-            // Calcula o prazo de vigência (data_vigencia - data_atual)
-            let dataAtual = new Date();
-            let prazoVigencia = Math.round((dataVigencia - dataAtual) / (1000 * 60 * 60 * 24)) + 1;
-            prazo_vigencia.value = prazoVigencia;
-        } else {
-            // Limpa os campos se a data de publicação estiver vazia
-            data_vigencia.value = '';
-            prazo_vigencia.value = '';
-        }
     }
 
     function salvarContrato() {
@@ -469,12 +569,12 @@ document.addEventListener("DOMContentLoaded", function() {
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                carregarTabelaObjetosContrato(data.objetos)            
+                //carregarTabelaObjetosContrato(data.objetos)            
             })
             .catch(error => console.error('Erro ao vincular objetos:', error));
         
         localStorage.setItem('objetosInseridos', 'true');
-        //window.location.reload();
+        window.location.reload();
     }
 
     function carregarTabelaObjetosContrato(objetos) {
@@ -546,6 +646,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 let produto = data.produto;
                 $('#ctobjeto_produto').val(produto);
                 $('#ctobjeto_produto_hidden').val(produto);
+                $('#ctobjeto_arpItem_hidden').val(data.arp_item);
                 $('#ctobjeto_parcelas').val(data.numero_parcelas);
                 $('#ctobjeto_valor_unitario').val(formatarComoMoeda(data.valor_unitario));
                 $('#ctobjeto_qtd_contratada').val(data.qtd_contratada.toLocaleString('pt-BR'));
@@ -630,6 +731,129 @@ document.addEventListener("DOMContentLoaded", function() {
         return true;
     }
 
-    
+    function salvarParcela(){
+        const parcela_id = document.getElementById('parcela_id').value
 
+        //Verificar preenchimento dos campos
+        let preenchimento_incorreto = verificar_campos_parcela()
+        if (preenchimento_incorreto === false) {
+            return;
+        }
+        
+        //Enviar para o servidor
+            //definir o caminho
+            if (parcela_id == '') {
+                postURL = '/contratos/contrato/parcela/salvar/novo/'
+            } else
+            {
+                postURL = `/contratos/contrato/parcela/salvar/${parcela_id}/`
+            }
+
+            //pegar os dados
+            let formData = new FormData(document.getElementById('parcelaForm'));
+    
+            //enviar 
+            fetch(postURL, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+        
+        //Retorno do Servidor
+        .then(response => {
+            // Primeiro verifique se a resposta é ok
+            if (!response.ok) {
+                sweetAlert('Dados não foram salvos.', 'error', 'red');
+                throw new Error('Server response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.retorno === "Salvo") {
+                let id_parcela = data.parcela_id;
+                localStorage.setItem('ParcelaSalva', 'true');
+                localStorage.setItem('id_parcela', id_parcela);
+                window.location.href = data.redirect_url;
+            }
+    
+            if (data.retorno === "Não houve mudanças") {
+                //alert
+                sweetAlert('Dados não foram salvos.<br>Não houve mudanças.', 'warning', 'orange')
+            }
+    
+            if (data.retorno === "Erro ao salvar") {
+                //alert
+                sweetAlert('Dados não foram salvos.', 'error', 'red')
+            }
+        })
+        .catch(error => {
+            console.error('Fetch operation error:', error);
+        });
+    }
+
+    function verificar_campos_parcela() {
+        const campos = [
+            { id: 'id_numero_parcela', mensagem: 'Informe o <b>Número da Parcela</b>!' },
+            { id: 'id_parcela_qtd_contratada', mensagem: 'Informe a <b>Qtd Contratada</b>!' },
+            { id: 'id_parcela_previsao_entrega', mensagem: 'Informe a <b>Previsão de Entrega</b>!' },
+        ];
+    
+        let mensagensErro = campos.reduce((mensagens, campo) => {
+            const elemento = document.getElementById(campo.id);
+            if (!elemento || elemento.value === '' || elemento.value == 0) {
+                mensagens.push(campo.mensagem);
+            }
+            return mensagens;
+        }, []);
+    
+        if (mensagensErro.length > 0) {
+            const campos = mensagensErro.join('<br>')
+            sweetAlertPreenchimento(campos)
+            return false;
+        }
+        
+        return true;
+    }
+    
+    function openModalParcela(id_parcela) {
+        fetch(`/contratos/contrato/parcela/${id_parcela}/dados/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar dados da Parcela.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Atualizar os campos do formulário no modal com os dados recebidos
+                $('#parcela_id').val(data.id);
+                $('#parcela_log_data_registro').val(data.log_data_registro);
+                $('#parcela_log_responsavel_registro').val(data.log_responsavel_registro);
+                $('#parcela_log_ult_atualizacao').val(data.lot_ult_atualizacao);
+                $('#parcela_log_responsavel_atualizacao').val(data.log_responsavel_atualizacao);
+                $('#parcela_log_edicoes').val(data.log_edicoes);
+                $('#id_numero_parcela').val(data.numero_parcela);
+                $('#id_objeto_item').val(data.numero_item);
+                $('#id_parcela_objeto').val(data.objeto);
+                let produto = data.produto;
+                $('#id_objeto_produto').val(produto);
+                $('#id_parcela_fator_embalagem').val(data.fator_embalagem);
+                $('#id_parcela_qtd_contratada').val(data.qtd_contratada.toLocaleString('pt-BR'));
+                $('#id_parcela_qtd_entregue').val(data.qtd_entregue);
+                $('#id_parcela_qtd_a_entregar').val(data.qtd_a_entregar);
+                $('#id_parcela_valor_unitario').val(formatarComoMoeda(data.valor_unitario));
+                $('#id_parcela_valor_total').val(formatarComoMoeda(data.valor_total));
+                $('#id_parcela_previsao_entrega').val(data.data_previsao_entrega);
+                $('#id_parcela_ultima_entrega').val(data.data_ultima_entrega);
+                $('#id_parcela_observacoes').val(data.observacoes);
+    
+                // Abrir o modal
+                const modal = new bootstrap.Modal(document.getElementById('contratoParcelaModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
 });

@@ -414,6 +414,15 @@ class ContratosObjetosForm(forms.ModelForm):
         initial='',
         required=True,
     )
+    arp_item = forms.ModelChoiceField(
+        queryset=ContratosArpsItens.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        label='Item ARP',
+        initial='',
+        required=True,
+    )
     observacoes_gerais = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-control auto-expand',
@@ -465,9 +474,17 @@ class ContratosParcelasForm(forms.ModelForm):
         queryset=ContratosObjetos.objects.all(),
         widget=forms.Select(attrs={
             'class': 'form-control',
-            'id': 'id_parcela_objeto',
         }),
         label='Objeto',
+        initial='',
+        required=True,
+    )
+    contrato = forms.ModelChoiceField(
+        queryset=Contratos.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        label='Contrato',
         initial='',
         required=True,
     )
@@ -483,7 +500,7 @@ class ContratosParcelasForm(forms.ModelForm):
     )
 
     class Meta:
-        model = ContratosObjetos
+        model = ContratosParcelas
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):

@@ -12,20 +12,34 @@ function formatarComoMoeda(valor) {
 
 
 function formatoMoeda(valor) {
+    if (typeof valor === 'number') {
+        // Se o valor for um número, formatar diretamente
+        valor = valor.toFixed(2);
+    } else if (typeof valor === 'string') {
+        // Se o valor for uma string, remover caracteres não numéricos e converter
+        valor = valor.replace(/[^\d.,]/g, '');
+        valor = valor.replace(/,/g, '.');
+        valor = parseFloat(valor);
+        if (isNaN(valor)) {
+            valor = 0;
+        }
+        valor = valor.toFixed(2);
+    } else {
+        // Se o valor não for nem número nem string, definir como 0
+        valor = '0.00';
+    }
 
-    // Remover tudo o que não for dígito
-    valor = valor.replace(/\D/g, '');
-
-    // Converter para float e dividir por 100 para obter os decimais corretos
-    valor = (valor / 100).toFixed(2) + '';
+    // Converter para string para fazer as substituições
+    valor = valor.toString();
 
     // Substituir ponto por vírgula e adicionar o símbolo da moeda
-    valor = valor.replace('.', ',');
-    valor = 'R$ ' + valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    valor = 'R$ ' + valor.replace('.', ',').replace(/(\d)(?=(\d{3})+\d)/g, "$1.");
 
-    return valor
-
+    return valor;
 }
+
+
+
 
 function formatoQuantidade(campo) {
         
