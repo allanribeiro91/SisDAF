@@ -286,3 +286,35 @@ INSTRUMENTOS_JURIDICOS_CONSULTORES = [
     ('TC132', 'TC132'),
     ('', 'Não Informado'),
 ]
+
+LOCAL_ENTREGA_PRODUTOS = [
+    ('', ''),
+    ('apenas_almoxarifado', 'Almoxarifado'),
+    ('apenas_ses', 'SES'),
+    ('apenas_almoxarifado_ses', 'Almoxarifado e SES'),
+]
+
+NOTAS_RECEBIDAS = [
+    ('nao_informado', 'Não Informado'),
+    ('nenhuma', 'Nenhuma'),
+    ('parcial', 'Parcial'),
+    ('todas', 'Todas'),
+]
+
+NOTAS_STATUS = [
+    ('nao_informado', 'Não Informado'),
+    ('nao_validadas', 'Não Validadas'),
+    ('validadas', 'Validadas'),
+]
+
+NOTAS_PAGAMENTOS = [
+    ('nao_informado', 'Não Informado'),
+    ('nao_realizado', 'Não Realizado'),
+    ('realizado', 'Realizado'),
+]
+
+NIVEL_ALERTA = [
+    ('baixo', 'Baixo'),
+    ('medio', 'Médio'),
+    ('alto', 'Alto'),
+]

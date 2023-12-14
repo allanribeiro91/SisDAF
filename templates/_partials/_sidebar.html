@@ -1,7 +1,11 @@
 {% load static %}
     <!-- Barra Lateral Esquerda -->
     <div class="sidebar">
-
+        <div class="cabecalho">
+            <img src="{% static 'assets/logo/logo_sisdaf_negativo.png' %}" alt="Logo Forrageiras" class="top-logo">
+            <span class="titulo">SisDAF</span>
+            <span class="versao">Versão 0.1</span>
+        </div>
         <div>
             <a class="tab {% if request.resolver_match.url_name == 'home' %}active-tab{% endif %}" href="{% url 'home' %}">Home</a>
         </div>
@@ -16,11 +20,6 @@
             <a class="tab {% if current_url in 'fornecedores, fornecedor_representante_novo, fornecedores_representantes, fornecedores_comunicacoes, fornecedores_faq, fornecedor_faq_novo, fornecedor_faq_ficha, fornecedor_novo, fornecedor_ficha' %}active-tab{% endif %}" href="{% url 'fornecedores' %}">Fornecedores</a>
             {% endwith %}
         </div>
-        <!-- <div>
-            {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in '' %}active-tab{% endif %}" href="">Demandas de Imprensa/LAI</a>
-            {% endwith %}
-        </div> -->
         <div>
             {% with current_url=request.resolver_match.url_name %}
             <a class="tab {% if current_url in 'proaq, proaq_ficha_dados_gerais, proaq_ficha_evolucao, proaq_ficha_evolucao_nova, nova_tramitacao, proaq_ficha_tramitacoes, novo_proaq' %}active-tab{% endif %}" href="{% url 'proaq' %}">Processos Aquisitivos</a>
@@ -37,30 +36,31 @@
             <a class="tab {% if current_url in 'prog_basico, prog_especializado, prog_estrategico' %}active-tab{% endif %}" href="{% url 'prog_basico' %}">Programação</a>
             {% endwith %}
         </div>
-        <!-- <div>
-            {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in '' %}active-tab{% endif %}" href="">Distribuição</a>
-            {% endwith %}
-        </div>
-        
-        <div>
-            {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in '' %}active-tab{% endif %}" href="">Gestão de Pacientes</a>
-            {% endwith %}
-        </div>
-        <div>
-            {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in '' %}active-tab{% endif %}" href="">Planejamento</a>
-            {% endwith %}
-        </div> -->
         <div>
             {% with current_url=request.resolver_match.url_name %}
             <a class="tab {% if current_url in 'consultores_tecnicos' %}active-tab{% endif %}" href="{% url 'consultores_tecnicos' %}">Consultores Técnicos</a>
             {% endwith %}
         </div>
 
-        <!-- Adicione o botão abaixo -->
-        <div id="toggleButton" class="toggle-button"><i class="fas fa-arrow-left"></i></div>
+        <!-- Usuário -->
+        <div id="toggleButton" class="toggle-button">
+            <div class="usuario">
+                <img src="{% if usuario.foto_usuario %}{{ usuario.foto_usuario.url }}{% else %}{% static 'assets/imagens/user.png' %}{% endif %}" class="profile-pic-img"><br>
+                {{ request.user.usuario_relacionado.primeiro_ultimo_nome  }}<br>
+                {{ request.user.usuario_relacionado.alocacao_ativa  }}
+            </div>
+        </div>
+        <div class="dropdown" id="dropdown">
+            <a href="{% url 'meusdados' %}">
+                <i class="fas fa-user"></i>
+                &nbsp;Meus Dados</a>
+            <a href="{% url 'sisdaf_ajuda' %}">
+                <i class="fas fa-info-circle"></i>
+                &nbsp;Sobre o SisDAF</a>
+            <a href="{% url 'logout' %}">
+                <i class="fas fa-sign-out-alt"></i>
+                &nbsp;Sair</a>
+        </div>
         
 
     </div>

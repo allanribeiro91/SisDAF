@@ -1,9 +1,10 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
 {% load humanize %}
+{% load contratos_filters %}
 {% block extra_head %}
     <meta name="csrf-token" content="{{ csrf_token }}">
-    <link rel="stylesheet" href="{% static '\styles\fornecedores.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\arp.css' %}">
 {% endblock %}
 {% block content %}    
     
@@ -126,14 +127,27 @@
                     <th class="col-arp-data">Prazo (dias)</th>
                     <th class="col-arp-denominacao">Denominação</th>
                     <th class="col-arp-fornecedor">Fornecedor</th>
-                    <th class="col-arp-data" style="text-align: center !important;">Valor Total</th>
+                    <th class="col-arp-data" style="text-align: center !important;">Valor Total R$</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in tab_arps %}
                 <tr data-id="{{ item.id }}">
                     <td class="col-arp-id">{{ item.id }}</td>
-                    <td class="col-arp-status">{{ item.get_status_display }}</td>
+                    <td class="col-status">
+                        {% if item.get_status_display == 'Vigente' %}
+                            <span class="status-vigente"><span class="bolinha bolinha-vigente"></span>{{ item.get_status_display }}</span>
+                        {% endif %}
+                        {% if item.get_status_display == 'Suspenso' %}
+                            <span class="status-suspenso"><span class="bolinha bolinha-suspenso"></span>{{ item.get_status_display }}</span>
+                        {% endif %}
+                        {% if item.get_status_display == 'Encerrado' %}
+                            <span class="status-suspenso"><span class="bolinha bolinha-encerrado"></span>{{ item.get_status_display }}</span>
+                        {% endif %}
+                        {% if item.get_status_display == 'Cancelado' %}
+                            <span class="status-suspenso"><span class="bolinha bolinha-cancelado"></span>{{ item.get_status_display }}</span>
+                        {% endif %}
+                    </td>
                     <td class="col-arp-unidadedaf" style="text-transform: uppercase;">{{ item.unidade_daf }}</td>
                     <td class="col-arp-processo-sei">{{ item.numero_processo_sei }}</td>
                     <td class="col-arp-doc-sei">{{ item.numero_documento_sei }}</td>
@@ -143,7 +157,7 @@
                     <td class="col-arp-data">{{ item.prazo_vigencia }}</td>
                     <td class="col-arp-denominacao">{{ item.denominacao.denominacao }}</td>
                     <td class="col-arp-fornecedor">{{ item.fornecedor.nome_fantasia }}</td>
-                    <th class="col-arp-valor" style="font-weight: normal; text-align: right !important;">{{ item.valor_total_arp|floatformat:2|intcomma }}</th>
+                    <th class="col-arp-valor" style="font-weight: normal; text-align: right !important;">{{ item.valor_total_arp|custom_number_format }}</th>
                 </tr>
                 {% endfor %}
             </tbody>

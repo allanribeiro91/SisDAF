@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from apps.main.forms import LoginForms, CadastroForms
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
+from apps.contratos.models import Contratos
+from apps.main.models import CustomLog
 from apps.fornecedores.models import Fornecedores
 from apps.processos_aquisitivos.models import ProaqDadosGerais
 from apps.main.models import UserAccessLog
@@ -69,6 +71,8 @@ def home(request):
     else:
         unidade_daf = 'Não Informado'  # Ou algum valor padrão, se apropriado
     
+    tabContratos = Contratos.objects.filter(del_status=False)
+    tab_logs = CustomLog.objects.all().order_by('-timestamp')[:20]
     conteudo ={
         'usuario': usuario,
         'tot_denominacoes': tot_denominacaoes,
@@ -77,6 +81,8 @@ def home(request):
         'tot_proaqs': tot_proaqs,
         'tot_contratos': tot_contratos,
         'unidade_daf': unidade_daf,
+        'tabContratos': tabContratos,
+        'tab_logs': tab_logs,
     }
     return render(request, 'main/home.html', conteudo)
 

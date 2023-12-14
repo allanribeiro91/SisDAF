@@ -473,8 +473,6 @@ document.addEventListener('DOMContentLoaded', function() {
         combinacoesExistentes.push(produto + "-" + tipoCota);
     });
 
-    
-
 });
 
 function verificarCombinacaoExistente() {

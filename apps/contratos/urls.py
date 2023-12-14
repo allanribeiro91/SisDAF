@@ -5,7 +5,7 @@ from apps.contratos.views import (
     arp_item_ficha, arp_item_formulario, arp_item_delete,
     buscar_arps, arp_buscar_dados_sei, buscar_contrato, contrato_delete, buscar_arps_itens, vincular_itens_arp,
     contrato_objeto_modal, contrato_objeto_salvar, contrato_objeto_delete, buscar_objeto, contrato_parcela_salvar,
-    contrato_parcela_modal
+    contrato_parcela_modal, contrato_dados_arp
 )
 
 
@@ -36,6 +36,7 @@ urlpatterns = [
     path('contratos/buscararpsitens/<int:id_arp>/', buscar_arps_itens, name='buscar_arps_itens'),
     path('contratos/buscarcontrato/<int:id_contrato>/', buscar_contrato, name='buscar_contrato'),
     path('contratos/vincularitensarp/<int:id_arp>-<int:id_contrato>/', vincular_itens_arp, name='vincular_itens_arp'),
+    path('contratos/ficha-arp/<int:id_arp>/', contrato_dados_arp, name='contrato_dados_arp'),
     
     #OBJETO DO CONTRATO
     path('contratos/contrato/objeto/<int:id_objeto>/dados/', contrato_objeto_modal, name='contrato_objeto_modal'),
@@ -48,4 +49,5 @@ urlpatterns = [
     path('contratos/contrato/parcela/<int:id_parcela>/dados/', contrato_parcela_modal, name='contrato_parcela_modal'),
     path('contratos/contrato/parcela/salvar/<int:id_parcela>/', contrato_parcela_salvar, name='contrato_parcela_salvar'),
     path('contratos/contrato/parcela/salvar/novo/', contrato_parcela_salvar, name='contrato_parcela_salvar'),
+
 ]

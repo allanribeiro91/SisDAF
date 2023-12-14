@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
         atualizarDatas();
     }
     if (localStorage.getItem('objetosInseridos') === 'true') {
-        sweetAlert('Objetos vinculados com sucesso!', 'success', 'top-end');
+        sweetAlert('Itens da ARP vinculados com sucesso!', 'success', 'top-end');
         localStorage.removeItem('objetosInseridos');
         atualizarDatas();
     }
@@ -93,15 +93,40 @@ document.addEventListener("DOMContentLoaded", function() {
     const botao_inserir_nova_parcela = document.getElementById('inserirNovaParcela')
     const botao_salvar_parcela = document.getElementById('botaoSalvarParcela')
     const tabela_parcelas_contrato = document.getElementById('tabContratoParcelas')
+    const botao_nova_entrega = document.getElementById('btnNovaEntrega')
+    const modal_entrega = new bootstrap.Modal(document.getElementById('contratoEntregaModal'))
+    const entrega_qtd_entregue = document.getElementById('id_entrega_qtd_entregue')
+    const modal_entrega_parcela = new bootstrap.Modal(document.getElementById('contratoEntregaParcela'))
+    const botao_inserir_nova_entrega = document.getElementById('inserirNovaEntrega')
+    const selecionar_parcela_entrega = document.getElementById('entrega_selecionar_parcela')
 
     //Carregar dados
     carregarDados();
     
+    
     //Formatação dos dados
     $('#ct_processo_sei').mask('00000.000000/0000-00');
     $('#ct_documento_sei').mask('000000');
+    formatoQuantidade(entrega_qtd_entregue)
 
-    
+    //Dados da ARP
+    arp_display.addEventListener('click', function() {
+        
+        var arp_numero = arp.value
+
+        if (arp_numero == '') {
+            sweetAlert('Não possui ARP!', 'warning')
+            return
+        }
+        
+        var width = 700;
+        var height = 300;
+        var left = (window.screen.width / 2) - (width / 2);
+        var top = (window.screen.height / 2) - (height / 2);
+        
+        var url = '/contratos/ficha-arp/' + arp_numero + '/';
+        window.open(url, 'newwindow', 'scrollbars=yes, width=' + width + ', height=' + height + ', top=' + top + ', left=' + left);
+    })
 
     //Lei de Licitação
     lei_licitacao.addEventListener('change', leiLicitacao)
@@ -283,6 +308,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const id_objeto_produto = document.getElementById('id_objeto_produto')
         const id_parcela_valor_unitario = document.getElementById('id_parcela_valor_unitario')
         const id_parcela_fator_embalagem = document.getElementById('id_parcela_fator_embalagem')
+        const id_qtd_saldo_arp = document.getElementById('id_qtd_saldo_arp')
 
         fetch(url)
             .then(response => response.json())
@@ -293,24 +319,32 @@ document.addEventListener("DOMContentLoaded", function() {
                 id_objeto_produto.value = objeto_json.objeto_produto;
                 id_parcela_fator_embalagem.value = objeto_json.objeto_fator_embalagem;
                 id_parcela_valor_unitario.value = formatoMoeda(objeto_json.objeto_valor_unitario);
+                id_qtd_saldo_arp.value = objeto_json.arp_item_saldo;
             })
             .catch(error => console.error('Erro ao buscar Objeto:', error));
         modal_parcela_objeto.hide();
-        limpar_dados_modal_objetos();
+        limpar_dados_modal_parcelas();
         modal_parcela.show();
     });
 
     //limpar dados do modal objeto
-    function limpar_dados_modal_objetos() {
-        const id_numero_parcela = document.getElementById('id_numero_parcela')
-        const id_parcela_qtd_contratada = document.getElementById('id_parcela_qtd_contratada')
-        const id_parcela_previsao_entrega = document.getElementById('id_parcela_previsao_entrega')
-        const ctobjeto_observacoes = document.getElementById('ctobjeto_observacoes')
+    function limpar_dados_modal_parcelas() {
+        //logs
+        document.getElementById('parcela_id').value = ''
+        document.getElementById('parcela_log_data_registro').value = ''
+        document.getElementById('parcela_log_responsavel_registro').value = ''
+        document.getElementById('parcela_log_ult_atualizacao').value = ''
+        document.getElementById('parcela_log_responsavel_atualizacao').value = ''
+        document.getElementById('parcela_log_edicoes').value = ''
         
-        id_numero_parcela.value = ''
-        id_parcela_qtd_contratada.value = ''
-        id_parcela_previsao_entrega.value = ''
-        ctobjeto_observacoes.value = ''
+        document.getElementById('id_numero_parcela').value = ''
+        document.getElementById('id_parcela_qtd_contratada').value = ''
+        document.getElementById('id_parcela_qtd_a_entregar').value = ''
+        document.getElementById('id_parcela_previsao_entrega').value = ''
+        document.getElementById('id_parcela_valor_total').value = ''
+        document.getElementById('ctobjeto_observacoes').value = ''
+        
+
     }
 
     //Salvar Parcela
@@ -354,6 +388,17 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       });
   
+    //Nova entrega
+    botao_nova_entrega.addEventListener('click', function(){
+        modal_entrega_parcela.show()
+    })
+    botao_inserir_nova_entrega.addEventListener('click', function(){
+        modal_entrega_parcela.hide()
+        modal_entrega.show()
+    })
+    selecionar_parcela_entrega.addEventListener('click', function(){
+        document.getElementById('entrega_parcela_id').value = selecionar_parcela_entrega.value
+    })
 
     //Funções
     function deletarContrato(){
@@ -510,12 +555,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function verificar_campos_contrato() {
         const campos = [
-            { id: 'ct_lei_licitacao_valor', mensagem: 'Informe a Lei de Licitação!' },
-            { id: 'ct_processo_sei', mensagem: 'Informe o Processo SEI!' },
-            { id: 'ct_documento_sei', mensagem: 'Informe o Documento SEI!' },
-            { id: 'ct_numero_contrato', mensagem: 'Informe o Número do Contrato!' },
-            { id: 'ct_status', mensagem: 'Informe o Status!' },
-            { id: 'data_publicacao', mensagem: 'Informe a Data da Publicação!' },
+            { id: 'ct_unidade_daf_display', mensagem: 'Informe a <b>Unidade DAF</b>!' },
+            { id: 'ct_lei_licitacao_valor', mensagem: 'Informe a <b>Lei de Licitação</b>!' },
+            { id: 'ct_processo_sei', mensagem: 'Informe o <b>Processo SEI</b>!' },
+            { id: 'ct_documento_sei', mensagem: 'Informe o <b>Documento SEI</b>!' },
+            { id: 'ct_numero_contrato', mensagem: 'Informe o <b>Número do Contrato</b>!' },
+            { id: 'ct_status', mensagem: 'Informe o <b>Status</b>!' },
+            { id: 'data_publicacao', mensagem: 'Informe a <b>Data da Publicação</b>!' },
         ];
     
         let mensagensErro = campos.reduce((mensagens, campo) => {
@@ -536,6 +582,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function inserir_objeto() {
+        if (contrato_id == '') {
+            sweetAlert('Salve o <b>Contrato</b> primeiro!', 'warning', 'orange')
+            return
+        }
+        
         if (arp.value == '') {
             document.querySelectorAll('#contratoObjetoModal input').forEach(input => input.value = '');
             modal_inserir_objeto.show()
@@ -550,9 +601,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 title='Contrato com ARP', 
                 html=(
                     '<br><p style="text-align: justify;">O presente contrato está vinculado a uma Ata de Registro de Preços.<br>' +
-                    '<br>Clique em <b>"Vincular Itens da ARP"</b> para trazer preencher os objetos do contrato.<br>' +
-                    '<br>Serão vinculados todos os itens da ARP com quantidade igual a zero.<br>' +
-                    '<br>Caso um dos itens não seja contratado, <b>você deverá deixar a quantidade igual a zero.</b></p><br>'
+                    '<br>Clique em <b>"Vincular Itens da ARP"</b> para trazer os itens da ARP para este contrato.<br>' +
+                    '<br>Serão vinculados todos os itens da ARP.<br>'
                     ),
                 icon='info',
                 iconColor='blue',
@@ -733,13 +783,32 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function salvarParcela(){
         const parcela_id = document.getElementById('parcela_id').value
+        const id_qtd_saldo_arp = document.getElementById('id_qtd_saldo_arp')
 
         //Verificar preenchimento dos campos
         let preenchimento_incorreto = verificar_campos_parcela()
         if (preenchimento_incorreto === false) {
             return;
         }
+
+        //Verificar número do item e número da parcela
+        let n_item_parcela = verificar_item_parcela()
+        if (n_item_parcela == true) {
+            return;
+        }
         
+        //Verificar Saldo ARP
+        if (arp.value != '') {
+            let saldo_arp = parseFloat(id_qtd_saldo_arp.value)
+            let qtd_contratada_str = parcela_qtd_contratada.value
+            qtd_contratada_str = qtd_contratada_str.replace(/\./g, '');
+            let qtd_contratada = parseFloat(qtd_contratada_str)
+            if (qtd_contratada > saldo_arp) {
+                sweetAlert('Saldo da ARP insuficiente!', 'warning', 'red')
+                return
+            }
+        }
+
         //Enviar para o servidor
             //definir o caminho
             if (parcela_id == '') {
@@ -817,6 +886,29 @@ document.addEventListener("DOMContentLoaded", function() {
         return true;
     }
     
+    function verificar_item_parcela() {
+        
+        // Coletar as combinações de item e parcela armazenar no array
+        var combinacoesItensParcelas = [];
+        document.querySelectorAll('#tabContratoParcelas tr').forEach(function(tr) {
+            var item = tr.querySelector('.col-parcela-item').innerText.trim();
+            var parcela = tr.querySelector('.col-parcela-parcela').innerText.trim();
+            combinacoesItensParcelas.push(item + "-" + parcela);
+        })
+        
+        var selectItem = document.getElementById('id_objeto_item').value;
+        var selectParcela = document.getElementById('id_numero_parcela').value;
+
+        var combinacao = selectItem.trim() + "-" + selectParcela.trim();
+
+        if (combinacoesItensParcelas.includes(combinacao)) {
+            const mensagem = "Já existe <b>parcela</b> com este número para este <b>item</b>!";
+            sweetAlertPreenchimento(mensagem);
+            return true;
+        }
+        return false;
+    }
+
     function openModalParcela(id_parcela) {
         fetch(`/contratos/contrato/parcela/${id_parcela}/dados/`)
             .then(response => {
@@ -840,8 +932,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 $('#id_objeto_produto').val(produto);
                 $('#id_parcela_fator_embalagem').val(data.fator_embalagem);
                 $('#id_parcela_qtd_contratada').val(data.qtd_contratada.toLocaleString('pt-BR'));
-                $('#id_parcela_qtd_entregue').val(data.qtd_entregue);
-                $('#id_parcela_qtd_a_entregar').val(data.qtd_a_entregar);
+                $('#id_parcela_qtd_entregue').val(data.qtd_entregue.toLocaleString('pt-BR'));
+                $('#id_parcela_qtd_a_entregar').val(data.qtd_a_entregar.toLocaleString('pt-BR'));
                 $('#id_parcela_valor_unitario').val(formatarComoMoeda(data.valor_unitario));
                 $('#id_parcela_valor_total').val(formatarComoMoeda(data.valor_total));
                 $('#id_parcela_previsao_entrega').val(data.data_previsao_entrega);

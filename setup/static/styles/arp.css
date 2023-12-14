@@ -83,14 +83,6 @@
     overflow-y: auto;
 }
 
-.grid {
-    display: flex;
-    justify-content: flex-start;  /* Alinha os itens à esquerda */
-    /*align-items: center;  /* Alinha os itens verticalmente */
-    flex-wrap: wrap;  /* Permite que os itens ocupem várias linhas */
-    gap: 10px;  /* Espaçamento entre os itens */
-}
-
 .filter-title {
     position: absolute;
     top: 5px;
@@ -210,7 +202,8 @@
     justify-content: center;  /* Centraliza o conteúdo do botão verticalmente */
 }
 
-.custom-btn.limpar-filtro-fornecedores {
+.custom-btn.limpar-filtro-fornecedores, .custom-btn.limpar-filtro-fornecedores-faq,
+.custom-btn.limpar-filtro-arps {
     padding: 6px 5px;
     max-width: 5%;
     border: 0px;
@@ -273,70 +266,90 @@ table tbody tr:hover {
 .col-id {
     width: 2% !important;
 }
-.col-status {
+.col-cnpj {
     width: 6% !important;
-    text-align: left !important;
-}
-.col-unidadedaf {
-    width: 6% !important;
-    text-align: left !important;
-}
-.col-modalidade {
-    width: 8% !important;
-    text-align: left !important;
-}
-
-.col-contrato {
-    width: 6% !important;
-    text-align: left !important;
-}
-
-.col-data {
-    width: 5% !important;
-    text-align: left !important;
-}
-.col-denominacao {
-    width: 10% !important;
     text-align: left !important;
 }
 .col-fornecedor {
-    width: 20% !important;
+    width: 38% !important;
     text-align: left !important;
 }
-.col-valor {
+.col-hierarquia {
+    width: 6% !important;
+    text-align: left !important;
+}
+
+.col-porte {
+    width: 6% !important;
+    text-align: left !important;
+}
+.col-direito {
+    width: 6% !important;
+    text-align: left !important;
+}
+.col-uf {
+    width: 3% !important;
+    text-align: left !important;
+}
+
+.col-faq-id {
     width: 5% !important;
-    text-align: right !important;
+    text-align: left !important;
+}
+
+.col-faq-topico {
+    width: 15% !important;
+    text-align: left !important;
+}
+
+.col-faq-contexto {
+    width: 40% !important;
+    text-align: left !important;
+}
+
+.col-faq-resposta {
+    width: 40% !important;
+    text-align: left !important;
 }
 
 
-.full-width {
-    flex-grow: 2;  /* Cresce para ocupar o espaço disponível */
-    margin-right: 5px;
+
+
+/* colunas arp */
+.col-arp-id {
+    width: 2% !important;
+    text-align: left !important;
+}
+.col-arp-status {
+    width: 5% !important;
+    text-align: left !important;
+}
+.col-arp-unidadedaf {
+    width: 5% !important;
+    text-align: left !important;
+}
+.col-arp-processo-sei {
+    width: 7% !important;
+    text-align: left !important;
+}
+.col-arp-doc-sei {
+    width: 5% !important;
+    text-align: left !important;
+}
+.col-arp-data {
+    width: 5% !important;
+    text-align: center !important;
+}
+.col-arp-denominacao {
+    width: 10% !important;
+    text-align: left !important;
+}
+.col-arp-fornecedor {
+    width: 15% !important;
+    text-align: left !important;
 }
 
-/* .status-vigente {
-    font-weight: bold;
-    color: #01a71a;
-}
-.status-suspenso {
-    font-weight: bold;
-    color: #ff7700;
-} */
-/* .status-suspenso {
-    font-weight: bold;
-    color: white;
-    background-color: #ff7700;
-    border-radius: 5px;
-    padding: 3px;
-}
 
-.status-vigente {
-    font-weight: bold;
-    color: white;
-    background-color: #01a71a;
-    border-radius: 5px;
-    padding: 3px;
-} */
 .bolinha {
     height: 15px;
     width: 15px;

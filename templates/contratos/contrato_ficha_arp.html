@@ -1,0 +1,40 @@
+{% load static %}
+{% load humanize %}
+{% load contratos_filters %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/contrato_ficha.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+
+<div class="conteudo_arp" style="margin: 10px;">
+
+    <h3 style="font-size: 18px;">ATA DE REGISTRO DE PREÇOS: <span style="background-color: yellow;"> {{ arp_numero }}</span></h3>
+
+<div class="grid" style="font-size: 14px; text-align: right !important;">
+    <table class="table table-striped fixed-size-table" style="font-size: 12px;" id="tabObjetosContrato">
+        <thead>
+            <tr>
+                <th class="col-item">Item</th>
+                <th class="col-produto">Produto</th>
+                <th class="col-valor">Qtd Registrada</th>
+                <th class="col-valor">Qtd Contratada</th>
+                <th class="col-valor">Saldo a Contratar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in arps_itens %}
+            <tr data-id="{{ item.id }}">
+                <td class="col-item">{{ item.numero_item }}</td>
+                <td class="col-produto">{{ item.produto.produto }}</td>
+                <td class="col-valor">{{ item.qtd_registrada|floatformat:0|intcomma }}</td>
+                <td class="col-valor">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
+                <td class="col-valor">{{ item.qtd_saldo|floatformat:0|intcomma }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> 
+</div>
+
+</div>
+

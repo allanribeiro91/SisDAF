@@ -225,10 +225,13 @@ select[name="numero_processo"] {
 
 
 /*--colunas--*/
-.col-item {
+.col-item,
+.col-parcela-item,
+.col-parcela-parcela {
     width: 3% !important;
     text-align: left;
 }
+
 .col-status {
     width: 7% !important;
     text-align: left;

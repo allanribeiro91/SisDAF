@@ -1,47 +1,152 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
+{% load contratos_filters %}
 {% block extra_head %}
     <link rel="stylesheet" href="{% static '\styles\home.css' %}">
 {% endblock %}
 {% block content %}    
 
-        <!-- Caminho da Área de Trabalho -->
-        <div class="breadcrumb2">
-            <i class="fas fa-home"></i> Home
-        </div>        
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fas fa-home"></i> Home
+    </div>   
+
+    <div class="area-scroll">
+    
+             
         
-        <!-- Contêiner das Caixas de Apresentação -->
+        <!-- Contêiner das Caixas de Apresentação -->     
         <div class="presentation-container">
-            <div class="presentation-box">
-                <h2>Denominações Genéricas</h2>
-                <p>{{ tot_denominacoes }}</p>
-            </div>
-        
-            <div class="presentation-box">
-                <h2>Produtos Farmacêuticos</h2>
-                <p>{{ tot_produtos }}</p>
+            <div class="title-row">
+                <i class="fas fa-chart-bar"></i>&nbsp;Principais Números
             </div>
 
-            <div class="presentation-box">
-                <h2>Fornecedores</h2>
-                <p>{{ tot_fornecedores }}</p>
+            <div class="boxes-row">
+            
+                <div class="presentation-box">
+                    <h2>Denominações Genéricas</h2>
+                    <p>{{ tot_denominacoes }}</p>
+                </div>
+                <div class="presentation-box">
+                    <h2>Produtos Farmacêuticos</h2>
+                    <p>{{ tot_produtos }}</p>
+                </div>
+    
+                <div class="presentation-box">
+                    <h2>Fornecedores</h2>
+                    <p>{{ tot_fornecedores }}</p>
+                </div>
+    
+                <div class="presentation-box">
+                    <h2>Processos Aquisitivos</h2>
+                    <p>{{ tot_proaqs }}</p>
+                </div>
+    
+                <div class="presentation-box">
+                    <h2>ARPs</h2>
+                    <p>{{ tot_contratos }}</p>
+                </div>
+    
+                <div class="presentation-box">
+                    <h2>Contratos</h2>
+                    <p>{{ tot_contratos }}</p>
+                </div>
+            
+            </div>
+          
+        </div>
+
+        <div class="presentation-container">
+            <div class="title-row">
+                <i class="fas fa-bell"></i>&nbsp;Central de Notificações
             </div>
 
-            <div class="presentation-box">
-                <h2>Processos Aquisitivos</h2>
-                <p>{{ tot_proaqs }}</p>
-            </div>
+            <div class="boxes-row">
+                
 
-            <div class="presentation-box">
-                <h2>ARPs</h2>
-                <p>{{ tot_contratos }}</p>
+                <div class="section-tabela">
+                    <table class="table table-striped table-hover fixed-size-table table-fixed-head" style="font-size: 14px;" id="tabContratos">
+                        <thead>
+                            <tr>
+                                <th class="col-unidade-daf">Unidade DAF</th>
+                                <th class="col-nivel">Nível</th>
+                                <th class="col-item">Item</th>
+                                <th class="col-mensagem">Mensagem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in tabAlertas %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="col-unidade-daf">{{ item.unidadedaf }}</td>
+                                <td class="col-nivel">
+                                    {% if item.get_status_display == 'Vigente' %}
+                                        <span class="bolinha bolinha-nivel-baixo"></span>{{ item.get_status_display }}</span>
+                                    {% endif %}
+                                    {% if item.get_status_display == 'Suspenso' %}
+                                        <span class="bolinha bolinha-nivel-medio"></span>{{ item.get_status_display }}</span>
+                                    {% endif %}
+                                    {% if item.get_status_display == 'Encerrado' %}
+                                        <span class="bolinha bolinha-nivel-alto"></span>{{ item.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="col-item" style="text-transform: uppercase;">{{ item.item }}</td>
+                                <td class="col-mensagem">{{ item.mensagem }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>  
+                </div>
+                
+            
             </div>
-
-            <div class="presentation-box">
-                <h2>Contratos</h2>
-                <p>{{ tot_contratos }}</p>
-            </div>
+          
         </div>
         
+        <div class="presentation-container">
+            <div class="title-row">
+                <i class="fas fa-history"></i>&nbsp;Últimos Logs
+            </div>
+
+            <div class="boxes-row">
+            
+                <div class="section-tabela">
+                    <table class="table table-striped table-hover fixed-size-table table-fixed-head" style="font-size: 14px;" id="tabLogs">
+                        <thead>
+                            <tr>
+                                <th class="log-id">ID</th>
+                                <th class="log-usuario">Usuário</th>
+                                <th class="log-unidade">Unidade DAF</th>
+                                <th class="log-data">Data/Hora</th>
+                                <th class="log-modulo">Entidade</th>
+                                <th class="log-acao">Ação</th>
+                                <th class="log-descricao">Detalhamento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in tab_logs %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="log-id">{{ item.id }}</td>
+                                <td class="log-usuario">{{ item.usuario.primeiro_ultimo_nome }}</td>
+                                <td class="log-unidade">{{ item.usuario.alocacao_ativa }}</td>
+                                <td class="log-data">{{ item.timestamp|date:"d/m/Y H:i:s" }}</td>
+                                <td class="log-modulo">{{ item.model }}</td>
+                                <td class="log-acao">{{ item.acao }}</td>
+                                <td class="log-descricao">{{ item.observacoes_sem_cpf }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>  
+                </div>
+                
+            
+            </div>
+          
+        </div>
+
+        <div style="margin-top: 30px;">
+            &nbsp;
+        </div>
+    
+    </div>
 
 {% endblock %}

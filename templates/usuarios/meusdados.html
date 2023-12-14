@@ -33,11 +33,11 @@
         </div>
         
         <div class="horizontal-sections">
-            <!-- Foto do usuário --> 
+            <!-- Foto do usuário -->
             <div class="image-upload">
                 <label for="file-input">
-                    <!-- <img id="foto_usuario" src="{% if usuario.foto_usuario %}{{ usuario.foto_usuario.url }}{% else %}{% static 'assets/imagens/user.png' %}{% endif %}" class="rounded-circle" alt="Imagem do usuário"> -->
-                    <img id="foto_usuario" src="{% static 'assets/imagens/user.png' %}" class="rounded-circle" alt="Imagem do usuário">
+                    <img id="foto_usuario" src="{% if usuario.foto_usuario %}{{ usuario.foto_usuario.url }}{% else %}{% static 'assets/imagens/user.png' %}{% endif %}" class="rounded-circle" alt="Imagem do usuário">
+                    <!-- <img id="foto_usuario" src="{% static 'assets/imagens/user.png' %}" class="rounded-circle" alt="Imagem do usuário"> -->
                 </label>
                 <input id="file-input" type="file" name="foto_usuario" style="display:none;" accept="image/*" onchange="previewImage(this)">
             </div>

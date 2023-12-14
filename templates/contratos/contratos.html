@@ -1,5 +1,6 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
+{% load contratos_filters %}
 {% block extra_head %}
 <!-- <link rel="stylesheet" href="{% static '\styles\contrato_ficha.css' %}"> -->
     <link rel="stylesheet" href="{% static '\styles\contratos.css' %}">
@@ -127,13 +128,27 @@
                     <th class="col-data">Vigência</th>
                     <th class="col-denominacao">Denominação</th>
                     <th class="col-fornecedor">Fornecedor</th>
+                    <th class="col-valor">Valor Total R$</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in tabContratos %}
                 <tr data-id="{{ item.id }}">
                     <td class="col-id">{{ item.id }}</td>
-                    <td class="col-status">{{ item.get_status_display }}</td>
+                    <td class="col-status">
+                        {% if item.get_status_display == 'Vigente' %}
+                            <span class="status-vigente"><span class="bolinha bolinha-vigente"></span>{{ item.get_status_display }}</span>
+                        {% endif %}
+                        {% if item.get_status_display == 'Suspenso' %}
+                            <span class="status-suspenso"><span class="bolinha bolinha-suspenso"></span>{{ item.get_status_display }}</span>
+                        {% endif %}
+                        {% if item.get_status_display == 'Encerrado' %}
+                            <span class="status-suspenso"><span class="bolinha bolinha-encerrado"></span>{{ item.get_status_display }}</span>
+                        {% endif %}
+                        {% if item.get_status_display == 'Cancelado' %}
+                            <span class="status-suspenso"><span class="bolinha bolinha-cancelado"></span>{{ item.get_status_display }}</span>
+                        {% endif %}
+                    </td>
                     <td class="col-unidadedaf" style="text-transform: uppercase;">{{ item.unidade_daf }}</td>
                     <td class="col-modalidade">{{ item.get_modalidade_aquisicao_display }}</td>
                     <td class="col-contrato">{{ item.arp.numero_arp }}</td>
@@ -142,6 +157,7 @@
                     <td class="col-data">{{ item.data_vigencia|date:"d/m/Y" }}</td>
                     <td class="col-denominacao">{{ item.denominacao.denominacao }}</td>
                     <td class="col-fornecedor">{{ item.fornecedor.nome_fantasia }}</td>
+                    <td class="col-valor">{{ item.valor_total|custom_number_format }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

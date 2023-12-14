@@ -1,23 +1,46 @@
-.presentation-container {
-    display: flex;
-    align-items: flex-start;
-    margin-top: 0px;
-    margin-left: 0px;
+.area-scroll{
+    overflow-y: auto;
 }
+
+.presentation-container {
+    background-color: #dee5e9;
+    width: 98%;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 10px;
+    border-radius: 10px;
+    padding: 15px; /* Espaçamento interno */
+
+}
+
+.title-row {
+    text-align: left; /* Centraliza o título */
+    margin-bottom: 5px; /* Espaço abaixo do título antes dos boxes */
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.boxes-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* Distribui os boxes uniformemente com espaço ao redor */
+    gap: 30px; /* Espaçamento entre os boxes */
+}
+
 
 .presentation-box {
     width: 12%;
-    height: 60%;
+    height: 85px;
     background-color: white;
     border-left: 10px solid #1B2144;
-    /* border-left: 10px solid rgb(2, 41, 118); */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin-top: 30px;
-    margin-left: 25px;
+    margin-top: 10px;
+    
     padding: 5px 10px 5px 5px;
-    display: flex;
-    flex-direction: column;
+    /* display: flex;
+    flex-direction: column; */
     border-radius: 5px;
+
 }
 
 .presentation-box h2 {
@@ -31,8 +54,110 @@
     font-size: 35px;
     font-weight: normal;
     color: black;
-    /* color: rgb(17, 0, 126); */
     margin: 5px 5px 20px;
     text-align: right;
 }
 
+
+.section-tabela {
+    /* margin: 10px 10px 10px 10px;
+    padding: 0px 10px 10px 10px; */
+    background-color: #FFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 5px;
+    width: 100%;
+    height: 300px; /* Ajuste para a altura total de três linhas da tabela */
+    overflow-y: auto;
+  }
+
+  .table-fixed-head {
+    display: block;
+  }
+  
+  .table-fixed-head thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #fff;
+  }
+  
+
+  
+  
+
+/*--colunas--*/
+.col-id {
+    width: 2% !important;
+}
+.col-status {
+    width: 6% !important;
+    text-align: left !important;
+}
+
+.col-mensagem {
+    width: 50% !important;
+    text-align: left !important;
+}
+
+.col-modalidade {
+    width: 8% !important;
+    text-align: left !important;
+}
+
+.col-contrato {
+    width: 6% !important;
+    text-align: left !important;
+}
+
+.col-data {
+    width: 5% !important;
+    text-align: left !important;
+}
+.col-denominacao {
+    width: 10% !important;
+    text-align: left !important;
+}
+.col-fornecedor {
+    width: 20% !important;
+    text-align: left !important;
+}
+.col-valor {
+    width: 5% !important;
+    text-align: right !important;
+}
+
+.col-nivel {
+    width: 10% !important;
+    text-align: right !important;
+}
+
+
+/*--colunas--*/
+.log-id {
+    width: 3% !important;
+}
+.log-usuario {
+    width: 7% !important;
+    text-align: left !important;
+}
+.log-unidade {
+    width: 7% !important;
+    text-align: left !important;
+}
+.log-data {
+    width: 7% !important;
+    text-align: center !important;
+}
+.log-modulo {
+    width: 8% !important;
+    text-align: left !important;
+}
+
+.log-acao {
+    width: 5% !important;
+    text-align: center !important;
+}
+.log-descricao {
+    width: 40% !important;
+    text-align: left !important;
+}

@@ -109,4 +109,4 @@ class Alocacao(models.Model):
         super(Alocacao, self).save(*args, **kwargs)  # Chamando o save original
 
     def __str__(self):
-        return f"Usuário: {self.usuario.dp_nome_completo} ({self.usuario.dp_cpf}) | Alocação: ({self.setor})"
+        return f"{self.get_unidade_display()}/{self.setor}"

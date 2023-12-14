@@ -8,8 +8,10 @@ from django.contrib import auth, messages
 from apps.main.models import CustomLog
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from apps.contratos.models import ContratosArps, ContratosArpsItens, Contratos, ContratosObjetos, ContratosParcelas
-from apps.contratos.forms import ContratosArpsForm, ContratosArpsItensForm, ContratosForm, ContratosObjetosForm, ContratosParcelasForm
+from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos, 
+                                   ContratosObjetos, ContratosParcelas)
+from apps.contratos.forms import (ContratosArpsForm, ContratosArpsItensForm, ContratosForm, 
+                                  ContratosObjetosForm, ContratosParcelasForm, ContratosEntregasForm)
 from setup.choices import UNIDADE_DAF, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
@@ -64,7 +66,6 @@ def contrato_ficha(request, id_contrato=None):
 
         #Passar o objeto Denominação Genérica
         denominacao_id = request.POST.get('denominacao')
-        print('Denominação ID: ', denominacao_id)
         denominacao_instance = DenominacoesGenericas.objects.get(id=denominacao_id)
     
         #Passar o objeto Fornecedor
@@ -143,10 +144,14 @@ def contrato_ficha(request, id_contrato=None):
                 })
 
     list_objetos = []
+    list_parcelas = []
+
+    tab_objetos = None
+    tab_parcelas = None
     if contrato:
         form = ContratosForm(instance=contrato)
         tab_objetos = ContratosObjetos.objects.filter(del_status=False, contrato_id=id_contrato)
-        tab_parcelas = ContratosParcelas.objects.filter(del_status=False, contrato=id_contrato)
+        tab_parcelas = ContratosParcelas.objects.filter(del_status=False, contrato=id_contrato).order_by('objeto__numero_item', 'numero_parcela')
         
         if tab_objetos.count()>0:
             for objeto in tab_objetos:
@@ -155,22 +160,35 @@ def contrato_ficha(request, id_contrato=None):
                 produto = objeto.produto.produto
                 item_produto = f'[Item {item}] {produto}'
                 list_objetos.append((objeto_id, item_produto))
+        
+        if tab_parcelas.count()>0:
+            for parcela in tab_parcelas:
+                parcela_id = parcela.id
+                item = parcela.objeto.numero_item
+                numero_parcela = parcela.numero_parcela
+                produto = parcela.objeto.produto.produto
+                item_parcela_produto = f'[Item {item}] [Parcela {numero_parcela}] {produto}'
+                list_parcelas.append((parcela_id, item_parcela_produto))
     else:
         form = ContratosForm()
         tab_objetos = None
+        tab_parcelas = None
 
     #Formulários
     form_ct_objeto = ContratosObjetosForm()
     form_ct_parcela = ContratosParcelasForm()
+    form_ct_entrega = ContratosEntregasForm()
 
     return render(request, 'contratos/contrato_ficha.html', {
         'form': form,
         'contrato': contrato,
         'form_objeto': form_ct_objeto,
         'form_parcela': form_ct_parcela,
+        'form_ct_entrega': form_ct_entrega,
         'tab_objetos': tab_objetos,
         'tab_parcelas': tab_parcelas,
-        'list_objetos': list_objetos
+        'list_objetos': list_objetos,
+        'list_parcelas': list_parcelas
     })
 
 def contrato_delete(request, id_contrato=None):   
@@ -274,6 +292,17 @@ def vincular_itens_arp(request, id_arp=None, id_contrato=None):
 
     return JsonResponse({'objetos': objetos_list})
 
+def contrato_dados_arp(request, id_arp=None):
+    arps_itens = ContratosArpsItens.objects.filter(del_status=False, arp_id=id_arp).order_by('numero_item')
+    if arps_itens:
+        arp_numero = arps_itens.first().arp.numero_arp
+    else:
+        arp_numero = None
+    conteudo = {
+        'arps_itens': arps_itens,
+        'arp_numero': arp_numero,
+    }
+    return render(request, 'contratos/contrato_ficha_arp.html', conteudo)
 
 #OBJETOS DO CONTRATO
 def contrato_objeto_modal(request, id_objeto=None):
@@ -441,14 +470,21 @@ def buscar_objeto(request, id_objeto=None):
     objeto_fator_embalagem = objeto.fator_embalagem
     objeto_valor_unitario = objeto.valor_unitario
 
+    arp_item_id = objeto.arp_item_id
+    arp_item_saldo = 0
+    if (arp_item_id):
+        arp_item = ContratosArpsItens.objects.get(id=arp_item_id)
+        arp_item_saldo = arp_item.qtd_saldo()
+
+    print('Saldo ARP: ', arp_item_saldo)
     objeto_dados = {
             'objeto_id': objeto_id,
             'objeto_numero_item': objeto_numero_item,
             'objeto_produto': objeto_produto,
             'objeto_fator_embalagem': objeto_fator_embalagem,
             'objeto_valor_unitario': objeto_valor_unitario,
+            'arp_item_saldo': arp_item_saldo,
         }
-    print('objeto: ', objeto_dados)
     return JsonResponse({'objeto': objeto_dados})
 
 
@@ -497,20 +533,12 @@ def contrato_parcela_salvar(request, id_parcela=None):
 
         #Criar o formulário com os dados atualizados
         parcela_form = ContratosParcelasForm(modificacoes_post, instance=parcela_form.instance)
-        
+
         #salvar
         if parcela_form.is_valid():
             #Salvar o produto
             parcela = parcela_form.save(commit=False)
             parcela.save(current_user=request.user.usuario_relacionado)
-            
-            #logs
-            log_id = parcela.id
-            log_registro_usuario = parcela.usuario_registro.dp_nome_completo
-            log_registro_data = parcela.registro_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
-            log_atualizacao_usuario = parcela.usuario_atualizacao.dp_nome_completo
-            log_atualizacao_data = parcela.ult_atual_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
-            log_edicoes = parcela.log_n_edicoes
 
             #id do contrato e da parcela
             contrado_id = parcela.objeto.contrato.id
@@ -534,12 +562,6 @@ def contrato_parcela_salvar(request, id_parcela=None):
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'retorno': 'Salvo',
-                    'log_id': log_id,
-                    'log_registro_usuario': log_registro_usuario,
-                    'log_registro_data': log_registro_data,
-                    'log_atualizacao_usuario': log_atualizacao_usuario,
-                    'log_atualizacao_data': log_atualizacao_data,
-                    'log_edicoes': log_edicoes,
                     'novo': nova_parcela,
                     'redirect_url': reverse('contrato_ficha', args=[contrado_id]),
                     'parcela_id': parcela_id,
@@ -975,9 +997,7 @@ def arp_item_ficha(request, arp_item_id=None):
 
         #valor unitario reequilibrio
         valor_reequilibrio_str  = request.POST.get('valor_unit_reequilibrio')
-        print('valor = ', valor_reequilibrio_str)
         if valor_reequilibrio_str != "":
-            print('teste')
             valor_reequilibrio_str = valor_reequilibrio_str.replace('R$', '').replace('.', '')
             valor_reequilibrio_str = valor_reequilibrio_str.replace(',', '.')
             valor_reequilibrio = float(valor_reequilibrio_str)
@@ -1057,7 +1077,6 @@ def arp_item_ficha(request, arp_item_id=None):
 def arp_item_formulario(request, arp_item_id=None):
     try:
         item = ContratosArpsItens.objects.get(id=arp_item_id)
-        print('qtd: ',float(item.qtd_registrada))
         produto_id = item.produto_id
         produto_nome = item.produto.produto
         data = {

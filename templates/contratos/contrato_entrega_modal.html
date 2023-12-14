@@ -8,7 +8,7 @@
     }
 
     .custom-modal-width-parcela {
-        max-width: 90%;  /* ou qualquer largura que você desejar */
+        max-width: 60%;  /* ou qualquer largura que você desejar */
         font-size: 16px !important;
     }
 
@@ -32,19 +32,19 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="contratoParcelaModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="contratoEntregaModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-parcela" role="document">
         <div class="modal-content">
             
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Parcela do Contrato</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Entrega de Produto Farmacêutico</h5>
                 <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 
-                <form id="parcelaForm">
+                <form id="entregaForm">
                     {% csrf_token %}
                     <div class="horizontal-sections-modal-parcela" >
                         <div class="section" style="border: 0px !important;">
@@ -80,15 +80,19 @@
                     <div class="horizontal-sections-modal-parcela">
                         <div class="section" style="border: 0px !important;">
                             <div class="grid" style="font-size: 14px;">
-                                <div class="form-floating mb-3" style="width: 100px !important;">
-                                    {{ form_parcela.numero_parcela }}
-                                    <label>{{ form_parcela.numero_parcela.label }}</label>
-                                    <input type="hidden" id="id_parcela_objeto" name="parcela_objeto_hidden" readonly>
-                                    <input type="hidden" id="id_qtd_saldo_arp" readonly>
-                                </div>
+                                
                                 <div class="form-floating mb-3" style="max-width: 100px !important;">
                                     <input type="text" class="form-control" id="id_objeto_item" readonly>
                                     <label>Nº do Item</label>
+                                </div>
+                                <div class="form-floating mb-3" style="max-width: 120px !important;">
+                                    <input type="text" class="form-control" id="id_objeto_item" readonly>
+                                    <label>Nº da Parcela</label>
+                                </div>
+                                <div class="form-floating mb-3" style="width: 120px !important;">
+                                    {{ form_ct_entrega.numero_entrega }}
+                                    <label>{{ form_ct_entrega.numero_entrega.label }}</label>
+                                    <input type="hidden" id="id_entrega_objeto" name="entrega_objeto_hidden" readonly>
                                 </div>
                                 <div class="form-floating mb-3 full-width">
                                     <input type="text" class="form-control" id="id_objeto_produto" readonly>
@@ -101,54 +105,39 @@
                     <div class="horizontal-sections-modal-parcela">
                         <div class="section" style="border: 0px !important;">
                             <div class="grid" style="font-size: 14px;">
-                                <div class="form-floating mb-3" >
-                                    <input type="text" id="id_parcela_fator_embalagem" class="form-control" style="width: 100px; text-align: right;" readonly>
-                                    <label>Fator Emb.</label>
-                                </div>
+                                
                                 <div class="form-floating mb-3" style="width: 150px">
-                                    {{ form_parcela.qtd_contratada }}
-                                    <label>{{ form_parcela.qtd_contratada.label }}</label>
+                                    {{ form_ct_entrega.qtd_entregue }}
+                                    <label>{{ form_ct_entrega.qtd_entregue.label }}</label>
                                 </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_qtd_entregue" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Qtd Entregue</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_qtd_a_entregar" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Qtd a Entregar</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_unitario" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Valor Unitário</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_total" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Valor Total</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_empenhado" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Valor Empenhado</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_percentual_empenhado" class="form-control" style="width: 120px; text-align: right;" readonly>
-                                    <label>% Empenho</label>
-                                </div>
-
                                 <div class="form-floating mb-3">
                                     <input type="date" class="form-control" style="width: 160px;" id="id_parcela_previsao_entrega" name="data_previsao_entrega">
-                                    <label for="id_parcela_previsao_entrega">Previsão Entrega</label>
+                                    <label for="id_parcela_previsao_entrega">Data da Entrega</label>
                                 </div>
-
-                                <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" style="width: 160px;" id="id_parcela_ultima_entrega" readonly>
-                                    <label for="id_parcela_ultima_entrega">Última Entrega</label>
+                                <div class="form-floating mb-3" style="width: 200px">
+                                    {{ form_ct_entrega.local_entrega }}
+                                    <label>{{ form_ct_entrega.local_entrega.label }}</label>
+                                </div>
+                                
+                               
+                                <div class="form-floating mb-3" style="width: 150px; margin-left: 30px;">
+                                    {{ form_ct_entrega.notas_recebidas }}
+                                    <label>{{ form_ct_entrega.notas_recebidas.label }}</label>
+                                </div>
+                                <div class="form-floating mb-3" style="width: 150px">
+                                    {{ form_ct_entrega.notas_status }}
+                                    <label>{{ form_ct_entrega.notas_status.label }}</label>
+                                </div>
+                                <div class="form-floating mb-3" style="width: 180px">
+                                    {{ form_ct_entrega.notas_pagamentos }}
+                                    <label>{{ form_ct_entrega.notas_pagamentos.label }}</label>
                                 </div>
                             </div>
 
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3 full-width">
-                                    {{ form_objeto.observacoes_gerais }}
-                                    <label>{{ form_objeto.observacoes_gerais.label }}</label>
+                                    {{ form_ct_entrega.observacoes_gerais }}
+                                    <label>{{ form_ct_entrega.observacoes_gerais.label }}</label>
                                 </div>
                             </div>
                         </div>
@@ -172,7 +161,7 @@
 <script>
     document.querySelectorAll('.closeModalButton').forEach(button => {
         button.addEventListener('click', function() {
-            $('#contratoParcelaModal').modal('hide');
+            $('#contratoEntregaModal').modal('hide');
         });
     });
 </script>

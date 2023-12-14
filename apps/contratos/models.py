@@ -2,7 +2,9 @@ from django.db import models
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from setup.choices import STATUS_ARP, UNIDADE_DAF2, TIPO_COTA, MODALIDADE_AQUISICAO, STATUS_FASE, LEI_LICITACAO
+from setup.choices import (STATUS_ARP, UNIDADE_DAF2, TIPO_COTA, 
+                           MODALIDADE_AQUISICAO, LEI_LICITACAO, LOCAL_ENTREGA_PRODUTOS,
+                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS)
 from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Sum
@@ -239,6 +241,14 @@ class Contratos(models.Model):
         self.del_usuario = user
         self.save()
 
+    def valor_total(self):
+        total = 0
+        itens = self.contrato_objeto.all()  # Acessa todos os itens relacionados a esta ARP
+        for item in itens:
+            if not item.del_status:  # Se o item não estiver deletado
+                total += item.valor_total()
+        return total
+
     @property
     def data_vigencia(self):
         """Calcula a data de vigência como data_publicacao + 365 dias."""
@@ -255,7 +265,6 @@ class Contratos(models.Model):
 
     def __str__(self):
         return f"Contrato: {self.numero_contrato} - Denominação: ({self.denominacao}) - ID ({self.id})"
-
 
 class ContratosObjetos(models.Model):
     #relacionamento
@@ -322,7 +331,6 @@ class ContratosObjetos(models.Model):
     def __str__(self):
         return f"Objeto do contrato: {self.numero_contrato} - Contrato: {self.contrato.numero_contrato} - Produto: ({self.produto.produto}) - ID ({self.id})"
     
-
 class ContratosParcelas(models.Model):
     #relacionamento
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='contrato_parcela_registro')
@@ -390,3 +398,59 @@ class ContratosParcelas(models.Model):
 
     def __str__(self):
         return f"Parcela do contrato: {self.numero_parcela} - Contrato: {self.objeto.contrato.numero_contrato} - Produto: ({self.objeto.produto.produto}) - ID ({self.id})"
+
+class ContratosEntregas(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='contrato_entrega_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='contrato_entrega_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados da entrega
+    numero_entrega = models.IntegerField(null=False, blank=False)
+    qtd_entregue = models.IntegerField(null=False, blank=False)
+    data_entrega = models.DateField(null=False, blank=False)
+    local_entrega = models.CharField(max_length=30, choices=LOCAL_ENTREGA_PRODUTOS, null=False, blank=False)
+
+    #notas fiscais
+    notas_recebidas = models.CharField(max_length=20, choices=NOTAS_RECEBIDAS, null=False, blank=False)
+    notas_status = models.CharField(max_length=20, choices=NOTAS_STATUS, null=False, blank=False)
+    notas_pagamentos = models.CharField(max_length=20, choices=NOTAS_PAGAMENTOS, null=False, blank=False)
+
+    #parcela
+    parcela = models.ForeignKey(ContratosParcelas, on_delete=models.DO_NOTHING, related_name='entrega_parcela', null=False, blank=False)
+
+    #objeto
+    objeto = models.ForeignKey(ContratosObjetos, on_delete=models.DO_NOTHING, related_name='entrega_objeto', null=False, blank=False)
+
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='contrato_entrega_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(ContratosEntregas, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+
+    def __str__(self):
+        return f"Entrega do contrato: {self.numero_parcela} - Contrato: {self.objeto.contrato.numero_contrato} - Produto: ({self.objeto.produto.produto}) - ID ({self.id})"

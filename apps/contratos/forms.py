@@ -3,9 +3,11 @@ from django_select2.forms import Select2Widget
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from apps.contratos.models import ContratosArps, ContratosArpsItens, ContratosObjetos, ContratosParcelas
-from apps.contratos.models import Contratos
-from setup.choices import STATUS_ARP, UNIDADE_DAF, TIPO_COTA, YES_NO, MODALIDADE_AQUISICAO, STATUS_FASE, LEI_LICITACAO
+from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos,
+                                   ContratosObjetos, ContratosParcelas, ContratosEntregas)
+from setup.choices import (STATUS_ARP, UNIDADE_DAF, TIPO_COTA, YES_NO, 
+                           MODALIDADE_AQUISICAO, LEI_LICITACAO, LOCAL_ENTREGA_PRODUTOS,
+                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS)
 
 UNIDADE_DAF = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
 
@@ -118,7 +120,6 @@ class ContratosArpsForm(forms.ModelForm):
         observacoes = self.cleaned_data.get('observacoes_gerais')
         return observacoes or "Sem observações."
 
-
 class ContratosArpsItensForm(forms.ModelForm):
     arp = forms.ModelChoiceField(
         queryset=ContratosArps.objects.all(),
@@ -225,7 +226,6 @@ class ContratosArpsItensForm(forms.ModelForm):
     def clean_observacoes_gerais(self):
         observacoes = self.cleaned_data.get('observacoes_gerais')
         return observacoes or "Sem observações."
-
 
 class ContratosForm(forms.ModelForm):
     unidade_daf = forms.CharField(
@@ -364,7 +364,6 @@ class ContratosForm(forms.ModelForm):
         observacoes = self.cleaned_data.get('observacoes_gerais')
         return observacoes or "Sem observações."
 
-
 class ContratosObjetosForm(forms.ModelForm):
     numero_item = forms.IntegerField(
         widget=forms.NumberInput(attrs={
@@ -459,7 +458,7 @@ class ContratosParcelasForm(forms.ModelForm):
             'id': 'id_parcela_qtd_contratada',
             'style': 'text-align: right',
         }),
-        label='Quantidade Contratada',
+        label='Qtd Contratada',
         required=False,
     )
     data_previsao_entrega = forms.DateField(
@@ -501,6 +500,114 @@ class ContratosParcelasForm(forms.ModelForm):
 
     class Meta:
         model = ContratosParcelas
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
+
+class ContratosEntregasForm(forms.ModelForm):
+    #dados da entrega
+    numero_entrega = forms.IntegerField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_entrega_numero_entrega',
+            'readonly': 'readonly',
+        }),
+        required=True,
+        label='Nº da Entrega',
+    )
+    qtd_entregue = forms.FloatField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_entrega_qtd_entregue',
+            'style': 'text-align: right',
+        }),
+        label='Qtd Entregue',
+        required=True,
+    )
+    data_entrega = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'id': 'id_entrega_data_entrega',
+            'type': 'date',
+        }),
+        required=True,
+        label='Data de Entrega'
+    )
+    local_entrega = forms.ChoiceField(
+        choices=LOCAL_ENTREGA_PRODUTOS,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id':'id_entrega_local_entrega'
+        }),
+        label='Local da Entrega',
+        initial='',
+        required=True,
+    )
+    #notas fiscais
+    notas_recebidas = forms.ChoiceField(
+        choices=NOTAS_RECEBIDAS,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id':'id_entrega_notas_recebidas'
+        }),
+        label='Notas Recebidas',
+        initial='nao_informado',
+        required=True,
+    )
+    notas_status = forms.ChoiceField(
+        choices=NOTAS_STATUS,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id':'id_entrega_notas_status'
+        }),
+        label='Status das Notas',
+        initial='nao_informado',
+        required=True,
+    )
+    notas_pagamentos = forms.ChoiceField(
+        choices=NOTAS_PAGAMENTOS,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id':'id_entrega_notas_pagamentos'
+        }),
+        label='Pagamentos das Notas',
+        initial='nao_informado',
+        required=True,
+    )
+    #relacionamentos
+    objeto = forms.ModelChoiceField(
+        queryset=ContratosObjetos.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        label='Objeto',
+        initial='',
+        required=True,
+    )
+    parcela = forms.ModelChoiceField(
+        queryset=ContratosParcelas.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        label='Parcela',
+        initial='',
+        required=True,
+    )
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control auto-expand',
+            'rows': 1,
+            'style': 'padding-top: 30px; height: 80px;',
+            'id': 'id_entrega_observacoes'
+            }),
+        required=False,
+        label='Observações Gerais'
+    )
+
+    class Meta:
+        model = ContratosEntregas
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):

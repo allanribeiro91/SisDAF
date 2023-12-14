@@ -1,0 +1,62 @@
+<!-- Modal -->
+{% load static %}
+<style>
+
+    .custom-modal-width {
+        max-width: 30%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .modal-content.objeto{
+        min-height: 15vh;
+        height: 30%;
+        
+    }
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="contratoEntregaParcela" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered  custom-modal-width" role="document">
+        <div class="modal-content objeto">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Nova Entrega</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <div class="grid" style="font-size: 14px; margin: 20px;">
+                    <!-- Objeto -->
+                    <div class="form-floating full-width">
+                        <select class="form-select" id="entrega_selecionar_parcela">
+                            <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
+                            {% for value, display in list_parcelas %}
+                            <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="entrega_selecionar_parcela">Selecione a Parcela</label>
+                    </div>
+                    <input type="text" id="entrega_parcela_id" readonly>
+                </div>
+                    
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="inserirNovaEntrega" style="background-color: rgb(18, 134, 34); border-color: rgb(18, 134, 34);">Inserir Entrega</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#contratoEntregaParcela').modal('hide');
+        });
+    });
+</script>
