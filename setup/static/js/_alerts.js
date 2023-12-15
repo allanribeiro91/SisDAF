@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-function sweetAlert(title, icon, iconColor='black', position='center', timer=2000) {
+function sweetAlert(title, icon='warning', iconColor='black', position='center', timer=2000) {
     Swal.fire({
         position: position,
         icon: icon,

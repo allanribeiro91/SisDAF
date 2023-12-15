@@ -1,8 +1,9 @@
-from apps.contratos.models import ContratosParcelas, ContratosObjetos, Contratos, ContratosArpsItens, ContratosArps
+from apps.contratos.models import ContratosParcelas, ContratosObjetos, Contratos, ContratosArpsItens, ContratosArps, ContratosEntregas
 
 def run():
     # Apagar todos os registros
-    ContratosParcelas.objects.all().delete()
+    ContratosEntregas.objects.all().delete()
+    #ContratosParcelas.objects.all().delete()
     # ContratosObjetos.objects.all().delete()
     # Contratos.objects.all().delete()
     # ContratosArpsItens.objects.all().delete()

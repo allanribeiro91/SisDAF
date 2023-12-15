@@ -50,28 +50,28 @@
                         <div class="section" style="border: 0px !important;">
                             <div class="grid" style="font-size: 10px;">
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_data" id="parcela_id" style="width: 100px;"  readonly>
-                                    <label for="parcela_id">ID</label>
+                                    <input type="text" class="form-control log_data" id="entrega_id" style="width: 100px;"  readonly>
+                                    <label for="entrega_id">ID</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_data" id="parcela_log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
-                                    <label for="parcela_log_data_registro">Data do Registro</label>
+                                    <input type="text" class="form-control log_data" id="entrega_log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
+                                    <label for="entrega_log_data_registro">Data do Registro</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_responsavel" id="parcela_log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
-                                    <label for="parcela_log_responsavel_registro">Responsável pelo Registro</label>
+                                    <input type="text" class="form-control log_responsavel" id="entrega_log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
+                                    <label for="entrega_log_responsavel_registro">Responsável pelo Registro</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_data" id="parcela_log_ult_atualizacao" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
-                                    <label for="parcela_log_ult_atualizacao">Última Atualização</label>
+                                    <input type="text" class="form-control log_data" id="entrega_log_ult_atualizacao" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                                    <label for="entrega_log_ult_atualizacao">Última Atualização</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_responsavel" id="parcela_log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
-                                    <label for="parcela_log_responsavel_atualizacao">Responsável Atualização</label>
+                                    <input type="text" class="form-control log_responsavel" id="entrega_log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
+                                    <label for="entrega_log_responsavel_atualizacao">Responsável Atualização</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_edicoes" id="parcela_log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
-                                    <label for="parcela_log_edicoes">Nº Edições</label>
+                                    <input type="text" class="form-control log_edicoes" id="entrega_log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
+                                    <label for="entrega_log_edicoes">Nº Edições</label>
                                 </div>
                             </div>
                         </div>
@@ -82,20 +82,22 @@
                             <div class="grid" style="font-size: 14px;">
                                 
                                 <div class="form-floating mb-3" style="max-width: 100px !important;">
-                                    <input type="text" class="form-control" id="id_objeto_item" readonly>
+                                    <input type="text" class="form-control" id="id_entrega_item" readonly>
                                     <label>Nº do Item</label>
                                 </div>
                                 <div class="form-floating mb-3" style="max-width: 120px !important;">
-                                    <input type="text" class="form-control" id="id_objeto_item" readonly>
+                                    <input type="text" class="form-control" id="id_entrega_parcela" readonly>
+                                    <input type="hidden" id="id_entrega_contrato_hidden" name="id_entrega_contrato_hidden" readonly>
+                                    <input type="hidden" id="id_entrega_parcela_hidden" name="id_entrega_parcela_hidden" readonly>
                                     <label>Nº da Parcela</label>
                                 </div>
                                 <div class="form-floating mb-3" style="width: 120px !important;">
                                     {{ form_ct_entrega.numero_entrega }}
                                     <label>{{ form_ct_entrega.numero_entrega.label }}</label>
-                                    <input type="hidden" id="id_entrega_objeto" name="entrega_objeto_hidden" readonly>
+                                    
                                 </div>
                                 <div class="form-floating mb-3 full-width">
-                                    <input type="text" class="form-control" id="id_objeto_produto" readonly>
+                                    <input type="text" class="form-control" id="id_entrega_produto" readonly>
                                     <label>Produto Farmacêutico</label>
                                 </div>
                             </div>
@@ -111,15 +113,13 @@
                                     <label>{{ form_ct_entrega.qtd_entregue.label }}</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" style="width: 160px;" id="id_parcela_previsao_entrega" name="data_previsao_entrega">
-                                    <label for="id_parcela_previsao_entrega">Data da Entrega</label>
+                                    <input type="date" class="form-control" style="width: 160px;" id="id_data_entrega" name="data_entrega">
+                                    <label for="id_data_entrega">Data da Entrega</label>
                                 </div>
                                 <div class="form-floating mb-3" style="width: 200px">
                                     {{ form_ct_entrega.local_entrega }}
                                     <label>{{ form_ct_entrega.local_entrega.label }}</label>
-                                </div>
-                                
-                               
+                                </div>                               
                                 <div class="form-floating mb-3" style="width: 150px; margin-left: 30px;">
                                     {{ form_ct_entrega.notas_recebidas }}
                                     <label>{{ form_ct_entrega.notas_recebidas.label }}</label>
@@ -150,8 +150,8 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnDeletarParcela" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
-                <button type="button" class="btn btn-primary" id="botaoSalvarParcela" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+                <button type="button" class="btn btn-primary" id="btnDeletarEntrega" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-primary" id="botaoSalvarEntrega" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
             </div>
         </div>
     </div>

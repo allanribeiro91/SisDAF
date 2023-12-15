@@ -227,7 +227,10 @@ select[name="numero_processo"] {
 /*--colunas--*/
 .col-item,
 .col-parcela-item,
-.col-parcela-parcela {
+.col-parcela-parcela,
+.col-numero-item,
+.col-numero-parcela,
+.col-numero-entrega {
     width: 3% !important;
     text-align: left;
 }
@@ -248,7 +251,7 @@ select[name="numero_processo"] {
     width: 7% !important;
     text-align: right;
 }
-.col-valor {
+.col-valor, .col-local-entrega {
     width: 8% !important;
     text-align: right;
 }

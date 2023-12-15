@@ -509,11 +509,12 @@ class ContratosParcelasForm(forms.ModelForm):
 class ContratosEntregasForm(forms.ModelForm):
     #dados da entrega
     numero_entrega = forms.IntegerField(
-        widget=forms.TextInput(attrs={
+        widget=forms.NumberInput(attrs={
             'class': 'form-control',
             'id': 'id_entrega_numero_entrega',
-            'readonly': 'readonly',
         }),
+        min_value=1,
+        max_value=30,
         required=True,
         label='Nº da Entrega',
     )
@@ -554,7 +555,7 @@ class ContratosEntregasForm(forms.ModelForm):
         }),
         label='Notas Recebidas',
         initial='nao_informado',
-        required=True,
+        required=False,
     )
     notas_status = forms.ChoiceField(
         choices=NOTAS_STATUS,
@@ -564,7 +565,7 @@ class ContratosEntregasForm(forms.ModelForm):
         }),
         label='Status das Notas',
         initial='nao_informado',
-        required=True,
+        required=False,
     )
     notas_pagamentos = forms.ChoiceField(
         choices=NOTAS_PAGAMENTOS,
@@ -574,18 +575,9 @@ class ContratosEntregasForm(forms.ModelForm):
         }),
         label='Pagamentos das Notas',
         initial='nao_informado',
-        required=True,
+        required=False,
     )
     #relacionamentos
-    objeto = forms.ModelChoiceField(
-        queryset=ContratosObjetos.objects.all(),
-        widget=forms.Select(attrs={
-            'class': 'form-control',
-        }),
-        label='Objeto',
-        initial='',
-        required=True,
-    )
     parcela = forms.ModelChoiceField(
         queryset=ContratosParcelas.objects.all(),
         widget=forms.Select(attrs={
@@ -595,6 +587,16 @@ class ContratosEntregasForm(forms.ModelForm):
         initial='',
         required=True,
     )
+    contrato = forms.ModelChoiceField(
+        queryset=Contratos.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        label='Contrato',
+        initial='',
+        required=True,
+    )
+    #observacoes gerais
     observacoes_gerais = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-control auto-expand',

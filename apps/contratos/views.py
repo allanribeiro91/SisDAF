@@ -9,7 +9,7 @@ from apps.main.models import CustomLog
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos, 
-                                   ContratosObjetos, ContratosParcelas)
+                                   ContratosObjetos, ContratosParcelas, ContratosEntregas)
 from apps.contratos.forms import (ContratosArpsForm, ContratosArpsItensForm, ContratosForm, 
                                   ContratosObjetosForm, ContratosParcelasForm, ContratosEntregasForm)
 from setup.choices import UNIDADE_DAF, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
@@ -148,11 +148,13 @@ def contrato_ficha(request, id_contrato=None):
 
     tab_objetos = None
     tab_parcelas = None
+    tab_entregas = None
     if contrato:
         form = ContratosForm(instance=contrato)
         tab_objetos = ContratosObjetos.objects.filter(del_status=False, contrato_id=id_contrato)
         tab_parcelas = ContratosParcelas.objects.filter(del_status=False, contrato=id_contrato).order_by('objeto__numero_item', 'numero_parcela')
-        
+        tab_entregas = ContratosEntregas.objects.filter(del_status=False, contrato=id_contrato).order_by('parcela__objeto__numero_item', 'parcela__numero_parcela', 'numero_entrega')
+
         if tab_objetos.count()>0:
             for objeto in tab_objetos:
                 objeto_id = objeto.id
@@ -187,6 +189,7 @@ def contrato_ficha(request, id_contrato=None):
         'form_ct_entrega': form_ct_entrega,
         'tab_objetos': tab_objetos,
         'tab_parcelas': tab_parcelas,
+        'tab_entregas': tab_entregas,
         'list_objetos': list_objetos,
         'list_parcelas': list_parcelas
     })
@@ -602,7 +605,119 @@ def contrato_parcela_modal(request, id_parcela=None):
     except ContratosParcelas.DoesNotExist:
         return JsonResponse({'error': 'Parcela não encontrada.'}, status=404)
 
+def buscar_parcela(request, id_parcela=None):
+    parcela = ContratosParcelas.objects.get(id=id_parcela)
+    numero_item = parcela.objeto.numero_item
+    numero_parcela = parcela.numero_parcela
+    contrato_id = parcela.contrato.id
+    parcela_id = parcela.id
+    produto = parcela.objeto.produto.produto
 
+    parcela_dados = {
+            'numero_item': numero_item,
+            'numero_parcela': numero_parcela,
+            'contrato_id': contrato_id,
+            'parcela_id': parcela_id,
+            'produto': produto,
+        }
+    return JsonResponse({'parcela': parcela_dados})
+
+
+#ENTREGAS
+def contrato_entrega_salvar(request, id_entrega=None):
+    if id_entrega:
+        entrega = ContratosEntregas.objects.get(id=id_entrega)
+    else:
+        entrega = None
+    
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if entrega:
+            entrega_form = ContratosEntregasForm(request.POST, instance=entrega)
+            nova_entrega = False
+        else:
+            entrega_form = ContratosEntregasForm(request.POST)
+            nova_entrega = True
+        
+        #Verificar se houve alteração no formulário
+        if not entrega_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+
+        #Parcela
+        parcela_id = request.POST.get('id_entrega_parcela_hidden')
+        parcela_instance = ContratosParcelas.objects.get(id=parcela_id)
+        
+        #Contrato
+        contrato_id = parcela_instance.contrato.id
+        contrato_instance = Contratos.objects.get(id=contrato_id)
+
+        #Qtd Contratada
+        qtd_entregue = request.POST.get('qtd_entregue')
+        qtd_entregue = float(qtd_entregue.replace('.', ''))
+
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['parcela'] = parcela_instance
+        modificacoes_post['contrato'] = contrato_instance
+        modificacoes_post['qtd_entregue'] = qtd_entregue
+
+        #Criar o formulário com os dados atualizados
+        entrega_form = ContratosEntregasForm(modificacoes_post, instance=entrega_form.instance)
+
+        #salvar
+        if entrega_form.is_valid():
+            #Salvar o produto
+            entrega = entrega_form.save(commit=False)
+            entrega.save(current_user=request.user.usuario_relacionado)
+
+            #id do contrato e da parcela
+            contrado_id = entrega.parcela.contrato.id
+            parcela_id = entrega.parcela.id
+            entrega_id = entrega.id
+
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            observacoes = (
+                f"Usuário {request.user.username} salvou a Entrega "
+                f"(ID {entrega.id}, Nº da Entrega: {entrega.numero_entrega}, "
+                f"Parcela: {entrega.parcela}, "
+                f"Contrato: {entrega.contrato}, "
+                f"Fornecedor: {entrega.contrato.fornecedor}, "
+                f"Produto: {entrega.parcela.objeto.produto.produto}) em {current_date_str}."
+            )
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Contratos_Contratos_Entregas",
+                model='ContratosEntregas',
+                model_id=entrega.id,
+                item_id=0,
+                item_descricao="Salvar edição da Entrega de Contrato.",
+                acao="Salvar",
+                observacoes=observacoes
+            )
+            log_entry.save()
+            
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'novo': nova_entrega,
+                    'entrega_id': entrega_id,
+                })
+        else:
+            print("Erro formulário Parcela do Contrato")
+            print(entrega_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+
+def contrato_entrega_modal(request, id_entrega=None):
+    pass
 
 #ARPs
 def arps(request):

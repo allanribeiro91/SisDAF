@@ -320,7 +320,15 @@ class ContratosObjetos(models.Model):
         return self.parcela_objeto.aggregate(Sum('qtd_contratada'))['qtd_contratada__sum'] or 0
 
     def qtd_entregue(self):
-        return 0
+        total_entregue = 0
+        for parcela in self.parcela_objeto.filter(del_status=False):
+            total_entregue += parcela.qtd_entregue()
+
+        return total_entregue
+    
+    def qtd_a_entregar(self):
+        qtd_a_entregar = self.qtd_contratada() - self.qtd_entregue()
+        return qtd_a_entregar
 
     def numero_parcelas(self):
         return 0
@@ -379,8 +387,7 @@ class ContratosParcelas(models.Model):
         self.save()
 
     def qtd_entregue(self):
-        qtd_entregue = 0
-        return qtd_entregue
+        return self.entrega_parcela.aggregate(Sum('qtd_entregue'))['qtd_entregue__sum'] or 0
     
     def qtd_a_entregar(self):
         qtd_a_entregar = self.qtd_contratada - self.qtd_entregue()
@@ -423,8 +430,8 @@ class ContratosEntregas(models.Model):
     #parcela
     parcela = models.ForeignKey(ContratosParcelas, on_delete=models.DO_NOTHING, related_name='entrega_parcela', null=False, blank=False)
 
-    #objeto
-    objeto = models.ForeignKey(ContratosObjetos, on_delete=models.DO_NOTHING, related_name='entrega_objeto', null=False, blank=False)
+    #contrato (para facilitar o filtro)
+    contrato = models.ForeignKey(Contratos, on_delete=models.DO_NOTHING, default=1, related_name='entrega_contrato', null=False, blank=False)
 
     #observações gerais
     observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
