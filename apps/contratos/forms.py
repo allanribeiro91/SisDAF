@@ -4,10 +4,10 @@ from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos,
-                                   ContratosObjetos, ContratosParcelas, ContratosEntregas)
+                                   ContratosObjetos, ContratosParcelas, ContratosEntregas, ContratosFiscais)
 from setup.choices import (STATUS_ARP, UNIDADE_DAF, TIPO_COTA, YES_NO, 
                            MODALIDADE_AQUISICAO, LEI_LICITACAO, LOCAL_ENTREGA_PRODUTOS,
-                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS)
+                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS, STATUS_FISCAL_CONTRATO)
 
 UNIDADE_DAF = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
 
@@ -491,7 +491,7 @@ class ContratosParcelasForm(forms.ModelForm):
         widget=forms.Textarea(attrs={
             'class': 'form-control auto-expand',
             'rows': 1,
-            'style': 'padding-top: 30px; height: 80px;',
+            'style': 'padding-top: 30px; height: 100px;',
             'id': 'id_parcela_observacoes'
             }),
         required=False,
@@ -610,6 +610,84 @@ class ContratosEntregasForm(forms.ModelForm):
 
     class Meta:
         model = ContratosEntregas
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
+
+class ContratosFiscaisForm(forms.ModelForm):
+    #dados do fiscal
+    fiscal = forms.ModelChoiceField(
+        queryset=Usuario.objects.filter(vms_vinculo__in=['servidor_federal', 'servidor_estadual', 'servidor_municipal']),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'id_fiscal',
+        }),
+        label='Fiscal',
+        initial='',
+        required=False,
+    )
+    fiscal_outro = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_fiscal_outro',
+            'readonly': 'readonly',
+        }),
+        label='Outro',
+        required=True,
+    )
+    status = forms.ChoiceField(
+        choices=STATUS_FISCAL_CONTRATO,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'id_fiscal_status',
+            'style': 'width: 120px'
+        }),
+        initial='ativo',
+        label='Status',
+        required=True,
+    )
+    data_inicio = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+        }),
+        required=True,
+        label='Data de Início'
+    )
+    data_fim = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+        }),
+        required=True,
+        label='Data Fim'
+    )
+    #contrato
+    contrato = forms.ModelChoiceField(
+        queryset=Contratos.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        label='Contrato',
+        initial='',
+        required=True,
+    )
+    #observacoes gerais
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control auto-expand',
+            'rows': 1,
+            'style': 'padding-top: 30px; height: 80px;',
+            'id': 'id_entrega_observacoes'
+            }),
+        required=False,
+        label='Observações Gerais'
+    )
+
+    class Meta:
+        model = ContratosFiscais
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):

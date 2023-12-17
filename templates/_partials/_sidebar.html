@@ -27,7 +27,7 @@
         </div>
         <div>
             {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in 'contratos, contrato_novo, contrato_ficha, arps, arp_nova, arp_ficha' %}active-tab{% endif %}" href="{% url 'contratos' %}">Contratos</a>
+            <a class="tab {% if current_url in 'contratos, contrato_novo, contrato_ficha, contrato_anotacoes, arps, arp_nova, arp_ficha' %}active-tab{% endif %}" href="{% url 'contratos' %}">Contratos</a>
             {% endwith %}
         </div>
         
@@ -45,7 +45,7 @@
         <!-- Usuário -->
         <div id="toggleButton" class="toggle-button">
             <div class="usuario">
-                <img src="{% if usuario.foto_usuario %}{{ usuario.foto_usuario.url }}{% else %}{% static 'assets/imagens/user.png' %}{% endif %}" class="profile-pic-img"><br>
+                <img src="{% if request.user.usuario_relacionado.foto_usuario %}{{ request.user.usuario_relacionado.foto_usuario.url }}{% else %}{% static 'assets/imagens/user.png' %}{% endif %}" class="profile-pic-img"><br>
                 {{ request.user.usuario_relacionado.primeiro_ultimo_nome  }}<br>
                 {{ request.user.usuario_relacionado.alocacao_ativa  }}
             </div>

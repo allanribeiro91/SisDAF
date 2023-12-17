@@ -1,0 +1,117 @@
+<!-- Modal -->
+{% load static %}
+{% load humanize %}
+{% load contratos_filters %}
+<style>
+    .tags-column{
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width-fiscais {
+        min-width: 60%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal-parcela {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;  /* Alinha os itens ao topo */
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-content{
+        height: 50%;
+    }
+
+    .modal-body{
+        height: auto;
+    }
+
+    .col-fiscal-nome {
+        width: 30% !important;
+        text-align: left !important;
+    }
+    .col-fiscal-vinculo {
+        width: 10% !important;
+        text-align: left !important;
+    }
+    .col-fiscal-status {
+        width: 10% !important;
+        text-align: left !important;
+    }
+    .col-fiscal-data {
+        width: 10% !important;
+        text-align: left !important;
+    }
+
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="contratoFiscalModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-fiscais" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Fiscais do Contrato</h5>
+                <button type="button" class="close closeModalButtonFiscais" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="font-size: 14px; text-align: right !important;">
+                    <button class="btn btn-primary me-md-2" type="button" data-bs-toggle="modal"  id="btnNovoFiscal" data-bs-target="" style="font-size: 12px; background-color: green; border-color: green;">
+                        <i class="fas fa-plus" style="font-size: 14px;"></i> 
+                        &nbsp;Inserir Fiscal
+                    </button>
+                </div>
+
+                <div class="horizontal-sections">
+                    <div class="section">                      
+                        <div class="grid" style="font-size: 14px;">
+                            <table class="table table-striped table-hover fixed-size-table" style="font-size: 12px;" id="tabEntregas">
+                                <thead>
+                                    <tr>
+                                        <th class="col-fiscal-nome">Fiscal</th>
+                                        <th class="col-fiscal-vinculo">Vínculo MS</th>
+                                        <th class="col-fiscal-status">Status Fiscal</th>
+                                        <th class="col-fiscal-data">Data Início</th>
+                                        <th class="col-fiscal-data">Data Fim</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in tab_fiscais %}
+                                    <tr data-id="{{ item.id }}">
+                                        <td class="col-fiscal-nome">{{ item. }}</td>
+                                        <td class="col-fiscal-vinculo">{{ item. }}</td>
+                                        <td class="col-fiscal-status">{{ item.get_status_display }}</td>
+                                        <td class="col-fiscal-data">{{ item. }}</td>
+                                        <td class="col-fiscal-data">{{ item. }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table> 
+                        </div>
+    
+                    </div>
+                </div>
+
+
+            </div>  
+                
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButtonFiscais').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#contratoFiscalModal').modal('hide');
+        });
+    });
+</script>

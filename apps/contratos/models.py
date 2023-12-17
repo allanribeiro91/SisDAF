@@ -1,10 +1,11 @@
 from django.db import models
+from django.db.models import Max
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from setup.choices import (STATUS_ARP, UNIDADE_DAF2, TIPO_COTA, 
                            MODALIDADE_AQUISICAO, LEI_LICITACAO, LOCAL_ENTREGA_PRODUTOS,
-                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS)
+                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS, STATUS_FISCAL_CONTRATO)
 from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Sum
@@ -331,7 +332,20 @@ class ContratosObjetos(models.Model):
         return qtd_a_entregar
 
     def numero_parcelas(self):
-        return 0
+        return self.parcela_objeto.filter(del_status=False).count()
+    
+    def numero_parcelas_atraso(self):
+        contador_atrasos = 0
+        for parcela in self.parcela_objeto.filter(del_status=False):
+            if parcela.dias_atraso() > 0:
+                contador_atrasos += 1
+        return contador_atrasos
+    
+    def dias_atraso(self):
+        total_dias_atraso = 0
+        for parcela in self.parcela_objeto.filter(del_status=False):
+            total_dias_atraso += parcela.dias_atraso()
+        return total_dias_atraso
 
     def valor_total(self):
         return self.valor_unitario * self.qtd_contratada()
@@ -386,19 +400,39 @@ class ContratosParcelas(models.Model):
         self.del_usuario = user
         self.save()
 
+    def data_ultima_entrega(self):
+        ultima_entrega_data = self.entrega_parcela.aggregate(Max('data_entrega'))['data_entrega__max']
+        return ultima_entrega_data if ultima_entrega_data is not None else None
+    
+    def dias_atraso(self):
+        today = timezone.now().date()
+        if self.data_ultima_entrega() is None or self.data_ultima_entrega() == "-":
+            dias_atraso = today - self.data_previsao_entrega
+            return max(dias_atraso.days, 0)  # Retorna 0 se dias_atraso for negativo
+        else:
+            dias_atraso = self.data_ultima_entrega() - self.data_previsao_entrega
+            return max(dias_atraso.days, 0)  # Retorna a diferença em dias
+    
+    def numero_entregas_atraso(self):
+        contador_atrasos = 0
+        for entrega in self.entrega_parcela.filter(del_status=False):
+            if entrega.dias_atraso() > 0:
+                contador_atrasos += 1
+        return contador_atrasos
+
     def qtd_entregue(self):
-        return self.entrega_parcela.aggregate(Sum('qtd_entregue'))['qtd_entregue__sum'] or 0
+        total_entregue = self.entrega_parcela.filter(del_status=False).aggregate(Sum('qtd_entregue'))['qtd_entregue__sum'] or 0
+        return total_entregue 
     
     def qtd_a_entregar(self):
         qtd_a_entregar = self.qtd_contratada - self.qtd_entregue()
         return qtd_a_entregar
 
+    def numero_entregas(self):
+        return self.entrega_parcela.filter(del_status=False).count()
+
     def valor_unitario(self):
         return self.objeto.valor_unitario
-    
-    def data_ultima_entrega(self):
-        data_ultima_entrega = '10/12/2023'
-        return data_ultima_entrega
 
     def valor_total(self):
         return self.valor_unitario() * self.qtd_contratada
@@ -458,6 +492,68 @@ class ContratosEntregas(models.Model):
         self.del_data = timezone.now()
         self.del_usuario = user
         self.save()
+    
+    def previsao_entrega(self):
+        return self.parcela.data_previsao_entrega
+    
+    def dias_atraso(self):
+        dias_atraso = (self.data_entrega - self.previsao_entrega()).days
+        return max(dias_atraso, 0)
 
     def __str__(self):
         return f"Entrega do contrato: {self.numero_parcela} - Contrato: {self.objeto.contrato.numero_contrato} - Produto: ({self.objeto.produto.produto}) - ID ({self.id})"
+
+class ContratosFiscais(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fiscal_contrato_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fiscal_contrato_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados da entrega
+    fiscal = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fiscal_contrato_usuario')
+    fiscal_outro = models.CharField(max_length=100, null=False, blank=False)
+    status = models.CharField(max_length=10, choices=STATUS_FISCAL_CONTRATO, null=False, blank=False)
+    data_inicio = models.DateField(null=False, blank=False)
+    data_fim = models.CharField(max_length=30, choices=LOCAL_ENTREGA_PRODUTOS, null=False, blank=False)
+
+    #contrato
+    contrato = models.ForeignKey(Contratos, on_delete=models.DO_NOTHING, default=1, related_name='fiscal_contrato', null=False, blank=False)
+
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='fiscal_contrato_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(ContratosEntregas, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+    
+    def fiscal_nome(self):
+        if (self.fiscal_outro != ''):
+            return self.fiscal_outro
+        else:
+            return self.fiscal.primeiro_ultimo_nome()
+
+    def __str__(self):
+        return f"Fiscal do contrato: {self.fiscal_nome()}"

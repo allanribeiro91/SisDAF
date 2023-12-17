@@ -1,0 +1,127 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/fornecedores_ficha.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fas fa-file-contract"></i>&nbsp;Contratos / Anotações
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tab-voltar">
+            <a href="{% url 'contratos' %}" style="color: black;">
+                <i class="fas fa-arrow-left"></i> 
+            </a>
+        </div>
+        <div class="tabs">
+            <button class="tab-button" id="contrato_ficha_dados_gerais">Dados Gerais</button>
+            <button class="tab-button active" id="contrato_ficha_anotacoes">Anotações</button>
+        </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button class="btn btn-primary me-md-2" type="submit" id="btnNovaAnotacao" style="font-size: 12px; background-color: green; border-color: green;">
+            <i class="fas fa-plus" style="font-size: 14px;"></i> 
+            &nbsp;Inserir Anotação
+        </button>
+        <button class="btn btn-primary me-md-2" type="submit" id="btnExportarAnotacoes" style="font-size: 12px; background-color: rgb(17, 0, 126)7, 0, 128); border-color: green;">
+            <i class="fas fa-download" style="font-size: 14px;"></i> 
+            &nbsp;Exportar Dados
+        </button>
+    </div>
+
+
+    <div class="section-tabela">
+        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabComunicacoes">
+            <thead>
+                <tr>
+                    <th class="comunicacao-id">ID</th>
+                    <th class="comunicacao-unidadedaf">Unidade DAF</th>
+                    <th class="comunicacao-tipo">Tipo</th>
+                    <th class="comunicacao-topico">Tópico</th>
+                    <th class="comunicacao-assunto">Assunto</th>
+                    <th class="comunicacao-responsavel">Responsável</th>
+                    <th class="comunicacao-status">Status</th>
+                    <th class="comunicacao-dataenvio">Data do Envio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in tab_fornecedores_comunicacoes %}
+                <tr data-id="{{ item.id }}" data-fornecedor-id="{{ item.fornecedor.id }}">
+                    <td class="comunicacao-id">{{ item.id }}</td>
+                    <td class="comunicacao-unidadedaf">
+                        {% if not item.unidade_daf == '' %}
+                            {% for value, display in lista_unidade_daf %}
+                                {% if item.unidade_daf == value %}
+                                    {{ display }}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {{ 'Não Informado' }}
+                        {% endif %}
+                    </td>
+                    <td class="comunicacao-tipo">
+                        {% if not item.tipo_comunicacao == '' %}
+                            {% for value, display in lista_tipo_comunicacao %}
+                                {% if item.tipo_comunicacao == value %}
+                                    {{ display }}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {{ 'Não Informado' }}
+                        {% endif %}
+                    </td>
+                    <td class="comunicacao-topico">
+                        {% if not item.topico_comunicacao == '' %}
+                            {% for value, display in lista_topicos %}
+                                {% if item.topico_comunicacao == value %}
+                                    {{ display }}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {{ 'Não Informado' }}
+                        {% endif %}
+                    </td>
+                    <td class="comunicacao-assunto">{{ item.assunto|default:'Não Informado' }}</td>
+                    <td class="comunicacao-responsavel">
+                        {% if item.outro_responsavel %}
+                            Outro
+                        {% else %}
+                            {{ item.responsavel_resposta.dp_nome_completo|default:'Não Informado' }}
+                        {% endif %}
+                    </td>
+                    <td class="comunicacao-status">
+                        {% if not item.status_envio == '' %}
+                            {% for value, display in lista_status_envio %}
+                                {% if item.status_envio == value %}
+                                    {{ display }}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {{ 'Não Informado' }}
+                        {% endif %}
+                    </td>
+                    <td class="comunicacao-dataenvio">{{ item.data_envio|date:"d/m/Y"|default:'Não Informado' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>  
+    </div>
+    
+
+    <script src="{% static 'js/fornecedores.js' %}"></script>
+    <script src="{% static 'js/fornecedores_comunicacao.js' %}"></script>
+    <script src="{% static 'js/contrato_abas.js' %}"></script>
+    
+
+    <!-- Modais -->
+    {% include "fornecedores/fornecedor_comunicacoes_modal.html" %}
+    {% include "fornecedores/fornecedor_comunicacoes_delete.html" %}
+
+{% endblock %}

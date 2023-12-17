@@ -318,3 +318,8 @@ NIVEL_ALERTA = [
     ('medio', 'Médio'),
     ('alto', 'Alto'),
 ]
+
+STATUS_FISCAL_CONTRATO = [
+    ('ativo', 'Ativo'),
+    ('inativo', 'Inativo'),
+]

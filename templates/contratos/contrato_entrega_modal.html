@@ -7,7 +7,7 @@
         padding: 5px;
     }
 
-    .custom-modal-width-parcela {
+    .custom-modal-width-entrega {
         max-width: 60%;  /* ou qualquer largura que você desejar */
         font-size: 16px !important;
     }
@@ -33,7 +33,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="contratoEntregaModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-parcela" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-entrega" role="document">
         <div class="modal-content">
             
             <div class="modal-header">
@@ -87,8 +87,6 @@
                                 </div>
                                 <div class="form-floating mb-3" style="max-width: 120px !important;">
                                     <input type="text" class="form-control" id="id_entrega_parcela" readonly>
-                                    <input type="hidden" id="id_entrega_contrato_hidden" name="id_entrega_contrato_hidden" readonly>
-                                    <input type="hidden" id="id_entrega_parcela_hidden" name="id_entrega_parcela_hidden" readonly>
                                     <label>Nº da Parcela</label>
                                 </div>
                                 <div class="form-floating mb-3" style="width: 120px !important;">
@@ -140,6 +138,21 @@
                                     <label>{{ form_ct_entrega.observacoes_gerais.label }}</label>
                                 </div>
                             </div>
+
+                            <input type="hidden" id="id_entrega_contrato_hidden" name="id_entrega_contrato_hidden" readonly>
+                            <input type="hidden" id="id_entrega_parcela_hidden" name="id_entrega_parcela_hidden" readonly>
+                            
+                            <input type="hidden" id="id_qtd_entregue_hidden" readonly>
+                            
+
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3" style="width: 220px;">
+                                    <input type="text" id="id_qtd_a_entregar_hidden" class="form-control" readonly>
+                                    <label>Saldo da Parcela a Entregar</label>
+                                </div>
+                            </div>
+                            
+                            
                         </div>
                     </div>
     

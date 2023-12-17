@@ -11,7 +11,8 @@ from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos, 
                                    ContratosObjetos, ContratosParcelas, ContratosEntregas)
 from apps.contratos.forms import (ContratosArpsForm, ContratosArpsItensForm, ContratosForm, 
-                                  ContratosObjetosForm, ContratosParcelasForm, ContratosEntregasForm)
+                                  ContratosObjetosForm, ContratosParcelasForm, ContratosEntregasForm,
+                                  ContratosFiscaisForm)
 from setup.choices import UNIDADE_DAF, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
@@ -180,6 +181,7 @@ def contrato_ficha(request, id_contrato=None):
     form_ct_objeto = ContratosObjetosForm()
     form_ct_parcela = ContratosParcelasForm()
     form_ct_entrega = ContratosEntregasForm()
+    form_ct_fiscal = ContratosFiscaisForm()
 
     return render(request, 'contratos/contrato_ficha.html', {
         'form': form,
@@ -187,6 +189,7 @@ def contrato_ficha(request, id_contrato=None):
         'form_objeto': form_ct_objeto,
         'form_parcela': form_ct_parcela,
         'form_ct_entrega': form_ct_entrega,
+        'form_fiscal': form_ct_fiscal,
         'tab_objetos': tab_objetos,
         'tab_parcelas': tab_parcelas,
         'tab_entregas': tab_entregas,
@@ -599,7 +602,9 @@ def contrato_parcela_modal(request, id_parcela=None):
             'valor_total': item.valor_total(),
             'data_previsao_entrega': item.data_previsao_entrega,
             'data_ultima_entrega': item.data_ultima_entrega(),
-            'observacoes': item.observacoes_gerais if item.observacoes_gerais else 'Sem observações.',
+            'observacoes': item.observacoes_gerais,
+
+            'saldo_arp': item.objeto.arp_item.qtd_saldo()
         }
         return JsonResponse(data)
     except ContratosParcelas.DoesNotExist:
@@ -612,15 +617,43 @@ def buscar_parcela(request, id_parcela=None):
     contrato_id = parcela.contrato.id
     parcela_id = parcela.id
     produto = parcela.objeto.produto.produto
-
+    qtd_a_entregar = parcela.qtd_a_entregar()
     parcela_dados = {
             'numero_item': numero_item,
             'numero_parcela': numero_parcela,
             'contrato_id': contrato_id,
             'parcela_id': parcela_id,
             'produto': produto,
+            'qtd_a_entregar': qtd_a_entregar,
         }
     return JsonResponse({'parcela': parcela_dados})
+
+def contrato_parcela_delete(request, id_entrega=None):    
+    try:
+        parcela = ContratosParcelas.objects.get(id=id_entrega)
+        parcela.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Contratos_Entregas",
+            model='ContratosEntregas',
+            model_id=parcela.id,
+            item_id=0,
+            item_descricao="Deleção da Parcela de Contrato.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou a Parcela (ID {parcela.id}, Nº Parcela: {parcela.numero_parcela}, Contrato: {parcela.contrato.numero_contrato}, Produto: {parcela.objeto.produto.produto}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Parcela do Contrato deletada com sucesso!"
+            })
+    except ContratosArps.DoesNotExist:
+        return JsonResponse({
+            "message": "Parcela do Contrato não encontrada."
+            })
 
 
 #ENTREGAS
@@ -668,6 +701,8 @@ def contrato_entrega_salvar(request, id_entrega=None):
 
         #Criar o formulário com os dados atualizados
         entrega_form = ContratosEntregasForm(modificacoes_post, instance=entrega_form.instance)
+
+        print('Observações: ', request.POST.get('observacoes_gerais'))
 
         #salvar
         if entrega_form.is_valid():
@@ -717,7 +752,72 @@ def contrato_entrega_salvar(request, id_entrega=None):
                 })
 
 def contrato_entrega_modal(request, id_entrega=None):
-    pass
+    try:
+        item = ContratosEntregas.objects.get(id=id_entrega)
+        produto = item.parcela.objeto.produto.produto
+        contrato = item.contrato.id
+        parcela = item.parcela.id
+        qtd_a_entregar = item.parcela.qtd_a_entregar()
+        data = {
+            'entrega_id': item.id,
+            'entrega_log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
+            'entrega_log_responsavel_registro': str(item.usuario_atualizacao.dp_nome_completo),
+            'entrega_log_ult_atualizacao': item.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if item.ult_atual_data else '',
+            'entrega_log_responsavel_atualizacao': str(item.usuario_atualizacao.dp_nome_completo),
+            'entrega_log_edicoes': item.log_n_edicoes,
+            
+            'id_entrega_item': item.id,
+            'id_entrega_parcela': item.parcela.numero_parcela,
+            'id_entrega_numero_entrega': item.numero_entrega,
+            'id_entrega_produto': produto,
+            'id_entrega_qtd_entregue': item.qtd_entregue,
+            'id_data_entrega': item.data_entrega,
+            'id_entrega_local_entrega': item.local_entrega,
+            'id_entrega_notas_recebidas': item.notas_recebidas,
+            'id_entrega_notas_status': item.notas_status,
+            'id_entrega_notas_pagamentos': item.notas_pagamentos,
+            'observacoes_gerais': item.observacoes_gerais,
+
+            'id_entrega_contrato_hidden': contrato,
+            'id_entrega_parcela_hidden': parcela,
+            'id_qtd_a_entregar_hidden': qtd_a_entregar, 
+        }
+        return JsonResponse(data)
+    except ContratosEntregas.DoesNotExist:
+        return JsonResponse({'error': 'Entrega não encontrada.'}, status=404)
+
+def contrato_entrega_delete(request, id_entrega=None):    
+    try:
+        entrega = ContratosEntregas.objects.get(id=id_entrega)
+        entrega.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Contratos_Entregas",
+            model='ContratosEntregas',
+            model_id=entrega.id,
+            item_id=0,
+            item_descricao="Deleção de Entrega de Contrato.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou a Entrega (ID {entrega.id}, Nº Parcela: {entrega.parcela.numero_parcela}, Contrato: {entrega.contrato.numero_contrato}, Produto: {entrega.parcela.objeto.produto.produto}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Entrega do Contrato deletada com sucesso!"
+            })
+    except ContratosArps.DoesNotExist:
+        return JsonResponse({
+            "message": "Entrega do Contrato não encontrada."
+            })
+
+#ANOTACOES DO CONTRATO
+def contrato_anotacoes(request, id_contrato):
+    return render(request, 'contratos/contrato_anotacoes.html')
+
+
 
 #ARPs
 def arps(request):

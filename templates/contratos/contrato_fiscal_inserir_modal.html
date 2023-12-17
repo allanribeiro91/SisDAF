@@ -7,8 +7,8 @@
         padding: 5px;
     }
 
-    .custom-modal-width-parcela {
-        min-width: 80%;  /* ou qualquer largura que você desejar */
+    .custom-modal-width-fiscal {
+        min-width: 50%;  /* ou qualquer largura que você desejar */
         font-size: 16px !important;
     }
 
@@ -32,13 +32,13 @@
 </style>
 
 <!-- Modal -->
-<div class="modal fade" id="contratoParcelaModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-parcela" role="document">
+<div class="modal fade" id="contratoFiscalFichaModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-fiscal" role="document">
         <div class="modal-content">
             
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Parcela do Contrato</h5>
-                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="exampleModalLabel">Fiscal do Contrato</h5>
+                <button type="button" class="close closeModalButtonFichaFiscal" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -80,68 +80,39 @@
                     <div class="horizontal-sections-modal-parcela">
                         <div class="section" style="border: 0px !important;">
                             <div class="grid" style="font-size: 14px;">
-                                <div class="form-floating mb-3" style="width: 100px !important;">
-                                    {{ form_parcela.numero_parcela }}
-                                    <label>{{ form_parcela.numero_parcela.label }}</label>
-                                    
+                                
+                                <div class="form-floating mb-3" style="width: 48%">
+                                    {{ form_fiscal.fiscal }}
+                                    <label>{{ form_fiscal.fiscal.label }}</label>
                                 </div>
-                                <div class="form-floating mb-3" style="max-width: 100px !important;">
-                                    <input type="text" class="form-control" id="id_objeto_item" readonly>
-                                    <label>Nº do Item</label>
+                                <div class="form-floating mb-3" style="display: flex; align-items: center; margin-left: 20px;">
+                                    <input type="checkbox" id="id_fiscal_outro_checkbox" class="form-checkbox" style="width: 20px; height: 20px;">
                                 </div>
-                                <div class="form-floating mb-3 full-width">
-                                    <input type="text" class="form-control" id="id_objeto_produto" readonly>
-                                    <label>Produto Farmacêutico</label>
+                                
+                                <div class="form-floating mb-3" style="width: 45%">
+                                    {{ form_fiscal.fiscal_outro }}
+                                    <label>{{ form_fiscal.fiscal_outro.label }}</label>
                                 </div>
+                                
                             </div>
-                        </div>
-                    </div>
-    
-                    <div class="horizontal-sections-modal-parcela">
-                        <div class="section" style="border: 0px !important;">
+
                             <div class="grid" style="font-size: 14px;">
-                                <div class="form-floating mb-3" >
-                                    <input type="text" id="id_parcela_fator_embalagem" class="form-control" style="width: 100px; text-align: right;" readonly>
-                                    <label>Fator Emb.</label>
-                                </div>
-                                <div class="form-floating mb-3" style="width: 150px">
-                                    {{ form_parcela.qtd_contratada }}
-                                    <label>{{ form_parcela.qtd_contratada.label }}</label>
-                                </div>
+                                
                                 <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_qtd_entregue" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Qtd Entregue</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_qtd_a_entregar" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Qtd a Entregar</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_unitario" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Valor Unitário</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_total" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Valor Total</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_empenhado" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Valor Empenhado</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_percentual_empenhado" class="form-control" style="width: 120px; text-align: right;" readonly>
-                                    <label>% Empenho</label>
+                                    {{ form_fiscal.status }}
+                                    <label>{{ form_fiscal.status.label }}</label>
                                 </div>
 
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" style="width: 160px;" id="id_parcela_previsao_entrega" name="data_previsao_entrega">
-                                    <label for="id_parcela_previsao_entrega">Previsão Entrega</label>
+                                    <input type="date" class="form-control" style="width: 160px;" id="id_fiscal_data_inicio" name="data_inicio">
+                                    <label for="id_fiscal_data_inicio">Data Início</label>
+                                </div>
+    
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" style="width: 160px;" id="id_fiscal_data_fim" name="data_fim">
+                                    <label for="id_fiscal_data_fim">Data Fim</label>
                                 </div>
 
-                                <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" style="width: 160px;" id="id_parcela_ultima_entrega" readonly>
-                                    <label for="id_parcela_ultima_entrega">Última Entrega</label>
-                                </div>
                             </div>
 
                             <div class="grid" style="font-size: 14px;">
@@ -151,13 +122,8 @@
                                 </div>
                             </div>
 
-
-
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3">
-                                    <input type="text" id="id_qtd_saldo_arp" class="form-control" readonly>
-                                    <label>Saldo da ARP</label>
-
                                     <input type="hidden" id="id_parcela_objeto" name="parcela_objeto_hidden" readonly>
                                     <input type="hidden" id="id_qtd_contratada_hidden" readonly>
                                 </div>
@@ -169,7 +135,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-secondary closeModalButtonFichaFiscal" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="btnDeletarParcela" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
                 <button type="button" class="btn btn-primary" id="botaoSalvarParcela" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
             </div>
@@ -179,9 +145,12 @@
 
    
 <script>
-    document.querySelectorAll('.closeModalButton').forEach(button => {
+    document.querySelectorAll('.closeModalButtonFichaFiscal').forEach(button => {
         button.addEventListener('click', function() {
-            $('#contratoParcelaModal').modal('hide');
+            $('#contratoFiscalFichaModal').modal('hide');
+            
+            const modal_fiscais = new bootstrap.Modal(document.getElementById('contratoFiscalModal')) 
+            modal_fiscais.show()
         });
     });
 </script>

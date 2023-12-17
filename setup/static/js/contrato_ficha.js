@@ -63,6 +63,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+
+    
+
     //Componentes
     const unidadeDaf = document.getElementById('ct_unidade_daf')
     const unidadeDaf_display = document.getElementById('ct_unidade_daf_display') 
@@ -111,7 +114,6 @@ document.addEventListener("DOMContentLoaded", function() {
     //Carregar dados
     carregarDados();
     
-    
     //Formatação dos dados
     $('#ct_processo_sei').mask('00000.000000/0000-00');
     $('#ct_documento_sei').mask('000000');
@@ -138,6 +140,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     //Lei de Licitação
     lei_licitacao.addEventListener('change', leiLicitacao)
+    verificar_arp_lei_licitacao()
+    function verificar_arp_lei_licitacao() {
+        if (arp.value != '') {
+            lei_licitacao.setAttribute('disabled', 'disabled')
+        }
+    }
 
     //Salvar Contrato 
     botao_salvar_contrato.addEventListener('click', function(event){
@@ -393,7 +401,7 @@ document.addEventListener("DOMContentLoaded", function() {
           openModalParcela(parcela_id);
           
         }
-      });
+    });
   
     //Nova entrega
     botao_nova_entrega.addEventListener('click', function(){
@@ -411,6 +419,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const id_entrega_parcela_hidden = document.getElementById('id_entrega_parcela_hidden')
         const id_entrega_numero_entrega = document.getElementById('id_entrega_numero_entrega')
         const id_entrega_produto = document.getElementById('id_entrega_produto')
+        const qtd_a_entregar_hidden = document.getElementById('id_qtd_a_entregar_hidden')
 
         fetch(url)
             .then(response => response.json())
@@ -421,10 +430,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 id_entrega_contrato_hidden.value = parcela_json.contrato_id;
                 id_entrega_parcela_hidden.value = parcela_json.parcela_id;
                 id_entrega_produto.value = parcela_json.produto;
+                qtd_a_entregar_hidden.value = parseFloat(parcela_json.qtd_a_entregar);
             })
             .catch(error => console.error('Erro ao buscar Parcela:', error));
-
-        modal_entrega_parcela.hide()
+        
+        modal_entrega_parcela.hide();
         limpar_dados_modal_entrega();
         modal_entrega.show()
     })
@@ -456,6 +466,15 @@ document.addEventListener("DOMContentLoaded", function() {
         
     }
 
+    //qtd entregue
+    entrega_qtd_entregue.addEventListener('dblclick', qtd_entregue_igual_qtd_a_entregar)
+    function qtd_entregue_igual_qtd_a_entregar(){
+        const qtd_a_entregar_hidden = document.getElementById('id_qtd_a_entregar_hidden')
+        var qtd_entregue_val = qtd_a_entregar_hidden.value
+        entrega_qtd_entregue.value = qtd_entregue_val
+        formatoQuantidade(entrega_qtd_entregue)
+    }
+
     //Salvar Entrega
     const botao_salvar_entrega = document.getElementById('botaoSalvarEntrega') 
     botao_salvar_entrega.addEventListener('click', function(e){
@@ -463,10 +482,66 @@ document.addEventListener("DOMContentLoaded", function() {
         salvarEntrega();
     })
 
+    //Abrir Entrega
+    const tabela_entregas_contrato = document.getElementById('tabEntregas')
+    tabela_entregas_contrato.addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.tagName === 'TD') {
+          const row = target.closest('tr');
+          const entrega_id = row.dataset.id;
+          limpar_dados_modal_entrega();
+          openModalEntrega(entrega_id);
+        }
+    });
+
+    function openModalEntrega(id_entrega) {
+        fetch(`/contratos/contrato/entrega/${id_entrega}/dados/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar dados da Entrega.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Atualizar os campos do formulário no modal com os dados recebidos
+                $('#entrega_id').val(data.entrega_id);
+                $('#entrega_log_data_registro').val(data.entrega_log_data_registro);
+                $('#entrega_log_responsavel_registro').val(data.entrega_log_responsavel_registro);
+                $('#entrega_log_ult_atualizacao').val(data.entrega_log_ult_atualizacao);
+                $('#entrega_log_responsavel_atualizacao').val(data.entrega_log_responsavel_atualizacao);
+                $('#entrega_log_edicoes').val(data.entrega_log_edicoes);
+                
+                $('#id_entrega_item').val(data.id_entrega_item);
+                $('#id_entrega_parcela').val(data.id_entrega_parcela);
+                $('#id_entrega_numero_entrega').val(data.id_entrega_numero_entrega);
+                let produto = data.id_entrega_produto;
+                $('#id_entrega_produto').val(produto);
+                
+                $('#id_entrega_qtd_entregue').val(data.id_entrega_qtd_entregue.toLocaleString('pt-BR'));
+                $('#id_data_entrega').val(data.id_data_entrega);
+                $('#id_entrega_local_entrega').val(data.id_entrega_local_entrega);
+                $('#id_entrega_notas_recebidas').val(data.id_entrega_notas_recebidas);
+                $('#id_entrega_notas_status').val(data.id_entrega_notas_status);
+                $('#id_entrega_notas_pagamentos').val(data.id_entrega_notas_pagamentos);
+                $('#id_entrega_observacoes').val(data.observacoes_gerais);
+                
+                $('#id_entrega_contrato_hidden').val(data.id_entrega_contrato_hidden);
+                $('#id_entrega_parcela_hidden').val(data.id_entrega_parcela_hidden);
+                $('#id_qtd_a_entregar_hidden').val(data.id_qtd_a_entregar_hidden);
+                $('#id_qtd_entregue_hidden').val(data.id_entrega_qtd_entregue);
+                
+    
+                // Abrir o modal
+                modal_entrega.show()
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     function salvarEntrega() {
 
         const entrega_id = document.getElementById('entrega_id').value
-        //const id_qtd_saldo_arp = document.getElementById('id_qtd_saldo_arp')
 
         //Verificar preenchimento dos campos
         let preenchimento_incorreto = verificar_campos_entrega()
@@ -475,22 +550,24 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         //Verificar dupliciidade no Número da Entrega
-        let duplicidade_entrega = verificar_numero_entrega_duplicidade()
-        if (duplicidade_entrega == true) {
+        if (entrega_id == ''){
+            let duplicidade_entrega = verificar_numero_entrega_duplicidade()
+            if (duplicidade_entrega == true) {
+                return;
+            }
+        }
+
+        //Verificar Qtd a Entregar
+        const qtdAEntregarParcela = parseFloat(document.getElementById('id_qtd_a_entregar_hidden').value);
+        const entregaQtdEntregue = parseFloat(document.getElementById('id_qtd_entregue_hidden').value);
+        const entregaQtdEntregueInformada = parseFloat(entrega_qtd_entregue.value.replace(/\./g, ''));
+        const isNovaEntrega = entrega_id === '';
+
+        const qtdMaximaPermitida = isNovaEntrega ? qtdAEntregarParcela : qtdAEntregarParcela + entregaQtdEntregue;
+        if (entregaQtdEntregueInformada > qtdMaximaPermitida) {
+            sweetAlert('A quantidade entregue informada é superior à quantidade a entregar desta parcela!', 'warning', 'red');
             return;
         }
-        
-        //Verificar Saldo a Entregar
-        // if (arp.value != '') {
-        //     let saldo_arp = parseFloat(id_qtd_saldo_arp.value)
-        //     let qtd_contratada_str = parcela_qtd_contratada.value
-        //     qtd_contratada_str = qtd_contratada_str.replace(/\./g, '');
-        //     let qtd_contratada = parseFloat(qtd_contratada_str)
-        //     if (qtd_contratada > saldo_arp) {
-        //         sweetAlert('Saldo da ARP insuficiente!', 'warning', 'red')
-        //         return
-        //     }
-        // }
 
         //Enviar para o servidor
             //definir o caminho
@@ -545,6 +622,58 @@ document.addEventListener("DOMContentLoaded", function() {
             });
             
     }
+
+
+    //Deletar Entrega
+    const botao_deletar_entrega = document.getElementById('btnDeletarEntrega')
+    botao_deletar_entrega.addEventListener('click', function() {
+
+        const id_entrega = document.getElementById('entrega_id').value
+        const url_apos_delete = "/contratos/contrato/ficha/" + contrato_id  + "/";
+
+        //Trata-se de um novo registro que ainda não foi salvo
+        if (!id_entrega) { 
+            modal_entrega.hide()
+            return;
+        }
+        
+        //parâmetros para deletar
+        const mensagem = "Deletar Entrega do Contrato."
+        const url_delete = "/contratos/contrato/entrega/deletar/" + id_entrega + "/"
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    })
+
+    //Deletar Parcela
+    const botao_deletar_parcela = document.getElementById('btnDeletarParcela')
+    botao_deletar_parcela.addEventListener('click', function() {
+
+        const parcela_id = document.getElementById('parcela_id').value
+        const url_apos_delete = "/contratos/contrato/ficha/" + contrato_id  + "/";
+
+        //Trata-se de um novo registro que ainda não foi salvo
+        if (!parcela_id) { 
+            modal_parcela.hide()
+            return;
+        }
+        
+        //Verificar se há quantidade entregue
+        const qtd_entregue = parseFloat(document.getElementById('id_parcela_qtd_entregue').value.replace(/\./g, ''));
+        if (qtd_entregue > 0) {
+            sweetAlert("Não é possível deletar uma parcela com entregas já realizadas!")
+            return
+        }
+
+        //parâmetros para deletar
+        const mensagem = "Deletar Parcela do Contrato."
+        const url_delete = "/contratos/contrato/parcela/deletar/" + parcela_id + "/"
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    })
 
     function verificar_campos_entrega() {
         const campos = [
@@ -975,21 +1104,39 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         //Verificar número do item e número da parcela
-        let n_item_parcela = verificar_item_parcela()
-        if (n_item_parcela == true) {
-            return;
+        if (parcela_id == '') {
+            let n_item_parcela = verificar_item_parcela()
+            if (n_item_parcela == true) {
+                return;
+            }
         }
         
         //Verificar Saldo ARP
+        let qtd_contratada_str = parcela_qtd_contratada.value
+        qtd_contratada_str = qtd_contratada_str.replace(/\./g, '');
+        let qtd_contratada = parseFloat(qtd_contratada_str)
+        let qtd_contratada_hidden = parseFloat(document.getElementById('id_qtd_contratada_hidden').value)
+        let saldo_arp = parseFloat(id_qtd_saldo_arp.value)        
+        let saldo_total = saldo_arp + qtd_contratada_hidden
         if (arp.value != '') {
-            let saldo_arp = parseFloat(id_qtd_saldo_arp.value)
-            let qtd_contratada_str = parcela_qtd_contratada.value
-            qtd_contratada_str = qtd_contratada_str.replace(/\./g, '');
-            let qtd_contratada = parseFloat(qtd_contratada_str)
-            if (qtd_contratada > saldo_arp) {
-                sweetAlert('Saldo da ARP insuficiente!', 'warning', 'red')
+            
+            let saldoComparar = parcela_id === '' ? saldo_arp : saldo_total;
+            
+            if (qtd_contratada > saldoComparar) {
+                sweetAlert('Saldo da ARP insuficiente!', 'warning', 'red');
+                return;
+            }
+   
+        }
+
+        //Verificar Qtd Entregue
+        if (parcela_id != '') {
+            const qtd_entregue = parseFloat(document.getElementById('id_parcela_qtd_entregue').value.replace(/\./g, ''))
+            if (qtd_contratada < qtd_entregue) {
+                sweetAlert('A Qtd Contratada não pode ser menor que a Qtd Entregue!')
                 return
             }
+
         }
 
         //Enviar para o servidor
@@ -1097,9 +1244,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // Coletar as combinações de item e parcela armazenar no array
         var combinacoesItensParcelasEntregas = [];
         document.querySelectorAll('#tabEntregas tr').forEach(function(tr) {
-            var item = tr.querySelector('.col-numero-item').innerText.trim();
-            var parcela = tr.querySelector('.col-numero-parcela').innerText.trim();
-            var entrega = tr.querySelector('.col-numero-entrega').innerText.trim();
+            var item = tr.querySelector('.col-entrega-numero-item').innerText.trim();
+            var parcela = tr.querySelector('.col-entrega-numero-parcela').innerText.trim();
+            var entrega = tr.querySelector('.col-entrega-numero-entrega').innerText.trim();
             combinacoesItensParcelasEntregas.push(item + "-" + parcela  + "-" + entrega);
         })
         
@@ -1147,53 +1294,49 @@ document.addEventListener("DOMContentLoaded", function() {
                 $('#id_parcela_previsao_entrega').val(data.data_previsao_entrega);
                 $('#id_parcela_ultima_entrega').val(data.data_ultima_entrega);
                 $('#id_parcela_observacoes').val(data.observacoes);
-    
+
+                $('#id_qtd_saldo_arp').val(data.saldo_arp);
+                $('#id_qtd_contratada_hidden').val(data.qtd_contratada);
+                
                 // Abrir o modal
                 const modal = new bootstrap.Modal(document.getElementById('contratoParcelaModal'));
                 modal.show();
+
+                
             })
             .catch(error => {
                 console.log(error);
             });
     }
 
-    function openModalEntrega(id_entrega) {
-        fetch(`/contratos/contrato/entrega/${id_entrega}/dados/`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar dados da Entrega.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Atualizar os campos do formulário no modal com os dados recebidos
-                $('#parcela_id').val(data.id);
-                $('#parcela_log_data_registro').val(data.log_data_registro);
-                $('#parcela_log_responsavel_registro').val(data.log_responsavel_registro);
-                $('#parcela_log_ult_atualizacao').val(data.lot_ult_atualizacao);
-                $('#parcela_log_responsavel_atualizacao').val(data.log_responsavel_atualizacao);
-                $('#parcela_log_edicoes').val(data.log_edicoes);
-                $('#id_numero_parcela').val(data.numero_parcela);
-                $('#id_objeto_item').val(data.numero_item);
-                $('#id_parcela_objeto').val(data.objeto);
-                let produto = data.produto;
-                $('#id_objeto_produto').val(produto);
-                $('#id_parcela_fator_embalagem').val(data.fator_embalagem);
-                $('#id_parcela_qtd_contratada').val(data.qtd_contratada.toLocaleString('pt-BR'));
-                $('#id_parcela_qtd_entregue').val(data.qtd_entregue.toLocaleString('pt-BR'));
-                $('#id_parcela_qtd_a_entregar').val(data.qtd_a_entregar.toLocaleString('pt-BR'));
-                $('#id_parcela_valor_unitario').val(formatarComoMoeda(data.valor_unitario));
-                $('#id_parcela_valor_total').val(formatarComoMoeda(data.valor_total));
-                $('#id_parcela_previsao_entrega').val(data.data_previsao_entrega);
-                $('#id_parcela_ultima_entrega').val(data.data_ultima_entrega);
-                $('#id_parcela_observacoes').val(data.observacoes);
+    const modal_fiscais = new bootstrap.Modal(document.getElementById('contratoFiscalModal')) 
+    const botao_fiscais = document.getElementById('btnContratoFiscais')
+    botao_fiscais.addEventListener('click', function(){
+        modal_fiscais.show()
+    })
+
+    const modal_fiscal_ficha = new bootstrap.Modal(document.getElementById('contratoFiscalFichaModal'))
+    const botao_inserir_fiscal = document.getElementById('btnNovoFiscal')
+    botao_inserir_fiscal.addEventListener('click', function(){
+        modal_fiscais.hide();
+        modal_fiscal_ficha.show();
+    })
+
+    const fiscal_outro_check = document.getElementById('id_fiscal_outro_checkbox')
+    const fiscal = document.getElementById('id_fiscal')
+    const fiscal_outro = document.getElementById('id_fiscal_outro')
+    fiscal_outro_check.addEventListener('change', function() {
+        if (fiscal_outro_check.checked) {
+            fiscal.value = ''
+            fiscal.setAttribute('disabled', 'disabled')
+            fiscal_outro.removeAttribute('readonly');
+            fiscal_outro.value = ''
+        } else {
+            fiscal.value = ''
+            fiscal.removeAttribute('disabled')
+            fiscal_outro.value = ''
+            fiscal_outro.setAttribute('readonly', 'true');
+        }
+    });
     
-                // Abrir o modal
-                const modal = new bootstrap.Modal(document.getElementById('contratoParcelaModal'));
-                modal.show();
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
 });

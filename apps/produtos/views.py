@@ -427,7 +427,6 @@ def salvar_tags(request, product_id):
 
 @login_required
 def produto_exportar_pdf(request, product_id):
-    pass
 #     #Buscar o produto
 #     produto = ProdutosFarmaceuticos.objects.get(id=product_id)
 
@@ -443,7 +442,7 @@ def produto_exportar_pdf(request, product_id):
 #     # if pisa_status.err:
 #     #     return HttpResponse('Tivemos alguns erros ao gerar o PDF <pre>' + html_string + '</pre>')
 #     # return response
-
+    pass
 
 
 
