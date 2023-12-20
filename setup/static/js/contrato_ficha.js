@@ -62,6 +62,16 @@ document.addEventListener("DOMContentLoaded", function() {
             openModalEntrega(idEntrega)
         }
     }
+    if (localStorage.getItem('FiscalSalvo') === 'true') {
+        sweetAlert('Fiscal salvo com sucesso!', 'success', 'top-end');
+        let idFiscal = localStorage.getItem('id_fiscal');
+        localStorage.removeItem('FiscalSalvo');
+        if (idFiscal) {
+            localStorage.removeItem('id_entrega');
+            openModalFiscal(idFiscal)
+        }
+    }
+
 
 
     
@@ -110,6 +120,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const modal_entrega_parcela = new bootstrap.Modal(document.getElementById('contratoEntregaParcela'))
     const botao_inserir_nova_entrega = document.getElementById('inserirNovaEntrega')
     const selecionar_parcela_entrega = document.getElementById('entrega_selecionar_parcela')
+    const tabela_fiscais = document.getElementById('tabFiscais')
 
     //Carregar dados
     carregarDados();
@@ -1315,10 +1326,45 @@ document.addEventListener("DOMContentLoaded", function() {
         modal_fiscais.show()
     })
 
+    function pegar_maior_data_fim_fiscais(){
+        // Verifica se a tabela tem linhas de dados
+        if (tabela_fiscais.rows.length > 1) {
+            // A primeira linha de dados é a linha de índice 1, já que a linha de índice 0 é o cabeçalho
+            const primeiraLinhaDados = tabela_fiscais.rows[1];
+
+            // Supondo que a data de fim está na quarta coluna (índice 3)
+            maiorDataFim = primeiraLinhaDados.cells[3].innerText.trim();
+
+            // Se a célula estiver vazia ou tiver um traço '-', define maiorDataFim como uma string vazia
+            if (maiorDataFim === '-' || maiorDataFim === '') {
+                maiorDataFim = '';
+            }
+
+            return maiorDataFim
+        }
+    }
+
     const modal_fiscal_ficha = new bootstrap.Modal(document.getElementById('contratoFiscalFichaModal'))
     const botao_inserir_fiscal = document.getElementById('btnNovoFiscal')
     botao_inserir_fiscal.addEventListener('click', function(){
+        
+        let status_fiscal_atual = fiscal_verificar_status()
+        if (!status_fiscal_atual){
+            sweetAlert('Inative primeiro o atuas Fiscal do contrato!')
+            return
+        }
+
         modal_fiscais.hide();
+        limpar_campos_fiscal();
+
+        const id_fiscal_contrato_hidden = document.getElementById('id_fiscal_contrato_hidden')
+        id_fiscal_contrato_hidden.value = contrato_id
+
+        const id_fiscal_data_fim_maior_hidden = document.getElementById('id_fiscal_data_fim_maior_hidden')
+        id_fiscal_data_fim_maior_hidden.value = pegar_maior_data_fim_fiscais()
+        fiscal_data_fim.setAttribute('disabled', 'disabled')
+        fiscal.removeAttribute('disabled')
+        fiscal_outro_check.removeAttribute('disabled')
         modal_fiscal_ficha.show();
     })
 
@@ -1339,4 +1385,311 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     
+
+    const fiscal_status = document.getElementById('id_fiscal_status')
+    const fiscal_data_inicio = document.getElementById('id_fiscal_data_inicio')
+    const fiscal_data_fim = document.getElementById('id_fiscal_data_fim')
+    const maior_data_fim_tabela_fiscais = pegar_maior_data_fim_fiscais()
+    const fiscal_data_fim_maior = document.getElementById('id_fiscal_data_fim_maior_hidden')
+    const fiscal_data_fim_registrada = document.getElementById('id_fiscal_data_fim_hidden')
+    
+    fiscal_data_inicio.addEventListener('change', function(){
+        let verificacao = verificar_fiscal_data_inicio()
+        if (verificacao == false){
+            sweetAlert('A data de início não pode ser inferior à última data fim do último fiscal do contrato.')
+            fiscal_data_inicio.value = ''
+        }
+    })
+
+
+    fiscal_data_fim.setAttribute('disabled', 'disabled')
+
+    fiscal_status.addEventListener('change', function(){
+        if (fiscal_status.value == 'inativo'){
+            fiscal_data_fim.removeAttribute('disabled')
+            fiscal_data_fim.value = ''
+        } else {
+            fiscal_data_fim.setAttribute('disabled', 'disabled')
+            fiscal_data_fim.value = ''
+        }
+    })
+
+    fiscal_data_fim.addEventListener('change', function(){
+        if (fiscal_data_fim.value < fiscal_data_inicio.value){
+            sweetAlert('A data fim não pode ser menor que a data de início!')
+            fiscal_data_fim.value = ''
+        }
+    })
+
+    const fiscal_id = document.getElementById('fiscal_id')
+    const id_fiscal_usuario_hidden = document.getElementById('id_fiscal_usuario_hidden')
+    function verificar_fiscal_id(){
+        if(fiscal_id.value != ''){
+            fiscal_outro_check.setAttribute('disabled', 'disabled')
+            fiscal_outro.setAttribute('readonly', 'true')
+            fiscal.setAttribute('disabled', 'disabled')
+            id_fiscal_usuario_hidden.value = fiscal.value
+        }else{
+            fiscal_outro_check.removeAttribute('disabled')
+            fiscal_outro.removeAttribute('readonly')
+            fiscal.removeAttribute('disabled')
+            id_fiscal_usuario_hidden.value = ''
+        }
+    }
+    
+    fiscal.addEventListener('change', function(){
+        id_fiscal_usuario_hidden.value = fiscal.value
+    })
+
+
+    const botao_salvar_fiscal = document.getElementById('botaoSalvarFiscal')
+    botao_salvar_fiscal.addEventListener('click', function(e){
+        e.preventDefault();
+        salvarFiscal();
+    })
+
+    
+
+    function salvarFiscal(){
+        const fiscal_id = document.getElementById('fiscal_id').value
+
+        //Verificar preenchimento dos campos
+        let preenchimento_incorreto = verificar_campos_fiscal()
+        if (preenchimento_incorreto === false) {
+            return;
+        }
+
+        //Enviar para o servidor
+            //definir o caminho
+            if (fiscal_id == '') {
+                postURL = '/contratos/contrato/fiscal/salvar/novo/'
+            } else
+            {
+                postURL = `/contratos/contrato/fiscal/salvar/${fiscal_id}/`
+            }
+
+            //pegar os dados
+            let formData = new FormData(document.getElementById('fiscalForm'));
+    
+            //enviar 
+            fetch(postURL, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+        
+        //Retorno do Servidor
+        .then(response => {
+            // Primeiro verifique se a resposta é ok
+            if (!response.ok) {
+                sweetAlert('Dados não foram salvos.', 'error', 'red');
+                throw new Error('Server response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.retorno === "Salvo") {
+                let id_fiscal = data.fiscal_id;
+                localStorage.setItem('FiscalSalvo', 'true');
+                localStorage.setItem('id_fiscal', id_fiscal);
+                window.location.reload();
+            }
+    
+            if (data.retorno === "Não houve mudanças") {
+                //alert
+                sweetAlert('Dados não foram salvos.<br>Não houve mudanças.', 'warning', 'orange')
+            }
+    
+            if (data.retorno === "Erro ao salvar") {
+                //alert
+                sweetAlert('Dados não foram salvos.', 'error', 'red')
+            }
+        })
+        .catch(error => {
+            console.error('Fetch operation error:', error);
+        });
+    }
+
+    function converterDataFormatoISO(dataStr) {
+        // Converte uma data no formato DD/MM/YYYY para YYYY-MM-DD
+        if (dataStr.includes('/')) {
+            const partes = dataStr.split('/');
+            return `${partes[2]}-${partes[1]}-${partes[0]}`;
+        }
+        // Se a data já estiver no formato YYYY-MM-DD, retorna como está
+        return dataStr;
+    }
+    
+    function verificar_fiscal_data_inicio() {
+        // Converte as datas para o formato ISO (YYYY-MM-DD) antes da comparação
+        const dataInicioISO = converterDataFormatoISO(fiscal_data_inicio.value);
+        const dataFimMaiorISO = converterDataFormatoISO(fiscal_data_fim_maior.value);
+    
+        // Realiza a comparação
+        if (dataInicioISO < dataFimMaiorISO) {
+            return false;
+        }
+        return true;
+    }
+
+    function verificar_campos_fiscal() {
+    
+        const campos = [
+            { id: 'id_fiscal_status', mensagem: 'Informe o <b>Status</b>!' },
+            { id: 'id_fiscal_data_inicio', mensagem: 'Informe a <b>Data de Início</b>!' },
+        ];
+    
+        let mensagensErro = campos.reduce((mensagens, campo) => {
+            const elemento = document.getElementById(campo.id);
+            if (!elemento || elemento.value === '' || elemento.value == 0) {
+                mensagens.push(campo.mensagem);
+            }
+            return mensagens;
+        }, []);
+
+
+        const mensagem_fiscal = 'Informe o <b>Fiscal do Contrato</b>!'
+        if (fiscal_outro_check.checked == false && fiscal_outro.value == ''){
+            if(fiscal.value == '') {
+                mensagensErro.push(mensagem_fiscal);
+            }
+        }else{
+            if(fiscal_outro.value == '') {
+                mensagensErro.push(mensagem_fiscal);
+            }
+        }
+    
+        const mensagem_data_fim = 'Informe a <b>Data Fim</b>!'
+        if (fiscal_status.value == 'inativo' && fiscal_data_fim.value == ''){
+            mensagensErro.push(mensagem_data_fim);
+        }
+    
+        if (mensagensErro.length > 0) {
+            const campos = mensagensErro.join('<br>')
+            sweetAlertPreenchimento(campos)
+            return false;
+        }
+        
+        return true;
+    }
+
+    const fiscal_observacoes = document.getElementById('id_fiscal_observacoes')
+    const log_fiscal_id = document.getElementById('fiscal_id')
+    const log_fiscal_data_registro = document.getElementById('fiscal_log_data_registro')
+    const log_fiscal_responsavel_registro = document.getElementById('fiscal_log_responsavel_registro')
+    const log_fiscal_data_atualizacao = document.getElementById('fiscal_log_ult_atualizacao')
+    const log_fiscal_responsavel_atualizacao = document.getElementById('fiscal_log_responsavel_atualizacao')
+    const log_fiscal_edicoes = document.getElementById('fiscal_log_edicoes')
+    function limpar_campos_fiscal() {
+        log_fiscal_id.value = ''
+        log_fiscal_data_registro.value = ''
+        log_fiscal_responsavel_registro.value = ''
+        log_fiscal_data_atualizacao.value = ''
+        log_fiscal_responsavel_atualizacao.value = ''
+        log_fiscal_edicoes.value = ''
+        fiscal_status.value = ''
+        fiscal_data_inicio.value = ''
+        fiscal_data_fim.value = ''
+        fiscal.value = ''
+        fiscal_outro.value = ''
+        fiscal_outro_check.value = false
+        fiscal_observacoes.value = ''
+        $('#id_fiscal_data_fim_maior_hidden').val('');
+        $('#id_fiscal_data_fim_hidden').val('');
+    }
+
+    function openModalFiscal(id_fiscal) {
+        fetch(`/contratos/contrato/fiscal/${id_fiscal}/dados/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar dados do Fiscal.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Atualizar os campos do formulário no modal com os dados recebidos
+                $('#fiscal_id').val(data.id);
+                $('#fiscal_log_data_registro').val(data.log_data_registro);
+                $('#fiscal_log_responsavel_registro').val(data.log_responsavel_registro);
+                $('#fiscal_log_ult_atualizacao').val(data.log_ult_atualizacao);
+                $('#fiscal_log_responsavel_atualizacao').val(data.log_responsavel_atualizacao);
+                $('#fiscal_log_edicoes').val(data.log_edicoes);
+                
+
+                $('#id_fiscal').val(data.id_fiscal);
+                $('#id_fiscal_outro_checkbox').val(data.id_fiscal_outro_checkbox);
+                $('#id_fiscal_outro').val(data.id_fiscal_outro);
+
+                $('#id_fiscal_status').val(data.id_fiscal_status)
+
+                $('#id_fiscal_data_inicio').val(data.id_fiscal_data_inicio);
+                $('#id_fiscal_data_fim').val(data.id_fiscal_data_fim);
+                
+                $('#id_fiscal_observacoes').val(data.id_fiscal_observacoes);
+
+                $('#id_fiscal_contrato_hidden').val(data.id_fiscal_contrato_hidden);
+
+                $('#id_fiscal_data_fim_maior_hidden').val(maior_data_fim_tabela_fiscais);
+                $('#id_fiscal_data_fim_hidden').val(data.id_fiscal_data_fim);
+                
+                // Abrir o modal
+                //const modal = new bootstrap.Modal(document.getElementById('contratoFiscalFichaModal'));
+                //modal.show();
+                verificar_fiscal_id();
+                verificar_status_fiscal();
+                modal_fiscal_ficha.show();
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    function verificar_status_fiscal(){
+        if (fiscal_status.value == 'inativo') {
+            fiscal_data_fim.removeAttribute('disabled')
+        }
+    }
+
+    //Abrir Entrega
+    tabela_fiscais.addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.tagName === 'TD') {
+          const row = target.closest('tr');
+          const fiscal_id = row.dataset.id;
+          limpar_campos_fiscal();
+          modal_fiscais.hide();
+          openModalFiscal(fiscal_id);
+        }
+    });
+
+    //fechar
+    document.querySelectorAll('.closeModalButtonFichaFiscal').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#contratoFiscalFichaModal').modal('hide');
+
+            modal_fiscais.show()
+        });
+    });
+
+    function fiscal_verificar_status(){
+        if (tabela_fiscais && tabela_fiscais.rows.length > 1){
+            const primeiraLinha = tabela_fiscais.rows[1];
+    
+            const statusFiscal = primeiraLinha.cells[2].textContent;
+
+            if (statusFiscal == 'Ativo') {
+                return false
+            }
+        
+        return true
+    }
+
+
+    }
+    
+
 });
+
+

@@ -6,7 +6,8 @@ from apps.contratos.views import (
     buscar_arps, arp_buscar_dados_sei, buscar_contrato, contrato_delete, buscar_arps_itens, vincular_itens_arp,
     contrato_objeto_modal, contrato_objeto_salvar, contrato_objeto_delete, buscar_objeto, contrato_parcela_salvar,
     contrato_parcela_modal, contrato_dados_arp, buscar_parcela, contrato_entrega_salvar, contrato_entrega_modal,
-    contrato_entrega_delete, contrato_parcela_delete, contrato_anotacoes
+    contrato_entrega_delete, contrato_parcela_delete, contrato_anotacoes, contrato_fiscal_salvar,
+    contrato_fiscal_modal, empenhos, empenho_ficha, teds
 )
 
 
@@ -39,27 +40,39 @@ urlpatterns = [
     path('contratos/vincularitensarp/<int:id_arp>-<int:id_contrato>/', vincular_itens_arp, name='vincular_itens_arp'),
     path('contratos/ficha-arp/<int:id_arp>/', contrato_dados_arp, name='contrato_dados_arp'),
     
-    #OBJETO DO CONTRATO
+    #CONTRATOS/OBJETO
     path('contratos/contrato/objeto/<int:id_objeto>/dados/', contrato_objeto_modal, name='contrato_objeto_modal'),
     path('contratos/contrato/objeto/salvar/<int:id_objeto>/', contrato_objeto_salvar, name='contrato_objeto_salvar'),
     path('contratos/contrato/objeto/salvar/novo/', contrato_objeto_salvar, name='contrato_objeto_salvar'),
     path('contratos/contrato/objeto/deletar/<int:id_objeto>/', contrato_objeto_delete, name='contrato_objeto_delete'),
     path('contratos/buscar_objeto/<int:id_objeto>/', buscar_objeto, name='buscar_objeto'),
 
-    #PARCELAS DO CONTRATO
+    #CONTRATOS/PARCELAS
     path('contratos/contrato/parcela/<int:id_parcela>/dados/', contrato_parcela_modal, name='contrato_parcela_modal'),
     path('contratos/contrato/parcela/deletar/<int:id_parcela>/', contrato_parcela_delete, name='contrato_parcela_delete'),
     path('contratos/contrato/parcela/salvar/<int:id_parcela>/', contrato_parcela_salvar, name='contrato_parcela_salvar'),
     path('contratos/contrato/parcela/salvar/novo/', contrato_parcela_salvar, name='contrato_parcela_salvar_novo'),
     path('contratos/buscar_parcela/<int:id_parcela>/', buscar_parcela, name='buscar_parcela'),
 
-    #ENTREGAS DO CONTRATO
+    #CONTRATOS/ENTREGAS
     path('contratos/contrato/entrega/<int:id_entrega>/dados/', contrato_entrega_modal, name='contrato_entrega_modal'),
     path('contratos/contrato/entrega/deletar/<int:id_entrega>/', contrato_entrega_delete, name='contrato_entrega_delete'),
     path('contratos/contrato/entrega/salvar/<int:id_entrega>/', contrato_entrega_salvar, name='contrato_entrega_salvar'),
     path('contratos/contrato/entrega/salvar/novo/', contrato_entrega_salvar, name='contrato_parcela_entrega_novo'),
 
+    #CONTRATOS/FISCAIS
+    path('contratos/contrato/fiscal/<int:id_fiscal>/dados/', contrato_fiscal_modal, name='contrato_fiscal_modal'),
+    path('contratos/contrato/fiscal/salvar/novo/', contrato_fiscal_salvar, name='contrato_fiscal_salvar'),
+    path('contratos/contrato/fiscal/salvar/<int:id_fiscal>/', contrato_fiscal_salvar, name='contrato_fiscal_salvar'),
+
     #ANOTACOES
     path('contratos/contrato/anotacoes/<int:id_contrato>/', contrato_anotacoes, name='contrato_anotacoes'),
+
+    #EMPENHOS
+    path('contratos/empenhos/', empenhos, name='empenhos'),
+    path('contratos/empenhos/novo', empenho_ficha, name='empenho_novo'),
+
+    #TEDs
+    path('contratos/teds/', teds, name='teds'),
 
 ]

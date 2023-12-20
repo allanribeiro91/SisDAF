@@ -4,10 +4,12 @@ from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos,
-                                   ContratosObjetos, ContratosParcelas, ContratosEntregas, ContratosFiscais)
-from setup.choices import (STATUS_ARP, UNIDADE_DAF, TIPO_COTA, YES_NO, 
+                                   ContratosObjetos, ContratosParcelas, ContratosEntregas, ContratosFiscais,
+                                   Empenhos)
+from setup.choices import (STATUS_ARP, UNIDADE_DAF, UNIDADE_DAF3, TIPO_COTA, YES_NO, 
                            MODALIDADE_AQUISICAO, LEI_LICITACAO, LOCAL_ENTREGA_PRODUTOS,
-                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS, STATUS_FISCAL_CONTRATO)
+                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS, STATUS_FISCAL_CONTRATO,
+                           STATUS_EMPENHO)
 
 UNIDADE_DAF = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
 
@@ -635,7 +637,7 @@ class ContratosFiscaisForm(forms.ModelForm):
             'readonly': 'readonly',
         }),
         label='Outro',
-        required=True,
+        required=False,
     )
     status = forms.ChoiceField(
         choices=STATUS_FISCAL_CONTRATO,
@@ -651,7 +653,7 @@ class ContratosFiscaisForm(forms.ModelForm):
     data_inicio = forms.DateField(
         widget=forms.DateInput(attrs={
             'class': 'form-control',
-            'type': 'date',
+            'type': 'date'
         }),
         required=True,
         label='Data de Início'
@@ -661,7 +663,7 @@ class ContratosFiscaisForm(forms.ModelForm):
             'class': 'form-control',
             'type': 'date',
         }),
-        required=True,
+        required=False,
         label='Data Fim'
     )
     #contrato
@@ -680,7 +682,7 @@ class ContratosFiscaisForm(forms.ModelForm):
             'class': 'form-control auto-expand',
             'rows': 1,
             'style': 'padding-top: 30px; height: 80px;',
-            'id': 'id_entrega_observacoes'
+            'id': 'id_fiscal_observacoes'
             }),
         required=False,
         label='Observações Gerais'
@@ -688,6 +690,96 @@ class ContratosFiscaisForm(forms.ModelForm):
 
     class Meta:
         model = ContratosFiscais
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
+
+class EmpenhoForm(forms.ModelForm):
+    #dados do fiscal
+    unidade_daf = forms.ChoiceField(
+        choices=UNIDADE_DAF3,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'empenho_unidade_daf',
+        }),
+        label='Unidade DAF',
+        initial='',
+        required=True,
+    )
+    numero_empenho = forms.CharField(
+        max_length=15,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'empenho_numero',
+            'style': 'width: 180px !important;'
+        }),
+        label='Nº do Empenho',
+        required=False,
+    )
+    status = forms.ChoiceField(
+        choices=STATUS_EMPENHO,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'empenho_status',
+        }),
+        initial='',
+        label='Status',
+        required=True,
+    )
+    data_solicitacao = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        required=True,
+        label='Data da Solicitação'
+    )
+    data_empenho = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        required=False,
+        label='Data do Empenho'
+    )
+    processo_sei = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control', 
+            'id': 'empenho_processo_sei', 
+            'style': 'width: 180px !important;'
+        }),
+        label='Nº Processo SEI',
+        required=True,
+    )
+    documento_sei = forms.CharField(
+        max_length=10,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'empenho_documento_sei',
+            'style': 'width: 180px !important;'
+        }),
+        label='Documento SEI',
+        required=True,
+    )
+
+    
+    #observacoes gerais
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control auto-expand',
+            'rows': 1,
+            'style': 'padding-top: 30px; height: 80px;',
+            'id': 'empenho_observacoes'
+            }),
+        required=False,
+        label='Observações Gerais'
+    )
+
+    class Meta:
+        model = Empenhos
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):

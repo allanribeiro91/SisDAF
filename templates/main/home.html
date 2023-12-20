@@ -61,50 +61,57 @@
                 <i class="fas fa-bell"></i>&nbsp;Central de Notificações
             </div>
 
-            <div class="boxes-row">
+            
+            <div class="area-cards-alertas">
+                
+                <div class="area-card">
+                    <div class="card-alerta alerta-nivel-1">
+                        <div class="simbolo-alerta">
+                            <i class="fas fa-exclamation-triangle">
+                                <span style="font-size: 14px; font-weight: bold; font-family:system-ui;">CGCEAF</span>
+                            </i>
+                        </div>
+
+                        <div class="caixa-texto-alerta">
+                            <div class="titulo-alerta">
+                                ARP
+                            </div>
+                            <div class="alerta-texto">
+                                A ARP 1234/2023 (ID: 45) está com prazo de vigência para encerrar em 27 dias.
+                                A ARP 1234/2023 (ID: 45) está com prazo de vigência para encerrar em 27 dias.
+                                A ARP 1234/2023 (ID: 45) está com prazo de vigência para encerrar em 27 dias.
+                                A ARP 1234/2023 (ID: 45) está com prazo de vigência para encerrar em 27 dias.
+                                A ARP 1234/2023 (ID: 45) está com prazo de vigência para encerrar em 27 dias.
+                                A ARP 1234/2023 (ID: 45) está com prazo de vigência para encerrar em 27 dias.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="area-card">
+                    <div class="card-alerta alerta-nivel-2">
+                        <div class="simbolo-alerta">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+
                 
 
-                <div class="section-tabela">
-                    <table class="table table-striped table-hover fixed-size-table table-fixed-head" style="font-size: 14px;" id="tabContratos">
-                        <thead>
-                            <tr>
-                                <th class="col-unidade-daf">Unidade DAF</th>
-                                <th class="col-nivel">Nível</th>
-                                <th class="col-item">Item</th>
-                                <th class="col-mensagem">Mensagem</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in tabAlertas %}
-                            <tr data-id="{{ item.id }}">
-                                <td class="col-unidade-daf">{{ item.unidadedaf }}</td>
-                                <td class="col-nivel">
-                                    {% if item.get_status_display == 'Vigente' %}
-                                        <span class="bolinha bolinha-nivel-baixo"></span>{{ item.get_status_display }}</span>
-                                    {% endif %}
-                                    {% if item.get_status_display == 'Suspenso' %}
-                                        <span class="bolinha bolinha-nivel-medio"></span>{{ item.get_status_display }}</span>
-                                    {% endif %}
-                                    {% if item.get_status_display == 'Encerrado' %}
-                                        <span class="bolinha bolinha-nivel-alto"></span>{{ item.get_status_display }}</span>
-                                    {% endif %}
-                                </td>
-                                <td class="col-item" style="text-transform: uppercase;">{{ item.item }}</td>
-                                <td class="col-mensagem">{{ item.mensagem }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>  
-                </div>
+
                 
-            
+                
+
             </div>
+            
           
         </div>
         
         <div class="presentation-container">
             <div class="title-row">
-                <i class="fas fa-history"></i>&nbsp;Últimos Logs
+                <i class="fas fa-history"></i>&nbsp;Últimos 50 Logs
             </div>
 
             <div class="boxes-row">

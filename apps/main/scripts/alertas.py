@@ -20,12 +20,12 @@ def arp_prazo_vigencia():
                 nivel = 'baixo'
             else:
                 continue
-            Alertas.objects.create(
-                unidade_daf=arp.unidade_daf,
-                item='ARP',
-                nivel=nivel,
-                mensagem=f'A ARP {arp.numero_arp} está com prazo de vigência para encerrar em {arp.prazo_vigencia} dias.'
-            )
+        Alertas.objects.create(
+            unidade_daf=arp.unidade_daf,
+            item='ARP',
+            nivel=nivel,
+            mensagem=f'A ARP {arp.numero_arp} (ID: {arp.id}) está com prazo de vigência para encerrar em {arp.prazo_vigencia} dias.'
+        )
 
 
 #Rotina de atualização dos alertas

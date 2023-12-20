@@ -72,7 +72,7 @@ def home(request):
         unidade_daf = 'Não Informado'  # Ou algum valor padrão, se apropriado
     
     tabContratos = Contratos.objects.filter(del_status=False)
-    tab_logs = CustomLog.objects.all().order_by('-timestamp')[:20]
+    tab_logs = CustomLog.objects.all().order_by('-timestamp')[:50]
     conteudo ={
         'usuario': usuario,
         'tot_denominacoes': tot_denominacaoes,

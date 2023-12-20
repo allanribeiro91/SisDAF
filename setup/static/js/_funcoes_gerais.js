@@ -39,8 +39,6 @@ function formatoMoeda(valor) {
 }
 
 
-
-
 function formatoQuantidade(campo) {
         
     campo.addEventListener('input', function (e) {
@@ -62,3 +60,5 @@ function formatoQuantidade(campo) {
         this.value = valorFormatado;
     });
 }
+
+

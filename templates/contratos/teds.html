@@ -1,25 +1,25 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
-{% load humanize %}
 {% load contratos_filters %}
 {% block extra_head %}
-    <meta name="csrf-token" content="{{ csrf_token }}">
-    <link rel="stylesheet" href="{% static '\styles\arp.css' %}">
+<!-- <link rel="stylesheet" href="{% static '\styles\contrato_ficha.css' %}"> -->
+    <link rel="stylesheet" href="{% static '\styles\contratos.css' %}">
+    
 {% endblock %}
 {% block content %}    
     
     <!-- Caminho da Área de Trabalho -->
     <div class="breadcrumb2">
-        <i class="fas fa-file-signature"></i>Atas de Registro de Preços (ARPs)
+        <i class="fa-solid fa-file-signature"></i></i>&nbsp;TEDs
     </div>
 
     <!-- Barra Superior -->
     <div class="barra-superior">
         <!-- Abas -->
         <div class="tabs">
-            <button class="tab-button active" id="abaARPS" onclick="location.href='{% url 'arps' %}'">ARPs</button>
+            <button class="tab-button" id="abaARPS" onclick="location.href='{% url 'arps' %}'">ARPs</button>
             <button class="tab-button" id="abaContratos" onclick="location.href='{% url 'contratos' %}'">Contratos</button>
-            <button class="tab-button" id="abaTEDs" onclick="location.href='{% url 'teds' %}'">TEDs</button>
+            <button class="tab-button active" id="abaTEDs" onclick="location.href='{% url 'teds' %}'">TEDs</button>
             <button class="tab-button" id="abaEmpenhos" onclick="location.href='{% url 'empenhos' %}'">Empenhos</button>
         </div>
     </div>
@@ -28,9 +28,9 @@
         
         <div class="section numbers">
             <div class="filter-title">
-                Total de ARPs
+                Total de TEDs
             </div>
-            <div id="numeroARPs" class="total-geral">{{ tab_arps.count }}</div>
+            <div id="numeroContratos" class="total-geral">{{ tabContratos.count }}</div>
         </div>
         
         <div class="section filter">
@@ -40,20 +40,31 @@
             
             <!-- Status -->
             <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" id="status_arp">
+                <select class="form-select" aria-label="Floating label select example" name="status_proaq" id="status_proaq">
                     <option value=""></option>
-                    {% for value, display in lista_status %}
+                    {% for value, display in STATUS_PROAQ %}
                     <option value="{{ value }}">{{ display }}</option>
                     {% endfor %}
                 </select>
                 <label for="floatingSelect">Status</label>
             </div>
 
+            <!-- Modalidade de Aquisição -->
+            <div class="form-floating tipo-fornecedor">
+                <select class="form-select" aria-label="Floating label select example" name="modalidade_aquisicao" id="modalidade_aquisicao">
+                    <option value=""></option>
+                    {% for value, display in MODALIDADE_AQUISICAO %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Mod. de Aquisição</label>
+            </div>
+
              <!-- Unidade DAF -->
              <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" id="unidade_daf">
+                <select class="form-select" aria-label="Floating label select example" name="unidade_daf" id="unidade_daf">
                     <option value=""></option>
-                    {% for value, display in lista_unidadesdaf %}
+                    {% for value, display in UNIDADE_DAF %}
                     <option value="{{ value }}">{{ display }}</option>
                     {% endfor %}
                 </select>
@@ -62,27 +73,18 @@
             
             <!-- Denominações Genéricas -->
             <div class="form-floating fornecedor">
-                <select class="form-select" aria-label="Floating label select example" id="denominacao">
+                <select class="form-select" aria-label="Floating label select example" name="denominacao" id="denominacao">
                     <option value=""></option>
-                    {% for id, name in lista_denominacoes %}
+                    {% for id, name in DENOMINACOES %}
                     <option value="{{ id }}">{{ name }}</option>
                     {% endfor %}
                 </select>
                 <label for="floatingSelect">Denominações Genéricas</label>
             </div>
 
-            <!-- Denominações Genéricas -->
-            <div class="form-floating fornecedor">
-                <select class="form-select" aria-label="Floating label select example" id="fornecedor">
-                    <option value=""></option>
-                    {% for name in lista_fornecedores %}
-                    <option value="{{ name }}">{{ name }}</option>
-                    {% endfor %}
-                </select>
-                <label for="floatingSelect">Fornecedor</label>
-            </div>
+            
                 
-            <button class="custom-btn limpar-filtro-arps">
+            <button class="custom-btn limpar-filtro-fornecedores">
                 <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
                 <span style="font-size: 10px;">Limpar Filtros</span>
             </button>
@@ -93,15 +95,15 @@
                 Funcionalidades
             </div>
             <div class="btn-container">
-                <a href="{% url 'arp_nova' %}" style="text-decoration: none;">
-                    <button class="custom-btn" id="inserir_contrato">
+                <!--<a href="{% url 'contrato_novo' %}" style="text-decoration: none;">-->
+                    <button class="custom-btn" id="inserirEmpenho">
                         <div class="icon-container">
                             <i class="fa fa-plus-circle" style="font-size: 1.5vw"></i>
                             <span>Inserir</span>
                         </div>
                     </button>
-                </a>
-                <button class="custom-btn" id="exportarARPs">
+                <!--</a>-->
+                <button class="custom-btn" id="exportarBtn">
                     <div class="icon-container">
                         <i class="fa fa-download" style="font-size: 1.5vw"></i>
                         <span>Exportar</span>
@@ -114,27 +116,26 @@
     </div>
 
     <div class="section-tabela">
-        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabARPs">
+        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabContratos">
             <thead>
                 <tr>
-                    <th class="col-arp-id">ID</th>
-                    <th class="col-arp-status">Status</th>
-                    <th class="col-arp-unidadedaf">Unidade DAF</th>
-                    <th class="col-arp-processo-sei">Nº Processo SEI</th>
-                    <th class="col-arp-doc-sei">Doc. SEI</th>
-                    <th class="col-arp-doc-sei">Nº ARP</th>
-                    <th class="col-arp-data">Publicação</th>
-                    <th class="col-arp-data">Vigência</th>
-                    <th class="col-arp-data">Prazo (dias)</th>
-                    <th class="col-arp-denominacao">Denominação</th>
-                    <th class="col-arp-fornecedor">Fornecedor</th>
-                    <th class="col-arp-data" style="text-align: center !important;">Valor Total R$</th>
+                    <th class="col-id">ID</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-unidadedaf">Unidade DAF</th>
+                    <th class="col-modalidade">Mod. Aquisição</th>
+                    <th class="col-contrato">ARP</th>
+                    <th class="col-contrato">Nº Contrato</th>
+                    <th class="col-data">Publicação</th>
+                    <th class="col-data">Vigência</th>
+                    <th class="col-denominacao">Denominação</th>
+                    <th class="col-fornecedor">Fornecedor</th>
+                    <th class="col-valor">Valor Total R$</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in tab_arps %}
+                {% for item in tabContratos %}
                 <tr data-id="{{ item.id }}">
-                    <td class="col-arp-id">{{ item.id }}</td>
+                    <td class="col-id">{{ item.id }}</td>
                     <td class="col-status">
                         {% if item.get_status_display == 'Vigente' %}
                             <span class="status-vigente"><span class="bolinha bolinha-vigente"></span>{{ item.get_status_display }}</span>
@@ -149,28 +150,32 @@
                             <span class="status-suspenso"><span class="bolinha bolinha-cancelado"></span>{{ item.get_status_display }}</span>
                         {% endif %}
                     </td>
-                    <td class="col-arp-unidadedaf" style="text-transform: uppercase;">{{ item.unidade_daf }}</td>
-                    <td class="col-arp-processo-sei">{{ item.numero_processo_sei }}</td>
-                    <td class="col-arp-doc-sei">{{ item.numero_documento_sei }}</td>
-                    <td class="col-arp-doc-sei">{{ item.numero_arp }}</td>
-                    <td class="col-arp-data">{{ item.data_publicacao|date:"d/m/Y" }}</td>
-                    <td class="col-arp-data">{{ item.data_vigencia|date:"d/m/Y" }}</td>
-                    <td class="col-arp-data">{{ item.prazo_vigencia }}</td>
-                    <td class="col-arp-denominacao">{{ item.denominacao.denominacao }}</td>
-                    <td class="col-arp-fornecedor">{{ item.fornecedor.nome_fantasia }}</td>
-                    <th class="col-arp-valor" style="font-weight: normal; text-align: right !important;">{{ item.valor_total_arp|custom_number_format }}</th>
+                    <td class="col-unidadedaf" style="text-transform: uppercase;">{{ item.unidade_daf }}</td>
+                    <td class="col-modalidade">{{ item.get_modalidade_aquisicao_display }}</td>
+                    <td class="col-contrato">{{ item.arp.numero_arp }}</td>
+                    <td class="col-contrato">{{ item.numero_contrato }}</td>
+                    <td class="col-data">{{ item.data_publicacao|date:"d/m/Y" }}</td>
+                    <td class="col-data">{{ item.data_vigencia|date:"d/m/Y" }}</td>
+                    <td class="col-denominacao">{{ item.denominacao.denominacao }}</td>
+                    <td class="col-fornecedor">{{ item.fornecedor.nome_fantasia }}</td>
+                    <td class="col-valor">{{ item.valor_total|custom_number_format }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>  
-        </div>
-        <div id="pagination">
-            <button id="previousPage" class="page" disabled>Anterior</button>
-            <span id="currentPage">1</span>
-            <button id="nextPage" class="page">Próximo</button>
-        </div>
     </div>
     
-    <script src="{% static 'js/arp.js' %}"></script>
+    <div id="pagination">
+            <button id="denominacaoPreviousPage" class="page" disabled>Anterior </button>
+            <span id="denominacaoCurrentPage">1</span>
+            <button id="denominacaoNextPage" class="page">Próximo</button>
+    </div>
+
+    </div>
+    
+    <script src="{% static 'js/contratos.js' %}"></script>
+
+    <!-- Modais -->
+    {% include "contratos/contrato_inserir_modal.html" %}
 
 {% endblock %}

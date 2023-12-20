@@ -3,9 +3,9 @@ from django.db.models import Max
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
-from setup.choices import (STATUS_ARP, UNIDADE_DAF2, TIPO_COTA, 
+from setup.choices import (STATUS_ARP, UNIDADE_DAF2, UNIDADE_DAF, TIPO_COTA, 
                            MODALIDADE_AQUISICAO, LEI_LICITACAO, LOCAL_ENTREGA_PRODUTOS,
-                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS, STATUS_FISCAL_CONTRATO)
+                           NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS, STATUS_FISCAL_CONTRATO, STATUS_EMPENHO)
 from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Sum
@@ -264,6 +264,12 @@ class Contratos(models.Model):
             return (self.data_vigencia - timezone.now().date()).days
         return None
 
+    def fiscal_atual(self):
+        fiscal_ativo = self.fiscal_contrato.filter(status='ativo', del_status=False).order_by('-data_inicio').first()
+        if fiscal_ativo:
+            return fiscal_ativo.fiscal_nome()
+        return 'Fiscal Não Informado'
+
     def __str__(self):
         return f"Contrato: {self.numero_contrato} - Denominação: ({self.denominacao}) - ID ({self.id})"
 
@@ -401,7 +407,7 @@ class ContratosParcelas(models.Model):
         self.save()
 
     def data_ultima_entrega(self):
-        ultima_entrega_data = self.entrega_parcela.aggregate(Max('data_entrega'))['data_entrega__max']
+        ultima_entrega_data = self.entrega_parcela.filter(del_status=False).aggregate(Max('data_entrega'))['data_entrega__max']
         return ultima_entrega_data if ultima_entrega_data is not None else None
     
     def dias_atraso(self):
@@ -514,11 +520,11 @@ class ContratosFiscais(models.Model):
     log_n_edicoes = models.IntegerField(default=1)
 
     #dados da entrega
-    fiscal = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fiscal_contrato_usuario')
+    fiscal = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='fiscal_contrato_usuario', null=True, blank=True)
     fiscal_outro = models.CharField(max_length=100, null=False, blank=False)
     status = models.CharField(max_length=10, choices=STATUS_FISCAL_CONTRATO, null=False, blank=False)
     data_inicio = models.DateField(null=False, blank=False)
-    data_fim = models.CharField(max_length=30, choices=LOCAL_ENTREGA_PRODUTOS, null=False, blank=False)
+    data_fim = models.DateField(null=True, blank=True)
 
     #contrato
     contrato = models.ForeignKey(Contratos, on_delete=models.DO_NOTHING, default=1, related_name='fiscal_contrato', null=False, blank=False)
@@ -541,7 +547,7 @@ class ContratosFiscais(models.Model):
             if user:
                 self.usuario_registro = user
                 self.usuario_atualizacao = user
-        super(ContratosEntregas, self).save(*args, **kwargs)
+        super(ContratosFiscais, self).save(*args, **kwargs)
 
     def soft_delete(self, user):
         self.del_status = True
@@ -553,7 +559,57 @@ class ContratosFiscais(models.Model):
         if (self.fiscal_outro != ''):
             return self.fiscal_outro
         else:
-            return self.fiscal.primeiro_ultimo_nome()
+            return self.fiscal.dp_nome_completo
+
+    def __str__(self):
+        return f"Fiscal do contrato: {self.fiscal_nome()}"
+
+
+class Empenhos(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='empenho_usuario_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='empenho_usuario_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados do empenho
+    unidade_daf = models.CharField(max_length=15, choices=UNIDADE_DAF, null=False, blank=False)
+    numero_empenho = models.CharField(max_length=20, null=False, blank=False)
+    status = models.CharField(max_length=15, choices=STATUS_EMPENHO, null=False, blank=False)
+    data_solicitacao = models.DateField(null=False, blank=False)
+    data_empenho = models.DateField(null=True, blank=True)
+    processo_sei = models.CharField(max_length=20, null=False, blank=False)
+    documento_sei = models.CharField(max_length=15, null=False, blank=False)
+
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='empenho_usuario_delete')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(Empenhos, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+    
 
     def __str__(self):
         return f"Fiscal do contrato: {self.fiscal_nome()}"

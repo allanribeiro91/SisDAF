@@ -22,14 +22,26 @@
         </div>
         <div>
             {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in 'proaq, proaq_ficha_dados_gerais, proaq_ficha_evolucao, proaq_ficha_evolucao_nova, nova_tramitacao, proaq_ficha_tramitacoes, novo_proaq' %}active-tab{% endif %}" href="{% url 'proaq' %}">Processos Aquisitivos</a>
+            <a class="tab
+                    {% if current_url in 'proaq, proaq_ficha_dados_gerais, proaq_ficha_evolucao, proaq_ficha_evolucao_nova, nova_tramitacao, proaq_ficha_tramitacoes, novo_proaq' %}
+                        active-tab
+                    {% endif %}"
+                    href="{% url 'proaq' %}">
+                    Processos Aquisitivos</a>
             {% endwith %}
         </div>
         <div>
             {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in 'contratos, contrato_novo, contrato_ficha, contrato_anotacoes, arps, arp_nova, arp_ficha' %}active-tab{% endif %}" href="{% url 'contratos' %}">Contratos</a>
+                <a class="tab 
+                    {% if current_url in 'contratos, contrato_novo, contrato_ficha, contrato_anotacoes, empenhos, empenho_novo, teds, arps, arp_nova, arp_ficha' %}
+                        active-tab
+                    {% endif %}"
+                    href="{% url 'contratos' %}">
+                    Contratos
+                </a>
             {% endwith %}
         </div>
+        
         
         <div>
             {% with current_url=request.resolver_match.url_name %}

@@ -323,3 +323,10 @@ STATUS_FISCAL_CONTRATO = [
     ('ativo', 'Ativo'),
     ('inativo', 'Inativo'),
 ]
+
+STATUS_EMPENHO = [
+    ('', 'Nâo Informado'),
+    ('pre_empenho', 'Pré-Empenho'),
+    ('empenhado', 'Empenhado'),
+    ('cancelado', 'Cancelado'),
+]

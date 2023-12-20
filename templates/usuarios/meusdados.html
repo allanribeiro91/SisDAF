@@ -102,10 +102,10 @@
                     <label for="floatingSelect">{{ form.vms_vinculo.label }}</label>
                 </div>
                 <div class="form-floating mb-3 subsecao_vinculo">
-                    <select class="form-select" id="orgao_origem" name="vms_orgao_origem" aria-label="Floating label select example">
-                        <option value="" disabled {% if not form.vms_orgao_origem.value %}selected{% endif %}>Não Informado</option>
+                    <select class="form-select" id="orgao_origem" name="vms_orgao" aria-label="Floating label select example">
+                        <option value="" disabled {% if not form.vms_orgao.value %}selected{% endif %}>Não Informado</option>
                         {% for value, display in ORGAO_PUBLICO %}
-                        <option value="{{ value }}" {% if form.vms_orgao_origem.value == value %}selected{% endif %}>{{ display }}</option>
+                        <option value="{{ value }}" {% if form.vms_orgao.value == value %}selected{% endif %}>{{ display }}</option>
                         {% endfor %}
                     </select>
                     <label for="floatingInput">{{ form.vms_orgao.label }}</label>

@@ -1,18 +1,20 @@
 from django.shortcuts import render, redirect
-from django.db.models import Sum, F, Case, When
+from django.db.models import Sum, F, Case, When, Max
 from django.db import models
 from django.http import QueryDict
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage
 from django.contrib import auth, messages
 from apps.main.models import CustomLog
+from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos, 
-                                   ContratosObjetos, ContratosParcelas, ContratosEntregas)
+                                   ContratosObjetos, ContratosParcelas, ContratosEntregas,
+                                   ContratosFiscais, Empenhos)
 from apps.contratos.forms import (ContratosArpsForm, ContratosArpsItensForm, ContratosForm, 
                                   ContratosObjetosForm, ContratosParcelasForm, ContratosEntregasForm,
-                                  ContratosFiscaisForm)
+                                  ContratosFiscaisForm, EmpenhoForm)
 from setup.choices import UNIDADE_DAF, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
@@ -150,11 +152,13 @@ def contrato_ficha(request, id_contrato=None):
     tab_objetos = None
     tab_parcelas = None
     tab_entregas = None
+    tab_fiscais = None
     if contrato:
         form = ContratosForm(instance=contrato)
         tab_objetos = ContratosObjetos.objects.filter(del_status=False, contrato_id=id_contrato)
         tab_parcelas = ContratosParcelas.objects.filter(del_status=False, contrato=id_contrato).order_by('objeto__numero_item', 'numero_parcela')
         tab_entregas = ContratosEntregas.objects.filter(del_status=False, contrato=id_contrato).order_by('parcela__objeto__numero_item', 'parcela__numero_parcela', 'numero_entrega')
+        tab_fiscais = ContratosFiscais.objects.filter(del_status=False, contrato=id_contrato).order_by('-data_inicio')
 
         if tab_objetos.count()>0:
             for objeto in tab_objetos:
@@ -193,6 +197,7 @@ def contrato_ficha(request, id_contrato=None):
         'tab_objetos': tab_objetos,
         'tab_parcelas': tab_parcelas,
         'tab_entregas': tab_entregas,
+        'tab_fiscais': tab_fiscais,
         'list_objetos': list_objetos,
         'list_parcelas': list_parcelas
     })
@@ -310,7 +315,7 @@ def contrato_dados_arp(request, id_arp=None):
     }
     return render(request, 'contratos/contrato_ficha_arp.html', conteudo)
 
-#OBJETOS DO CONTRATO
+#CONTRATOS/OBJETOS
 def contrato_objeto_modal(request, id_objeto=None):
     try:
         item = ContratosObjetos.objects.get(id=id_objeto)
@@ -494,7 +499,7 @@ def buscar_objeto(request, id_objeto=None):
     return JsonResponse({'objeto': objeto_dados})
 
 
-#PARCELAS
+#CONTRATOS/PARCELAS
 def contrato_parcela_salvar(request, id_parcela=None):
     if id_parcela:
         parcela = ContratosParcelas.objects.get(id=id_parcela)
@@ -656,7 +661,8 @@ def contrato_parcela_delete(request, id_entrega=None):
             })
 
 
-#ENTREGAS
+
+#CONTRATOS/ENTREGAS
 def contrato_entrega_salvar(request, id_entrega=None):
     if id_entrega:
         entrega = ContratosEntregas.objects.get(id=id_entrega)
@@ -812,6 +818,135 @@ def contrato_entrega_delete(request, id_entrega=None):
         return JsonResponse({
             "message": "Entrega do Contrato não encontrada."
             })
+
+
+
+#CONTRATOS/FISCAIS
+def contrato_fiscal_salvar(request, id_fiscal=None):
+    if id_fiscal:
+        fiscal = ContratosFiscais.objects.get(id=id_fiscal)
+    else:
+        fiscal = None
+    
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if fiscal:
+            fiscal_form = ContratosFiscaisForm(request.POST, instance=fiscal)
+            novo_fiscal = False
+        else:
+            fiscal_form = ContratosFiscaisForm(request.POST)
+            novo_fiscal = True
+        
+        #Verificar se houve alteração no formulário
+        if not fiscal_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+        
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
+        #Usuario
+        outro_fiscal = request.POST.get('fiscal_outro')
+        if outro_fiscal == '':
+            print('teste1')
+            fiscal_id = request.POST.get('fiscal_usuario_hidden')
+            fiscal_instance = Usuario.objects.get(id=fiscal_id)
+  
+            #Atualizar os valores no mutable_post
+            modificacoes_post['fiscal'] = fiscal_instance
+        
+        #Contrato
+        contrato_id = request.POST.get('id_fiscal_contrato_hidden')
+        contrato_instance = Contratos.objects.get(id=contrato_id)
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['contrato'] = contrato_instance
+
+        #Criar o formulário com os dados atualizados
+        fiscal_form = ContratosFiscaisForm(modificacoes_post, instance=fiscal_form.instance)
+        
+        #salvar
+        if fiscal_form.is_valid():
+            #Salvar o produto
+            fiscal = fiscal_form.save(commit=False)
+            fiscal.save(current_user=request.user.usuario_relacionado)
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            observacoes = (
+                f"Usuário {request.user.username} salvou o Fiscal do Contrato "
+                f"(ID {fiscal.id}, Nome: {fiscal.fiscal_nome()}, "
+                f"Contrato: (ID: {fiscal.contrato.id}, Número: {fiscal.contrato.numero_contrato}) "
+                f"em {current_date_str}."
+            )
+            
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Contratos_Contratos_Fiscais",
+                model='ContratosFiscais',
+                model_id=fiscal.id,
+                item_id=0,
+                item_descricao="Salvar edição de Fiscal de Contrato.",
+                acao="Salvar",
+                observacoes=observacoes
+            )
+            log_entry.save()
+            
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'novo': novo_fiscal,
+                    'fiscal_id': fiscal.id,
+                })
+        else:
+            print("Erro formulário Fiscal do Contrato")
+            print(fiscal_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+
+def contrato_fiscal_modal(request, id_fiscal=None):
+    try:
+        item = ContratosFiscais.objects.get(id=id_fiscal)
+        fiscal = None
+        fiscal_outro = item.fiscal_outro
+        if fiscal_outro == '':
+            fiscal = item.fiscal.id
+            fiscal_outro_checkbox = False
+        else:
+            fiscal_outro_checkbox = True
+        contrato = item.contrato.id
+        maior_data_fim = ContratosFiscais.objects.filter(contrato=contrato).aggregate(Max('data_fim'))['data_fim__max']
+
+        data = {
+            'id': item.id,
+            'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
+            'log_responsavel_registro': str(item.usuario_atualizacao.dp_nome_completo),
+            'log_ult_atualizacao': item.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if item.ult_atual_data else '',
+            'log_responsavel_atualizacao': str(item.usuario_atualizacao.dp_nome_completo),
+            'log_edicoes': item.log_n_edicoes,
+            
+            'id_fiscal': fiscal,
+            'id_fiscal_outro_checkbox': fiscal_outro_checkbox,
+            'id_fiscal_outro': fiscal_outro,
+            'id_fiscal_status': item.status,
+
+            'id_fiscal_data_inicio': item.data_inicio,
+            'id_fiscal_data_fim': item.data_fim,
+            'id_fiscal_observacoes': item.observacoes_gerais,
+
+            'id_fiscal_contrato_hidden': contrato,
+
+            'id_fiscal_data_fim_maior_hidden': maior_data_fim,
+        }
+        return JsonResponse(data)
+    except ContratosEntregas.DoesNotExist:
+        return JsonResponse({'error': 'Fiscal não encontrado.'}, status=404)
+
+
+
 
 #ANOTACOES DO CONTRATO
 def contrato_anotacoes(request, id_contrato):
@@ -1342,3 +1477,88 @@ def arp_item_delete(request, arp_item_id=None):
             "message": "Item da ARP não encontrada."
             })
 
+
+
+
+#EMPENHOS
+def empenhos(request):
+    tabEmpenhos = Empenhos.objects.all()
+    conteudo = {
+        'tabEmpenhos': tabEmpenhos,
+    }
+    return render(request, 'contratos/empenhos.html', conteudo)
+
+def empenho_ficha(request, id_empenho=None):
+    if id_empenho:
+        empenho = Empenhos.objects.get(id=id_empenho)
+    else:
+        empenho = None
+    
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if empenho:
+            empenho_form = EmpenhoForm(request.POST, instance=empenho)
+            novo_empenho = False
+        else:
+            empenho_form = EmpenhoForm(request.POST)
+            novo_empenho = True
+        
+        #Verificar se houve alteração no formulário
+        if not empenho_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+        
+        #salvar
+        if empenho_form.is_valid():
+            #Salvar o produto
+            empenho = empenho_form.save(commit=False)
+            empenho.save(current_user=request.user.usuario_relacionado)
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            observacoes = (
+                f"Usuário {request.user.username} salvou o Empenho Orçamentário "
+                f"(ID {empenho.id}) "
+                f"em {current_date_str}."
+            )
+            
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Contratos_Empenhos",
+                model='Empenhos',
+                model_id=empenho.id,
+                item_id=0,
+                item_descricao="Salvar edição de Empenho Orçamentário.",
+                acao="Salvar",
+                observacoes=observacoes
+            )
+            log_entry.save()
+            
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'novo': novo_empenho,
+                    'empenho_id': empenho.id,
+                })
+        else:
+            print("Erro formulário Fiscal do Contrato")
+            print(empenho_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+    
+    if empenho:
+        empenho_form = EmpenhoForm(instance=empenho)
+    else:
+        empenho_form = EmpenhoForm()
+
+    conteudo = {
+        'form': empenho_form,
+    }
+    return render(request, 'contratos/empenho_ficha.html', conteudo)
+
+#TEDs
+def teds(request):
+    return render(request, 'contratos/teds.html')
