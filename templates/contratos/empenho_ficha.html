@@ -51,23 +51,23 @@
                             <label for="floatingInput">ID</label>
                         </div>                        
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_data" id="log_data_registro" readonly value="{{ arp.registro_data|date:"d/m/Y H:i:s" }}">
+                            <input type="text" class="form-control log_data" id="log_data_registro" readonly value="{{ empenho.registro_data|date:"d/m/Y H:i:s" }}">
                             <label for="floatingInput">Data do Registro</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" readonly value="{{ arp.usuario_registro.dp_nome_completo }}">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" readonly value="{{ empenho.usuario_registro.dp_nome_completo }}">
                             <label for="floatingInput">Responsável pelo Registro</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" readonly value="{{ arp.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" readonly value="{{ empenho.ult_atual_data|date:"d/m/Y H:i:s" }}">
                             <label for="floatingInput">Última Atualização</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" readonly value="{{ arp.usuario_atualizacao.dp_nome_completo }}">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" readonly value="{{ empenho.usuario_atualizacao.dp_nome_completo }}">
                             <label for="floatingInput">Responsável Atualização</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" readonly value="{{ arp.log_n_edicoes }}">
+                            <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" readonly value="{{ empenho.log_n_edicoes }}">
                             <label for="floatingInput">Nº Edições</label>
                         </div>
                     </div>
@@ -101,11 +101,11 @@
                             <label>{{ form.documento_sei.label }}</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="empenho_data_solicitacao" name="data_solicitacao" style="width: 150px;">
+                            <input type="date" class="form-control" id="empenho_data_solicitacao" name="data_solicitacao" style="width: 150px;" value="{{ empenho.data_solicitacao|date:'Y-m-d' }}">
                             <label>Data da Solicitação</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="empenho_data_empenho" name="data_empenho" style="width: 150px;" readonly>
+                            <input type="date" class="form-control" id="empenho_data_empenho" name="data_empenho" style="width: 150px;" value="{{ empenho.data_empenho|date:'Y-m-d' }}" readonly>
                             <label>Data do Empenho</label>
                         </div>
                         
@@ -119,7 +119,7 @@
                 <div class="section">
                     <h3>Itens do Empenho</h3>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="font-size: 14px; text-align: right !important;">
-                        <button class="btn btn-primary me-md-2" type="button" data-bs-toggle="modal"  id="btnNovoItemARP" style="font-size: 12px; background-color: green; border-color: green;">
+                        <button class="btn btn-primary me-md-2" type="button" data-bs-toggle="modal"  id="btnNovoItemEmpenho" style="font-size: 12px; background-color: green; border-color: green;">
                             <i class="fas fa-plus" style="font-size: 14px;"></i> 
                             &nbsp;Inserir Item
                         </button>
@@ -199,12 +199,8 @@
     
 
     <!-- Modal -->
-    {% include "contratos/arp_ficha_modal.html" %}  
+    {% include "contratos/empenho_contrato_definir_modal.html" %}
 
-    <script type="text/javascript">
-        var filtrar_dados = "{% url 'fornecedor_ficha_filtrar_dados' %}";
-    </script>
-    <!-- <script src="{% static 'js/fornecedores.js' %}"></script> -->
     <script src="{% static 'js/empenho_ficha.js' %}"></script>
 
     

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.db.models import Sum, F, Case, When, Max
+from django.db.models import Sum, F, Case, When, Max, Value
 from django.db import models
 from django.http import QueryDict
 from django.urls import reverse
@@ -231,7 +231,7 @@ def contrato_delete(request, id_contrato=None):
 
 def buscar_arps(request, unidade_daf=None):
     arps = ContratosArps.objects.filter(del_status=False, unidade_daf=unidade_daf, status='vigente').order_by('numero_arp')
-    arps_list = list(arps.values('id', 'numero_arp', 'denominacao', 'fornecedor'))  # Convertendo para uma lista de dicionários
+    arps_list = list(arps.values('id', 'numero_arp', 'denominacao', 'fornecedor'))
     return JsonResponse({'arps': arps_list})
 
 def buscar_arps_itens(request, id_arp=None):
@@ -263,7 +263,7 @@ def buscar_contrato(request, id_contrato=None):
             'fornecedor_id': ct_fornecedor_id,
             'fornecedor_texto': ct_fornecedor,
         }
-    return JsonResponse({'contrato': contrato_dados})
+    return JsonResponse({'contrato': contrato_dados})   
 
 def vincular_itens_arp(request, id_arp=None, id_contrato=None):
     arps_itens = ContratosArpsItens.objects.filter(del_status=False, arp__status='vigente', arp__id=id_arp)
@@ -632,6 +632,17 @@ def buscar_parcela(request, id_parcela=None):
             'qtd_a_entregar': qtd_a_entregar,
         }
     return JsonResponse({'parcela': parcela_dados})
+
+def buscar_parcelas(request, id_contrato=None):
+    parcelas = ContratosParcelas.objects.filter(contrato=id_contrato)
+    parcelas_list = []
+    for parcela in parcelas:
+        parcela_qtd_a_empenhar = parcela.qtd_a_empenhar()
+        parcela_detalhe = f"Parcela: {parcela.numero_parcela} - {parcela.objeto.produto.produto}"
+        parcelas_list.append({'id': parcela.id, 'detalhe': parcela_detalhe, 'qtd_a_empenhar': parcela_qtd_a_empenhar})
+    return JsonResponse({'parcelas': parcelas_list})
+
+
 
 def contrato_parcela_delete(request, id_entrega=None):    
     try:
@@ -1482,7 +1493,12 @@ def arp_item_delete(request, arp_item_id=None):
 
 #EMPENHOS
 def empenhos(request):
-    tabEmpenhos = Empenhos.objects.all()
+    tabEmpenhos = Empenhos.objects.annotate(
+            data_empenho_ordenada=Case(
+                When(data_empenho__isnull=True, then=Value(0)),
+                default=Value(1)
+            )
+        ).order_by('-data_empenho_ordenada', '-data_empenho')
     conteudo = {
         'tabEmpenhos': tabEmpenhos,
     }
@@ -1549,13 +1565,25 @@ def empenho_ficha(request, id_empenho=None):
                     'retorno': 'Erro ao salvar'
                 })
     
+    list_contratos = []
     if empenho:
         empenho_form = EmpenhoForm(instance=empenho)
+        empenho_unidade_daf = empenho.unidade_daf
+        print('Unidade DAF: ', empenho_unidade_daf)
+        tab_contratos = Contratos.objects.filter(unidade_daf=empenho_unidade_daf, del_status=False, status='vigente')
+        if tab_contratos.count()>0:
+            for contrato in tab_contratos:
+                contrato_id = contrato.id
+                item_contrato = f'[ID: {contrato.id}] Contrato Nº {contrato.numero_contrato} - {contrato.denominacao.denominacao} - {contrato.fornecedor.nome_fantasia}'
+                list_contratos.append((contrato_id, item_contrato))
+
     else:
         empenho_form = EmpenhoForm()
 
     conteudo = {
         'form': empenho_form,
+        'empenho': empenho,
+        'list_contratos': list_contratos,
     }
     return render(request, 'contratos/empenho_ficha.html', conteudo)
 

@@ -7,7 +7,7 @@ from apps.contratos.views import (
     contrato_objeto_modal, contrato_objeto_salvar, contrato_objeto_delete, buscar_objeto, contrato_parcela_salvar,
     contrato_parcela_modal, contrato_dados_arp, buscar_parcela, contrato_entrega_salvar, contrato_entrega_modal,
     contrato_entrega_delete, contrato_parcela_delete, contrato_anotacoes, contrato_fiscal_salvar,
-    contrato_fiscal_modal, empenhos, empenho_ficha, teds
+    contrato_fiscal_modal, empenhos, empenho_ficha, teds, buscar_parcelas
 )
 
 
@@ -53,6 +53,7 @@ urlpatterns = [
     path('contratos/contrato/parcela/salvar/<int:id_parcela>/', contrato_parcela_salvar, name='contrato_parcela_salvar'),
     path('contratos/contrato/parcela/salvar/novo/', contrato_parcela_salvar, name='contrato_parcela_salvar_novo'),
     path('contratos/buscar_parcela/<int:id_parcela>/', buscar_parcela, name='buscar_parcela'),
+    path('contratos/buscar_parcelas/<int:id_contrato>/', buscar_parcelas, name='buscar_parcelas'),
 
     #CONTRATOS/ENTREGAS
     path('contratos/contrato/entrega/<int:id_entrega>/dados/', contrato_entrega_modal, name='contrato_entrega_modal'),
@@ -71,6 +72,8 @@ urlpatterns = [
     #EMPENHOS
     path('contratos/empenhos/', empenhos, name='empenhos'),
     path('contratos/empenhos/novo', empenho_ficha, name='empenho_novo'),
+    path('contratos/empenhos/ficha/<int:id_empenho>/', empenho_ficha, name='empenho_ficha'),
+    path('contratos/empenhos/ficha/novo/', empenho_ficha, name='empenho_salvar_novo'),
 
     #TEDs
     path('contratos/teds/', teds, name='teds'),

@@ -1,0 +1,78 @@
+<!-- Modal -->
+{% load static %}
+<style>
+
+    .custom-modal-width {
+        max-width: 40%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .modal-content.objeto{
+        min-height: 15vh;
+        height: 30%;
+        
+    }
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="empenhoContratoItem" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered  custom-modal-width" role="document">
+        <div class="modal-content objeto">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Novo Item</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <div class="grid" style="font-size: 14px; margin: 20px;">
+                    <!-- Contrato -->
+                    <div class="form-floating full-width">
+                        <select class="form-select" id="empenho_selecionar_contrato">
+                            <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
+                            {% for value, display in list_contratos %}
+                            <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="empenho_selecionar_contrato">Selecione o Contrato</label>
+                    </div>
+                </div>
+
+                <div class="grid" style="font-size: 14px; margin: 20px;">
+                    <!-- Parcela -->
+                    <div class="form-floating full-width">
+                        <select class="form-select" id="empenho_selecionar_parcela" disabled>
+                            <option value=""></option>
+                        </select>
+                        <label for="empenho_selecionar_parcela">Selecione a Parcela</label>
+                    </div>
+                    
+                    <div class="form-floating mb-3" style="width: 150px;">
+                        <input type="text" class="form-control" style="text-align: right;" id="empenho_parcela_qtd_a_empenhar" readonly>
+                        <label for="empenho_parcela_qtd_a_empenhar">Qtd a Empenhar</label>
+                    </div> 
+
+                    <input type="hidden" id="empenho_parcela_id" readonly>
+                </div>
+                    
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="inserirNovoItem" style="background-color: rgb(18, 134, 34); border-color: rgb(18, 134, 34);">Selecionar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#empenhoContratoItem').modal('hide');
+        });
+    });
+</script>

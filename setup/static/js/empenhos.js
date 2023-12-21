@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '/contratos/empenhos/novo'
     })
 
+    //Mudar de aba
+    $('#tabEmpenhos tbody').on('click', 'tr', function() {
+        const id_empenho = $(this).attr('data-id').toString();
+        window.location.href = `/contratos/empenhos/ficha/${id_empenho}/`;
+    });
 
 
 });

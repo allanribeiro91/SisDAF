@@ -33,7 +33,7 @@
         <div>
             {% with current_url=request.resolver_match.url_name %}
                 <a class="tab 
-                    {% if current_url in 'contratos, contrato_novo, contrato_ficha, contrato_anotacoes, empenhos, empenho_novo, teds, arps, arp_nova, arp_ficha' %}
+                    {% if current_url in 'contratos, contrato_novo, contrato_ficha, contrato_anotacoes, empenhos, empenho_novo, empenho_ficha, teds, arps, arp_nova, arp_ficha' %}
                         active-tab
                     {% endif %}"
                     href="{% url 'contratos' %}">

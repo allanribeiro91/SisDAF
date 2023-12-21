@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const botao_salvar_empenho = document.getElementById('btnSalvarEmpenho')
     botao_salvar_empenho.addEventListener('click', function(e){
-        e.preventDefault;
+        e.preventDefault();
         salvar_empenho();
     })
 
@@ -52,20 +52,21 @@ document.addEventListener('DOMContentLoaded', function() {
         //Verificar preenchimento dos campos
         let preenchimento_incorreto = verificar_campos_empenho()
         if (preenchimento_incorreto === false) {
+            
             return;
         }
 
         //Enviar para o servidor
             //definir o caminho
-            if (fiscal_id == '') {
-                postURL = '/contratos/contrato/fiscal/salvar/novo/'
+            if (empenho_id == '') {
+                postURL = '/contratos/empenhos/ficha/novo/'
             } else
             {
-                postURL = `/contratos/contrato/fiscal/salvar/${fiscal_id}/`
+                postURL = `/contratos/empenhos/ficha/${empenho_id}/`
             }
 
             //pegar os dados
-            let formData = new FormData(document.getElementById('fiscalForm'));
+            let formData = new FormData(document.getElementById('empenhoForm'));
     
             //enviar 
             fetch(postURL, {
@@ -87,11 +88,9 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.retorno === "Salvo") {
-                let id_fiscal = data.fiscal_id;
+                let id_empenho = data.empenho_id;
                 localStorage.setItem('empenhoSalvo', 'true');
-                return
-                localStorage.setItem('id_fiscal', id_fiscal);
-                window.location.reload();
+                window.location.href = `/contratos/empenhos/ficha/${id_empenho}/`
             }
     
             if (data.retorno === "Não houve mudanças") {
@@ -137,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 mensagensErro.push('Informe o <b>Documento SEI do Empenho</b>!');
             }
         }
-
+        
         if (mensagensErro.length > 0) {
             const campos = mensagensErro.join('<br>')
             sweetAlertPreenchimento(campos)
@@ -146,5 +145,74 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return true;
     }
+
+    const id_empenho = document.getElementById('id_empenho')
+    function verificar_id_empenho(){
+        if (id_empenho.value > 0){
+            empenho_unidade_daf.setAttribute('disabled', 'disabled')
+        }else{
+            empenho_unidade_daf.removeAttribute('disabled')
+        }
+    }
+    verificar_id_empenho()
+
+
+    const botao_inserir_novo_item = document.getElementById('btnNovoItemEmpenho')
+    const modal_empenho_contrato_selecionar = new bootstrap.Modal(document.getElementById('empenhoContratoItem'))
+    botao_inserir_novo_item.addEventListener('click', function(){
+
+        modal_empenho_contrato_selecionar.show()
+    })
+
+    const empenho_selecionar_contrato = document.getElementById('empenho_selecionar_contrato')
+    const empenho_selecionar_parcela = document.getElementById('empenho_selecionar_parcela')
+    empenho_selecionar_contrato.addEventListener('change', function(){
+        buscarParcelasContrato(empenho_selecionar_contrato.value)
+        empenho_selecionar_parcela.removeAttribute('disabled')
+    })
+    
+    const empenho_parcela_qtd_a_empenhar = document.getElementById('empenho_parcela_qtd_a_empenhar')
+    const empenho_parcela_id = document.getElementById('empenho_parcela_id')
+    empenho_selecionar_parcela.addEventListener('change', function(){
+        const selectedOption = empenho_selecionar_parcela.options[empenho_selecionar_parcela.selectedIndex];
+        empenho_parcela_qtd_a_empenhar.value = selectedOption.getAttribute('data-qtd-a-empenhar');
+        empenho_parcela_id.value = empenho_selecionar_parcela.value
+    })
+    
+    function buscarParcelasContrato(id_contrato) {
+        const url = `/contratos/buscar_parcelas/${id_contrato}/`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                empenho_selecionar_parcela.innerHTML = '<option value=""></option>';
+
+                data.parcelas.forEach(parcela => {
+                    const option = document.createElement('option');
+                    option.value = parcela.id;
+                    option.textContent = parcela.detalhe;
+                    option.setAttribute('data-qtd-a-empenhar', parcela.qtd_a_empenhar);
+                    empenho_selecionar_parcela.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Erro ao buscar Parcelas:', error));
+    }
+    
+    const botao_selecionar_contrato_empenho = document.getElementById('inserirNovoItem')
+    botao_selecionar_contrato_empenho.addEventListener('click', function(){
+
+        if (empenho_selecionar_parcela.value == ''){
+            sweetAlert('Selecione a Parcela!')
+            return
+        }
+        
+        if (empenho_parcela_qtd_a_empenhar.value == 0){
+            sweetAlert('Não há Quantidade a ser Empenhada!')
+            return
+        }
+        else{
+            alert('Deu certo!')
+        }
+    })
 
 });

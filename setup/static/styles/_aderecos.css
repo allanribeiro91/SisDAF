@@ -1,0 +1,24 @@
+.bolinha {
+    height: 15px;
+    width: 15px;
+    border-radius: 20%;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.bolinha-vigente, .bolinha-empenho {
+    background-color: #01a71a;
+}
+
+.bolinha-suspenso, .bolinha-pre-empenho {
+    background-color: #ff7700;
+}
+
+.bolinha-encerrado {
+    background-color: #414141;
+}
+
+.bolinha-cancelado {
+    background-color: #bf0000;
+}

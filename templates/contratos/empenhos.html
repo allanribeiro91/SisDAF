@@ -1,9 +1,12 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
 {% load contratos_filters %}
+{% load contratos_filters %}
 {% block extra_head %}
 <!-- <link rel="stylesheet" href="{% static '\styles\contrato_ficha.css' %}"> -->
-    <link rel="stylesheet" href="{% static '\styles\contratos.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_aderecos.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_pagina_inicial_modulo.css' %}">
     
 {% endblock %}
 {% block content %}    
@@ -40,7 +43,7 @@
             
             <!-- Status -->
             <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" name="status_proaq" id="status_proaq">
+                <select class="form-select" name="status_proaq" id="status_proaq">
                     <option value=""></option>
                     {% for value, display in STATUS_PROAQ %}
                     <option value="{{ value }}">{{ display }}</option>
@@ -51,7 +54,7 @@
 
             <!-- Modalidade de Aquisição -->
             <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" name="modalidade_aquisicao" id="modalidade_aquisicao">
+                <select class="form-select"name="modalidade_aquisicao" id="modalidade_aquisicao">
                     <option value=""></option>
                     {% for value, display in MODALIDADE_AQUISICAO %}
                     <option value="{{ value }}">{{ display }}</option>
@@ -62,7 +65,7 @@
 
              <!-- Unidade DAF -->
              <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" name="unidade_daf" id="unidade_daf">
+                <select class="form-select" name="unidade_daf" id="unidade_daf">
                     <option value=""></option>
                     {% for value, display in UNIDADE_DAF %}
                     <option value="{{ value }}">{{ display }}</option>
@@ -73,7 +76,7 @@
             
             <!-- Denominações Genéricas -->
             <div class="form-floating fornecedor">
-                <select class="form-select" aria-label="Floating label select example" name="denominacao" id="denominacao">
+                <select class="form-select" name="denominacao" id="denominacao">
                     <option value=""></option>
                     {% for id, name in DENOMINACOES %}
                     <option value="{{ id }}">{{ name }}</option>
@@ -84,7 +87,7 @@
 
             
                 
-            <button class="custom-btn limpar-filtro-fornecedores">
+            <button class="custom-btn limpar-filtro">
                 <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
                 <span style="font-size: 10px;">Limpar Filtros</span>
             </button>
@@ -116,47 +119,76 @@
     </div>
 
     <div class="section-tabela">
-        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabContratos">
+        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabEmpenhos">
             <thead>
                 <tr>
                     <th class="col-id">ID</th>
                     <th class="col-status">Status</th>
                     <th class="col-unidadedaf">Unidade DAF</th>
                     <th class="col-modalidade">Nº do Empenho</th>
+                    <th class="col-contrato">Data da Solicitação</th>
                     <th class="col-contrato">Data do Empenho</th>
-                    <th class="col-contrato">Valor Empenhado</th>
-                    <th class="col-data">Nº Parcelas</th>
-                    <th class="col-data">Nº Contratos</th>
+                    <th class="col-contrato">Dias</th>
+                    <th class="col-contrato" style="text-align: right;">Valor Total</th>
+                    <th class="col-data" style="text-align: right;">Parcelas</th>
+                    <th class="col-data" style="text-align: right;">Contratos</th>
 
                 </tr>
             </thead>
             <tbody>
-                {% for item in tabContratos %}
+                {% for item in tabEmpenhos %}
                 <tr data-id="{{ item.id }}">
                     <td class="col-id">{{ item.id }}</td>
                     <td class="col-status">
-                        {% if item.get_status_display == 'Vigente' %}
-                            <span class="status-vigente"><span class="bolinha bolinha-vigente"></span>{{ item.get_status_display }}</span>
+                        {% if item.get_status_display == 'Pré-Empenho' %}
+                            <span class="bolinha bolinha-suspenso"></span>{{ item.get_status_display }}</span>
                         {% endif %}
-                        {% if item.get_status_display == 'Suspenso' %}
-                            <span class="status-suspenso"><span class="bolinha bolinha-suspenso"></span>{{ item.get_status_display }}</span>
-                        {% endif %}
-                        {% if item.get_status_display == 'Encerrado' %}
-                            <span class="status-suspenso"><span class="bolinha bolinha-encerrado"></span>{{ item.get_status_display }}</span>
+                        {% if item.get_status_display == 'Empenhado' %}
+                           <span class="bolinha bolinha-empenho"></span>{{ item.get_status_display }}</span>
                         {% endif %}
                         {% if item.get_status_display == 'Cancelado' %}
-                            <span class="status-suspenso"><span class="bolinha bolinha-cancelado"></span>{{ item.get_status_display }}</span>
+                            <span class="bolinha bolinha-cancelado"></span>{{ item.get_status_display }}</span>
                         {% endif %}
                     </td>
                     <td class="col-unidadedaf" style="text-transform: uppercase;">{{ item.unidade_daf }}</td>
-                    <td class="col-modalidade">{{ item.get_modalidade_aquisicao_display }}</td>
-                    <td class="col-contrato">{{ item.arp.numero_arp }}</td>
-                    <td class="col-contrato">{{ item.numero_contrato }}</td>
-                    <td class="col-data">{{ item.data_publicacao|date:"d/m/Y" }}</td>
-                    <td class="col-data">{{ item.data_vigencia|date:"d/m/Y" }}</td>
-                    <td class="col-denominacao">{{ item.denominacao.denominacao }}</td>
-                    <td class="col-fornecedor">{{ item.fornecedor.nome_fantasia }}</td>
-                    <td class="col-valor">{{ item.valor_total|custom_number_format }}</td>
+                    <td class="col-modalidade">
+                        {% if item.numero_empenho %}
+                            {{ item.numero_empenho }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td class="col-modalidade">{{ item.data_solicitacao|date:"d/m/Y" }}</td>
+                    <td class="col-modalidade">
+                        {% if item.data_empenho %}
+                            {{ item.data_empenho|date:"d/m/Y" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td class="col-modalidade">{{ item.dias_empenho }}</td>
+                    <td class="col-modalidade" style="text-align: right;">
+                        {% if item.valor_total %}
+                            {{ item.valor_total|custom_number_format }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td class="col-modalidade" style="text-align: right;">
+                        {% if item.parcelas %}
+                            {{ item.parcelas }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td class="col-modalidade" style="text-align: right;">
+                        {% if item.contratos %}
+                            {{ item.contratos }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    
                 </tr>
                 {% endfor %}
             </tbody>

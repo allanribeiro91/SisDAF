@@ -442,6 +442,15 @@ class ContratosParcelas(models.Model):
 
     def valor_total(self):
         return self.valor_unitario() * self.qtd_contratada
+    
+    def qtd_empenhada(self):
+        return 1
+    
+    def qtd_a_empenhar(self):
+        return 1
+
+    def valor_empenhado(self):
+        return 10
 
     def __str__(self):
         return f"Parcela do contrato: {self.numero_parcela} - Contrato: {self.objeto.contrato.numero_contrato} - Produto: ({self.objeto.produto.produto}) - ID ({self.id})"
@@ -610,6 +619,21 @@ class Empenhos(models.Model):
         self.del_usuario = user
         self.save()
     
+    def dias_empenho(self):
+        if self.data_empenho:
+            dias = (self.data_empenho - self.data_solicitacao).days
+            return dias
+        else:
+            return (timezone.now().date() - self.data_solicitacao).days
+
+    def valor_total(self):
+        return 1
+    
+    def parcelas(self):
+        return 1
+    
+    def contratos(self):
+        return 1
 
     def __str__(self):
         return f"Fiscal do contrato: {self.fiscal_nome()}"

@@ -762,7 +762,7 @@ class EmpenhoForm(forms.ModelForm):
             'style': 'width: 180px !important;'
         }),
         label='Documento SEI',
-        required=True,
+        required=False,
     )
 
     
