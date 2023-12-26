@@ -22,3 +22,11 @@
 .bolinha-cancelado {
     background-color: #bf0000;
 }
+
+.produto-unidadedaf{
+    background-color: #008d9f;
+    border-radius: 5px;
+    color: white;
+    padding: 5px;
+    font-weight: bold;
+}

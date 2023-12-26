@@ -121,22 +121,24 @@
                 <tr>
                     
                     <th class="col-cnpj">CNPJ</th>
-                    <th class="col-fornecedor">Fornecedor</th>
+                    
                     <th class="col-hierarquia">Hierarquia</th>
                     <th class="col-porte">Porte</th>
                     <th class="col-direito">Direito</th>
                     <th class="col-uf">UF</th>
+                    <th class="col-fornecedor">Fornecedor</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in tab_fornecedores %}
                 <tr data-id="{{ item.id }}">
                     <td class="col-cnpj">{{ item.cnpj }}</td>
-                    <td class="col-fornecedor">{{ item.nome_fantasia }}</td>
+                    
                     <td class="col-hierarquia">{{ item.hierarquia|capfirst }}</td>
                     <td class="col-porte">{{ item.get_porte_display }}</td>
                     <td class="col-direito">{{ item.tipo_direito|capfirst }}</td>
                     <td class="col-uf">{{ item.end_uf }}</td>
+                    <td class="col-fornecedor">{{ item.nome_fantasia }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

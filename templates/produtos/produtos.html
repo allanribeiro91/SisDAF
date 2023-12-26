@@ -3,6 +3,7 @@
 {% block extra_head %}
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="stylesheet" href="{% static '\styles\produtos_daf.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_aderecos.css' %}">
 {% endblock %}
 {% block content %}    
     
@@ -128,35 +129,35 @@
                     <td>{{ item.produto }}</td>
                     <td style="text-align: center;">
                         {% if item.comp_basico %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
                     <td style="text-align: center;">
                         {% if item.comp_especializado %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
                     <td style="text-align: center;">
                         {% if item.comp_estrategico %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
                     <td style="text-align: center;">
                         {% if item.disp_farmacia_popular %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
                     <td style="text-align: center;">
                         {% if item.hospitalar %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}

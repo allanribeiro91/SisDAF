@@ -148,7 +148,7 @@
 }
 
 
- .section.funcionalidades {
+.section.funcionalidades {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -195,6 +195,13 @@
     background: transparent;
 }
 
+.icon-container {
+    display: flex;
+    flex-direction: column;
+    padding-top: 5px;
+    align-items: center;
+    gap: 2px;
+}
 
 #pagination {
     display: flex;

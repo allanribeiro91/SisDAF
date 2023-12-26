@@ -255,11 +255,11 @@ function updateTable(produtos) {
                 <td>${produto.id}</td>
                 <td>${produto.denominacao__tipo_produto}</td>
                 <td>${produto.produto}</td>
-                <td style="text-align: center;">${produto.comp_basico ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${produto.comp_especializado ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${produto.comp_estrategico ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${produto.disp_farmacia_popular ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${produto.hospitalar ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
+                <td style="text-align: center;">${produto.comp_basico ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td style="text-align: center;">${produto.comp_especializado ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td style="text-align: center;">${produto.comp_estrategico ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td style="text-align: center;">${produto.disp_farmacia_popular ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td style="text-align: center;">${produto.hospitalar ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
             </tr>
         `;
         $tableBody.append(row);

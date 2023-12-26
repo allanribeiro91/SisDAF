@@ -1,7 +1,7 @@
 from django.db import models
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
-from setup.choices import STATUS_PROAQ, UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_FASE
+from setup.choices import STATUS_PROAQ, UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_FASE, TIPO_COTA
 from django.utils import timezone
 
 
@@ -21,7 +21,8 @@ class ProaqDadosGerais(models.Model):
     numero_processo_sei = models.TextField(max_length=20, null=False, blank=False)
     numero_etp = models.TextField(max_length=10, null=True, blank=True)
     status = models.CharField(default="nao_informado", max_length=20, choices=STATUS_PROAQ, null=False, blank=False)
-    responsavel_tecnico = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='proaq_responsavel')
+    responsavel_tecnico = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='proaq_responsavel', null=True, blank=True)
+    outro_responsavel = models.CharField(max_length=80, null=True, blank=True)
 
     #denominacao genérica
     denominacao = models.ForeignKey(DenominacoesGenericas, on_delete=models.DO_NOTHING, related_name='denominacao_proaq')
@@ -68,8 +69,11 @@ class ProaqDadosGerais(models.Model):
         return self.get_modalidade_aquisicao_display()
     
     def get_usuario_nome(self):
-        return self.responsavel_tecnico.primeiro_ultimo_nome()
-    
+        if self.responsavel_tecnico is None:
+            return self.outro_responsavel
+        else:
+            return self.responsavel_tecnico.primeiro_ultimo_nome()
+
     def get_usuario_nome_completo(self):
         return self.responsavel_tecnico.dp_nome_completo
     
@@ -78,6 +82,73 @@ class ProaqDadosGerais(models.Model):
 
     def __str__(self):
         return f"Processo Aquisitivo: {self.numero_processo_sei} - Denominacao: ({self.denominacao}) - ID ({self.id})"
+
+class ProaqItens(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='proaq_item_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='proaq_item_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #item do processo aquisitivo
+    numero_item = models.IntegerField(null=False, blank=False)
+    tipo_cota = models.CharField(max_length=20, choices=TIPO_COTA, null=False, blank=False)
+    cmm_data_inicio = models.DateField(null=False, blank=False, default=timezone.now)
+    cmm_data_fim = models.DateField(null=False, blank=False, default=timezone.now)
+    cmm_estimado = models.FloatField(null=False, blank=False)
+    qtd_a_ser_contratada = models.FloatField(null=False, blank=False)
+    valor_unitario_estimado = models.FloatField(null=False, blank=False)
+
+    #proaq
+    proaq = models.ForeignKey(ProaqDadosGerais, on_delete=models.DO_NOTHING, related_name='proaq_item')
+
+    #produto
+    produto = models.ForeignKey(ProdutosFarmaceuticos, on_delete=models.DO_NOTHING, related_name='proaq_item_produto')
+
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True)
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='proaq_item_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)  # Obtenha o usuário atual e remova-o dos kwargs
+
+        # Se o objeto já tem um ID, então ele já existe no banco de dados
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(ProaqItens, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        """
+        Realiza uma "deleção lógica" do registro.
+        """
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+
+    def cobertura_meses(self):
+        meses = self.qtd_a_ser_contratada / self.cmm_estimado
+        return meses
+    
+    def cobertura_dias(self):
+        dias = self.cobertura_meses() * 30
+        return dias
+
+    def valor_total(self):
+        return 0
 
 class ProaqProdutosManager(models.Manager):
     def active(self):

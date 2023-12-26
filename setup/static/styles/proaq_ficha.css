@@ -169,6 +169,69 @@ select[name="numero_processo"] {
     height: 95px;
 }
 
+.section-evolucao {
+    display: flex;
+    flex-direction: column;  /* Organiza o título e as fases em colunas */
+    margin: 5px 5px 10px 10px;
+    padding: 5px 10px 0px 10px;
+    background-color: #e5e5e5;
+    border: 1px solid #acacac;
+    border-radius: 5px;
+    width: 99%;
+}
+
+.fases-container {
+    display: flex;
+    justify-content: center;  /* Centraliza as fases horizontalmente */
+    align-items: center;  /* Centraliza as fases verticalmente */
+    flex-wrap: wrap;
+    gap: 10px;
+    height: 180px;  /* Altura ajustada para conter as fases */
+}
+
+.evolucao-fase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 150px;
+    background-color: #008d9f;
+    border-radius: 10px;
+    width: 12%;
+    cursor: pointer;
+}
+
+.evolucao-simbolo {
+    color: white;
+    margin-top: 5px;
+    font-size: 35px;
+    text-align: center;
+}
+
+.evolucao-dados {
+    width: 80%;
+    color: white;
+    font-size: 14px;
+}
+
+.evolucao-titulo{
+    font-size: 12px;
+    padding-top: 5px;
+    font-family: Verdana, sans-serif;
+}
+
+.evolucao-editar{
+    text-align: right;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.botao-editar{
+    width: 70px;
+    cursor: pointer;
+}
+
 .grid-log{
     display: flex;
     justify-content: flex-start;  /* Alinha os itens à esquerda */
@@ -255,4 +318,25 @@ table tbody tr:hover {
 .tramitacao-data {
     width: 7% !important;
     text-align: center;
+}
+
+
+/*--colunas--*/
+.col-item {
+    width: 3% !important;
+    text-align: left;
+}
+.col-produto {
+    width: 30% !important;
+    text-align: left;
+}
+.col-texto-curto {
+    width: 5% !important;
+    text-align: left;
+}
+.col-data {
+    width: 5% !important;
+}
+.col-valor {
+    width: 7% !important;
 }

@@ -642,8 +642,6 @@ def buscar_parcelas(request, id_contrato=None):
         parcelas_list.append({'id': parcela.id, 'detalhe': parcela_detalhe, 'qtd_a_empenhar': parcela_qtd_a_empenhar})
     return JsonResponse({'parcelas': parcelas_list})
 
-
-
 def contrato_parcela_delete(request, id_entrega=None):    
     try:
         parcela = ContratosParcelas.objects.get(id=id_entrega)

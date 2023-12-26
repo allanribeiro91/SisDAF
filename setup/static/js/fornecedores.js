@@ -292,11 +292,12 @@ function recarregarTabelaFornecedores(fornecedores) {
             <tr data-id="${ fornecedor.id }">
                 
                 <td class="col-cnpj">${ fornecedor.cnpj }</td>
-                <td class="col-fornecedor">${ fornecedor.nome_fantasia }</td>
+                
                 <td class="col-hierarquia">${ capitalizeFirstLetter(fornecedor.hierarquia) }</td>
                 <td class="col-porte">${ getPorteDisplay(fornecedor.porte) }</td>
                 <td class="col-direito">${ capitalizeFirstLetter(fornecedor.tipo_direito) }</td>
                 <td class="col-uf">${ fornecedor.end_uf }</td>
+                <td class="col-fornecedor">${ fornecedor.nome_fantasia }</td>
             </tr>
         `;
         $tableBody.append(row);

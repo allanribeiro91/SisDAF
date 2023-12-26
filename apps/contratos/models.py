@@ -636,4 +636,51 @@ class Empenhos(models.Model):
         return 1
 
     def __str__(self):
+        return f"Empenho: {self.numero_empenho()}"
+    
+
+class EmpenhosItens(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='empenho_item_usuario_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='empenho_item_usuario_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados do empenho
+    valor_empenhado = models.FloatField(null=False, blank=False)
+    
+    #relacionamentos
+    empenho = models.ForeignKey(Empenhos, on_delete=models.DO_NOTHING, default=1, related_name='empenho_item', null=False, blank=False)
+    parcela = models.ForeignKey(ContratosParcelas, on_delete=models.DO_NOTHING, default=1, related_name='empenho_parcela', null=False, blank=False)
+
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='empenho_item_usuario_delete')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(EmpenhoItens, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+    
+    def __str__(self):
         return f"Fiscal do contrato: {self.fiscal_nome()}"

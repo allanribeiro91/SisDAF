@@ -1,23 +1,31 @@
 from unidecode import unidecode
 from django.core.paginator import Paginator, EmptyPage
+from django.http import QueryDict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from django.contrib import auth, messages
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
-from setup.choices import UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_PROAQ, STATUS_FASE
+from setup.choices import UNIDADE_DAF, UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_PROAQ, STATUS_FASE
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.main.models import CustomLog
-from apps.processos_aquisitivos.models import ProaqDadosGerais, ProaqProdutos, ProaqEvolucao, PROAQ_AREA_MS, PROAQ_ETAPA, ProaqTramitacao
-from apps.processos_aquisitivos.forms import ProaqDadosGeraisForm, ProaqEvolucaoForm, ProaqTramitacaoForm
+from apps.processos_aquisitivos.models import (ProaqDadosGerais, ProaqProdutos, ProaqEvolucao, 
+                                               PROAQ_AREA_MS, PROAQ_ETAPA, ProaqTramitacao, ProaqItens)
+from apps.processos_aquisitivos.forms import (ProaqDadosGeraisForm, ProaqItensForm, 
+                                              ProaqEvolucaoForm, ProaqTramitacaoForm)
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
+from datetime import datetime
+from django.utils import timezone
 from io import BytesIO
 import json
 import re
-from datetime import datetime
+import pytz
+
+#timezone
+tz = pytz.timezone("America/Sao_Paulo")
 
 def proaq(request):
     tab_proaqs = ProaqDadosGerais.objects.filter(del_status=False).order_by('denominacao')
@@ -27,119 +35,280 @@ def proaq(request):
         .distinct()
     )
     total_processos = tab_proaqs.count()
+    
     # Ordenando a lista em Python, removendo acentos e considerando maiúsculas/minúsculas
-    lista_denominacoes = sorted(lista_denominacoes, key=lambda x: unidecode((x[1] or '').lower()))
+    lista_unidadesdaf = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete', '']]
+    lista_modalidades = [('', '')] + MODALIDADE_AQUISICAO
+
     conteudo = {
         'tab_proaqs': tab_proaqs,
-        'MODALIDADE_AQUISICAO': MODALIDADE_AQUISICAO,
+        'lista_modalidades': MODALIDADE_AQUISICAO,
         'STATUS_PROAQ': STATUS_PROAQ,
-        'UNIDADE_DAF': UNIDADE_DAF2,
-        'DENOMINACOES': lista_denominacoes,
+        'lista_unidadesdaf': lista_unidadesdaf,
+        'lista_modalidades': lista_modalidades,
         'total_processos': total_processos,
     }
     return render(request, 'processos_aquisitivos/proaq.html', conteudo)
 
-def proaq_ficha_dados_gerais(request, proaq_id=None):
-    
-    produtos_selecionados = []
-    nomes_produtos = None
+
+#PROAQ DADOS GERAIS
+def proaq_ficha(request, proaq_id=None):
     if proaq_id:
-         try:
-             proaq_dados_gerais = ProaqDadosGerais.objects.get(id=proaq_id)
-             produtos_selecionados = list(proaq_dados_gerais.proaq_produto.filter(del_status=False).values('produto_id', 'produto__produto'))
-             nomes_produtos = [produto['produto__produto'] for produto in produtos_selecionados]
-         except ProaqDadosGerais.DoesNotExist:
-             messages.error(request, "Processo Aquisitivo não encontrado.")
-             return redirect('proaq')
+        proaq = ProaqDadosGerais.objects.get(id=proaq_id)
     else:
-         proaq_dados_gerais = None  # Preparando para criar um novo processo
-
+        proaq = None
+    
+    #salvar
     if request.method == 'POST':
-
-        if proaq_dados_gerais:
-            proaq_dados_gerais_form = ProaqDadosGeraisForm(request.POST, instance=proaq_dados_gerais)
+        #Carregar formulário
+        if proaq:
+            proaq_form = ProaqDadosGeraisForm(request.POST, instance=proaq)
             novo_proaq = False
         else:
-            proaq_dados_gerais_form = ProaqDadosGeraisForm(request.POST)
+            proaq_form = ProaqDadosGeraisForm(request.POST)
             novo_proaq = True
-
+        
         #Verificar se houve alteração no formulário
-        if not proaq_dados_gerais_form.has_changed():
-            messages.error(request, "Dados não foram salvos. Não houve mudanças.")
-            if proaq_dados_gerais:
-                return redirect('proaq_ficha_dados_gerais', proaq_id=proaq_dados_gerais.id)
-            else:
-                return redirect('novo_proaq')
+        if not proaq_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
 
-        if proaq_dados_gerais_form.is_valid():
-            #Verificar se já existe registro desse processo aquisitivo
-            numero_processo_sei = proaq_dados_gerais_form.cleaned_data.get('numero_processo_sei')
-            processo_sei_existente = ProaqDadosGerais.objects.filter(numero_processo_sei=numero_processo_sei)
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
 
-            #Se estivermos atualizando um processo existente, excluímos esse processo da verificação
-            if proaq_dados_gerais:
-                processo_sei_existente = processo_sei_existente.exclude(id=proaq_dados_gerais.id)
-            
-            if processo_sei_existente.exists():
-                messages.error(request, "Já existe um registro com esse Processo SEI. Não foi possível salvar.")
-                if proaq_dados_gerais:
-                    return redirect('proaq_ficha_dados_gerais', proaq_id=proaq_dados_gerais.id)
-                else:
-                    return redirect('novo_proaq')
+        #Passar o objeto Denominação Genérica
+        denominacao_id = request.POST.get('denominacao')
+        denominacao_instance = DenominacoesGenericas.objects.get(id=denominacao_id)
 
+        #Responsável técnico
+        responsavel_id = request.POST.get('responsavel_tecnico')
+        if responsavel_id:
+            responsavel_instance = Usuario.objects.get(id=responsavel_id)
+            modificacoes_post['responsavel_tecnico'] = responsavel_instance       
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['denominacao'] = denominacao_instance
+
+        #Criar o formulário com os dados atualizados
+        proaq_form = ProaqDadosGeraisForm(modificacoes_post, instance=proaq_form.instance)
+        
+        #salvar
+        if proaq_form.is_valid():
             #Salvar o produto
-            proaq_dados_gerais = proaq_dados_gerais_form.save(commit=False)
-            proaq_dados_gerais.save(current_user=request.user.usuario_relacionado)
+            proaq = proaq_form.save(commit=False)
+            proaq.save(current_user=request.user.usuario_relacionado)
             
-            if novo_proaq:
-                messages.success(request, "Novo processo aquisitivo registrado com sucesso!")
-            else:
-                messages.success(request, "Dados atualizados com sucesso!")
-                print("Dado atualizado")
+            #logs
+            log_atualizacao_usuario = proaq.usuario_atualizacao.dp_nome_completo
+            log_atualizacao_data = proaq.ult_atual_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
+            log_edicoes = proaq.log_n_edicoes
 
             # Registrar a ação no CustomLog
             current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             log_entry = CustomLog(
                 usuario=request.user.usuario_relacionado,
-                modulo="Processo Aquisitivo_Dados Gerais",
+                modulo="ProcessosAquisitivos_DadosGerais",
                 model='ProaqDadosGerais',
-                model_id=proaq_dados_gerais.id,
+                model_id=proaq.id,
                 item_id=0,
-                item_descricao="Salvar edição de processo aquisitivo.",
+                item_descricao="Salvar edição de Processo Aquisitivo.",
                 acao="Salvar",
-                observacoes=f"Usuário {request.user.username} salvou o processo aquisitivo (ID: {proaq_dados_gerais.id}) da unidade daf {proaq_dados_gerais.unidade_daf} e denominação genérica {proaq_dados_gerais.denominacao.denominacao} em {current_date_str}."
+                observacoes=f"Usuário {request.user.username} salvou o Processo Aquisitivo (ID {proaq.id}, Número do Processo SEI: {proaq.numero_processo_sei}, Denominação: {proaq.denominacao.denominacao}) em {current_date_str}."
             )
             log_entry.save()
 
-            #Retornar log
+            #Retornar
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
-                    'redirect_url': reverse('proaq_ficha_dados_gerais', args=[proaq_dados_gerais.id]),
-                    'registro_data': proaq_dados_gerais.registro_data.strftime('%d/%m/%Y %H:%M:%S'),
-                    'usuario_registro': proaq_dados_gerais.usuario_registro.dp_nome_completo,
-                    'ult_atual_data': proaq_dados_gerais.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S'),
-                    'usuario_atualizacao': proaq_dados_gerais.usuario_atualizacao.dp_nome_completo,
-                    'log_n_edicoes': proaq_dados_gerais.log_n_edicoes,
-                    'id': proaq_dados_gerais.id,
+                    'retorno': 'Salvo',
+                    'log_atualizacao_usuario': log_atualizacao_usuario,
+                    'log_atualizacao_data': log_atualizacao_data,
+                    'log_edicoes': log_edicoes,
+                    'novo': novo_proaq,
+                    'redirect_url': reverse('proaq_ficha', args=[proaq.id]),
                 })
         else:
-            messages.error(request, "Preencha os campos obrigatórios.")
-            print("Erro formulário produto")
-            print(proaq_dados_gerais_form.errors)
-            
-    denominacoes_genericas = DenominacoesGenericas.objects.filter(del_status=False).values_list('id', 'denominacao')
-    form = ProaqDadosGeraisForm(instance=proaq_dados_gerais)
+            print("Erro formulário Contrato")
+            print(proaq_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+
+    lista_produtos = []
+    tab_proaq_itens = None
+    if proaq:
+        form = ProaqDadosGeraisForm(instance=proaq)
+
+        denominacao_id = proaq.denominacao.id
+        tab_produtos = ProdutosFarmaceuticos.objects.filter(del_status=False, denominacao_id=denominacao_id)
+        for produto in tab_produtos:
+            lista_produtos.append((produto.id, produto.produto))
+
+        tab_proaq_itens = ProaqItens.objects.filter(del_status=False, proaq_id=proaq.id)
+    else:
+        form = ProaqDadosGeraisForm()   
+
+    form_item_proaq = ProaqItensForm()
 
     return render(request, 'processos_aquisitivos/proaq_ficha_dados_gerais.html', {
-        'denominacoes_genericas': denominacoes_genericas,
         'form': form,
-        'proaq_dados_gerais': proaq_dados_gerais,
-        'produtos_selecionados': produtos_selecionados,
-        'nomes_produtos': nomes_produtos,
-        'UNIDADE_DAF': UNIDADE_DAF2,
-        'MODALIDADE_AQUISICAO': MODALIDADE_AQUISICAO,
+        'proaq': proaq,
+        'form_item_proaq': form_item_proaq,
         'STATUS_PROAQ': STATUS_PROAQ,
+        'lista_produtos': lista_produtos,
+        'tab_proaq_itens': tab_proaq_itens,
     })
+
+
+
+
+#PROAQ ITENS
+def proaq_item_salvar(request, proaq_item_id=None):
+    if proaq_item_id:
+        proaq_item = ProaqItens.objects.get(id=proaq_item_id)
+    else:
+        proaq_item = None
+    
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if proaq_item:
+            proaq_item_form = ProaqItensForm(request.POST, instance=proaq_item)
+            novo_proaq_item = False
+        else:
+            proaq_item_form = ProaqItensForm(request.POST)
+            novo_proaq_item = True
+        
+        #Verificar se houve alteração no formulário
+        if not proaq_item_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+
+        #Objeto
+        produto_id = request.POST.get('produto')
+        produto_instance = ProdutosFarmaceuticos.objects.get(id=produto_id)
+        
+        #Processo Aquisitivo
+        proaq_id = request.POST.get('id_proaq_item_hidden')
+        proaq_instance = ProaqDadosGerais.objects.get(id=proaq_id)
+
+        #Valor Unitário
+        valor_unitario = request.POST.get('valor_unitario_estimado')
+        valor_unitario = valor_unitario.replace('R$', '').replace('.', '').replace(',', '.').strip()
+        valor_unitario = float(valor_unitario)
+
+        #CMM de Referência
+        cmm_referencia = request.POST.get('cmm_estimado')
+        cmm_referencia = float(cmm_referencia.replace('.', ''))
+
+        #Qtd a ser Contratada
+        qtd_a_ser_contratada = request.POST.get('qtd_a_ser_contratada')
+        qtd_a_ser_contratada = float(qtd_a_ser_contratada.replace('.', ''))
+
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['produto'] = produto_instance
+        modificacoes_post['proaq'] = proaq_instance
+        modificacoes_post['valor_unitario_estimado'] = valor_unitario
+        modificacoes_post['qtd_a_ser_contratada'] = qtd_a_ser_contratada
+        modificacoes_post['cmm_estimado'] = cmm_referencia
+
+        #Criar o formulário com os dados atualizados
+        proaq_item_form = ProaqItensForm(modificacoes_post, instance=proaq_item_form.instance)
+
+        #salvar
+        if proaq_item_form.is_valid():
+            #Salvar o produto
+            proaq_item = proaq_item_form.save(commit=False)
+            proaq_item.save(current_user=request.user.usuario_relacionado)
+
+            #id do processo aquisitivo e do item
+            proaq_id = proaq_item.proaq.id
+
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="ProcessosAquisitivos_Itens",
+                model='ProaqItens',
+                model_id=proaq_item.id,
+                item_id=0,
+                item_descricao="Salvar edição de Parcela de Contrato.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o Item do Processo Aquisitivo (ID {proaq_item.id}, Processo Aquisitivo: {proaq_item.proaq.numero_processo_sei}, Produto: {proaq_item.produto.produto}) em {current_date_str}."
+            )
+            log_entry.save()
+            
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'novo': novo_proaq_item,
+                    'redirect_url': reverse('proaq_ficha', args=[proaq_id]),
+                    'id_proaq_item': proaq_item.id,
+                })
+        else:
+            print("Erro formulário Parcela do Contrato")
+            print(proaq_item_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+
+def proaq_item_modal(request, proaq_item_id=None):
+    try:
+        item = ProaqItens.objects.get(id=proaq_item_id)
+        produto = item.produto.id
+        data = {
+            'id': item.id,
+            'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
+            'log_responsavel_registro': str(item.usuario_atualizacao.dp_nome_completo),
+            'lot_ult_atualizacao': item.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if item.ult_atual_data else '',
+            'log_responsavel_atualizacao': str(item.usuario_atualizacao.dp_nome_completo),
+            'log_edicoes': item.log_n_edicoes,
+            'tipo_cota': item.tipo_cota,
+            'numero_item': item.numero_item,
+            'produto': produto,
+            'data_inicio': item.cmm_data_inicio,
+            'data_fim': item.cmm_data_fim,
+            'cmm_estimado': item.cmm_estimado,
+            'qtd_a_ser_contratada': item.qtd_a_ser_contratada,
+            'valor_unitario_estimado': item.valor_unitario_estimado,
+            'observacoes': item.observacoes_gerais,
+        }
+        return JsonResponse(data)
+    except ProaqItens.DoesNotExist:
+        return JsonResponse({'error': 'Item do Processo Aquisitivo não encontrado.'}, status=404)
+
+def proaq_item_deletar(request, proaq_item_id=None):
+    try:
+        proaq_item = ProaqItens.objects.get(id=proaq_item_id)
+        proaq_item.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="ProcessosAquisitivos_Itens",
+            model='ProaqItens',
+            model_id=proaq_item.id,
+            item_id=0,
+            item_descricao="Deleção da Parcela de Contrato.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o Item do Processo Aquisitivo (ID {proaq_item.id}, Processo SEI: {proaq_item.proaq.numero_processo_sei}, Produto: {proaq_item.produto.produto}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Item do Processo deletado com sucesso!"
+            })
+    except ProaqItens.DoesNotExist:
+        return JsonResponse({
+            "message": "Item do Processo não encontrado."
+            })
 
 def proaq_usuarios_por_unidade(request, unidade):
     usuarios = Usuario.usuarios_por_unidade(unidade)

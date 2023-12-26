@@ -178,6 +178,8 @@ select[name="oncologico"], select[name="biologico"] {
     height: 95px;
 }
 
+
+
 .grid-log{
     display: flex;
     justify-content: flex-start;  /* Alinha os itens à esquerda */

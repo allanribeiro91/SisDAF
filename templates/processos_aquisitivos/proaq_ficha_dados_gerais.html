@@ -1,5 +1,7 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
+{% load humanize %}
+{% load proaq_custom_filters %}
 {% block extra_head %}    
     <link rel="stylesheet" href="{% static 'styles/proaq_ficha.css' %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
@@ -21,199 +23,329 @@
         </div>
         <div class="tabs">
             <button class="tab-button active" id="proaq_ficha_dados_gerais">Dados Gerais</button>
-            <button class="tab-button" id="proaq_ficha_evolucao">Evolução Processual</button>
-            <button class="tab-button" id="proaq_ficha_tramitacoes">Tramitações</button>
         </div>
     </div>
 
-    <!-- form denominacoes_genericas -->
-        <form id="proaqForm" method="POST" data-post-url="{% if form.instance.id %}{% url 'proaq_ficha_dados_gerais' form.instance.id %}{% else %}{% url 'novo_proaq' %}{% endif %}">
+
+    <div class="area-scroll">
+    
+        <!-- form Processo Aquisitivo -->
+        <form id="proaqForm">
         {% csrf_token %}
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#proaq_delete" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
-                <i class="fas fa-trash-alt"></i>
-                Deletar
-            </button>
-            
-            <button class="btn btn-primary me-md-2" type="submit" id="btnSaveProaq" style="font-size: 12px;">
-                <i class="fas fa-save me-1"></i> 
-                Salvar
-            </button>
-        </div>
-        
-        <div class="horizontal-sections">
-            <div class="section-log">
-                <h3>Log</h3>
-                <div class="grid-log">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_responsavel" id="id_proaq" name="id_proaq" readonly value="{{ form.instance.id|default_if_none:'' }}">
-                        <label for="floatingInput">ID</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ proaq_dados_gerais.registro_data|date:"d/m/Y H:i:s" }}">
-                        <label for="floatingInput">Data do Registro</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ proaq_dados_gerais.usuario_registro.dp_nome_completo }}">
-                        <label for="floatingInput">Responsável pelo Registro</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ proaq_dados_gerais.ult_atual_data|date:"d/m/Y H:i:s" }}">
-                        <label for="floatingInput">Última Atualização</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ proaq_dados_gerais.usuario_atualizacao.dp_nome_completo }}">
-                        <label for="floatingInput">Responsável Atualização</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" name="log_edicoes" readonly value="{{ proaq_dados_gerais.log_n_edicoes }}">
-                        <label for="floatingInput">Nº Edições</label>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="horizontal-sections">
-            <div class="section">
-                <h3>Dados Administrativos</h3>
-                <div class="grid" style="font-size: 14px;">
-                    <div class="form-floating">
-                        <select class="form-select" id="unidade_daf" aria-label="Floating label select example" name="unidade_daf">
-                            <option value="" disabled {% if not form.instance.unidade_daf %}selected{% endif %}>Não Informado</option>
-                            {% for value, display in UNIDADE_DAF %}
-                            <option value="{{ value }}" {% if form.instance.unidade_daf == value %}selected{% endif %}>{{ display }}</option>
-                            {% endfor %}
-                        </select>
-                        <label for="floatingSelect">Unidade DAF*</label>
+            <!-- Botões -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#proaq_delete" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                    <i class="fas fa-trash-alt"></i>
+                    Deletar
+                </button>
+                
+                <button class="btn btn-primary me-md-2" type="submit" id="btnSaveProaq" style="font-size: 12px;">
+                    <i class="fas fa-save me-1"></i> 
+                    Salvar
+                </button>
+            </div>
+        
+            <!-- Log -->
+            <div class="horizontal-sections">
+                <div class="section-log">
+                    <h3>Log</h3>
+                    <div class="grid-log">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="id_proaq" name="id_proaq" readonly value="{{ form.instance.id|default_if_none:'' }}">
+                            <label for="floatingInput">ID</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ proaq.registro_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Data do Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ proaq.usuario_registro.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável pelo Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ proaq.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Última Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ proaq.usuario_atualizacao.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" name="log_edicoes" readonly value="{{ proaq.log_n_edicoes }}">
+                            <label for="floatingInput">Nº Edições</label>
+                        </div>
                     </div>
-                    <div class="form-floating">
-                        <select class="form-select" id="modalidade_aquisicao" aria-label="Floating label select example" name="modalidade_aquisicao">
-                            <option value="" disabled {% if not form.instance.modalidade_aquisicao %}selected{% endif %}>Não Informado</option>
-                            {% for value, display in MODALIDADE_AQUISICAO %}
-                            <option value="{{ value }}" {% if form.instance.modalidade_aquisicao == value %}selected{% endif %}>{{ display }}</option>
-                            {% endfor %}
-                        </select>
-                        <label for="floatingSelect">Modalidade de Aquisição*</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="numero_processo_sei" name="numero_processo_sei" value="{{ form.instance.numero_processo_sei|default_if_none:'' }}" inputmode="numeric">
-                        <label for="numero_processo_sei">Número do Processo*</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="numero_etp" name="numero_etp" value="{{ form.instance.numero_etp|default_if_none:'' }}" inputmode="numeric" pattern="\d{0,9}" maxlength="9">
-                        <label for="numero_etp">ETP</label>
-                    </div>
-                    <div class="form-floating">
-                        <select class="form-select" id="status" aria-label="Floating label select example" name="status">
-                            <option value="" disabled {% if not form.instance.status %}selected{% endif %}>Não Informado</option>
-                            {% for value, display in STATUS_PROAQ %}
-                            <option value="{{ value }}" {% if form.instance.status == value %}selected{% endif %}>{{ display }}</option>
-                            {% endfor %}
-                        </select>
-                        <label for="floatingSelect">Status*</label>
-                    </div>
-                    <div class="form-floating full-width">
-                        <select class="form-select" id="responsavel_tecnico" aria-label="Floating label select example" name="responsavel_tecnico" disabled>
-                            <option value="" disabled {% if not form.instance.responsavel_tecnico.id %}selected{% endif %}>Não Informado</option>
-                        </select>
-                        <label for="floatingSelect">Responsável Técnico*</label>
-                    </div>
-                    
                 </div>
             </div>
-        </div>
-        <div class="horizontal-sections">
-            <div class="section">
-                <h3>Produtos Farmacêuticos</h3>
-                <div class="grid" style="font-size: 14px;">
-                    <div class="form-floating" style="width: 400px;" id="proaq_denominacao">
-                        {{ form.denominacao }}
-                        <label for="{{ form.denominacao.id_for_label }}">Denominação Genérica*</label>
+
+            <!-- Evolução Processual-->
+            <div class="horizontal-sections"> 
+                <div class="section-evolucao">
+                    <h3>Evolução Processual</h3>
+                    <div class="fases-container">
+                        <div class="evolucao-fase">
+                            <div class="evolucao-simbolo">
+                                <i class="fas fa-check-circle">
+                                    <div class="evolucao-titulo">Docs Iniciais</div>
+                                </i>
+                            </div>
+                            <div class="evolucao-dados">
+                                Entrada: 22/12/2023<br>
+                                Saída: -<br>
+                                Dias: 1
+                            </div>
+                        </div>
+
+                        <div class="evolucao-fase" style="background-color: #86d0c6">
+                            <div class="evolucao-simbolo" style="color: #004253">
+                                <i class="fas fa-exclamation-circle">
+                                    <div class="evolucao-titulo">Pré-Contratual</div>
+                                </i>
+                            </div>
+                            <div class="evolucao-dados" style="color: black">
+                                Entrada: -<br>
+                                Saída: -<br>
+                                Dias: -
+                            </div>
+                        </div>
+
+                        <div class="evolucao-fase" style="background-color: #898989">
+                            <div class="evolucao-simbolo" style="color: black">
+                                <i class="fas fa-times-circle">
+                                    <div class="evolucao-titulo">Contratação</div>
+                                </i>
+                            </div>
+                            <div class="evolucao-dados" style="color: black">
+                                Entrada: -<br>
+                                Saída: -<br>
+                                Dias: -
+                            </div>
+                        </div>
+
+                        <div class="evolucao-fase" style="background-color: #898989">
+                            <div class="evolucao-simbolo" style="color: black">
+                                <i class="fas fa-times-circle">
+                                    <div class="evolucao-titulo">Execução do Contrato</div>
+                                </i>
+                            </div>
+                            <div class="evolucao-dados" style="color: black">
+                                Entrada: -<br>
+                                Saída: -<br>
+                                Dias: -
+                            </div>
+                        </div>
+
+                        <div class="evolucao-fase" style="background-color: #898989">
+                            <div class="evolucao-simbolo" style="color: black">
+                                <i class="fas fa-times-circle">
+                                    <div class="evolucao-titulo">Aditivo de Contrato</div>
+                                </i>
+                            </div>
+                            <div class="evolucao-dados" style="color: black">
+                                Entrada: -<br>
+                                Saída: -<br>
+                                Dias: -
+                            </div>
+                        </div>
+
+                        <div class="evolucao-fase" style="background-color: #898989">
+                            <div class="evolucao-simbolo" style="color: black">
+                                <i class="fas fa-times-circle">
+                                    <div class="evolucao-titulo">Prestação de Contas</div>
+                                </i>
+                            </div>
+                            <div class="evolucao-dados" style="color: black">
+                                Entrada: -<br>
+                                Saída: -<br>
+                                Dias: -
+                            </div>
+                        </div>
+
+                        <div class="evolucao-fase" style="background-color: #898989">
+                            <div class="evolucao-simbolo" style="color: black">
+                                <i class="fas fa-times-circle">
+                                    <div class="evolucao-titulo">Encerrado</div>
+                                </i>
+                            </div>
+                            <div class="evolucao-dados" style="color: black">
+                                Entrada: -<br>
+                                Saída: -<br>
+                                Dias: -
+                            </div>
+                        </div>
                     </div>
-                                        
+                    <div class="evolucao-editar">
+                        <div class="botao-editar" id="botaoEditar" data-bs-toggle="modal" data-bs-target="#proaqEvolucaoEditar">
+                            <i class="fas fa-edit"></i>
+                            Editar
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Dados Administrativos -->
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Dados Administrativos</h3>
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating">
+                            {{ form.status }}
+                            <label>{{ form.status.label }}</label>
+                        </div>
+                        <div class="form-floating">
+                            {{ form.unidade_daf }}
+                            <input type="text" id="id_proaq_unidade_daf_display" class="form-control" style="width: 130px;" value="{% if form.unidade_daf.value %}{{ form.instance.get_unidade_daf_display }}{% endif %}" readonly>
+                            <label>Unidade DAF</label>
+                        </div>
+                        <div class="form-floating">
+                            {{ form.modalidade_aquisicao }}
+                            <input type="text" id="id_proaq_modalidade_aquisicao_display" class="form-control" style="width: 200px;" value="{% if form.modalidade_aquisicao.value %}{{ form.instance.get_modalidade_aquisicao_display }}{% endif %}" readonly>
+                            <label>Modalidade de Aquisição</label>
+                        </div>
+                        <div class="form-floating full-width">
+                            <input type="hidden" id="id_proaq_denominacao_hidden" name="denominacao" class="form-control" value="{% if form.instance.denominacao %}{{ form.instance.denominacao.id }}{% endif %}" readonly>
+                            <input type="text" id="id_proaq_denominacao_display" name="denominacao_display" class="form-control"  value="{% if form.instance.denominacao %}{{ form.instance.denominacao }}{% endif %}" readonly>
+                            <label>Denominação Genérica</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            {{ form.numero_processo_sei }}
+                            <label>{{ form.numero_processo_sei.label }}</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            {{ form.numero_etp }}
+                            <label>{{ form.numero_etp.label }}</label>
+                        </div>
+                        
+                        <div class="form-floating">
+                            {{ form.responsavel_tecnico }}
+                            <label>{{ form.responsavel_tecnico.label }}</label>
+                        </div>
+                        <div class="form-floating mb-3" style="display: flex; align-items: center; margin-left: 10px;">
+                            <input type="checkbox" id="id_proaq_outro_resp_checkbox" class="form-checkbox" style="width: 20px; height: 20px;">
+                        </div>
+                        <div class="form-floating">
+                            {{ form.outro_responsavel }}
+                            <label>{{ form.outro_responsavel.label }}</label>
+                        </div>
+                        
+                        
+                        
+                    </div>
+
+                    <div class="section" style="width: 99.9% !important; margin-left: 0px;">
+                        <h3>Itens a serem Adquiridos</h3>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="font-size: 14px; text-align: right !important;">
+                            <button class="btn btn-primary me-md-2" type="button" id="btnNovoItem" style="font-size: 12px; background-color: green; border-color: green;">
+                                <i class="fas fa-plus" style="font-size: 14px;"></i> 
+                                &nbsp;Inserir Item
+                            </button>
+                        </div>
+
+                        <div class="grid" style="font-size: 14px; text-align: right !important;">
+                            <table class="table table-striped table-hover fixed-size-table" style="font-size: 12px;  width: 100%;" id="tabProaqItens">
+                                <thead>
+                                    <tr>
+                                        <th class="col-item">Item</th>
+                                        <th class="col-produto">Produto</th>
+                                        <th class="col-texto-curto">Tipo de Cota</th>
+                                        <th class="col-data">CMM - Início</th>
+                                        <th class="col-data">CMM - Fim</th>
+                                        <th class="col-valor">CMM de Referência</th>
+                                        <th class="col-valor">Qtd a ser Contratada</th>
+                                        <th class="col-valor">Cobertura - Dias</th>
+                                        <th class="col-valor">Cobertura - Meses</th>
+                                        <th class="col-valor">Valor Unitário R$</th>
+                                        <th class="col-valor">Valor Total R$</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in tab_proaq_itens %}
+                                    <tr data-id="{{ item.id }}">
+                                        <td class="col-item">{{ item.numero_item }}</td>
+                                        <td class="col-produto">{{ item.produto.produto }}</td>
+                                        <td class="col-texto-curto">{{ item.get_tipo_cota_display }}</td>
+                                        <td class="col-data">{{ item.cmm_data_inicio|date:"d/m/Y" }}</td>
+                                        <td class="col-data">{{ item.cmm_data_fim|date:"d/m/Y" }}</td>
+                                        <td class="col-valor">{{ item.cmm_estimado|floatformat:0|intcomma }}</td>
+                                        <td class="col-valor">{{ item.qtd_a_ser_contratada|floatformat:0|intcomma }}</td>
+                                        <td class="col-valor">{{ item.cobertura_dias|floatformat:0|intcomma }}</td>
+                                        <td class="col-valor">{{ item.cobertura_meses|floatformat:0|intcomma }}</td>
+                                        <td class="col-valor">{{ item.valor_unitario_estimado|custom_number_format }}</td>
+                                        <td class="col-valor">{{ item.valor_total|custom_number_format }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table> 
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Tramitações -->
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Tramitações</h3>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button class="btn btn-primary me-md-2" type="submit" id="btnNovaTramitacao" style="font-size: 12px; background-color: green; border-color: green;">
+                            <i class="fas fa-plus" style="font-size: 14px;"></i> 
+                            &nbsp;Nova Tramitação
+                        </button>
+                    </div>
+                
+                
+                    <div class="section-tabela" style="width: 100% !important; margin-left: 0px;">
+                        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabTramitacoes">
+                            <thead>
+                                <tr>
+                                    <th class="tramitacao-id">ID</th>
+                                    <th class="tramitacao-docsei">Documento SEI</th>
+                                    <th class="tramitacao-setor">Setor</th>
+                                    <th class="tramitacao-etapa">Etapa</th>
+                                    <th class="tramitacao-data">Entrada</th>
+                                    <th class="tramitacao-data">Previsão</th>
+                                    <th class="tramitacao-data">Saída</th>
+                                    <th class="tramitacao-data">Dias</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tab_tramitacoes %}
+                                <tr data-id="{{ item.id }}" data-proaq-id="{{ item.proaq.id }}">
+                                    <td class="tramitacao-id">{{ item.id }}</td>
+                                    <td class="tramitacao-docsei">{{ item.documento_sei }}</td>
+                                    <td class="tramitacao-setor">{{ item.setor }}</td>
+                                    <td class="tramitacao-etapa">{{ item.etapa_processo }}</td>
+                                    <td class="tramitacao-data">{{ item.data_entrada|date:"d/m/Y" }}{% if not item.data_entrada %}NI{% endif %}</td>
+                                    <td class="tramitacao-data">{{ item.previsao_saida|date:"d/m/Y" }}{% if not item.previsao_saida %}NI{% endif %}</td>
+                                    <td class="tramitacao-data">{{ item.data_saida|date:"d/m/Y" }}{% if not item.data_saida %}NI{% endif %}</td>
+                                    <td class="tramitacao-data">{{ item.duracao|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>  
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Observações Gerais -->
+            <div class="section">
+                <h3>Observações Gerais</h3>
+                <div class="grid" style="font-size: 14px;">
                     <div class="form-floating mb-3 full-width">
-                        <input type="text" class="form-control" id="produto" name="produto" readonly value="{{ nomes_produtos|join:', '|default_if_none:'' }}">
-                        <label for="floatingInput">Produtos</label>
-                    </div>
-                    <button type="button" class="btn open-proaq-produtos-modal" style="font-size: 30px !important; background-color: None; border-color:None;">
-                        <i class="fas fa-pills"></i>
-                    </button>       
+                        <textarea class="form-control auto-expand" id="observacoes_gerais" name="observacoes_gerais" rows="1" style="padding-top: 10px; height: 200px;">{{ form.instance.observacoes_gerais|default_if_none:'' }}</textarea>
+                    </div> 
                 </div>
             </div>
-        </div>
-        
-        <div class="section">
-            <h3>Observações Gerais</h3>
-            <div class="grid" style="font-size: 14px;">
-                <div class="form-floating mb-3 full-width">
-                    <textarea class="form-control auto-expand" id="observacoes_gerais" name="observacoes_gerais" rows="1" style="padding-top: 10px; height: 200px;">{{ form.instance.observacoes_gerais|default_if_none:'' }}</textarea>
-                </div> 
-            </div>
-        </div>
-    </form>
 
-    <script>
-        $(document).ready(function() {
-            var produtos = [];  // Para armazenar os produtos buscados
-            var denominacaoLabel = "Não Informado";  // Valor inicial
-            var produtosSelecionados = {{ produtos_selecionados|safe }};
+        </form>
+    </div>
 
-            console.log(produtosSelecionados)
-
-            // Quando uma denominação genérica é selecionada
-            $('#id_denominacao').change(function() {
-                denominacaoLabel = $("#id_denominacao option:selected").text();
-                if (denominacaoLabel) {
-                    var urlBase = '/proaq_produtos_por_denominacao/';
-                    var url = urlBase + denominacaoLabel + '/';
-                    $.ajax({
-                        url: url,
-                        success: function(data) {
-                            produtos = data;
-                            console.log(produtos);
-                        }
-                    });
-                }
-            });
-
-            // Quando o botão é clicado
-            $(".open-proaq-produtos-modal").on('click', function(event) {
-                
-                if (denominacaoLabel == "Não Informado") {
-                    alert("Por favor, selecione uma denominação genérica válida.");
-                    return;  // Não prossiga com a exibição do modal
-                }
-                
-                var modalBody = $('#proaqProdutosModal .modal-body');
-                modalBody.empty();  // Limpe o corpo do modal
-
-                // Carregue os produtos no modal
-                produtos.forEach(function(produto, index) {
-                    var content = "<div class='form-check'>";
-                    var isChecked = produtosSelecionados.some(function(p) { return p.produto_id === produto.id; }) ? "checked" : "";
-                    content += "<input type='checkbox' class='form-check-input' id='" + produto.id + "' name='" + produto.id + "' value='" + produto.id + "' " + isChecked + ">";
-                    content += "<label class='form-check-label' for='produto" + produto.id + "'>" + produto.produto + "</label>";
-                    content += "</div>";
-                    modalBody.append(content);
-                });
-                
-                $('#proaqProdutosModal').modal('show');  // Mostre o modal
-            });
-
-            $('#id_denominacao').change();
-        });
- 
-    </script>
-
-    <script type="text/javascript">
-        var initialUnidade = "{{ form.instance.unidade_daf }}";
-        var initialResponsavelTecnico = "{{ form.instance.responsavel_tecnico.id }}";
-    </script>
-
-    <script src="{% static 'js/processos_aquisitivos.js' %}"></script>
+    
+    <script src="{% static 'js/proaq_ficha.js' %}"></script>
 
     <!-- Modais -->
-    {% include "processos_aquisitivos/proaq_ficha_dados_gerais_delete.html" %}
-    {% include "processos_aquisitivos/proaq_ficha_produtos_modal.html" %}
+    {% include "processos_aquisitivos/proaq_ficha_editar_evolucao_modal.html" %}
+    {% include "processos_aquisitivos/proaq_ficha_item_modal.html" %}
 
 {% endblock %}

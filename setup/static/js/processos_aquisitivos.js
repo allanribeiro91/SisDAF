@@ -154,11 +154,7 @@ $(document).ready(function() {
         }
     }
 
-    // Mudar de página com delegação de eventos
-    $('#tabProcessosAquisitivos tbody').on('click', 'tr', function() {
-        const proaqId = $(this).attr('data-id').toString();
-        window.location.href = `/proaq/ficha/dadosgerais/${proaqId}/`;
-    });
+    
 
     // Chame as funções quando a página é carregada
     checkUnidadeDaf();

@@ -39,8 +39,10 @@ function formatoMoeda(valor) {
 }
 
 
-function formatoQuantidade(campo) {
-        
+function formatoQuantidade(campoId) {
+    
+    var campo = document.getElementById(campoId);
+
     campo.addEventListener('input', function (e) {
         // Impede caracteres não-numéricos de serem digitados
         var valor = this.value.replace(/[^0-9]/g, '');
@@ -61,4 +63,60 @@ function formatoQuantidade(campo) {
     });
 }
 
+function transformarValorEmFloat(valor) {
+    valor = valor.replace('R$', '').trim();
+    valor = valor.replace(/\./g, '').replace(',', '.');
+    return parseFloat(valor);
+}
+
+function numeroSeparadorMilhar(valor) {
+        
+    valor = valor.value.replace(/[^0-9]/g, '');
+
+    // Converte valor para número
+    var numero = parseInt(valor, 10);
+
+    // Se o valor for NaN, define como 0
+    if (isNaN(numero)) {
+        numero = 0;
+    }
+
+    // Adiciona pontos como separadores de milhar
+    var valorFormatado = numero.toLocaleString('pt-BR');
+
+    // Atualiza o valor do campo
+    return valorFormatado;
+}
+
+function formatoValorMonetario(campoId) {
+    var campo = document.getElementById(campoId);
+    
+    campo.addEventListener('input', function (e) {
+        // Impede caracteres não-numéricos de serem digitados
+        var valor = this.value.replace(/[^0-9]/g, '');
+
+        // Converte valor para número
+        var numero = parseInt(valor, 10);
+
+        // Se o valor for NaN, define como 0
+        if (isNaN(numero)) {
+            numero = 0;
+        }
+
+        // Formata o valor como um número com duas casas decimais
+        var valorFormatado = (numero / 100).toFixed(2);
+
+        // Substitui o ponto por uma vírgula
+        valorFormatado = valorFormatado.replace('.', ',');
+
+        // Adiciona pontos como separadores de milhar
+        valorFormatado = valorFormatado.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        // Adiciona o símbolo de real
+        valorFormatado = 'R$ ' + valorFormatado;
+
+        // Atualiza o valor do campo
+        this.value = valorFormatado;
+    });
+}
 

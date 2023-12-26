@@ -1,0 +1,82 @@
+<!-- Modal -->
+{% load static %}
+<style>
+
+    .custom-modal-width {
+        max-width: 40%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .modal-content.novo-proaq{
+        height: 30%;
+    }
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="proaqInserirModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width" role="document">
+        <div class="modal-content novo-proaq">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Novo Processo Aquisitivo</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Unidade DAF e Modalidade de Aquisição -->
+                <div class="grid" style="font-size: 14px; margin: 20px;">
+                    <!-- Unidade DAF -->
+                    <div class="form-floating">
+                        <select class="form-select" id="inserir_unidade_daf">
+                            <option value=""></option>
+                            {% for value, display in lista_unidadesdaf %}
+                            <option value="{{ value }}">{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="inserir_unidade_daf">Unidade DAF</label>
+                    </div>
+
+                    <!-- Modalidade de Aquisição -->
+                    <div class="form-floating">
+                        <select class="form-select" id="inserir_mod_aquisicao" disabled>
+                            {% for value, display in lista_modalidades %}
+                            <option value="{{ value }}">{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="inserir_mod_aquisicao">Modalidade de Aquisição</label>
+                    </div>
+
+                </div>
+                
+                <!-- Denominação Genérica -->
+                <div class="grid" style="font-size: 14px; margin: 20px;">
+                    <div class="form-floating full-width">
+                        <select class="form-select" id="inserir_denominacao_generica" disabled>
+                        </select>
+                        <label for="inserir_denominacao_generica">Denominação Genérica</label>
+                    </div>                         
+                </div>
+                    
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnInserirProaq" style="background-color: rgb(18, 134, 34); border-color: rgb(18, 134, 34);">Inserir Processo Aquisitivo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#contratoNovoModal').modal('hide');
+        });
+    });
+</script>
+
+<script src="{% static 'js/contrato_inserir.js' %}"></script>

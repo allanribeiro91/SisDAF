@@ -5,7 +5,7 @@ from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos,
                                    ContratosObjetos, ContratosParcelas, ContratosEntregas, ContratosFiscais,
-                                   Empenhos)
+                                   Empenhos, EmpenhosItens)
 from setup.choices import (STATUS_ARP, UNIDADE_DAF, UNIDADE_DAF3, TIPO_COTA, YES_NO, 
                            MODALIDADE_AQUISICAO, LEI_LICITACAO, LOCAL_ENTREGA_PRODUTOS,
                            NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS, STATUS_FISCAL_CONTRATO,
@@ -765,7 +765,6 @@ class EmpenhoForm(forms.ModelForm):
         required=False,
     )
 
-    
     #observacoes gerais
     observacoes_gerais = forms.CharField(
         widget=forms.Textarea(attrs={
@@ -780,6 +779,57 @@ class EmpenhoForm(forms.ModelForm):
 
     class Meta:
         model = Empenhos
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
+
+
+class EmpenhosItensForm(forms.ModelForm):
+    #valor empenhado
+    valor_empenhado = forms.FloatField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'empenhoItem_valor_empenhado',
+            'style': 'width: 180px !important;'
+        }),
+        label='Valor Empenhado',
+        required=False,
+    )
+    #observacoes gerais
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control auto-expand',
+            'rows': 1,
+            'style': 'padding-top: 30px; height: 80px;',
+            'id': 'empenhoItem_observacoes'
+            }),
+        required=False,
+        label='Observações Gerais'
+    )
+    #contratos parcelas
+    empenho = forms.ModelChoiceField(
+        queryset=Empenhos.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        label='Empenho',
+        initial='',
+        required=True,
+    )
+    parcela = forms.ModelChoiceField(
+        queryset=ContratosParcelas.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        label='Parcela',
+        initial='',
+        required=True,
+    )
+
+    class Meta:
+        model = EmpenhosItens
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
 
     def clean_observacoes_gerais(self):

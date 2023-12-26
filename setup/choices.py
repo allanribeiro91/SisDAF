@@ -182,8 +182,10 @@ TIPO_DIREITO = {
 }
 
 TIPO_COTA = [
+    ('', 'Não Informado'),
     ('principal', 'Principal'),
     ('reservada', 'Reservada'),
+    ('nao_se_aplica', 'Não Se Aplica'),
 ]
 
 FAQ_FORNECEDOR_TOPICO = [

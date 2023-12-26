@@ -73,9 +73,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 
-
-    
-
     //Componentes
     const unidadeDaf = document.getElementById('ct_unidade_daf')
     const unidadeDaf_display = document.getElementById('ct_unidade_daf_display') 
@@ -1306,7 +1303,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 $('#id_parcela_ultima_entrega').val(data.data_ultima_entrega);
                 $('#id_parcela_observacoes').val(data.observacoes);
 
-                $('#id_qtd_saldo_arp').val(data.saldo_arp);
+                $('#id_qtd_saldo_arp').val(data.saldo_arp.toLocaleString('pt-BR'));
                 $('#id_qtd_contratada_hidden').val(data.qtd_contratada);
                 
                 // Abrir o modal
@@ -1668,7 +1665,6 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('.closeModalButtonFichaFiscal').forEach(button => {
         button.addEventListener('click', function() {
             $('#contratoFiscalFichaModal').modal('hide');
-
             modal_fiscais.show()
         });
     });
@@ -1683,10 +1679,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 return false
             }
         
-        return true
-    }
-
-
+            return true
+        }
     }
     
 

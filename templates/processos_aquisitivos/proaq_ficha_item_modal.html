@@ -1,0 +1,189 @@
+<!-- Modal -->
+{% load static %}
+<style>
+    .tags-column{
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width-parcela {
+        min-width: 80%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal-parcela {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;  /* Alinha os itens ao topo */
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-content{
+        height: 50%;
+    }
+
+    .modal-body{
+        height: auto;
+    }
+
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="proaqItemModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-parcela" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Item do Processo Aquisitivo</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <form id="itemProaqForm">
+                    {% csrf_token %}
+                    
+                    <!-- Logs -->
+                    <div class="horizontal-sections-modal-parcela" >
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 10px;">
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="proaq_item_id" style="width: 100px;"  readonly>
+                                    <label for="parcela_id">ID</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="proaq_item_log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
+                                    <label for="parcela_log_data_registro">Data do Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="proaq_item_log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
+                                    <label for="parcela_log_responsavel_registro">Responsável pelo Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="proaq_item_log_ult_atualizacao" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                                    <label for="parcela_log_ult_atualizacao">Última Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="proaq_item_log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
+                                    <label for="parcela_log_responsavel_atualizacao">Responsável Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_edicoes" id="proaq_item_log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
+                                    <label for="parcela_log_edicoes">Nº Edições</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Dados do Item -->
+                    <div class="horizontal-sections-modal-parcela">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3" style="width: 100px !important;">
+                                    {{ form_item_proaq.numero_item }}
+                                    <label>{{ form_item_proaq.numero_item.label }}</label>
+                                </div>
+                                
+                                <div class="form-floating mb-3" style="width: 200px !important;">
+                                    {{ form_item_proaq.tipo_cota }}
+                                    <label>{{ form_item_proaq.tipo_cota.label }}</label>
+                                </div>
+                                <div class="form-floating mb-3 full-width">
+                                    <select class="form-select" id="id_item_produto">
+                                        {% for id, produto in lista_produtos %}
+                                            <option value="{{ id }}">{{ produto }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="id_item_produto">Produto Farmacêutico</label>
+                                </div>                                
+                                <div class="form-floating mb-3" style="width: 120px;">
+                                    <input type="text" id="id_produto_id" name="produto" class="form-control" readonly>
+                                    <label>ID Produto</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Valores -->
+                    <div class="horizontal-sections-modal-parcela">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3" style="width: 150px">
+                                    {{ form_item_proaq.cmm_data_inicio }}
+                                    <label>{{ form_item_proaq.cmm_data_inicio.label }}</label>
+                                </div>
+                                <div class="form-floating mb-3" style="width: 150px">
+                                    {{ form_item_proaq.cmm_data_fim }}
+                                    <label>{{ form_item_proaq.cmm_data_fim.label }}</label>
+                                </div>
+                                <div class="form-floating mb-3" style="width: 180px">
+                                    {{ form_item_proaq.cmm_estimado }}
+                                    <label>{{ form_item_proaq.cmm_estimado.label }}</label>
+                                </div>
+                                <div class="form-floating mb-3" style="width: 180px">
+                                    {{ form_item_proaq.qtd_a_ser_contratada }}
+                                    <label>{{ form_item_proaq.qtd_a_ser_contratada.label }}</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" id="id_proaqitem_cobertura_dias" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                    <label>Cobertura - Dias</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" id="id_proaqitem_cobertura_meses" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                    <label>Cobertura - Meses</label>
+                                </div>
+                                <div class="form-floating mb-3" style="width: 250px; text-align: right !important;">
+                                    {{ form_item_proaq.valor_unitario_estimado }}
+                                    <label>{{ form_item_proaq.valor_unitario_estimado.label }}</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" id="id_proaqitem_valor_total" class="form-control" style="width: 250px; text-align: right;" readonly>
+                                    <label>Valor Total R$ Estimado</label>
+                                </div>
+                
+                            </div>
+
+                            <!-- Observações Gerais -->
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3 full-width">
+                                    {{ form_item_proaq.observacoes_gerais }}
+                                    <label>{{ form_item_proaq.observacoes_gerais.label }}</label>
+                                </div>
+                            </div>
+
+
+
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3">
+                                    <input type="hidden" id="id_proaq_item_hidden" name="id_proaq_item_hidden" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnDeletarItemProaq" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarItemProaq" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#proaqItemModal').modal('hide');
+        });
+    });
+</script>
+
+<script src="{% static 'js/proaq_item.js' %}"></script>

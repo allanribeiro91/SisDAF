@@ -199,6 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     const botao_selecionar_contrato_empenho = document.getElementById('inserirNovoItem')
+    const modal_empenho_item = new bootstrap.Modal(document.getElementById('empenhoItemModal'))
     botao_selecionar_contrato_empenho.addEventListener('click', function(){
 
         if (empenho_selecionar_parcela.value == ''){
@@ -211,8 +212,78 @@ document.addEventListener('DOMContentLoaded', function() {
             return
         }
         else{
-            alert('Deu certo!')
+            modal_empenho_contrato_selecionar.hide()
+            modal_empenho_item.show()
         }
     })
+
+
+    
+    //regras de qtd e valor do empenho
+    const fator_embalagem = document.getElementById('itemEmpenho_fatorEmbalagem')
+    const valor_unitario = document.getElementById('itemEmpenho_valorUnitario')
+    const qtd_a_empenhar = document.getElementById('itemEmpenho_qtdEmpenhar')
+    const qtd_empenho = document.getElementById('itemEmpenho_qtdEmpenho')
+    const embalagens_empenho = document.getElementById('itemEmpenho_embalagens')
+    const valor_empenho = document.getElementById('itemEmpenho_valorEmpenho')
+    
+    qtd_empenho.addEventListener('input', function(){
+        formatoQuantidade(qtd_empenho)
+    })
+
+    valor_empenho.addEventListener('input', function(){
+        formatoValorMonetario('itemEmpenho_valorEmpenho'); 
+    })
+
+    qtd_empenho.addEventListener('change', function(){
+        qtd_empenho_inserida()
+    })
+
+    valor_empenho.addEventListener('change', function(){
+        valor_empenho_inserida()
+    })
+
+    function qtd_empenho_inserida() {
+        var v_fator_embalagem = transformarValorEmFloat(fator_embalagem.value);
+        var v_valor_unitario = transformarValorEmFloat(valor_unitario.value);
+        var v_qtd_a_empenhar = transformarValorEmFloat(qtd_a_empenhar.value);
+        var v_qtd_empenho = transformarValorEmFloat(qtd_empenho.value);
+        var v_embalagens_empenho = transformarValorEmFloat(embalagens_empenho.value);
+        var v_valor_empenho = transformarValorEmFloat(valor_empenho.value);
+        
+        // Arredondar o valor para o menor valor mais próximo múltiplo do fator embalagem
+        v_qtd_empenho = v_qtd_empenho / v_fator_embalagem;
+        v_embalagens_empenho = Math.floor(v_qtd_empenho);
+        v_qtd_empenho = v_embalagens_empenho * v_fator_embalagem;
+        v_valor_empenho = v_qtd_empenho * v_valor_unitario
+        
+    
+        // Formatação com separadores de milhar
+        embalagens_empenho.value = v_embalagens_empenho.toLocaleString('pt-BR');
+        qtd_empenho.value = v_qtd_empenho.toLocaleString('pt-BR');
+        valor_empenho.value = formatarComoMoeda(v_valor_empenho)
+    }
+
+
+    function valor_empenho_inserida() {        
+        var v_fator_embalagem = transformarValorEmFloat(fator_embalagem.value);
+        var v_valor_unitario = transformarValorEmFloat(valor_unitario.value);
+        var v_qtd_a_empenhar = transformarValorEmFloat(qtd_a_empenhar.value);
+        var v_qtd_empenho = transformarValorEmFloat(qtd_empenho.value);
+        var v_embalagens_empenho = transformarValorEmFloat(embalagens_empenho.value);
+        var v_valor_empenho = transformarValorEmFloat(valor_empenho.value);
+        
+        // Arredondar o valor para o menor valor mais próximo múltiplo do fator embalagem        
+        v_qtd_empenho = v_valor_empenho / v_valor_unitario     
+        v_embalagens_empenho = Math.floor(v_qtd_empenho / v_fator_embalagem);
+        v_qtd_empenho = v_embalagens_empenho * v_fator_embalagem;
+        v_valor_empenho = v_qtd_empenho * v_valor_unitario
+    
+        // Formatação com separadores de milhar
+        embalagens_empenho.value = v_embalagens_empenho.toLocaleString('pt-BR');
+        qtd_empenho.value = v_qtd_empenho.toLocaleString('pt-BR');
+        valor_empenho.value = formatarComoMoeda(v_valor_empenho)
+    }
+    
 
 });
