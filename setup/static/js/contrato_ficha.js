@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function() {
     //Formatação dos dados
     $('#ct_processo_sei').mask('00000.000000/0000-00');
     $('#ct_documento_sei').mask('000000');
-    formatoQuantidade(entrega_qtd_entregue)
+    //formatoQuantidade(entrega_qtd_entregue)
 
     //Dados da ARP
     arp_display.addEventListener('click', function() {
@@ -630,7 +630,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
             
     }
-
 
     //Deletar Entrega
     const botao_deletar_entrega = document.getElementById('btnDeletarEntrega')
@@ -1398,7 +1397,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     })
 
-
     fiscal_data_fim.setAttribute('disabled', 'disabled')
 
     fiscal_status.addEventListener('change', function(){
@@ -1438,14 +1436,11 @@ document.addEventListener("DOMContentLoaded", function() {
         id_fiscal_usuario_hidden.value = fiscal.value
     })
 
-
     const botao_salvar_fiscal = document.getElementById('botaoSalvarFiscal')
     botao_salvar_fiscal.addEventListener('click', function(e){
         e.preventDefault();
         salvarFiscal();
     })
-
-    
 
     function salvarFiscal(){
         const fiscal_id = document.getElementById('fiscal_id').value

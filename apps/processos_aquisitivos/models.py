@@ -1,8 +1,9 @@
 from django.db import models
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
-from setup.choices import STATUS_PROAQ, UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_FASE, TIPO_COTA
+from setup.choices import STATUS_PROAQ, UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_FASE, TIPO_COTA, FASES_EVOLUCAO_PROAQ
 from django.utils import timezone
+from datetime import date
 
 
 class ProaqDadosGerais(models.Model):
@@ -148,7 +149,58 @@ class ProaqItens(models.Model):
         return dias
 
     def valor_total(self):
-        return 0
+        total = self.valor_unitario_estimado * self.qtd_a_ser_contratada
+        return total
+
+class ProaqEvolucao(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='proaq_evolucao_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='proaq_evolucao_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #item do processo aquisitivo
+    fase_numero = models.IntegerField(null=False, blank=False)
+    fase = models.CharField(max_length=20, choices=FASES_EVOLUCAO_PROAQ, null=False, blank=False)
+    data_entrada = models.DateField(null=False, blank=False, default=timezone.now)
+    data_saida = models.DateField(null=True, blank=True, default=timezone.now)
+
+    #proaq
+    proaq = models.ForeignKey(ProaqDadosGerais, on_delete=models.DO_NOTHING, related_name='proaq_evolucao')
+
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True)
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='proaq_evolucao_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(ProaqEvolucao, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+    
+    def total_dias(self):
+        data_saida = self.data_saida if self.data_saida is not None else date.today()
+        dias = data_saida - self.data_entrada
+        return dias.days
 
 class ProaqProdutosManager(models.Manager):
     def active(self):
@@ -199,56 +251,7 @@ class ProaqProdutos(models.Model):
         return f"Produto/Proaq: {self.produto} - Proaq ({self.proaq})"
     
     objects = ProaqProdutosManager()
-
-class ProaqEvolucao(models.Model):
-    #relacionamento usuario
-    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_registro_proaqevolucao')
-    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_atualizacao_proaqevolucao')
-
-    # Relacionamento com ProaqDadosGerais
-    proaq = models.ForeignKey(ProaqDadosGerais, on_delete=models.DO_NOTHING, related_name='proaq_evolucao')
-
-    #log
-    registro_data = models.DateTimeField(auto_now_add=True)
-    ult_atual_data = models.DateTimeField(auto_now=True)
-    log_n_edicoes = models.IntegerField(default=1)
-
-    #fase
-    fase = models.IntegerField(null=False, blank=False)
-    status = models.TextField(null=False, blank=False, choices=STATUS_FASE, max_length=15)
-    data_inicio = models.DateField(null=True, blank=True)
-    data_fim = models.DateField(null=True, blank=True)
-    comentario = models.TextField(null=False, blank=False, default='Sem comentário.')
-
-    #delete (del)
-    del_status = models.BooleanField(default=False)
-    del_data = models.DateTimeField(null=True, blank=True)
-    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='usuario_proaqevolucao_deletado')
-
-
-    def soft_delete(self, usuario_instance):
-        """
-        Realiza uma "deleção lógica" do registro.
-        """
-        if self.del_status:
-            return  # Se já estiver deletado, simplesmente retorne e não faça nada
-        self.del_status = True
-        self.del_data = timezone.now()
-        self.del_usuario = usuario_instance
-        self.save()
-    
-    def reverse_soft_delete(self):
-        """
-        Reverte a "deleção lógica" do registro.
-        """
-        self.del_status = False
-        self.del_data = None
-        self.del_usuario = None
-        self.save()
-
-    def __str__(self):
-        return f"Proaq ({self.proaq}) - Fase ({self.fase})"
-    
+ 
 class PROAQ_AREA_MS(models.Model):
     setor = models.CharField(max_length=40, null=False, blank=False)
     orgao_publico = models.BooleanField(null=False, blank=False)

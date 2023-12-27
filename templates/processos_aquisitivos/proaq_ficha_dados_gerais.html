@@ -83,100 +83,126 @@
             <div class="horizontal-sections"> 
                 <div class="section-evolucao">
                     <h3>Evolução Processual</h3>
+                    
+                    <!-- Fases do Processo Aquisitivo -->
                     <div class="fases-container">
-                        <div class="evolucao-fase">
-                            <div class="evolucao-simbolo">
-                                <i class="fas fa-check-circle">
-                                    <div class="evolucao-titulo">Docs Iniciais</div>
-                                </i>
+
+                        <!-- Docs Iniciais -->
+                        <div class="evolucao-fase" data-value={{ proaq_fases.0.4 }} 
+                            style="background-color: {% if proaq_fases.0.1 and proaq_fases.0.2 %}#008d9f{% elif proaq_fases.0.1 %}#86d0c6{% else %}#898989{% endif %}">
+                            <div class="evolucao-simbolo" 
+                                style="color: {% if proaq_fases.0.1 and proaq_fases.0.2 %}white{% elif proaq_fases.0.1 %}#004253{% else %}black{% endif %}">
+                                    <i class="{% if proaq_fases.0.1 and proaq_fases.0.2 %}fas fa-check-circle{% elif proaq_fases.0.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                        <div class="evolucao-titulo">Docs Iniciais</div>
+                                    </i>
                             </div>
-                            <div class="evolucao-dados">
-                                Entrada: 22/12/2023<br>
-                                Saída: -<br>
-                                Dias: 1
+                            <div class="evolucao-dados" 
+                                style="color: {% if proaq_fases.0.1 and proaq_fases.0.2 %}white{% elif proaq_fases.0.1 %}#004253{% else %}black{% endif %}">
+                                Entrada: {% if proaq_fases.0.1 %}{{ proaq_fases.0.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Saída: {% if proaq_fases.0.2 %}{{ proaq_fases.0.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Dias: {% if proaq_fases.0.3 %}{{ proaq_fases.0.3 }}{% else %}-{% endif %}
                             </div>
                         </div>
 
-                        <div class="evolucao-fase" style="background-color: #86d0c6">
-                            <div class="evolucao-simbolo" style="color: #004253">
-                                <i class="fas fa-exclamation-circle">
-                                    <div class="evolucao-titulo">Pré-Contratual</div>
-                                </i>
+                        <!-- Pré-Contratual -->
+                        <div class="evolucao-fase" data-value={{ proaq_fases.1.4 }} 
+                            style="background-color: {% if proaq_fases.1.1 and proaq_fases.1.2 %}#008d9f{% elif proaq_fases.1.1 %}#86d0c6{% else %}#898989{% endif %}">
+                            <div class="evolucao-simbolo" 
+                                style="color: {% if proaq_fases.1.1 and proaq_fases.1.2 %}white{% elif proaq_fases.1.1 %}#004253{% else %}black{% endif %}">
+                                    <i class="{% if proaq_fases.1.1 and proaq_fases.1.2 %}fas fa-check-circle{% elif proaq_fases.1.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                        <div class="evolucao-titulo">Pré-Contratual</div>
+                                    </i>
                             </div>
-                            <div class="evolucao-dados" style="color: black">
-                                Entrada: -<br>
-                                Saída: -<br>
-                                Dias: -
-                            </div>
-                        </div>
-
-                        <div class="evolucao-fase" style="background-color: #898989">
-                            <div class="evolucao-simbolo" style="color: black">
-                                <i class="fas fa-times-circle">
-                                    <div class="evolucao-titulo">Contratação</div>
-                                </i>
-                            </div>
-                            <div class="evolucao-dados" style="color: black">
-                                Entrada: -<br>
-                                Saída: -<br>
-                                Dias: -
+                            <div class="evolucao-dados" 
+                                style="color: {% if proaq_fases.1.1 and proaq_fases.1.2 %}white{% elif proaq_fases.1.1 %}#004253{% else %}black{% endif %}">
+                                Entrada: {% if proaq_fases.1.1 %}{{ proaq_fases.1.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Saída: {% if proaq_fases.1.2 %}{{ proaq_fases.1.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Dias: {% if proaq_fases.1.3 %}{{ proaq_fases.1.3 }}{% else %}-{% endif %}
                             </div>
                         </div>
 
-                        <div class="evolucao-fase" style="background-color: #898989">
-                            <div class="evolucao-simbolo" style="color: black">
-                                <i class="fas fa-times-circle">
-                                    <div class="evolucao-titulo">Execução do Contrato</div>
-                                </i>
+                        <!-- Contratação -->
+                        <div class="evolucao-fase" data-value={{ proaq_fases.2.4 }} 
+                            style="background-color: {% if proaq_fases.2.1 and proaq_fases.2.2 %}#008d9f{% elif proaq_fases.2.1 %}#86d0c6{% else %}#898989{% endif %}">
+                            <div class="evolucao-simbolo" 
+                                style="color: {% if proaq_fases.2.1 and proaq_fases.2.2 %}white{% elif proaq_fases.2.1 %}#004253{% else %}black{% endif %}">
+                                    <i class="{% if proaq_fases.2.1 and proaq_fases.2.2 %}fas fa-check-circle{% elif proaq_fases.2.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                        <div class="evolucao-titulo">Contratação</div>
+                                    </i>
                             </div>
-                            <div class="evolucao-dados" style="color: black">
-                                Entrada: -<br>
-                                Saída: -<br>
-                                Dias: -
-                            </div>
-                        </div>
-
-                        <div class="evolucao-fase" style="background-color: #898989">
-                            <div class="evolucao-simbolo" style="color: black">
-                                <i class="fas fa-times-circle">
-                                    <div class="evolucao-titulo">Aditivo de Contrato</div>
-                                </i>
-                            </div>
-                            <div class="evolucao-dados" style="color: black">
-                                Entrada: -<br>
-                                Saída: -<br>
-                                Dias: -
+                            <div class="evolucao-dados" 
+                                style="color: {% if proaq_fases.2.1 and proaq_fases.2.2 %}white{% elif proaq_fases.2.1 %}#004253{% else %}black{% endif %}">
+                                Entrada: {% if proaq_fases.2.1 %}{{ proaq_fases.2.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Saída: {% if proaq_fases.2.2 %}{{ proaq_fases.2.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Dias: {% if proaq_fases.2.3 %}{{ proaq_fases.2.3 }}{% else %}-{% endif %}
                             </div>
                         </div>
 
-                        <div class="evolucao-fase" style="background-color: #898989">
-                            <div class="evolucao-simbolo" style="color: black">
-                                <i class="fas fa-times-circle">
-                                    <div class="evolucao-titulo">Prestação de Contas</div>
-                                </i>
+                        <!-- Execução do Contrato -->
+                        <div class="evolucao-fase" data-value={{ proaq_fases.3.4 }} 
+                            style="background-color: {% if proaq_fases.3.1 and proaq_fases.3.2 %}#008d9f{% elif proaq_fases.3.1 %}#86d0c6{% else %}#898989{% endif %}">
+                            <div class="evolucao-simbolo" 
+                                style="color: {% if proaq_fases.3.1 and proaq_fases.3.2 %}white{% elif proaq_fases.3.1 %}#004253{% else %}black{% endif %}">
+                                    <i class="{% if proaq_fases.3.1 and proaq_fases.3.2 %}fas fa-check-circle{% elif proaq_fases.3.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                        <div class="evolucao-titulo">Execução do Contrato</div>
+                                    </i>
                             </div>
-                            <div class="evolucao-dados" style="color: black">
-                                Entrada: -<br>
-                                Saída: -<br>
-                                Dias: -
+                            <div class="evolucao-dados" 
+                                style="color: {% if proaq_fases.3.1 and proaq_fases.3.2 %}white{% elif proaq_fases.3.1 %}#004253{% else %}black{% endif %}">
+                                Entrada: {% if proaq_fases.3.1 %}{{ proaq_fases.3.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Saída: {% if proaq_fases.3.2 %}{{ proaq_fases.3.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Dias: {% if proaq_fases.3.3 %}{{ proaq_fases.3.3 }}{% else %}-{% endif %}
                             </div>
                         </div>
 
-                        <div class="evolucao-fase" style="background-color: #898989">
-                            <div class="evolucao-simbolo" style="color: black">
-                                <i class="fas fa-times-circle">
-                                    <div class="evolucao-titulo">Encerrado</div>
-                                </i>
+                        <!-- Prestação de Contas -->
+                        <div class="evolucao-fase" data-value={{ proaq_fases.4.4 }} 
+                            style="background-color: {% if proaq_fases.4.1 and proaq_fases.4.2 %}#008d9f{% elif proaq_fases.4.1 %}#86d0c6{% else %}#898989{% endif %}">
+                            <div class="evolucao-simbolo" 
+                                style="color: {% if proaq_fases.4.1 and proaq_fases.4.2 %}white{% elif proaq_fases.4.1 %}#004253{% else %}black{% endif %}">
+                                    <i class="{% if proaq_fases.4.1 and proaq_fases.4.2 %}fas fa-check-circle{% elif proaq_fases.4.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                        <div class="evolucao-titulo">Prestação de Contas</div>
+                                    </i>
                             </div>
-                            <div class="evolucao-dados" style="color: black">
-                                Entrada: -<br>
-                                Saída: -<br>
-                                Dias: -
+                            <div class="evolucao-dados" 
+                                style="color: {% if proaq_fases.4.1 and proaq_fases.4.2 %}white{% elif proaq_fases.41 %}#004253{% else %}black{% endif %}">
+                                Entrada: {% if proaq_fases.4.1 %}{{ proaq_fases.4.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Saída: {% if proaq_fases.4.2 %}{{ proaq_fases.4.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Dias: {% if proaq_fases.4.3 %}{{ proaq_fases.4.3 }}{% else %}-{% endif %}
                             </div>
                         </div>
+
+                        <!-- Encerrado -->
+                        <div class="evolucao-fase" data-value={{ proaq_fases.5.4 }} 
+                            style="background-color: {% if proaq_fases.5.1 and proaq_fases.5.2 %}#008d9f{% elif proaq_fases.5.1 %}#86d0c6{% else %}#898989{% endif %}">
+                            <div class="evolucao-simbolo" 
+                                style="color: {% if proaq_fases.5.1 and proaq_fases.5.2 %}white{% elif proaq_fases.5.1 %}#004253{% else %}black{% endif %}">
+                                    <i class="{% if proaq_fases.5.1 and proaq_fases.5.2 %}fas fa-check-circle{% elif proaq_fases.5.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                        <div class="evolucao-titulo">Encerrado</div>
+                                    </i>
+                            </div>
+                            <div class="evolucao-dados" 
+                                style="color: {% if proaq_fases.5.1 and proaq_fases.5.2 %}white{% elif proaq_fases.5.1 %}#004253{% else %}black{% endif %}">
+                                Entrada: {% if proaq_fases.5.1 %}{{ proaq_fases.5.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Saída: {% if proaq_fases.5.2 %}{{ proaq_fases.5.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                                Dias: {% if proaq_fases.5.3 %}{{ proaq_fases.5.3 }}{% else %}-{% endif %}
+                            </div>
+                        </div>
+
+
+
+
+                        
                     </div>
+                    
+                    <!-- Editar -->
                     <div class="evolucao-editar">
-                        <div class="botao-editar" id="botaoEditar" data-bs-toggle="modal" data-bs-target="#proaqEvolucaoEditar">
+                        <div class="botao-editar" id="botao_modal_evolucao_proaq_info">
+                            <i class="fas fa-info-circle"></i>
+                            Info
+                        </div>
+
+                        <div class="botao-editar" id="botao_modal_evolucao_proaq" style="margin-left: 10px;">
                             <i class="fas fa-edit"></i>
                             Editar
                         </div>
@@ -252,7 +278,7 @@
                                         <th class="col-data">CMM - Início</th>
                                         <th class="col-data">CMM - Fim</th>
                                         <th class="col-valor">CMM de Referência</th>
-                                        <th class="col-valor">Qtd a ser Contratada</th>
+                                        <th class="col-valor">Qtd a ser Adquirida</th>
                                         <th class="col-valor">Cobertura - Dias</th>
                                         <th class="col-valor">Cobertura - Meses</th>
                                         <th class="col-valor">Valor Unitário R$</th>
@@ -345,7 +371,10 @@
     <script src="{% static 'js/proaq_ficha.js' %}"></script>
 
     <!-- Modais -->
-    {% include "processos_aquisitivos/proaq_ficha_editar_evolucao_modal.html" %}
+    {% include "processos_aquisitivos/proaq_ficha_evolucao_ficha_modal.html" %} 
+    {% include "processos_aquisitivos/proaq_ficha_evolucao_modal.html" %}
+    {% include "processos_aquisitivos/proaq_ficha_evolucao_info_modal.html" %}
     {% include "processos_aquisitivos/proaq_ficha_item_modal.html" %}
+    
 
 {% endblock %}

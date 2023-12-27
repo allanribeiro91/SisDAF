@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.processos_aquisitivos.models import ProaqDadosGerais, ProaqItens, ProaqEvolucao, ProaqTramitacao
-from setup.choices import STATUS_PROAQ, UNIDADE_DAF2, STATUS_FASE, TIPO_COTA
+from setup.choices import STATUS_PROAQ, UNIDADE_DAF2, STATUS_FASE, TIPO_COTA, FASES_EVOLUCAO_PROAQ
 
 class DenominacaoModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
@@ -209,67 +209,74 @@ class ProaqItensForm(forms.ModelForm):
         observacoes = self.cleaned_data.get('observacoes_gerais')
         return observacoes or "Sem observações."
 
-class ProaqEvolucaoForm(forms.ModelForm):
-    proaq = forms.ModelChoiceField(
-        queryset=ProaqDadosGerais.objects.all(), 
-        required=True, 
-        widget=forms.Select(attrs={'class':'form-control'}),
-        label='Proaq'
+
+class ProaqEvolucaoForm(forms.ModelForm):    
+    fase_numero = forms.IntegerField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_evolucaoproaq_fase_numero',
+            'readonly': 'readonly',
+        }),
+        label='Nº da Fase',
+        initial='',
+        required=True,
     )
-    fase = forms.IntegerField(
-        required=True, 
-        widget=forms.NumberInput(attrs={'class':'form-control'}),
-        label='Fase'
+    fase = forms.ChoiceField(
+        choices=FASES_EVOLUCAO_PROAQ, 
+        required=True,
+        widget=forms.Select(attrs={
+            'class':'form-select',
+            'disabled': 'disabled',
+        }),
+        label='Fase do Processo Aquisitivo',
+        initial=''
     )
-    status = forms.ChoiceField(
-        choices=STATUS_FASE, 
-        required=True, 
-        widget=forms.Select(attrs={'class':'form-control'}),
-        label='Status'
+    data_entrada = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+            'id': 'id_evolucaoproaq_data_entrada',
+        }),
+        required=True,
+        label='Data da Entrada'
     )
-    data_inicio = forms.DateField(
-        required=False, 
-        widget=forms.DateInput(attrs={'class':'form-control', 'type':'date'}),
-        label='Data de Início'
-    )
-    data_fim = forms.DateField(
-        required=False, 
-        widget=forms.DateInput(attrs={'class':'form-control', 'type':'date'}),
-        label='Data Fim'
-    )
-    comentario = forms.CharField(
-        required=False, 
-        widget=forms.Textarea(attrs={'class':'form-control'}),
-        label='Comentário'
+    data_saida = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+            'id': 'id_evolucaoproaq_data_saida',
+        }),
+        required=False,
+        label='Data da Saída'
     )
     
+    #relacionamentos
+    proaq = forms.ModelChoiceField(
+        queryset=ProaqDadosGerais.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        label='Processo Aquisitivo',
+        initial='',
+        required=True,
+    )
+    #observações gerais
+    observacoes_gerais = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class':'form-control',
+            'rows': 1,
+            'style': 'padding-top: 30px; height: 80px;',
+            'id': 'id_evolucaoproaq_observacoes'
+        }),
+        label='Observações Gerais'
+    )
     class Meta:
         model = ProaqEvolucao
-        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario',]
-        labels = {
-            'proaq': 'proaq',
-            'fase': 'Fase',
-            'status': 'Status',
-            'data_inicio': 'Data de Início',
-            'data_fim': 'Data Fim',
-            'comentario': 'Comentário',
-        }
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        data_inicio = cleaned_data.get("data_inicio")
-        data_fim = cleaned_data.get("data_fim")
-        comentario = cleaned_data.get("comentario")
-        
-        #Validação de data
-        if data_inicio and data_fim and data_inicio > data_fim:
-            raise ValidationError("A data de início não pode ser posterior à data de fim.")
-        
-        # Ajuste para o campo comentario
-        if comentario in [None, '']:
-            cleaned_data['comentario'] = "Sem comentários."
-        
-        return cleaned_data
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."
 
 
 class ProaqTramitacaoForm(forms.ModelForm):

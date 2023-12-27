@@ -1,0 +1,183 @@
+<!-- Modal -->
+{% load static %}
+{% load humanize %}
+{% load contratos_filters %}
+<style>
+    .tags-column{
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width-evolucao-info {
+        min-width: 70%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal-parcela {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;  /* Alinha os itens ao topo */
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-content.info{
+        height: 90%;
+    }
+
+    .modal-body{
+        height: auto;
+    }
+
+    .col-evolucao-numero {
+        width: 5% !important;
+        text-align: left !important;
+    }
+    .col-evolucao-fase {
+        width: 30% !important;
+        text-align: left !important;
+    }
+    .col-evolucao-data {
+        width: 10% !important;
+        text-align: right !important;
+    }
+
+    .card-evolucao-info{
+        width: 100%;
+        font-size: 16px;
+        background-color: #f5f5f5dd;
+        border-radius: 5px;
+        justify-content: center;
+        text-align: justify;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .info-titulo{
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .info-fase{
+        background-color: #031025;
+        border-radius: 5px;
+        padding: 2px;
+        padding-left: 10px;
+        padding-right: 10px;
+        color: white;
+    }
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="proaqEvolucaoInfoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-evolucao-info" role="document">
+        <div class="modal-content info">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Sobre as Fases do Processo Aquisitivo</h5>
+                <button type="button" class="close closeModalButtonEvolucaoInfo" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Fase 1 -->
+                <div class="card-evolucao-info">
+                    <div class="info-titulo">
+                        <span class="info-fase">FASE 1</span>
+                        Prepração dos Documentos Iniciais
+                    </div>
+                    <div class="info-texto">
+                        Elaboração dos documentos iniciais do processo.<br>
+                        Nesta fase, são realizados os primeiros passos para iniciar o processo de aquisição de 
+                        produtos farmacêuticos. São elaborados os documentos iniciais, como requerimentos, solicitações e 
+                        levantamento de informações preliminares.
+                    </div>
+                </div>
+
+                <!-- Fase 2 -->
+                <div class="card-evolucao-info">
+                    <div class="info-titulo">
+                        <span class="info-fase">FASE 2</span>
+                        Tramitação Pré-Contratual
+                    </div>
+                    <div class="info-texto">
+                        Processo em andamento até a contratação.<br>
+                        Durante esta etapa, são realizadas as tramitações necessárias para avançar no processo de aquisição 
+                        até a definição do fornecedor. Isso as etapas de tramitação do DLOG até a definição da empresa 
+                        que irá fornecer os produtos farmacêuticos.
+                    </div>
+                </div>
+
+                <!-- Fase 3 -->
+                <div class="card-evolucao-info">
+                    <div class="info-titulo">
+                        <span class="info-fase">FASE 3</span>
+                        Fase de Contratação
+                    </div>
+                    <div class="info-texto">
+                        Formalização do contrato com o fornecedor.<br>
+                        Etapa que compreende todas as atividades relacionadas à formalização do contrato com o fornecedor. 
+                        Nessa etapa há muita troca de documentos entre o Ministério e o fornecedor. 
+                        Esta etapa compreende até a assinatura do contrato.
+                    </div>
+                </div>
+                
+                <!-- Fase 4 -->
+                <div class="card-evolucao-info">
+                    <div class="info-titulo">
+                        <span class="info-fase">FASE 4</span>
+                        Execução do Contratação
+                    </div>
+                    <div class="info-texto">
+                        Entrega dos produtos farmacêuticos e pagamentos.<br>
+                        Nessa fase, o contrato de aquisição é executado.
+                        Os produtos farmacêuticos são entregues conforme as condições estabelecidas, 
+                        e os pagamentos são realizados de acordo com os termos acordados no contrato.
+                    </div>
+                </div>
+
+                <!-- Fase 5 -->
+                <div class="card-evolucao-info">
+                    <div class="info-titulo">
+                        <span class="info-fase">FASE 5</span>
+                        Prestação de Contas
+                    </div>
+                    <div class="info-texto">
+                        Documentação final, restos a pagar e encerramento do contrato.<br>
+                        Durante essa etapa, são reunidos todos os documentos finais relacionados à aquisição. 
+                        Isso inclui a verificação de eventuais restos a pagar, a finalização de relatórios e registros 
+                        e a conclusão de todas as obrigações contratuais.
+                    </div>
+                </div>
+
+                <!-- Fase 6 -->
+                <div class="card-evolucao-info">
+                    <div class="info-titulo">
+                        <span class="info-fase">FASE 6</span>
+                        Processo Encerrado
+                    </div>
+                    <div class="info-texto">
+                        Todos os documentos entregues e o processo está finalizado.<br>
+                        Na fase final, o contrato e o processo de aquisição dos produtos farmacêuticos estão concluídos. 
+                        Todas as etapas foram finalizadas, os documentos foram arquivados corretamente e todas as obrigações 
+                        contratuais foram cumpridas.
+                    </div>
+                </div>
+
+            </div>  
+                
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButtonEvolucaoInfo').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#proaqEvolucaoInfoModal').modal('hide');
+        });
+    });
+</script>

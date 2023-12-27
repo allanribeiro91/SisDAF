@@ -1,0 +1,150 @@
+<!-- Modal -->
+{% load static %}
+<style>
+    .tags-column{
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width-fiscal-ficha {
+        min-width: 60%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal-parcela {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;  /* Alinha os itens ao topo */
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-content{
+        height: 40%;
+    }
+
+    .modal-body{
+        height: auto;
+    }
+
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="proaqEvolucaoFicha" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-fiscal-ficha" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Evolução do Processo Aquisitivo</h5>
+                <button type="button" class="close closeModalButtonFichaEvolucaoProaq" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <form id="evolucaoProaqForm">
+                    {% csrf_token %}
+                    
+                    <!-- Logs -->
+                    <div class="horizontal-sections-modal-parcela" >
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 10px;">
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="proaq_evolucao_id" style="width: 100px;"  readonly>
+                                    <label for="proaq_evolucao_id">ID</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="proaq_evolucao_log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
+                                    <label for="proaq_evolucao_log_data_registro">Data do Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="proaq_evolucao_log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
+                                    <label for="proaq_evolucao_log_responsavel_registro">Responsável pelo Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="proaq_evolucao_log_ult_atualizacao" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                                    <label for="proaq_evolucao_log_ult_atualizacao">Última Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="proaq_evolucao_log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
+                                    <label for="proaq_evolucao_log_responsavel_atualizacao">Responsável Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_edicoes" id="proaq_evolucao_log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
+                                    <label for="proaq_evolucao_log_edicoes">Nº Edições</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Fase Evolução -->
+                    <div class="horizontal-sections-modal-parcela">
+                        <div class="section" style="border: 0px !important;">
+                            <div class="grid" style="font-size: 14px;">
+                                
+                                <div class="form-floating mb-3" style="width: 100px">
+                                    {{ form_evolucao_proaq.fase_numero }}
+                                    <label>{{ form_evolucao_proaq.fase_numero.label }}</label>
+                                </div>
+                                                                
+                                
+
+                                <div class="form-floating mb-3" style="width: 250px">
+                                    <select class="form-select" id="id_evolucaoproaq_fase" disabled>
+                                        {% for id, fase in lista_fases_evolucao_proaq %}
+                                            <option value="{{ id }}">{{ fase }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="id_evolucaoproaq_fase">Fase</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" style="width: 160px;" id="id_evolucaoproaq_data_inicio" name="data_entrada">
+                                    <label for="id_evolucaoproaq_data_inicio">Data Início</label>
+                                </div>
+    
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" style="width: 160px;" id="id_evolucaoproaq_data_fim" name="data_saida">
+                                    <label for="id_evolucaoproaq_data_fim">Data Fim</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" style="width: 160px;" id="id_evolucaoproaq_dias" readonly>
+                                    <label for="id_evolucaoproaq_dias">Dias</label>
+                                </div>
+                                
+                            </div>
+
+                            <div class="grid" style="font-size: 14px;">
+                                
+                                <div class="form-floating mb-3 full-width">
+                                    {{ form_evolucao_proaq.observacoes_gerais }}
+                                    <label>{{ form_evolucao_proaq.observacoes_gerais.label }}</label>
+                                </div>
+
+                            </div>
+
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3">
+                                    <input type="hidden" id="id_evolucaoproaq_proaq_hidden" name="id_evolucaoproaq_proaq_hidden" readonly>
+                                    <input type="hidden" id="id_evolucaoproaq_fase_hidden" name="fase" readonly>
+                                    <input type="hidden" id="id_evolucaoproaq_data_saida_hidden" readonly>
+                                    <input type="hidden" id="id_evolucaoproaq_maior_fase_hidden" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary closeModalButtonFichaEvolucaoProaq" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnDeletarEvolucaoProaq" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-primary" id="botaoSalvarEvolucaoProaq" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>

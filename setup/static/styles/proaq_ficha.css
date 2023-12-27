@@ -195,14 +195,12 @@ select[name="numero_processo"] {
     align-items: center;
     justify-content: center;
     height: 150px;
-    background-color: #008d9f;
     border-radius: 10px;
     width: 12%;
     cursor: pointer;
 }
 
 .evolucao-simbolo {
-    color: white;
     margin-top: 5px;
     font-size: 35px;
     text-align: center;
@@ -210,7 +208,6 @@ select[name="numero_processo"] {
 
 .evolucao-dados {
     width: 80%;
-    color: white;
     font-size: 14px;
 }
 
@@ -327,7 +324,7 @@ table tbody tr:hover {
     text-align: left;
 }
 .col-produto {
-    width: 30% !important;
+    width: 25% !important;
     text-align: left;
 }
 .col-texto-curto {

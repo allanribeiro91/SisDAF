@@ -120,3 +120,13 @@ function formatoValorMonetario(campoId) {
     });
 }
 
+function converterDataParaFormatoInternacional(dataStr) {
+    const partes = dataStr.split('/');
+    if (partes.length === 3) {
+        const dia = partes[0];
+        const mes = partes[1];
+        const ano = partes[2];
+        return ano + '-' + mes + '-' + dia; // Converte para formato yyyy-mm-dd
+    }
+    return null; // Retorna null se a data não estiver no formato esperado
+}

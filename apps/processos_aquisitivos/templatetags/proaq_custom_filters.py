@@ -46,3 +46,7 @@ def custom_number_format(value):
     # Substitui ponto por vírgula e vice-versa
     formatted_value = "{:,.2f}".format(value)
     return mark_safe(formatted_value.replace(',', 'X').replace('.', ',').replace('X', '.'))
+
+@register.filter
+def get_fase_info(tab_proaq_evolucao, fase):
+    return next((item for item in tab_proaq_evolucao if item.fase == fase), None)

@@ -24,7 +24,8 @@ def arp_prazo_vigencia():
             unidade_daf=arp.unidade_daf,
             item='ARP',
             nivel=nivel,
-            mensagem=f'A ARP {arp.numero_arp} (ID: {arp.id}) está com prazo de vigência para encerrar em {arp.prazo_vigencia} dias.'
+            mensagem=f'A ARP {arp.numero_arp} (ID: {arp.id}) está com prazo de vigência para encerrar 
+            em {arp.prazo_vigencia} dias.'
         )
 
 

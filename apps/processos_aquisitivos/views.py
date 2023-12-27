@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 from django.contrib import auth, messages
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
-from setup.choices import UNIDADE_DAF, UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_PROAQ, STATUS_FASE
+from setup.choices import UNIDADE_DAF, UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_PROAQ, STATUS_FASE, FASES_EVOLUCAO_PROAQ
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.main.models import CustomLog
@@ -137,6 +137,7 @@ def proaq_ficha(request, proaq_id=None):
 
     lista_produtos = []
     tab_proaq_itens = None
+    tab_proaq_evolucao = None
     if proaq:
         form = ProaqDadosGeraisForm(instance=proaq)
 
@@ -146,18 +147,47 @@ def proaq_ficha(request, proaq_id=None):
             lista_produtos.append((produto.id, produto.produto))
 
         tab_proaq_itens = ProaqItens.objects.filter(del_status=False, proaq_id=proaq.id)
+        tab_proaq_evolucao = ProaqEvolucao.objects.filter(del_status=False, proaq_id=proaq.id)
     else:
         form = ProaqDadosGeraisForm()   
 
     form_item_proaq = ProaqItensForm()
+    form_evolucao_proaq = ProaqEvolucaoForm()
+
+    fases = [
+        {'nome': 'Docs Iniciais', 'numero': 1},
+        {'nome': 'Pré-Contratual', 'numero': 2},
+        {'nome': 'Contratação', 'numero': 3},
+        {'nome': 'Execução do Contrato', 'numero': 4},
+        {'nome': 'Prestação de Contas', 'numero': 5},
+        {'nome': 'Encerrado', 'numero': 6},
+    ]
+
+    proaq_fases = []
+    for fase in fases:
+        evolucao = tab_proaq_evolucao.filter(fase_numero=fase['numero']).first()
+        if evolucao:
+            proaq_fases.append([
+                fase['nome'], 
+                evolucao.data_entrada, 
+                evolucao.data_saida,
+                evolucao.total_dias(),
+                evolucao.id,
+            ])
+        else:
+            proaq_fases.append([fase['nome'], None, None, None, None])
 
     return render(request, 'processos_aquisitivos/proaq_ficha_dados_gerais.html', {
         'form': form,
         'proaq': proaq,
         'form_item_proaq': form_item_proaq,
+        'form_evolucao_proaq': form_evolucao_proaq,
+        'proaq_fases': proaq_fases,
         'STATUS_PROAQ': STATUS_PROAQ,
+        'lista_fases_evolucao_proaq': FASES_EVOLUCAO_PROAQ,
         'lista_produtos': lista_produtos,
         'tab_proaq_itens': tab_proaq_itens,
+        'tab_proaq_evolucao': tab_proaq_evolucao,
     })
 
 
@@ -237,7 +267,7 @@ def proaq_item_salvar(request, proaq_item_id=None):
                 model='ProaqItens',
                 model_id=proaq_item.id,
                 item_id=0,
-                item_descricao="Salvar edição de Parcela de Contrato.",
+                item_descricao="Salvar edição de Item do Processo Aquisitivo.",
                 acao="Salvar",
                 observacoes=f"Usuário {request.user.username} salvou o Item do Processo Aquisitivo (ID {proaq_item.id}, Processo Aquisitivo: {proaq_item.proaq.numero_processo_sei}, Produto: {proaq_item.produto.produto}) em {current_date_str}."
             )
@@ -310,6 +340,134 @@ def proaq_item_deletar(request, proaq_item_id=None):
             "message": "Item do Processo não encontrado."
             })
 
+
+
+#PROAQ EVOLUÇÃO
+def proaq_ficha_evolucao(request, proaq_evolucao_id=None):
+    if proaq_evolucao_id:
+        proaq_evolucao = ProaqEvolucao.objects.get(id=proaq_evolucao_id)
+    else:
+        proaq_evolucao = None
+    
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if proaq_evolucao:
+            proaq_evolucao_form = ProaqEvolucaoForm(request.POST, instance=proaq_evolucao)
+            novo_proaq_evolucao = False
+        else:
+            proaq_evolucao_form = ProaqEvolucaoForm(request.POST)
+            novo_proaq_evolucao = True
+        
+        #Verificar se houve alteração no formulário
+        if not proaq_evolucao_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+        
+        #Processo Aquisitivo
+        proaq_id = request.POST.get('id_evolucaoproaq_proaq_hidden')
+        proaq_instance = ProaqDadosGerais.objects.get(id=proaq_id)
+
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['proaq'] = proaq_instance
+
+        #Criar o formulário com os dados atualizados
+        proaq_evolucao_form = ProaqEvolucaoForm(modificacoes_post, instance=proaq_evolucao_form.instance)
+
+        #salvar
+        if proaq_evolucao_form.is_valid():
+            #Salvar o produto
+            proaq_evolucao = proaq_evolucao_form.save(commit=False)
+            proaq_evolucao.save(current_user=request.user.usuario_relacionado)
+
+            #id do processo aquisitivo
+            proaq_id = proaq_evolucao.proaq.id
+
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="ProcessosAquisitivos_Evolucao",
+                model='ProaqEvolucao',
+                model_id=proaq_evolucao.id,
+                item_id=0,
+                item_descricao="Salvar edição da Evolução do Processo Aquisitivo.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou a Evolução do Processo Aquisitivo (ID {proaq_evolucao.id}, Processo Aquisitivo: {proaq_evolucao.proaq.numero_processo_sei} em {current_date_str}."
+            )
+            log_entry.save()
+            
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'novo': novo_proaq_evolucao,
+                    'redirect_url': reverse('proaq_ficha', args=[proaq_id]),
+                    'id_evolucao_proaq': proaq_evolucao.id,
+                })
+        else:
+            print("Erro formulário Parcela do Contrato")
+            print(proaq_evolucao_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+
+def proaq_evolucao_modal(request, proaq_evolucao_id=None):
+    try:
+        item = ProaqEvolucao.objects.get(id=proaq_evolucao_id)
+        data = {
+            'id': item.id,
+            'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
+            'log_responsavel_registro': str(item.usuario_atualizacao.dp_nome_completo),
+            'lot_ult_atualizacao': item.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if item.ult_atual_data else '',
+            'log_responsavel_atualizacao': str(item.usuario_atualizacao.dp_nome_completo),
+            'log_edicoes': item.log_n_edicoes,
+            'fase_numero': item.fase_numero,
+            'fase': item.fase,
+            'data_entrada': item.data_entrada,
+            'data_saida': item.data_saida,
+            'observacoes': item.observacoes_gerais,
+        }
+        print('Data da Entrada: ', item.data_entrada)
+        print('Data da Saída: ', item.data_saida)
+        return JsonResponse(data)
+    except ProaqEvolucao.DoesNotExist:
+        return JsonResponse({'error': 'Evolução do Processo Aquisitivo não encontrado.'}, status=404)
+
+def proaq_evolucao_deletar(request, proaq_evolucao_id=None):
+    try:
+        proaq_evolucao = ProaqEvolucao.objects.get(id=proaq_evolucao_id)
+        proaq_evolucao.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="ProcessosAquisitivos_Evolucao",
+            model='ProaqEvolucao',
+            model_id=proaq_evolucao.id,
+            item_id=0,
+            item_descricao="Deleção da Parcela de Contrato.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou a Evolução do Processo Aquisitivo (ID {proaq_evolucao.id}, Processo SEI: {proaq_evolucao.proaq.numero_processo_sei}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Evolução do Processo Aquisitivo deletado com sucesso!"
+            })
+    except ProaqEvolucao.DoesNotExist:
+        return JsonResponse({
+            "message": "Evolução do Processo Aquisitivo não encontrado."
+            })
+
+
+
+
 def proaq_usuarios_por_unidade(request, unidade):
     usuarios = Usuario.usuarios_por_unidade(unidade)
     return JsonResponse(usuarios, safe=False)
@@ -318,113 +476,7 @@ def proaq_produtos_por_denominacao(request, denominacao):
     produtos = ProdutosFarmaceuticos.get_produtos_por_denominacao(denominacao)
     return JsonResponse(produtos, safe=False)
 
-def proaq_ficha_evolucao(request, proaq_id=None):
-    form = ProaqEvolucaoForm()
 
-    if request.method == 'POST':
-        # 1. Extrair o id_proaq e os dados das fases do request
-        id_proaq = request.POST.get('id_proaq')
-        fases_data = json.loads(request.POST.get('fasesData'))
-
-        # 2. Para cada fase recebida, verificar se já existe na base de dados. Se existir, atualizar. Se não, criar uma nova.
-        proaq = get_object_or_404(ProaqDadosGerais, pk=id_proaq)
-        user = request.user
-        try:
-            usuario_atualizacao = Usuario.objects.get(user=user)  # Convertendo de User para Usuario
-        except Usuario.DoesNotExist:
-            usuario_atualizacao = None
-        
-        print("PROAQ: ", id_proaq)
-        log_n_edicoes = ProaqEvolucao.objects.filter(del_status=False, proaq_id=id_proaq, fase=1).first()
-        if log_n_edicoes:
-            log_n = log_n_edicoes.log_n_edicoes + 1
-        else:
-            log_n = 1
-
-        created = False
-        fase = None
-
-        for fase_num, fase_data in fases_data.items():
-            # Extrair o número da fase
-            num = int(re.search(r'\d+', fase_num).group())
-
-            data_inicio = fase_data.get('dataInicio')
-            data_fim = fase_data.get('dataFim')
-
-            fase, created = ProaqEvolucao.objects.update_or_create(
-                proaq=proaq,
-                fase=num,
-                del_status=False,
-                defaults={
-                    'status': fase_data['status'],
-                    'data_inicio': data_inicio if data_inicio else None,
-                    'data_fim': data_fim if data_fim else None,
-                    'comentario': fase_data.get('comentario'),
-                    'usuario_atualizacao': usuario_atualizacao,
-                    'usuario_registro': usuario_atualizacao if created or fase is None else fase.usuario_registro,
-                    'log_n_edicoes': log_n,
-                }
-            )
-
-            if fase is None:
-                # Houve um problema ao tentar criar ou atualizar o objeto ProaqEvolucao.
-                # Você pode decidir como lidar com essa situação.
-                pass
-
-        # # 3. Verificar se existem fases na base de dados que não foram recebidas e, se sim, fazer o soft delete dessas fases.
-        existing_fases = ProaqEvolucao.objects.filter(proaq=proaq, del_status=False)
-        received_fases = set(fases_data.keys())
-        for fase in existing_fases:
-            fase_num_str = f'fase{fase.fase}'
-            if fase_num_str not in received_fases:
-                fase.soft_delete(usuario_atualizacao)
-
-        # Registrar a ação no CustomLog
-        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-        log_entry = CustomLog(
-            usuario=request.user.usuario_relacionado,
-            modulo="Processo Aquisitivo_Evolução",
-            model='ProaqEvolucao',
-            model_id=proaq.id,
-            item_id=0,
-            item_descricao="Salvou evolução de processo aquisitivo.",
-            acao="Salvar",
-            observacoes=f"Usuário {request.user.username} salvou evolução o processo aquisitivo (ID: {proaq.id}) da unidade daf {proaq.unidade_daf} e denominação genérica {proaq.denominacao.denominacao} em {current_date_str}."
-        )
-        log_entry.save()
-
-        #Retornar
-        messages.success(request, "Dados atualizados com sucesso!")
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({
-                'redirect_url': reverse('proaq_ficha_evolucao', args=[id_proaq]),
-            })
-
-        pass
-
-    fases = [
-        {'nome': 'Configuração dos documentos iniciais'},
-        {'nome': 'Tramitação Pré-Contratual'},
-        {'nome': 'Contratação'},
-        {'nome': 'Execução do Contrato'},
-        {'nome': 'Aditivo de Contrato'},
-        {'nome': 'Encerramento'},
-        {'nome': 'Processo Finalizado'},
-    ]
-
-    dados_fases = list(ProaqEvolucao.objects.filter(del_status=False, proaq_id=proaq_id))
-    dados_fase1 = ProaqEvolucao.objects.filter(del_status=False, proaq_id=proaq_id, fase=1).first()
-
-    conteudo = {
-        'status_fase': STATUS_FASE,
-        'form': form,
-        'fases': fases,
-        'proaq_id': proaq_id,
-        'dados_fases': dados_fases,
-        'dados_fase1': dados_fase1,
-    }
-
-    return render(request, 'processos_aquisitivos/proaq_ficha_evolucao.html', conteudo)
 
 @login_required
 def proaq_ficha_tramitacoes(request, tramitacao_id=None, proaq_id=None):

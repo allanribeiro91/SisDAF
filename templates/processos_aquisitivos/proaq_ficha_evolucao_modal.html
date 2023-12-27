@@ -1,0 +1,119 @@
+<!-- Modal -->
+{% load static %}
+{% load humanize %}
+{% load contratos_filters %}
+<style>
+    .tags-column{
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width-evolucao {
+        min-width: 40%;  /* ou qualquer largura que você desejar */
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal-parcela {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;  /* Alinha os itens ao topo */
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-content{
+        height: 50%;
+    }
+
+    .modal-body{
+        height: auto;
+    }
+
+    .col-evolucao-numero {
+        width: 5% !important;
+        text-align: left !important;
+    }
+    .col-evolucao-fase {
+        width: 30% !important;
+        text-align: left !important;
+    }
+    .col-evolucao-data {
+        width: 10% !important;
+        text-align: right !important;
+    }
+
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="proaqEvolucaoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-evolucao" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Evolução do Processo Aquisitivo</h5>
+                <button type="button" class="close closeModalButtonEvolucaoProaq" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="font-size: 14px; text-align: right !important;">
+                    <button class="btn btn-primary me-md-2" type="button" data-bs-toggle="modal"  id="btnInserirEvolucao" data-bs-target="" style="font-size: 12px; background-color: green; border-color: green;">
+                        <i class="fas fa-plus" style="font-size: 14px;"></i> 
+                        &nbsp;Inserir Evolução
+                    </button>
+                </div>
+
+                <div class="horizontal-sections">
+                    <div class="section">                      
+                        <div class="grid" style="font-size: 14px;">
+                            <table class="table table-striped table-hover fixed-size-table" style="font-size: 12px;" id="tabEvolucaoProaq">
+                                <thead>
+                                    <tr>
+                                        <th class="col-evolucao-numero">Nº</th>    
+                                        <th class="col-evolucao-fase">Fase</th>
+                                        <th class="col-evolucao-data">Entrada</th>
+                                        <th class="col-evolucao-data">Saída</th>
+                                        <th class="col-evolucao-data">Dias</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in tab_proaq_evolucao %}
+                                    <tr data-id="{{ item.id }}">
+                                        <td class="col-evolucao-numero">{{ item.fase_numero }}</td>
+                                        <td class="col-evolucao-fase">{{ item.get_fase_display }}</td>
+                                        <td class="col-evolucao-data">{{ item.data_entrada|date:"d/m/Y" }}</td>
+                                        <td class="col-evolucao-data-saida" style="text-align: right;">
+                                            {% if item.data_saida %}
+                                                {{ item.data_saida|date:"d/m/Y" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td class="col-evolucao-data">{{ item.total_dias }}</td>                                       
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table> 
+                        </div>
+    
+                    </div>
+                </div>
+
+
+            </div>  
+                
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButtonEvolucaoProaq').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#proaqEvolucaoModal').modal('hide');
+        });
+    });
+</script>

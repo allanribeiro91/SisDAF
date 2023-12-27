@@ -197,6 +197,16 @@ FAQ_FORNECEDOR_TOPICO = [
     ('outro','Outro'),
 ]
 
+FASES_EVOLUCAO_PROAQ = [
+    ('', 'Não Informado'),
+    ('fase1', 'Documentos Iniciais'),
+    ('fase2', 'Tramitação Pré-Contratual'),
+    ('fase3', 'Contratação'),
+    ('fase4', 'Execução do Contrato'),
+    ('fase5', 'Prestação de Contas'),
+    ('fase6', 'Encerrado'),
+]
+
 CARGOS_FUNCOES = [
     ('representante_comercial','Representante Comercial'),
     ('assessor_tecnico', 'Assessor Técnico'),

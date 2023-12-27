@@ -3,14 +3,13 @@ from apps.processos_aquisitivos.views import (
     proaq, proaq_ficha, proaq_ficha_evolucao, proaq_ficha_tramitacoes, proaq_filtro, tramitacao_dados,
     proaq_dados_gerais_delete, proaq_usuarios_por_unidade, proaq_produtos_por_denominacao, 
     salvar_proaq_produto, proaq_exportar, proaq_tramitacao_delete, proaq_item_salvar, proaq_item_modal,
-    proaq_item_deletar,
+    proaq_item_deletar, proaq_evolucao_modal, proaq_evolucao_deletar
 )
 
 urlpatterns = [
     
     path('proaq/exportar/', proaq_exportar, name='proaq_exportar'),
 
-    path('proaq/evolucao/salvar/', proaq_ficha_evolucao, name='proaq_evolucao_salvar'),
 
     path('proaq_produtos_relacionados/<int:proaq_id>/', salvar_proaq_produto, name='salvar_proaq_produto'),
     path('proaq_produtos_por_denominacao/<str:denominacao>/', proaq_produtos_por_denominacao, name='proaq_produtos_por_denominacao'),
@@ -23,8 +22,7 @@ urlpatterns = [
     path('proaq/ficha/tramitacoes/nova/', proaq_ficha_tramitacoes, name='nova_tramitacao'),
     path('proaq/tramitacao/<int:tramitacao_id>/dados/', tramitacao_dados, name='tramitacao_dados'),
 
-    path('proaq/ficha/evolucao/<int:proaq_id>/', proaq_ficha_evolucao, name='proaq_ficha_evolucao'),
-    path('proaq/ficha/evolucao/nova/', proaq_ficha_evolucao, name='proaq_ficha_evolucao_nova'),
+   
     
     
     path('proaq/ficha/dadosgerais/deletar/<int:proaq_id>/', proaq_dados_gerais_delete, name='proaq_dados_gerais_delete'),
@@ -40,5 +38,11 @@ urlpatterns = [
     path('proaq/ficha/item/<int:proaq_item_id>/', proaq_item_salvar, name='proaq_item_salvar'),
     path('proaq/buscar_item_proaq/<int:proaq_item_id>/', proaq_item_modal, name='proaq_item_modal'),
     path('proaq/ficha/item/deletar/<int:proaq_item_id>/', proaq_item_deletar, name='proaq_item_deletar'),
+
+    #PROAQ EVOLUÇÃO
+    path('proaq/ficha/evolucao/<int:proaq_evolucao_id>/', proaq_ficha_evolucao, name='proaq_ficha_evolucao'),
+    path('proaq/ficha/evolucao/nova/', proaq_ficha_evolucao, name='proaq_ficha_evolucao_nova'),
+    path('proaq/buscar_evolucao_proaq/<int:proaq_evolucao_id>/', proaq_evolucao_modal, name='proaq_evolucao_modal'),
+    path('proaq/ficha/evolucao/deletar/<int:proaq_evolucao_id>/', proaq_evolucao_deletar, name='proaq_evolucao_deletar'),
 
 ]

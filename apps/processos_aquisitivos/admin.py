@@ -17,13 +17,6 @@ class ProaqProdutosAdmin(admin.ModelAdmin):
     list_filter = ('del_status',)
     list_per_page = 100
 
-@admin.register(ProaqEvolucao)
-class ProaqEvolucaoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'proaq', 'fase', 'status', 'data_inicio', 'data_fim', 'del_status')
-    list_display_links = ('id', 'proaq')
-    search_fields = ('proaq__numero_processo_sei', 'fase', 'status')
-    list_filter = ('fase', 'status', 'del_status')
-    list_per_page = 100
 
 @admin.register(ProaqTramitacao)
 class ProaqTramitacaoAdmin(admin.ModelAdmin):
