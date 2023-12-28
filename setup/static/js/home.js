@@ -27,3 +27,12 @@ const areaCards = document.getElementById('area_cards');
         const walk = (x - startX) * 1; // Fator de velocidade do arrasto
         areaCards.scrollLeft = scrollLeft - walk;
     });
+
+
+    document.querySelectorAll('.card-alerta').forEach(card => {
+        card.addEventListener('mousedown', function(event) {
+            // Interrompe a propagação do evento para evitar que a área de cartões ative o arrasto
+            event.stopPropagation();
+        });
+    });
+    

@@ -385,8 +385,12 @@ document.addEventListener('DOMContentLoaded', function() {
             limpar_dados_modal_evolucao_proaq();
             id_evolucaoproaq_proaq_hidden.value = proaq_id
             indicar_fase_evolucao_nova(maior_fase);
-            id_evolucaoproaq_data_saida_hidden.value = maior_data
-            evolucao_data_inicio.value = converterDataParaFormatoInternacional(maior_data)
+            
+            if(maior_data){
+                id_evolucaoproaq_data_saida_hidden.value = maior_data
+                evolucao_data_inicio.value = converterDataParaFormatoInternacional(maior_data)
+            }
+            
             modal_evolucao_proaq_ficha.show()
         }
     })
@@ -399,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return false
         }
 
-        if(obter_data_saida_por_numero(numero_fase) == null || obter_data_saida_por_numero(numero_fase) == '-'){
+        if(obter_data_saida_por_numero(numero_fase) == '-'){
             sweetAlert('Informe a Data de Saída da fase atual!')
             return false
         }

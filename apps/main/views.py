@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from apps.main.forms import LoginForms, CadastroForms
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
-from apps.contratos.models import Contratos
+from apps.contratos.models import Contratos, ContratosArps
 from apps.main.models import CustomLog
 from apps.fornecedores.models import Fornecedores
 from apps.processos_aquisitivos.models import ProaqDadosGerais
@@ -60,7 +60,8 @@ def home(request):
     tot_produtos = ProdutosFarmaceuticos.objects.filter(del_status=False).count()
     tot_fornecedores = Fornecedores.objects.filter(del_status=0).count()
     tot_proaqs = ProaqDadosGerais.objects.filter(del_status=False).count()
-    tot_contratos = 0
+    tot_arps = ContratosArps.objects.filter(del_status=False).count()
+    tot_contratos = Contratos.objects.filter(del_status=False).count()
     usuario = request.user.usuario_relacionado
     
     # Obter a alocação ativa do usuário
@@ -71,7 +72,6 @@ def home(request):
     else:
         unidade_daf = 'Não Informado'  # Ou algum valor padrão, se apropriado
     
-    tabContratos = Contratos.objects.filter(del_status=False)
     tab_logs = CustomLog.objects.all().order_by('-timestamp')[:50]
     conteudo ={
         'usuario': usuario,
@@ -79,9 +79,9 @@ def home(request):
         'tot_produtos': tot_produtos,
         'tot_fornecedores': tot_fornecedores,
         'tot_proaqs': tot_proaqs,
+        'tot_arps': tot_arps,
         'tot_contratos': tot_contratos,
         'unidade_daf': unidade_daf,
-        'tabContratos': tabContratos,
         'tab_logs': tab_logs,
     }
     return render(request, 'main/home.html', conteudo)
