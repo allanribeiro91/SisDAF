@@ -41,6 +41,8 @@
             </div>
             
             <div class="horizontal-sections">
+                
+                <!-- Log -->
                 <div class="section-log">
                     <h3>Log</h3>
                     <div class="grid-log">
@@ -70,13 +72,19 @@
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <div class="horizontal-sections">
+                
+                <!-- Dados do FAQ -->
                 <div class="section">
                     <h3>Dados do FAQ</h3>
+                    
+                    <!-- Tópico -->
                     <div class="grid" style="font-size: 14px;">
                         
+                        <!-- Tópico -->
                         <div class="form-floating mb-3">
                             <select class="form-select" id="topico" aria-label="Floating label select example" name="topico">
                                 <option value="" disabled {% if not form.instance.topico %}selected{% endif %}>Não informado</option>
@@ -84,32 +92,35 @@
                                 <option value="{{ value }}" {% if form.instance.topico == value %}selected{% endif %}>{{ display }}</option>
                                 {% endfor %}
                             </select>
-                            <label for="topico">Tópico/Assunto*</label>
+                            <label for="topico">Tópico/Assunto</label>
                         </div>
                         
+                        <!-- Outro Tópico -->
                         <div class="form-floating mb-3 full-width">
                             <input type="text" class="form-control" id="topico_outro" name="topico_outro" {% if form.instance.topico_outro %}value="{{ form.instance.topico_outro }}"{% else %}readonly{% endif %}>
-
                             <label for="floatingInput">Outro Tópico/Assunto</label>
                         </div>
-                         
+                        
                     </div>
                     
+                    <!-- Contexto -->
                     <div class="grid" style="font-size: 14px;">
                         <div class="form-floating mb-3 full-width">
                             <textarea class="form-control auto-expand" id="contexto" name="contexto" rows="1" style="padding-top: 27px; height: 120px;">{{ form.instance.contexto|default_if_none:'' }}</textarea>
-                            <label for="form-floating">Contexto/Pergunta/Situação*</label>
+                            <label for="form-floating">Contexto/Pergunta/Situação</label>
                         </div> 
                     </div>
 
+                    <!-- Resposta -->
                     <div class="grid" style="font-size: 14px;">
                         <div class="form-floating mb-3 full-width">
                             <textarea class="form-control auto-expand" id="resposta" name="resposta" rows="1" style="padding-top: 27px; height: 120px;">{{ form.instance.resposta|default_if_none:'' }}</textarea>
-                            <label for="form-floating">Resposta/Encaminhamento*</label>
+                            <label for="form-floating">Resposta/Encaminhamento</label>
                         </div> 
                     </div>
                         
                 </div>
+
             </div>
             
             <div class="section">

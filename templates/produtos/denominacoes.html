@@ -3,6 +3,8 @@
 {% block extra_head %}
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="stylesheet" href="{% static '\styles\denominacoes_genericas.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_aderecos.css' %}">
 {% endblock %}
 {% block content %}    
     
@@ -56,23 +58,23 @@
                 <span>Unidades</span></br>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="basico" value=1>
-                    <label class="form-check-label" for="basico">Básico</label> <!-- Corrigido aqui -->
+                    <label class="form-check-label filtro-unidade" for="basico">Básico</label> <!-- Corrigido aqui -->
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="especializado" value=1>
-                    <label class="form-check-label" for="especializado">Especializado</label> <!-- Corrigido aqui -->
+                    <label class="form-check-label filtro-unidade" for="especializado">Especializado</label> <!-- Corrigido aqui -->
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="estrategico" value=1>
-                    <label class="form-check-label" for="estrategico">Estratégico</label> <!-- Corrigido aqui -->
+                    <label class="form-check-label filtro-unidade" for="estrategico">Estratégico</label> <!-- Corrigido aqui -->
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="farmacia_popular" value=1>
-                    <label class="form-check-label" for="farmacia_popular">Farm. Popular</label> <!-- Corrigido aqui -->
+                    <label class="form-check-label filtro-unidade" for="farmacia_popular">Farm. Popular</label> <!-- Corrigido aqui -->
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="hospitalar" value=1>
-                    <label class="form-check-label" for="hospitalar">Hospitalar</label> <!-- Corrigido aqui -->
+                    <label class="form-check-label filtro-unidade" for="hospitalar">Hospitalar</label> <!-- Corrigido aqui -->
                 </div>
             </div>
                 
@@ -127,41 +129,41 @@
                     <td>{{ item.id }}</td>
                     <td>{{ item.tipo_produto }}</td>
                     <td>{{ item.denominacao }}</td>
-                    <td style="text-align: center;">
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.unidade_basico %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.unidade_especializado %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.unidade_estrategico %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.unidade_farm_popular %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.hospitalar %}
-                            <span class="bold-blue">Sim</span>
+                            <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
-                    </td>                    
+                    </td>                 
                 </tr>
                 {% endfor %}
             </tbody>

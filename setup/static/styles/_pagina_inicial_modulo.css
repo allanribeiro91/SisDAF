@@ -100,7 +100,7 @@
 
 .filter {
     display: flex;
-    align-items: center; /* Alinhamento vertical */
+    align-items: center; 
     justify-content: space-between;
     gap: 10px;
     margin: 0px 0px 10px 10px;

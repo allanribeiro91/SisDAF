@@ -1,3 +1,13 @@
+document.addEventListener('DOMContentLoaded', function() {
+
+    if (localStorage.getItem('fornecedorSalvo') === 'true') {
+        sweetAlert('Fornecedor salvo com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('fornecedorSalvo');
+    }
+
+});
+
+
 $(document).ready(function() {
     
 
@@ -17,14 +27,6 @@ $(document).ready(function() {
         window.location.href = '/fornecedores/comunicacoes/' + id_fornecedor + '/';
     });
 
-    
-
-    $('#btnNovoRepresentante').click(function() {
-        document.getElementById('representanteFornecedorForm').reset();
-        
-        var modal = new bootstrap.Modal(document.getElementById('representanteFornecedorModal'));
-        modal.show();
-    });
 
     $('#btnNovaComunicacao').click(function() {
         document.getElementById('comunicacaoFornecedorForm').reset();
@@ -290,7 +292,7 @@ function recarregarTabelaFornecedores(fornecedores) {
     fornecedores.forEach(fornecedor => {
         var row = `
             <tr data-id="${ fornecedor.id }">
-                
+                <td class="col-id">${ fornecedor.id }</td>
                 <td class="col-cnpj">${ fornecedor.cnpj }</td>
                 
                 <td class="col-hierarquia">${ capitalizeFirstLetter(fornecedor.hierarquia) }</td>
@@ -344,7 +346,10 @@ document.getElementById('btnSaveFornecedor').addEventListener('click', function(
         if (data.data) {
             // Armazenar os dados no localStorage
             localStorage.setItem('temporaryFormData', JSON.stringify(data.data));
+            
         }
+
+        localStorage.setItem('fornecedorSalvo', 'true');
         
         // Redirecione para a nova URL
         window.location.href = data.redirect_url;
@@ -353,6 +358,7 @@ document.getElementById('btnSaveFornecedor').addEventListener('click', function(
 
 
 document.addEventListener('DOMContentLoaded', function() {
+
     let formData = JSON.parse(localStorage.getItem('temporaryFormData'));
 
     if (formData) {

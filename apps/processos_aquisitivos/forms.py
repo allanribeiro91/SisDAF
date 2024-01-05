@@ -2,7 +2,9 @@ from django import forms
 from django.core.exceptions import ValidationError
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
-from apps.processos_aquisitivos.models import ProaqDadosGerais, ProaqItens, ProaqEvolucao, ProaqTramitacao
+from apps.processos_aquisitivos.models import (ProaqDadosGerais, ProaqItens, 
+                                               ProaqEvolucao, ProaqTramitacao, PROAQ_AREA_MS,
+                                               PROAQ_ETAPA)
 from setup.choices import STATUS_PROAQ, UNIDADE_DAF2, STATUS_FASE, TIPO_COTA, FASES_EVOLUCAO_PROAQ
 
 class DenominacaoModelChoiceField(forms.ModelChoiceField):
@@ -12,6 +14,25 @@ class DenominacaoModelChoiceField(forms.ModelChoiceField):
 class UsuarioChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.dp_nome_completo
+
+class CustomModelChoiceField(forms.ModelChoiceField):
+    def __init__(self, *args, **kwargs):
+        super(CustomModelChoiceField, self).__init__(*args, **kwargs)
+        self.choices = self.choices  # Forçando a execução do método choices do ModelChoiceField
+
+    @property
+    def choices(self):
+        # Sobrescrevendo o método choices para incluir a opção "Não Informado"
+        yield ('', 'Não Informado')
+        yield from super().choices
+
+def get_etapas_choices():
+    etapas = PROAQ_ETAPA.objects.all()
+    choices = [('', 'Não informado')]  # Adiciona a opção 'Não informado'
+    choices += [(etapa.id, etapa.etapa) for etapa in etapas]
+    return choices
+
+
 
 class ProaqDadosGeraisForm(forms.ModelForm):    
     unidade_daf = forms.CharField(
@@ -102,8 +123,8 @@ class ProaqDadosGeraisForm(forms.ModelForm):
         model = ProaqDadosGerais
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']  
     def clean_observacoes_gerais(self):
-        observacoes = self.cleaned_data.get('observacoes_gerais')
-        return observacoes or "Sem observações."
+        observacoes_gerais = self.cleaned_data.get('observacoes_gerais')
+        return observacoes_gerais or "Sem observações."
 
 class ProaqItensForm(forms.ModelForm):    
     numero_item = forms.IntegerField(
@@ -209,7 +230,6 @@ class ProaqItensForm(forms.ModelForm):
         observacoes = self.cleaned_data.get('observacoes_gerais')
         return observacoes or "Sem observações."
 
-
 class ProaqEvolucaoForm(forms.ModelForm):    
     fase_numero = forms.IntegerField(
         widget=forms.TextInput(attrs={
@@ -280,64 +300,95 @@ class ProaqEvolucaoForm(forms.ModelForm):
 
 
 class ProaqTramitacaoForm(forms.ModelForm):
-    proaq = forms.ModelChoiceField(
-        queryset=ProaqDadosGerais.objects.all(), 
-        required=True, 
-        widget=forms.Select(attrs={'class':'form-control'}),
-        label='Proaq'
-    )
     documento_sei = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_tramitacaoproaq_documento_sei',
+        }),
+        label='Nº do Documento SEI',
+        initial='',
         required=True,
-        widget=forms.TextInput(attrs={'class':'form-control'}),
-        label='Documento SEI',
-        max_length=20,
     )
-    setor = forms.CharField(
-        required=True,
-        widget=forms.TextInput(attrs={'class':'form-control'}),
-        label='Setor',
-        max_length=50,
-    )
-    etapa_processo = forms.CharField(
-        required=True,
-        widget=forms.TextInput(attrs={'class':'form-control'}),
+    etapa_processo = forms.ChoiceField(
+        choices=get_etapas_choices(),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'id_tramitacaoproaq_etapa',
+        }),
         label='Etapa do Processo',
-        max_length=100,
+        initial='',
+        required=False,
+    )
+    etapa_processo_outro = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_tramitacaoproaq_etapa_processo_outro',
+            'readonly': 'readonly',
+        }),
+        label='Outra etapa',
+        initial='',
+        required=False,
     )
     data_entrada = forms.DateField(
-        required=False,
-        widget=forms.DateInput(attrs={'class':'form-control'}),
-        label='Data de Entrada'
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+        }),
+        required=True,
+        label='Data da Entrada'
     )
     previsao_saida = forms.DateField(
-        required=False,
-        widget=forms.DateInput(attrs={'class':'form-control'}),
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+        }),
+        required=True,
         label='Previsão de Saída'
     )
     data_saida = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+        }),
         required=False,
-        widget=forms.DateInput(attrs={'class':'form-control'}),
-        label='Data de Saída'
+        label='Data da Saída'
     )
+    #relacionamentos
+    proaq = forms.ModelChoiceField(
+        queryset=ProaqDadosGerais.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'id_tramitacaoproaq_proaq',
+        }),
+        label='Processo Aquisitivo',
+        initial='',
+        required=True,
+    )
+    setor = forms.ModelChoiceField(
+        queryset=PROAQ_AREA_MS.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'id_tramitacaoproaq_setor',
+        }),
+        label='Área do MS/Fornecedor',
+        initial='40',
+        empty_label='Selecione um Setor',
+        required=True,
+    )
+    #observações gerais
     observacoes = forms.CharField(
         required=False,
-        widget=forms.Textarea(attrs={'class':'form-control'}),
-        label='Observações'
+        widget=forms.Textarea(attrs={
+            'class':'form-control',
+            'rows': 1,
+            'style': 'padding-top: 30px; height: 80px;',
+            'id': 'id_tramitacaoproaq_observacoes'
+        }),
+        label='Observações Gerais'
     )
-
     class Meta:
         model = ProaqTramitacao
-        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario',]
-        labels = {
-            'usuario_registro': 'Usuário Registro',
-            'usuario_atualizacao': 'Usuário Atualização',
-            'proaq': 'ID PROAQ',
-            'documento_sei': 'Documento SEI',
-            'setor': 'Setor',
-            'etapa_processo': 'Etapa do Processo',
-            'data_entrada': 'Data de Entrada',
-            'previsao_saida': 'Previsão de Saída',
-            'data_saida': 'Data de Saída',
-            'observacoes': 'Observações',
-            'del_usuario': 'Usuário Deletado',
-        }
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+    def clean_observacoes(self):
+        observacoes = self.cleaned_data.get('observacoes')
+        return observacoes or "Sem observações."

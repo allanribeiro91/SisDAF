@@ -3,6 +3,7 @@
 {% block extra_head %}
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="stylesheet" href="{% static '\styles\produtos_daf.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
     <link rel="stylesheet" href="{% static '\styles\_aderecos.css' %}">
 {% endblock %}
 {% block content %}    
@@ -21,7 +22,7 @@
         </div>
     </div>
 
-
+    <!-- Cabeçalho -->
     <div class="horizontal-sections">
         
         <div class="section numbers">
@@ -47,6 +48,17 @@
                 <label for="floatingSelect">Tipo de Produto</label>
             </div>
             
+            <!-- Denominação -->
+            <div class="form-floating" style="max-width: 25% !important;">
+                <select class="form-select" aria-label="Floating label select example" id="denominacao">
+                    <option value=""></option>
+                    {% for value, display in denominacoes %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingSelect">Denominação Genérica</label>
+            </div>
+
             <!-- Produto -->
             <div class="form-floating  denominacao">
                 <input type="text" class="form-control" id="produto" name="produto">
@@ -54,31 +66,31 @@
             </div>
             
             <!-- Unidades -->
-            <div class="unidades">
+            <div class="unidades" style="width: 25%; font-size: 14px !important;">
                 <span>Unidades</span></br>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="comp_unidade_basico" value=1>
-                    <label class="form-check-label" for="comp_unidade_basico">Básico</label> <!-- Corrigido aqui -->
+                    <input class="form-check-input filtro" type="checkbox" id="comp_unidade_basico" value=1>
+                    <label class="form-check-label filtro" for="comp_unidade_basico">Básico</label> <!-- Corrigido aqui -->
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="comp_especializado" value=1>
-                    <label class="form-check-label" for="comp_especializado">Especializado</label> <!-- Corrigido aqui -->
+                    <input class="form-check-input filtro" type="checkbox" id="comp_especializado" value=1>
+                    <label class="form-check-label filtro" for="comp_especializado">Especializado</label> <!-- Corrigido aqui -->
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="comp_estrategico" value=1>
-                    <label class="form-check-label" for="comp_estrategico">Estratégico</label> <!-- Corrigido aqui -->
+                    <input class="form-check-input filtro" type="checkbox" id="comp_estrategico" value=1>
+                    <label class="form-check-label filtro" for="comp_estrategico">Estratégico</label> <!-- Corrigido aqui -->
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="disp_farmacia_popular" value=1>
-                    <label class="form-check-label" for="disp_farmacia_popular">Farm. Popular</label> <!-- Corrigido aqui -->
+                    <input class="form-check-input filtro" type="checkbox" id="disp_farmacia_popular" value=1>
+                    <label class="form-check-label filtro" for="disp_farmacia_popular">Farm. Popular</label> <!-- Corrigido aqui -->
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="hospitalar" value=1>
-                    <label class="form-check-label" for="hospitalar">Hospitalar</label> <!-- Corrigido aqui -->
+                    <input class="form-check-input filtro" type="checkbox" id="hospitalar" value=1>
+                    <label class="form-check-label filtro" for="hospitalar">Hospitalar</label> <!-- Corrigido aqui -->
                 </div>
             </div>
                 
-            <button class="custom-btn limpar-filtro">
+            <button class="custom-btn limpar-filtro" id="limpar-filtros">
                 <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
                 <span style="font-size: 10px;">Limpar Filtros</span>
             </button>
@@ -107,72 +119,80 @@
         </div>
         
     </div>
+
+    <!-- Tabela -->
     <div class="section-tabela">
-        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabproduto">
+        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px; vertical-align: middle;" id="tabproduto">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Tipo de Produto</th>
-                    <th>Produto</th>
-                    <th style="text-align: center;">Básico</th>
-                    <th style="text-align: center;">Especializado</th>
-                    <th style="text-align: center;">Estratégico</th>
-                    <th style="text-align: center;">Farm. Popular</th>
-                    <th style="text-align: center;">Hospitalar</th>
+                    <th class="col-id">ID</th>
+                    <th class="col-texto8">Tipo de Produto</th>
+                    <th class="col-texto18">Produto</th>
+                    <th class="col-texto6" style="text-align: center !important;">Básico</th>
+                    <th class="col-texto6" style="text-align: center !important;">Especializado</th>
+                    <th class="col-texto6" style="text-align: center !important;">Estratégico</th>
+                    <th class="col-texto6" style="text-align: center !important;">Farm. Popular</th>
+                    <th class="col-texto6" style="text-align: center !important;">Hospitalar</th>
+                    <th class="col-texto15">Tags</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in produtos %}
                 <tr data-id="{{ item.id }}">
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.denominacao.tipo_produto }}</td>
-                    <td>{{ item.produto }}</td>
-                    <td style="text-align: center;">
+                    <td class="col-id">{{ item.id }}</td>
+                    <td class="col-texto8">{{ item.denominacao.tipo_produto }}</td>
+                    <td class="col-texto18">{{ item.produto }}</td>
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.comp_basico %}
                             <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.comp_especializado %}
                             <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.comp_estrategico %}
                             <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.disp_farmacia_popular %}
                             <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-texto6" style="text-align: center !important;">
                         {% if item.hospitalar %}
                             <span class="produto-unidadedaf">Sim</span>
                         {% else %}
                             Não
                         {% endif %}
-                    </td>                    
+                    </td>
+                    <td class="col-texto15">{{ item.produtos_tags }}</td>                   
                 </tr>
                 {% endfor %}
             </tbody>
         </table>  
         
     </div>
+
+    <!-- Paginação -->
     <div id="pagination">
         <button id="produtoPreviousPage" class="page" disabled>Anterior </button>
         <span id="produtoCurrentPage">1</span>
         <button id="produtoNextPage" class="page">Próximo</button>
     </div>
+
+    <!-- Scripts -->
     <script src="{% static 'js/produtos.js' %}"></script>
 
 {% endblock %}

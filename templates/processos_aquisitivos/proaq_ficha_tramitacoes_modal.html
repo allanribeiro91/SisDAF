@@ -1,34 +1,39 @@
 <!-- Modal -->
 {% load static %}
 <style>
-    .tags-column {
+    .tags-column{
         float: left;
         width: 33.33%;
         padding: 5px;
     }
 
-    .custom-modal-width.tramitacao {
-        max-width: 80%;  /* ou qualquer largura que você desejar */
+    .custom-modal-width-tramitacao {
+        min-width: 80%;  /* ou qualquer largura que você desejar */
         font-size: 16px !important;
     }
 
-    .horizontal-sections-modal {
+    .horizontal-sections-modal-tramitacao {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;  /* Alinha os itens ao topo */
         width: 100%;
-        height: 75px;
+        height: auto;
+        margin-bottom: -25px;
     }
 
     .modal-content.tramitacao{
-        height: 60%;
+        height: auto;
+    }
+
+    .modal-body.tramitacao{
+        height: auto;
     }
 
 </style>
 
 <!-- Modal -->
 <div class="modal fade" id="tramitacaoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width tramitacao" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-tramitacao" role="document">
         <div class="modal-content tramitacao">
             
             <div class="modal-header">
@@ -38,96 +43,97 @@
                 </button>
             </div>
             
-            <form id="proaqTramitacaoForm" method="POST" data-post-url="{% if form.instance.id %}{% url 'proaq_ficha_tramitacoes' form.instance.id %}{% else %}{% url 'nova_tramitacao' %}{% endif %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <input type="hidden" name="proaq" id="proaq" value="{{ proaq_id }}">
-                    <div class="horizontal-sections-modal">
+            <div class="modal-body tramitacao">
+                
+                <!-- Formulário -->
+                <form id="proaqTramitacaoForm" method="POST">
+                {% csrf_token %}             
+                    <!-- Log -->
+                    <div class="horizontal-sections-modal-tramitacao">
                         <div class="section" style="border: 0px !important;">
                             <div class="grid" style="font-size: 10px;">
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_data" id="id_tramitacao" name="id_tramitacao" readonly>
+                                    <input type="text" class="form-control log_data" id="id_tramitacao" readonly>
                                     <label for="floatingInput">ID</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_data" id="log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
+                                    <input type="text" class="form-control log_data" id="tramitacao_log_data_registro" readonly>
                                     <label for="floatingInput">Data do Registro</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
+                                    <input type="text" class="form-control log_responsavel" id="tramitacao_log_responsavel_registro" readonly>
                                     <label for="floatingInput">Responsável pelo Registro</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_data" id="lot_ult_atualizacao" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                                    <input type="text" class="form-control log_data" id="tramitacao_log_ult_atualizacao" readonly>
                                     <label for="floatingInput">Última Atualização</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
+                                    <input type="text" class="form-control log_responsavel" id="tramitacao_log_responsavel_atualizacao" readonly>
                                     <label for="floatingInput">Responsável Atualização</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_edicoes" id="log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
+                                    <input type="text" class="form-control log_edicoes" id="tramitacao_log_edicoes" name="log_edicoes" readonly>
                                     <label for="floatingInput">Nº Edições</label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="horizontal-sections-modal">
+                    <!-- Dados da Tramitação -->
+                    <div class="horizontal-sections-modal-tramitacao">
                         <div class="section" style="border: 0px !important;">
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="tramitacao_docsei" name="documento_sei"  style="width: 180px !important;">
-                                    <label for="floatingInput">Nº do Documento SEI</label>
+                                    {{ form_tramitacao_proaq.documento_sei }}
+                                    <label>{{ form_tramitacao_proaq.documento_sei.label }}</label>
                                 </div>
-                                <div class="form-floating">
-                                    <select class="form-select" id="tramitacao_local" aria-label="Floating label select example" name="setor" style="width: 250px !important;">
-                                        <option value="" disabled {% if not form.instance.tipo_produto %}selected{% endif %}>Não Informado</option>
-                                        {% for value in lista_area_ms %}
-                                        <option value="{{ value }}" {% if form.instance.tipo_produto == value %}selected{% endif %}>{{ value }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <label for="floatingSelect">Área MS/Fornecedor*</label>
+                                <div class="form-floating mb-3">
+                                    {{ form_tramitacao_proaq.setor }}
+                                    <label>{{ form_tramitacao_proaq.setor.label }}</label>
                                 </div>
-                                <div class="form-floating full-width">
-                                    <input list="etapas" class="form-select" id="tramitacao_etapa" name="etapa_processo" value="{{ form.instance.tipo_produto }}">
-                                    <datalist id="etapas">
-                                        <option value="Não Informado"></option>
-                                        {% for value in lista_etapa %}
-                                        <option value="{{ value }}"></option>
-                                        {% endfor %}
-                                    </datalist>
-                                    <label for="tramitacao_etapa">Etapa do Processo*</label>
+                                <div class="form-floating mb-3">
+                                    {{ form_tramitacao_proaq.etapa_processo }}
+                                    <label>{{ form_tramitacao_proaq.etapa_processo.label }}</label>
+                                </div>
+                                <div class="form-floating mb-3" style="display: flex; align-items: center; margin-left: 10px;">
+                                    <input type="checkbox" id="id_tramitacao_outra_etapa_checkbox" class="form-checkbox" style="width: 20px; height: 20px;">
+                                </div>
+                                <div class="form-floating mb-3 full-width">
+                                    {{ form_tramitacao_proaq.etapa_processo_outro }}
+                                    <label>{{ form_tramitacao_proaq.etapa_processo_outro.label }}</label>
                                 </div>
                                 
                             </div>
                         </div>
                     </div>
 
-                    <div class="horizontal-sections-modal">
+                    <!-- Datas -->
+                    <div class="horizontal-sections-modal-tramitacao">
                         <div class="section" style="border: 0px !important;">
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" id="tramitacao_data_entrada" name="data_entrada">
+                                    <input type="date" class="form-control" id="id_tramitacao_data_entrada" name="data_entrada">
                                     <label for="data">Data Entrada</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" id="tramitacao_data_previsao" name="previsao_saida" value="{% if form.data.value %}{{ form.data.value|date:'Y-m-d' }}{% endif %}">
+                                    <input type="date" class="form-control" id="id_tramitacao_data_previsao" name="previsao_saida" value="{% if form.data.value %}{{ form.data.value|date:'Y-m-d' }}{% endif %}">
                                     <label for="data">Previsão Saída</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" id="tramitacao_data_saida" name="data_saida" value="{% if form.data.value %}{{ form.data.value|date:'Y-m-d' }}{% endif %}">
+                                    <input type="date" class="form-control" id="id_tramitacao_data_saida" name="data_saida" value="{% if form.data.value %}{{ form.data.value|date:'Y-m-d' }}{% endif %}">
                                     <label for="data">Data Saída</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="tramitacao_dias_setor" name="tramitacao_dias_setor" readonly value="{{ form.instance.id|default_if_none:'' }}" style="width: 150px">
+                                    <input type="text" class="form-control" id="id_tramitacao_dias_setor" name="tramitacao_dias_setor" readonly value="{{ form.instance.id|default_if_none:'' }}" style="width: 150px">
                                     <label for="floatingInput">Dias no setor</label>
                                 </div>         
                             </div>
                         </div>
                     </div>
 
-                    <div class="horizontal-sections-modal">
+                    <!-- Observações -->
+                    <div class="horizontal-sections-modal-tramitacao">
                         <div class="section" style="border: 0px !important; height: 100%;">
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3 full-width">
@@ -136,14 +142,27 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Campos ocultos -->
+                        <div class="grid" style="font-size: 14px;">
+                            <div class="form-floating mb-3">
+                                <input type="hidden" id="id_proaq_hidden" name="proaq_hidden" readonly>
+                                <input type="hidden" id="ultima_data_tramitacao" readonly>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary closeModalButton" data-bs-toggle="modal" data-bs-target="#proaq_tramitacoes_delete" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Deletar</button>
-                    <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="btnSalvarTramitacao" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
-                </div>
-            </form>
+
+                    
+                </form>
+                
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnDeletarTramitacao" style="background-color: rgb(255, 0, 0); border-color: rgb(255, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btnSalvarTramitacao" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+            </div>
+           
             
             
         </div>
@@ -155,20 +174,6 @@
     document.querySelectorAll('.closeModalButton').forEach(button => {
         button.addEventListener('click', function() {
             $('#tramitacaoModal').modal('hide');
-        });
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const tramitacaoDocseiInput = document.getElementById('tramitacao_docsei');
-    
-        tramitacaoDocseiInput.addEventListener('input', function () {
-        // Permite apenas números
-        this.value = this.value.replace(/[^0-9]/g, '');
-    
-        // Limita o comprimento para 7 dígitos
-        if (this.value.length > 7) {
-            this.value = this.value.substring(0, 7);
-        }
         });
     });
 </script>

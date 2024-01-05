@@ -167,6 +167,19 @@ class ProdutosFarmaceuticos(models.Model):
     def get_produtos_por_denominacao(cls, denominacao):
         produtos = cls.objects.filter(denominacao_id=denominacao, del_status=False).values('id', 'produto')
         return list(produtos)
+    
+    def produtos_tags(self):
+        # Retorna uma lista de tags associadas ao produto
+        try:
+            tags = [tag.tag for tag in self.produto_tag.all()]
+            tags = str(tags).replace('[', '').replace(']', '').replace("'", "")
+            if tags:
+                tags
+            else:
+                tags = '-'
+            return tags
+        except AttributeError:
+            return 'Erro'
 
     def __str__(self):
         return f"{self.produto} - ID: {self.id}"
@@ -212,9 +225,6 @@ class ProdutosTags(models.Model):
     del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='usuario_produtotag_deletado')
 
     def soft_delete(self, usuario_instance):
-        """
-        Realiza uma "deleção lógica" do registro.
-        """
         if self.del_status:
             return  # Se já estiver deletado, simplesmente retorne e não faça nada
         self.del_status = True
@@ -223,9 +233,6 @@ class ProdutosTags(models.Model):
         self.save()
     
     def reverse_soft_delete(self):
-        """
-        Reverte a "deleção lógica" do registro.
-        """
         self.del_status = False
         self.del_data = None
         self.del_usuario = None

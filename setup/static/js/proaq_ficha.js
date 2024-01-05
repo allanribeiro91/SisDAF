@@ -23,6 +23,15 @@ document.addEventListener('DOMContentLoaded', function() {
             openModalEvolucaoProaq(idEvolucaoProaq)
         }
     }
+    if (localStorage.getItem('tramitacaoProaqSalvo') === 'true') {
+        sweetAlert('Tramitação do Processo Aquisitivo salvo com sucesso!', 'success', 'top-end');
+        let idTramitacaoProaq = localStorage.getItem('id_proaq_tramitacao');
+        localStorage.removeItem('tramitacaoProaqSalvo');
+        if (idTramitacaoProaq) {
+            localStorage.removeItem('id_proaq_tramitacao');
+            openModalTramitacao(idTramitacaoProaq)
+        }
+    }
 
     const status_proaq = document.getElementById('id_proaq_status');
     status_cor()
@@ -115,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
    
     //Máscara de Número do Processo SEI
     $('#id_proaq_numero_processo_sei').mask('00000.000000/0000-00');
+    $('#id_tramitacaoproaq_documento_sei').mask('000000')
 
 
     //Salvar Processo Aquisitivo
@@ -231,6 +241,28 @@ document.addEventListener('DOMContentLoaded', function() {
     
         return true;
     }
+
+    //Deletar Evolução do Processo Aquisitivo
+    const botao_deletar_proaq = document.getElementById('btnProaqDeletar')
+    botao_deletar_proaq.addEventListener('click', function() {
+
+        const url_apos_delete = "/proaq/";
+        
+        //Trata-se de um novo registro que ainda não foi salvo
+        if (!proaq_id) {
+            window.location.href = "/proaq/";
+            return;
+        }        
+
+        //parâmetros para deletar
+        const mensagem = "Deletar Processo Aquisitivo."
+        const url_delete = "/proaq/ficha/dadosgerais/deletar/" + proaq_id + "/"
+
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    })
 
 
     const botao_inserir_novo_item = document.getElementById('btnNovoItem')
@@ -783,4 +815,427 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+
+
+
+    //TRAMITAÇÕES
+    const modal_tramitacao_proaq = new bootstrap.Modal(document.getElementById('tramitacaoModal'))
+    const id_proaq_tramitacao_hidden = document.getElementById('id_proaq_hidden')
+    const botao_inserir_tramitacao = document.getElementById('btnNovaTramitacao')
+    const maior_data_tramitacao = document.getElementById('ultima_data_tramitacao')
+    botao_inserir_tramitacao.addEventListener('click', function(){
+        if (verificaDataSaidaVazio()){
+            sweetAlert('<span style="font-weight:normal">Informe a última <span style="font-weight:bold">Data de Saída</span> antes de registrar uma nova tramitação.</span>')
+            return
+        }
+        
+        limpar_modal_tramitacao()
+        
+        maior_data_tramitacao.value = maiorDataSaidaTramitacao()
+        document.getElementById('id_tramitacao_data_entrada').value = maiorDataSaidaTramitacao()
+        
+        id_proaq_tramitacao_hidden.value = proaq_id
+        modal_tramitacao_proaq.show()
+    })
+
+
+    const tramitacao_etapa = document.getElementById('id_tramitacaoproaq_etapa')
+    const tramitacao_etapa_outra = document.getElementById('id_tramitacaoproaq_etapa_processo_outro')
+    const tramitacao_outra_checkbox = document.getElementById('id_tramitacao_outra_etapa_checkbox')
+
+    tramitacao_outra_checkbox.addEventListener('change', function() {
+        if (tramitacao_outra_checkbox.checked) {
+            tramitacao_etapa.value = ''
+            tramitacao_etapa.setAttribute('disabled', 'disabled')
+            tramitacao_etapa_outra.removeAttribute('readonly');
+            tramitacao_etapa_outra.value = ''
+        } else {
+            tramitacao_etapa.value = ''
+            tramitacao_etapa.removeAttribute('disabled')
+            tramitacao_etapa_outra.value = ''
+            tramitacao_etapa_outra.setAttribute('readonly', 'true');
+        }
+    });
+
+    function verificar_se_ha_outra_etapa(){
+        if (tramitacao_etapa_outra.value != '') {
+            var event = new Event('change');
+            var outra_etapa = tramitacao_etapa_outra.value
+            tramitacao_outra_checkbox.checked = true;
+            tramitacao_outra_checkbox.dispatchEvent(event);
+            tramitacao_etapa_outra.value = outra_etapa
+        }    
+    }
+    verificar_se_ha_outra_etapa();
+
+
+    const tramitacao_data_entrada = document.getElementById('id_tramitacao_data_entrada')
+    const tramitacao_previsao_saida = document.getElementById('id_tramitacao_data_previsao')
+    const tramitacao_data_saida = document.getElementById('id_tramitacao_data_saida')
+    const tramitacao_dias_setor = document.getElementById('id_tramitacao_dias_setor')
+
+
+    function datas_tramitacao() {
+        var data_entrada = new Date(tramitacao_data_entrada.value);
+        var data_saida = new Date(tramitacao_data_saida.value);
+        var data_hoje = new Date(); // Supõe que 'today' seja a data atual
+
+        // Verifica se data_saida é vazia
+        if (data_saida == 'Invalid Date') {
+            var diferencaTempo = data_hoje.getTime() - data_entrada.getTime();
+        } else {
+            var diferencaTempo = data_saida.getTime() - data_entrada.getTime();
+        }
+    
+        // Calcula a diferença em dias
+        var diferencaDias = diferencaTempo / (1000 * 3600 * 24);
+        tramitacao_dias_setor.value = parseInt(diferencaDias);
+    }
+    
+    function data_menor_ultima_tramitacao() {
+        var ultimaDataTramitacaoTexto = document.getElementById('ultima_data_tramitacao').value;
+        var dataEntradaTexto = tramitacao_data_entrada.value;
+    
+        if (ultimaDataTramitacaoTexto && dataEntradaTexto) {
+            var ultimaDataTramitacao = new Date(ultimaDataTramitacaoTexto);
+            var dataEntrada = new Date(dataEntradaTexto);
+
+            if (dataEntrada < ultimaDataTramitacao) {
+                sweetAlert('<span style="font-weight:normal">A <span style="font-weight:bold">Data de Entrada</span> <span style="font-weight:bold; color:red">não pode ser MENOR</span> que a <span style="font-weight:bold">Última Data de Saída</span>!</span>');
+                tramitacao_data_entrada.value = '';
+                return;
+            }
+        }
+    }
+    
+
+    tramitacao_data_entrada.addEventListener('change', function(){        
+        if (tramitacao_data_entrada.value != ''){
+            data_entrada_saida();
+            datas_tramitacao();
+            data_menor_ultima_tramitacao();
+        }
+    })
+
+
+
+    tramitacao_previsao_saida.addEventListener('change', function(){        
+        if (tramitacao_data_entrada.value != ''){
+            data_entrada_saida();
+            datas_tramitacao();
+        }
+    })
+
+    tramitacao_data_saida.addEventListener('change', function(){        
+        if (tramitacao_data_entrada.value != ''){
+            data_entrada_saida();
+            datas_tramitacao();
+        }
+    })
+
+
+    function limpar_modal_tramitacao(){
+        //log
+        $('#id_tramitacao').val('')
+        $('#tramitacao_log_data_registro').val('')
+        $('#tramitacao_log_responsavel_registro').val('')
+        $('#tramitacao_lot_ult_atualizacao').val('')
+        $('#tramitacao_log_responsavel_atualizacao').val('')
+        $('#tramitacao_log_edicoes').val('')
+
+        //dados da tramitação
+        $('#id_tramitacaoproaq_documento_sei').val('')
+        $('#id_tramitacaoproaq_etapa').val('')
+        $('#id_tramitacaoproaq_setor').val('')
+        $('#id_tramitacaoproaq_etapa_processo_outro').val('')
+
+        //datas
+        $('#id_tramitacao_data_entrada').val('')
+        $('#id_tramitacao_data_previsao').val('')
+        $('#id_tramitacao_data_saida').val('')
+        $('#id_tramitacao_dias_setor').val('')
+
+        //observações
+        $('#tramitacao_observacoes').val('')
+    }
+    
+    function data_entrada_saida(){
+        var data_entrada = new Date(tramitacao_data_entrada.value);
+        var data_previsao = new Date(tramitacao_previsao_saida.value);
+        var data_saida = new Date(tramitacao_data_saida.value);
+
+        if (data_entrada != '' && data_previsao != '' && data_saida != ''){
+            
+            if (data_saida < data_entrada){
+                sweetAlert('<span style="font-weight:normal">A <span style="font-weight:bold">Data de Saída</span> <span style="font-weight:bold; color:red">não pode ser MENOR</span> que a <span style="font-weight:bold">Data de Entrada</span>!</span>')
+                tramitacao_data_saida.value = ''
+                return
+            }
+
+            if (data_previsao < data_entrada){
+                sweetAlert('<span style="font-weight:normal">A <span style="font-weight:bold">Previsão de Saída</span> <span style="font-weight:bold; color:red">não pode ser MENOR</span> que a <span style="font-weight:bold">Data de Entrada</span>!</span>')
+                tramitacao_previsao_saida.value = ''
+            }
+            
+        }
+    }
+
+    const botao_salvar_tramitacao = document.getElementById('btnSalvarTramitacao')
+    botao_salvar_tramitacao.addEventListener('click', function(event){
+        event.preventDefault();
+        salvarTramitacaoProaq();
+    })
+    
+    function salvarTramitacaoProaq() {
+        const id_tramitacao_modal = document.getElementById('id_tramitacao')
+        
+        //Verificar preenchimento dos campos
+        let preenchimento_incorreto = verificar_campos_tramitacao_proaq()
+        if (preenchimento_incorreto === false) {
+            return;
+        }
+
+        //Enviar para o servidor
+            //definir o caminho
+            if (id_tramitacao_modal.value == '') {
+                postURL = '/proaq/ficha/tramitacoes/nova/'
+            } else
+            {
+                postURL = `/proaq/ficha/tramitacoes/salvar/${id_tramitacao_modal.value}/`
+            }
+
+            //pegar os dados
+            let formData = new FormData(document.getElementById('proaqTramitacaoForm'));
+    
+            //enviar 
+            fetch(postURL, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+        
+        //Retorno do Servidor
+        .then(response => {
+            // Primeiro verifique se a resposta é ok
+            if (!response.ok) {
+                sweetAlert('Dados não foram salvos.', 'error', 'red');
+                throw new Error('Server response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.retorno === "Salvo") {
+                let id_proaq_tramitacao = data.id_tramitacao_proaq;
+                localStorage.setItem('tramitacaoProaqSalvo', 'true');
+                localStorage.setItem('id_proaq_tramitacao', id_proaq_tramitacao);
+                window.location.href = data.redirect_url;
+            }
+    
+            if (data.retorno === "Não houve mudanças") {
+                //alert
+                sweetAlert('Dados não foram salvos.<br>Não houve mudanças.', 'warning', 'orange')
+            }
+    
+            if (data.retorno === "Erro ao salvar") {
+                //alert
+                sweetAlert('Dados não foram salvos.', 'error', 'red')
+            }
+        })
+        .catch(error => {
+            console.error('Fetch operation error:', error);
+        });
+            
+    }
+
+    function verificar_campos_tramitacao_proaq() {
+        const campos = [
+            { id: 'id_tramitacaoproaq_documento_sei', mensagem: 'Informe o <b>Documento SEI</b>!' },
+            { id: 'id_tramitacaoproaq_setor', mensagem: 'Informe a <b>Área do MS/Fornecedor</b>!' },
+            { id: 'id_tramitacao_data_entrada', mensagem: 'Informe a <b>Data da Entrada</b>!' },
+            { id: 'id_tramitacao_data_previsao', mensagem: 'Informe a <b>Previsão de Saída</b>!' },
+        ];
+    
+        let mensagensErro = campos.reduce((mensagens, campo) => {
+            const elemento = document.getElementById(campo.id);
+            if (!elemento || elemento.value === '') {
+                mensagens.push(campo.mensagem);
+            }
+            return mensagens;
+        }, []);
+
+        const mensagem_etapa = 'Informe a <b>Etapa do Processo</b>!'
+        const tramitacao_proaq_etapa = document.getElementById('id_tramitacaoproaq_etapa')
+        const tramitacao_proaq_etapa_outro = document.getElementById('id_tramitacaoproaq_etapa_processo_outro')
+        if (tramitacao_proaq_etapa.value == '' && tramitacao_proaq_etapa_outro.value == ''){
+            mensagensErro.push(mensagem_etapa);
+        }
+    
+        if (mensagensErro.length > 0) {
+            const campos = mensagensErro.join('<br>')
+            sweetAlertPreenchimento(campos)
+            return false;
+        }
+    
+        return true;
+    }
+
+    function openModalTramitacao(id_tramitacao_item) {
+        fetch(`/proaq/buscar_tramitacao_proaq/${id_tramitacao_item}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar dados da Tramitação do Processo Aquisitivo.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Atualizar os campos do formulário no modal com os dados recebidos
+                //log
+                $('#id_tramitacao').val(data.id);
+                $('#tramitacao_log_data_registro').val(data.log_data_registro);
+                $('#tramitacao_log_responsavel_registro').val(data.log_responsavel_registro);
+                $('#tramitacao_log_ult_atualizacao').val(data.lot_ult_atualizacao);
+                $('#tramitacao_log_responsavel_atualizacao').val(data.log_responsavel_atualizacao);
+                $('#tramitacao_log_edicoes').val(data.log_edicoes);
+
+                //dados da tramitação
+                $('#id_tramitacaoproaq_documento_sei').val(data.documento_sei);
+                $('#id_tramitacaoproaq_setor').val(data.setor);
+                $('#id_tramitacaoproaq_etapa').val(data.etapa_processo);
+                $('#id_tramitacaoproaq_etapa_processo_outro').val(data.etapa_processo_outro);
+                if (data.etapa_check_outro) {
+                    $('#id_tramitacao_outra_etapa_checkbox').prop('checked', true);
+                    $('#id_tramitacaoproaq_etapa').prop('disabled', true);
+                    $('#id_tramitacaoproaq_etapa_processo_outro').prop('readonly', false);
+                } else {
+                    $('#id_tramitacao_outra_etapa_checkbox').prop('checked', false);
+                    $('#id_tramitacaoproaq_etapa').prop('disabled', false);
+                    $('#id_tramitacaoproaq_etapa_processo_outro').prop('readonly', true);
+                }
+                
+                
+                
+                
+                
+                
+                //datas
+                $('#id_tramitacao_data_entrada').val(data.data_entrada);
+                $('#id_tramitacao_data_previsao').val(data.data_previsao);
+                $('#id_tramitacao_data_saida').val(data.data_saida);
+
+                //observações
+                $('#tramitacao_observacoes').val(data.observacoes);
+
+                //id proaq
+                $('#id_proaq_tramitacao_hidden').val(proaq_id)
+                
+                //ID Proaq
+                id_proaq_tramitacao_hidden.value = proaq_id
+
+                //Dias no setor
+                datas_tramitacao()
+
+                // Abrir o modal
+                modal_tramitacao_proaq.show();
+
+
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    //Abrir Tramitação do Processo Aquisitivo
+    const tabela_tramitacoes = document.getElementById('tabTramitacoes')
+    tabela_tramitacoes.addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.tagName === 'TD') {
+          const row = target.closest('tr');
+          const proaq_tramitacao_id = row.dataset.id;
+          limpar_modal_tramitacao();
+          openModalTramitacao(proaq_tramitacao_id);
+        }
+    });
+
+    function maiorDataSaidaTramitacao() {
+
+        let maiorData = new Date(0); // Data inicial para comparação (1 de janeiro de 1970)
+    
+        for (const linha of tabela_tramitacoes.rows) {
+            const celulaDataSaida = linha.querySelector('#tramitacao_data_saida');
+            if (celulaDataSaida) {
+                const dataTexto = celulaDataSaida.textContent.trim();
+    
+                // Ignorar células sem data ou com texto 'NI'
+                if (dataTexto !== '' && dataTexto !== 'NI') {
+                    const dataSaida = new Date(dataTexto.split('/').reverse().join('-'));
+    
+                    if (dataSaida > maiorData) {
+                        maiorData = dataSaida;
+                    }
+                }
+            }
+        }
+
+        // Verifica se a maior data é válida antes de retornar
+        return maiorData > new Date(0) ? formatarData(maiorData) : null;
+    }
+    
+    function verificaDataSaidaVazio() {
+        const tabela = document.getElementById('tabTramitacoes');
+    
+        for (const linha of tabela.rows) {
+            const celulaDataSaida = linha.querySelector('#tramitacao_data_saida');
+            if (celulaDataSaida && celulaDataSaida.textContent.trim() === '-') {
+                return true; // Encontrou uma data de saída com "-"
+            }
+        }
+    
+        return false; // Não encontrou nenhuma data de saída com "-"
+    }
+    
+    //Deletar Evolução do Processo Aquisitivo
+    const botao_deletar_tramitacao = document.getElementById('btnDeletarTramitacao')
+    botao_deletar_tramitacao.addEventListener('click', function() {
+
+        const tramitacao_id = document.getElementById('id_tramitacao').value
+        const url_apos_delete = "/proaq/ficha/dadosgerais/" + proaq_id  + "/";
+        
+        //Trata-se de um novo registro que ainda não foi salvo
+        if (!tramitacao_id) { 
+            modal_tramitacao_proaq.hide()
+            return;
+        }
+
+        //parâmetros para deletar
+        const mensagem = "Deletar Tramitação do Processo Aquisitivo."
+        const url_delete = "/proaq/ficha/tramitacoes/deletar/" + tramitacao_id + "/"
+
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    })
+
+
+
+    //RELATÓRIO
+    const botao_relatorio = document.getElementById('btnProaqRelatorio')
+    botao_relatorio.addEventListener('click', function(){
+
+        if (proaq_id == '') {
+            sweetAlert('Não há dados!', 'warning')
+            return
+        }
+        
+        var width = 1000;
+        var height = 700;
+        var left = (window.screen.width / 2) - (width / 2);
+        var top = (window.screen.height / 2) - (height / 2);
+        
+        var url = '/proaq/relatorio/dadosgerais/' + proaq_id + '/';
+        window.open(url, 'newwindow', 'scrollbars=yes, width=' + width + ', height=' + height + ', top=' + top + ', left=' + left);
+    })
+
 });

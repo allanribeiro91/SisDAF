@@ -114,5 +114,139 @@ document.addEventListener('DOMContentLoaded', function() {
         const proaqId = $(this).attr('data-id').toString();
         window.location.href = `/proaq/ficha/dadosgerais/${proaqId}/`;
     });
+
+
+    //Filtrar
+    $('#status_proaq, #unidade_daf, #fase_evolucao, #modalidade_aquisicao, #denominacao').change(function() {
+        filtrarTabelaProaq();
+    });
+
+    //Renderizar tabela
+    function filtrarTabelaProaq(page = 1) {
+        var status = $('#status_proaq').val();
+        var unidadeDAF = $('#unidade_daf').val();
+        var faseEvolucao = $('#fase_evolucao').val();
+        var modalidadeAquisicao = $('#modalidade_aquisicao').val();
+        var denominacao_id = $('#denominacao').val();
+
+        var dataToSend = {
+            'status': status,
+            'unidadeDAF': unidadeDAF,
+            'faseEvolucao': faseEvolucao,
+            'modalidadeAquisicao': modalidadeAquisicao,
+            'denominacao_id': denominacao_id
+        };
+
+        $.ajax({
+            url: "/proaq/filtro/",
+            data: { ...dataToSend, page: page },
+            dataType: 'json',
+            success: function(data) {
+                recarregarTabela(data.data);
+                $('#numeroProcessos').text(data.total_processos.toLocaleString('pt-BR').replace(/,/g, '.'));
+                $('#currentPage').text(data.current_page);
+                $('#nextPage').prop('disabled', !data.has_next);
+                $('#previousPage').prop('disabled', !data.has_previous);
+                currentPage = data.current_page;
+            }
+        });
+    }
+
+    //Atualizar tabela
+    function recarregarTabela(proaqs) {
+        console.log('recarregarTabela')
+        var $tableBody = $('.table tbody');
+        $tableBody.empty(); // Limpar as linhas existentes
+
+        proaqs.forEach(proaq => {
+            var class_bolinha = ''
+            if (proaq.get_status_label == 'Em Execução'){
+                class_bolinha = 'bolinha bolinha-vigente'
+            }
+            if (proaq.get_status_label == 'Suspenso'){
+                class_bolinha = 'bolinha bolinha-suspenso'
+            }
+            if (proaq.get_status_label == 'Finalizado'){
+                class_bolinha = 'bolinha bolinha-encerrado'
+            }
+            if (proaq.get_status_label == 'Cancelado'){
+                class_bolinha = 'bolinha bolinha-cancelado'
+            }
+            
+            var row = `
+                <tr data-id="${proaq.id}">
+                    <td class="col-id">${proaq.id}</td>
+                    <td class="col-texto6">
+                        <span class="${class_bolinha}"></span>${proaq.get_status_label}
+                    </td>
+                    <td class="col-texto6">${proaq.get_unidade_daf_label}</td>
+                    <td class="col-texto12">${proaq.fase_processo}</td>
+                    <td class="col-texto4" style="text-align: center !important;">${proaq.fase_dias}</td>
+                    <td class="col-texto10">${proaq.get_modalidade_aquisicao_label}</td>
+                    <td class="col-texto10">${proaq.numero_processo_sei}</td>
+                    <td class="col-texto6">${proaq.numero_etp}</td>
+                    <td class="col-texto20">${proaq.get_denominacao_nome}</td>
+                    <td class="col-texto6">${proaq.get_usuario_nome}</td>
+                    <td class="col-valor5">${proaq.total_itens}</td>
+                    <td class="col-valor10">${proaq.valor_total.toLocaleString('pt-BR')}</td>
+                </tr>
+            `;
+            $tableBody.append(row);
+        });
+    }
+
+    //Limpar Filtros
+    $('#limpar_filtros').on('click', function() {
+        $('#status_proaq').val('');
+        $('#unidade_daf').val('');
+        $('#fase_evolucao').val('');
+        $('#modalidade_aquisicao').val('');
+        $('#denominacao').val('');
+        filtrarTabelaProaq();
+    });
+
+
+    //Exportar dados
+$('#exportarProaqs').on('click', function() {
+    // Coleta valores dos campos
+    const status_proaq = document.querySelector('#status_proaq').value;
+    const unidade_daf = document.querySelector('#unidade_daf').value;
+    const fase_evolucao = document.querySelector('#fase_evolucao').value;
+    const modalidade_aquisicao = document.querySelector('#modalidade_aquisicao').value;
+    const denominacao = document.querySelector('#denominacao').value;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Define dados a serem enviados
+    const data = {
+        status_proaq: status_proaq,
+        unidade_daf: unidade_daf,
+        fase_evolucao: fase_evolucao,
+        modalidade_aquisicao: modalidade_aquisicao,
+        denominacao: denominacao,
+    };
+
+    console.log('Exportar Processos Aquisitivos')
+
+    // Envia solicitação AJAX para o servidor
+    fetch('exportar/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        // Inicia o download do arquivo
+        const a = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = 'processos_aquisitivos.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+});
     
 });

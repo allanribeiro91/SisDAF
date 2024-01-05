@@ -1,3 +1,11 @@
+document.addEventListener('DOMContentLoaded', function() {
+
+    if (localStorage.getItem('produtoSalvo') === 'true') {
+        sweetAlert('Produto salvo com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('produtoSalvo');
+    }
+
+});
 
 $(document).ready(function() {
     //Mudar de aba
@@ -103,9 +111,10 @@ $(document).ready(function() {
 
 
     //Limpar Filtros
-    $('.limpar-filtro').on('click', function() {
+    $('#limpar-filtros').on('click', function() {
         $('#tipo_produto').val('');
         $('#produto').val('');
+        $('#denominacao').val('');
         $('#comp_unidade_basico').prop('checked', false);
         $('#comp_especializado').prop('checked', false);
         $('#comp_estrategico').prop('checked', false);
@@ -129,7 +138,7 @@ $(document).ready(function() {
     });
 
     //Filtrar
-    $('#tipo_produto, #produto').change(function() {
+    $('#tipo_produto, #produto, #denominacao').change(function() {
         
         fetchAndRenderTableData();
     });
@@ -195,12 +204,14 @@ function fetchAndRenderTableData(page = 1) {
     console.log('fetchAndRenderTableData')
     var selectedTipo = $('#tipo_produto').val();
     var produto = $('#produto').val();
+    var denominacao = $('#denominacao').val();
     
     console.log(produto)
 
     var dataToSend = {
         'tipo_produto': selectedTipo,
         'produto': produto,
+        'denominacao': denominacao,
     };
     
     if ($('#comp_unidade_basico').prop('checked')) {
@@ -238,11 +249,6 @@ function fetchAndRenderTableData(page = 1) {
 
 
 
-
-
-
-
-
 //Atualizar tabela
 function updateTable(produtos) {
     console.log('updateTable')
@@ -252,14 +258,15 @@ function updateTable(produtos) {
     produtos.forEach(produto => {
         var row = `
             <tr data-id="${produto.id}">
-                <td>${produto.id}</td>
-                <td>${produto.denominacao__tipo_produto}</td>
-                <td>${produto.produto}</td>
-                <td style="text-align: center;">${produto.comp_basico ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${produto.comp_especializado ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${produto.comp_estrategico ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${produto.disp_farmacia_popular ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
-                <td style="text-align: center;">${produto.hospitalar ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td class="col-id">${produto.id}</td>
+                <td class="col-texto8">${produto.denominacao__tipo_produto}</td>
+                <td class="col-texto18">${produto.produto}</td>
+                <td class="col-texto6" style="text-align: center !important;">${produto.comp_basico ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td class="col-texto6" style="text-align: center !important;">${produto.comp_especializado ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td class="col-texto6" style="text-align: center !important;">${produto.comp_estrategico ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td class="col-texto6" style="text-align: center !important;">${produto.disp_farmacia_popular ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td class="col-texto6" style="text-align: center !important;">${produto.hospitalar ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                <td class="col-texto15">${produto.produtos_tags}</td>
             </tr>
         `;
         $tableBody.append(row);
@@ -297,6 +304,8 @@ document.getElementById('btnSalvarProduto').addEventListener('click', function(e
     })
     .then(data => {
         if (data.redirect_url) {
+
+            localStorage.setItem('produtoSalvo', 'true');
             window.location.href = data.redirect_url;
         }
     })

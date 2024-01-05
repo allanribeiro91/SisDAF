@@ -131,11 +131,11 @@ $(document).ready(function() {
                     <td>${denominacao.id}</td>
                     <td>${denominacao.tipo_produto}</td>
                     <td>${denominacao.denominacao}</td>
-                    <td style="text-align: center;">${denominacao.unidade_basico ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                    <td style="text-align: center;">${denominacao.unidade_especializado ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                    <td style="text-align: center;">${denominacao.unidade_estrategico ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                    <td style="text-align: center;">${denominacao.unidade_farm_popular ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
-                    <td style="text-align: center;">${denominacao.hospitalar ? '<span class="bold-blue">Sim</span>' : 'Não'}</td>
+                    <td class="col-texto6" style="text-align: center !important;">${denominacao.unidade_basico ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                    <td class="col-texto6" style="text-align: center !important;">${denominacao.unidade_especializado ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                    <td class="col-texto6" style="text-align: center !important;">${denominacao.unidade_estrategico ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                    <td class="col-texto6" style="text-align: center !important;">${denominacao.unidade_farm_popular ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
+                    <td class="col-texto6" style="text-align: center !important;">${denominacao.hospitalar ? '<span class="produto-unidadedaf">Sim</span>' : 'Não'}</td>
                 </tr>
             `;
             $tableBody.append(row);

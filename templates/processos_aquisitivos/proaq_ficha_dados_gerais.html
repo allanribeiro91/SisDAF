@@ -4,6 +4,7 @@
 {% load proaq_custom_filters %}
 {% block extra_head %}    
     <link rel="stylesheet" href="{% static 'styles/proaq_ficha.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
 {% endblock %}
 {% block content %}    
@@ -35,11 +36,14 @@
 
             <!-- Botões -->
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#proaq_delete" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                <button type="button" class="btn btn-danger" id="btnProaqDeletar" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
                     <i class="fas fa-trash-alt"></i>
-                    Deletar
+                    &nbsp;Deletar
                 </button>
-                
+                <button type="button" class="btn btn-danger" id="btnProaqRelatorio" style="font-size: 12px; background-color: #039153; border-color: #039153;">
+                    <i class="fa-regular fa-file-pdf"></i>
+                    &nbsp;Relatório
+                </button>
                 <button class="btn btn-primary me-md-2" type="submit" id="btnSaveProaq" style="font-size: 12px;">
                     <i class="fas fa-save me-1"></i> 
                     Salvar
@@ -314,38 +318,38 @@
                 <div class="section">
                     <h3>Tramitações</h3>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button class="btn btn-primary me-md-2" type="submit" id="btnNovaTramitacao" style="font-size: 12px; background-color: green; border-color: green;">
+                        <button class="btn btn-primary me-md-2" type="button" id="btnNovaTramitacao" style="font-size: 12px; background-color: green; border-color: green;">
                             <i class="fas fa-plus" style="font-size: 14px;"></i> 
                             &nbsp;Nova Tramitação
                         </button>
                     </div>
                 
-                
+                    <!-- Tabela de Tramitações -->
                     <div class="section-tabela" style="width: 100% !important; margin-left: 0px;">
-                        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabTramitacoes">
+                        <table class="table table-striped table-hover fixed-size-table" style="font-size: 12px;" id="tabTramitacoes">
                             <thead>
                                 <tr>
-                                    <th class="tramitacao-id">ID</th>
-                                    <th class="tramitacao-docsei">Documento SEI</th>
-                                    <th class="tramitacao-setor">Setor</th>
-                                    <th class="tramitacao-etapa">Etapa</th>
-                                    <th class="tramitacao-data">Entrada</th>
-                                    <th class="tramitacao-data">Previsão</th>
-                                    <th class="tramitacao-data">Saída</th>
-                                    <th class="tramitacao-data">Dias</th>
+                                    <th class="col-id">ID</th>
+                                    <th class="col-texto6">Documento SEI</th>
+                                    <th class="col-texto8">Setor</th>
+                                    <th class="col-texto25">Etapa</th>
+                                    <th class="col-texto6">Entrada</th>
+                                    <th class="col-texto6">Previsão</th>
+                                    <th class="col-texto6">Saída</th>
+                                    <th class="col-texto4">Dias</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for item in tab_tramitacoes %}
+                                {% for item in tab_proaq_tramitacoes %}
                                 <tr data-id="{{ item.id }}" data-proaq-id="{{ item.proaq.id }}">
-                                    <td class="tramitacao-id">{{ item.id }}</td>
-                                    <td class="tramitacao-docsei">{{ item.documento_sei }}</td>
-                                    <td class="tramitacao-setor">{{ item.setor }}</td>
-                                    <td class="tramitacao-etapa">{{ item.etapa_processo }}</td>
-                                    <td class="tramitacao-data">{{ item.data_entrada|date:"d/m/Y" }}{% if not item.data_entrada %}NI{% endif %}</td>
-                                    <td class="tramitacao-data">{{ item.previsao_saida|date:"d/m/Y" }}{% if not item.previsao_saida %}NI{% endif %}</td>
-                                    <td class="tramitacao-data">{{ item.data_saida|date:"d/m/Y" }}{% if not item.data_saida %}NI{% endif %}</td>
-                                    <td class="tramitacao-data">{{ item.duracao|default:"-" }}</td>
+                                    <td class="col-id">{{ item.id }}</td>
+                                    <td class="col-texto6">{{ item.documento_sei }}</td>
+                                    <td class="col-texto8">{{ item.setor }}</td>
+                                    <td class="col-texto25">{{ item.etapa_tramitacao }}</td>
+                                    <td class="col-texto6" id="tramitacao_data_entrada">{{ item.data_entrada|date:"d/m/Y" }}{% if not item.data_entrada %}-{% endif %}</td>
+                                    <td class="col-texto6">{{ item.previsao_saida|date:"d/m/Y" }}{% if not item.previsao_saida %}-{% endif %}</td>
+                                    <td class="col-texto6" id="tramitacao_data_saida">{{ item.data_saida|date:"d/m/Y" }}{% if not item.data_saida %}-{% endif %}</td>
+                                    <td class="col-texto4">{{ item.dias_tramitacao }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -359,7 +363,7 @@
                 <h3>Observações Gerais</h3>
                 <div class="grid" style="font-size: 14px;">
                     <div class="form-floating mb-3 full-width">
-                        <textarea class="form-control auto-expand" id="observacoes_gerais" name="observacoes_gerais" rows="1" style="padding-top: 10px; height: 200px;">{{ form.instance.observacoes_gerais|default_if_none:'' }}</textarea>
+                        <textarea class="form-control auto-expand" id="observacoes_gerais" name="observacoes_gerais" rows="1" style="padding-top: 10px; height: 200px;">{{ form.instance.observacoes_gerais|default_if_none:'Sem observações.' }}</textarea>
                     </div> 
                 </div>
             </div>
@@ -368,9 +372,11 @@
     </div>
 
     
+    <script src="{% static 'js/_funcoes_gerais.js' %}"></script>
     <script src="{% static 'js/proaq_ficha.js' %}"></script>
 
     <!-- Modais -->
+    {% include "processos_aquisitivos/proaq_ficha_tramitacoes_modal.html" %}
     {% include "processos_aquisitivos/proaq_ficha_evolucao_ficha_modal.html" %} 
     {% include "processos_aquisitivos/proaq_ficha_evolucao_modal.html" %}
     {% include "processos_aquisitivos/proaq_ficha_evolucao_info_modal.html" %}

@@ -4,6 +4,7 @@ from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from setup.choices import STATUS_PROAQ, UNIDADE_DAF2, MODALIDADE_AQUISICAO, STATUS_FASE, TIPO_COTA, FASES_EVOLUCAO_PROAQ
 from django.utils import timezone
 from datetime import date
+from django.db.models import Max
 
 
 class ProaqDadosGerais(models.Model):
@@ -80,6 +81,46 @@ class ProaqDadosGerais(models.Model):
     
     def get_denominacao_nome(self):
         return self.denominacao.denominacao
+
+    def fase_processo(self):
+        # Filtra as evoluções relacionadas que não estão deletadas
+        evolucoes = self.proaq_evolucao.filter(del_status=False)
+
+        # Se não houver evoluções, retorna None ou algum valor padrão
+        if not evolucoes.exists():
+            return None, None  # Alterado para retornar também None para os dias
+
+        # Encontra o maior número de fase
+        max_fase_numero = evolucoes.aggregate(Max('fase_numero'))['fase_numero__max']
+
+        # Obtém a instância de ProaqEvolucao com o maior número de fase
+        evolucao = evolucoes.get(fase_numero=max_fase_numero)
+        fase = f'F{max_fase_numero} - {evolucao.get_fase_display()}'
+
+        # Calcula o total de dias para essa fase
+        total_dias = evolucao.total_dias()
+
+        # Retorna a representação legível da fase e o total de dias
+        return fase, total_dias
+
+    def total_itens(self):
+        quantidade_itens = self.proaq_item.filter(del_status=False).count()
+        return quantidade_itens
+
+    def valor_total(self):
+        # Filtra os itens relacionados que não estão deletados
+        itens = self.proaq_item.filter(del_status=False)
+
+        # Calcula a soma dos valores totais de cada item
+        total = sum(item.valor_unitario_estimado * item.qtd_a_ser_contratada for item in itens)
+
+        return total
+
+    def responsavel_tecnico_proaq(self):
+        if self.responsavel_tecnico:
+            return self.responsavel_tecnico.primeiro_ultimo_nome()
+        else:
+            return self.outro_responsavel
 
     def __str__(self):
         return f"Processo Aquisitivo: {self.numero_processo_sei} - Denominacao: ({self.denominacao}) - ID ({self.id})"
@@ -259,6 +300,9 @@ class PROAQ_AREA_MS(models.Model):
     secretaria = models.CharField(max_length=100, null=True, blank=True)
     departamento = models.CharField(max_length=100, null=True, blank=True)
 
+    def __str__(self):
+        return self.setor
+
 class PROAQ_ETAPA(models.Model):
     etapa = models.CharField(max_length=200, null=False, blank=False)
 
@@ -267,9 +311,6 @@ class ProaqTramitacao(models.Model):
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_registro_proaqtramitacao')
     usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_atualizacao_proaqtramitacao')
 
-    #Relacionamento com ProaqDadosGerais
-    proaq = models.ForeignKey(ProaqDadosGerais, on_delete=models.DO_NOTHING, related_name='proaq_tramitacao')
-
     #log
     registro_data = models.DateTimeField(auto_now_add=True)
     ult_atual_data = models.DateTimeField(auto_now=True)
@@ -277,8 +318,8 @@ class ProaqTramitacao(models.Model):
 
     #fase
     documento_sei = models.CharField(max_length=20, null=False, blank=False)
-    setor = models.CharField(max_length=50, null=False, blank=False)
-    etapa_processo = models.CharField(max_length=100, null=False, blank=False)
+    etapa_processo = models.CharField(max_length=100, null=True, blank=True)
+    etapa_processo_outro = models.CharField(max_length=100, null=True, blank=True)
 
     #datas
     data_entrada = models.DateField(null=True, blank=True)
@@ -288,11 +329,16 @@ class ProaqTramitacao(models.Model):
     #observacoes
     observacoes = models.TextField(null=False, blank=False, default='Sem observações.')
 
+    #Relacionamento com ProaqDadosGerais
+    proaq = models.ForeignKey(ProaqDadosGerais, on_delete=models.DO_NOTHING, related_name='proaq_tramitacao')
+
+    #Setor MS
+    setor = models.ForeignKey(PROAQ_AREA_MS, on_delete=models.DO_NOTHING, related_name='proaq_tramitacao_setor')
+
     #delete (del)
     del_status = models.BooleanField(default=False)
     del_data = models.DateTimeField(null=True, blank=True)
     del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='usuario_proaqtramitacao_deletado')
-
 
     def soft_delete(self, usuario_instance):
         """
@@ -318,6 +364,33 @@ class ProaqTramitacao(models.Model):
                 self.usuario_registro = user
                 self.usuario_atualizacao = user
         super(ProaqTramitacao, self).save(*args, **kwargs)
+
+    def dias_tramitacao(self):
+        """
+        Calcula o número de dias desde a data de entrada até a data de saída ou até hoje,
+        se a data de saída for None.
+        """
+        if self.data_entrada is None:
+            return 0  # Retorna 0 se não houver data de entrada
+
+        data_saida = self.data_saida if self.data_saida is not None else date.today()
+        delta = data_saida - self.data_entrada
+        return delta.days
+
+    def etapa_tramitacao(self):
+        # Verifica se etapa_processo não é None e é um número
+        if self.etapa_processo is not None:
+            try:
+                etapa_id = int(self.etapa_processo)
+                etapa_obj = PROAQ_ETAPA.objects.filter(id=etapa_id).first()
+                if etapa_obj:
+                    return etapa_obj.etapa
+            except ValueError:
+                # Se etapa_processo não é um número, ou se a etapa correspondente não foi encontrada
+                pass
+
+        # Se etapa_processo é None ou não encontrou a etapa, usa etapa_processo_outro
+        return self.etapa_processo_outro
 
     def __str__(self):
         return f"Proaq ({self.proaq}) - Etapa ({self.etapa_processo})"

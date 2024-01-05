@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import (ProaqDadosGerais, ProaqProdutos, ProaqEvolucao, ProaqTramitacao)
+from .models import (ProaqDadosGerais, ProaqProdutos, 
+                     ProaqEvolucao, ProaqTramitacao, PROAQ_ETAPA,
+                     PROAQ_AREA_MS)
 
 @admin.register(ProaqDadosGerais)
 class ProaqDadosGeraisAdmin(admin.ModelAdmin):
@@ -25,3 +27,14 @@ class ProaqTramitacaoAdmin(admin.ModelAdmin):
     search_fields = ('documento_sei', 'setor', 'etapa_processo')
     list_filter = ('setor', 'etapa_processo', 'del_status')
     list_per_page = 100
+
+@admin.register(PROAQ_ETAPA)
+class PROAQ_ETAPAAdmin(admin.ModelAdmin):
+    list_display = ('id', 'etapa')
+    list_display_links = ('id', 'etapa')
+    list_per_page = 300
+
+@admin.register(PROAQ_AREA_MS)
+class PROAQ_AREA_MSAdmin(admin.ModelAdmin):
+    list_display = ('id', 'setor', 'orgao_publico', 'ministerio', 'secretaria', 'departamento')
+    list_display_links = ('id', 'setor')

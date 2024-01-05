@@ -1,0 +1,337 @@
+{% load static %}
+{% load humanize %}
+{% load proaq_custom_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <link rel="stylesheet" href="{% static '/styles/relatorio_proaq.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    
+    <title>Processo Aquisitivo</title>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-sisdaf">
+            <!-- <img src="\setup\static\assets/logo/logo_sisdaf_transparente.png" alt="Logo SisDAF" class="top-logo"> -->
+            <img src="{% static '/assets/logo/logo_sisdaf_transparente.png' %}" alt="Logo SisDAF" class="top-logo">
+        </div>
+        <div class="titulo-relatorio">
+            <b>SisDAF</b> - Relatório do Processo Aquisitivo
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Log -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Log
+                </div>
+                <div class="grid">
+                    <div class="box">
+                        <div class="box-titulo">ID</div>
+                        <div class="box-conteudo">{{ proaq.id }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Registro</div>
+                        <div class="box-conteudo">{{ proaq.usuario_registro.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Data Registro</div>
+                        <div class="box-conteudo">{{ proaq.registro_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Últ. Atualização</div>
+                        <div class="box-conteudo">{{ proaq.usuario_atualizacao.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Última Atualização</div>
+                        <div class="box-conteudo">{{ proaq.ult_atual_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Nº Edições</div>
+                        <div class="box-conteudo">{{ proaq.log_n_edicoes }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evolução do Processo -->
+        <div class="horizontal-section log"> 
+            <div class="section evolucao">
+                <div class="section-titulo">
+                    Evolução Processual
+                </div>
+             
+                <!-- Fases do Processo Aquisitivo -->
+                <div class="fases-container">
+
+                    <!-- Docs Iniciais -->
+                    <div class="evolucao-fase" data-value={{ proaq_fases.0.4 }} 
+                        style="background-color: {% if proaq_fases.0.1 and proaq_fases.0.2 %}#008d9f{% elif proaq_fases.0.1 %}#86d0c6{% else %}#898989{% endif %}">
+                        <div class="evolucao-simbolo" 
+                            style="color: {% if proaq_fases.0.1 and proaq_fases.0.2 %}white{% elif proaq_fases.0.1 %}#004253{% else %}black{% endif %}">
+                                <i class="{% if proaq_fases.0.1 and proaq_fases.0.2 %}fas fa-check-circle{% elif proaq_fases.0.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                    <div class="evolucao-titulo">Docs Iniciais</div>
+                                </i>
+                        </div>
+                        <div class="evolucao-dados" 
+                            style="color: {% if proaq_fases.0.1 and proaq_fases.0.2 %}white{% elif proaq_fases.0.1 %}#004253{% else %}black{% endif %}">
+                            Entrada: {% if proaq_fases.0.1 %}{{ proaq_fases.0.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Saída: {% if proaq_fases.0.2 %}{{ proaq_fases.0.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Dias: {% if proaq_fases.0.3 %}{{ proaq_fases.0.3 }}{% else %}-{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Pré-Contratual -->
+                    <div class="evolucao-fase" data-value={{ proaq_fases.1.4 }} 
+                        style="background-color: {% if proaq_fases.1.1 and proaq_fases.1.2 %}#008d9f{% elif proaq_fases.1.1 %}#86d0c6{% else %}#898989{% endif %}">
+                        <div class="evolucao-simbolo" 
+                            style="color: {% if proaq_fases.1.1 and proaq_fases.1.2 %}white{% elif proaq_fases.1.1 %}#004253{% else %}black{% endif %}">
+                                <i class="{% if proaq_fases.1.1 and proaq_fases.1.2 %}fas fa-check-circle{% elif proaq_fases.1.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                    <div class="evolucao-titulo">Pré-Contratual</div>
+                                </i>
+                        </div>
+                        <div class="evolucao-dados" 
+                            style="color: {% if proaq_fases.1.1 and proaq_fases.1.2 %}white{% elif proaq_fases.1.1 %}#004253{% else %}black{% endif %}">
+                            Entrada: {% if proaq_fases.1.1 %}{{ proaq_fases.1.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Saída: {% if proaq_fases.1.2 %}{{ proaq_fases.1.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Dias: {% if proaq_fases.1.3 %}{{ proaq_fases.1.3 }}{% else %}-{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Contratação -->
+                    <div class="evolucao-fase" data-value={{ proaq_fases.2.4 }} 
+                        style="background-color: {% if proaq_fases.2.1 and proaq_fases.2.2 %}#008d9f{% elif proaq_fases.2.1 %}#86d0c6{% else %}#898989{% endif %}">
+                        <div class="evolucao-simbolo" 
+                            style="color: {% if proaq_fases.2.1 and proaq_fases.2.2 %}white{% elif proaq_fases.2.1 %}#004253{% else %}black{% endif %}">
+                                <i class="{% if proaq_fases.2.1 and proaq_fases.2.2 %}fas fa-check-circle{% elif proaq_fases.2.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                    <div class="evolucao-titulo">Contratação</div>
+                                </i>
+                        </div>
+                        <div class="evolucao-dados" 
+                            style="color: {% if proaq_fases.2.1 and proaq_fases.2.2 %}white{% elif proaq_fases.2.1 %}#004253{% else %}black{% endif %}">
+                            Entrada: {% if proaq_fases.2.1 %}{{ proaq_fases.2.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Saída: {% if proaq_fases.2.2 %}{{ proaq_fases.2.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Dias: {% if proaq_fases.2.3 %}{{ proaq_fases.2.3 }}{% else %}-{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Execução do Contrato -->
+                    <div class="evolucao-fase" data-value={{ proaq_fases.3.4 }} 
+                        style="background-color: {% if proaq_fases.3.1 and proaq_fases.3.2 %}#008d9f{% elif proaq_fases.3.1 %}#86d0c6{% else %}#898989{% endif %}">
+                        <div class="evolucao-simbolo" 
+                            style="color: {% if proaq_fases.3.1 and proaq_fases.3.2 %}white{% elif proaq_fases.3.1 %}#004253{% else %}black{% endif %}">
+                                <i class="{% if proaq_fases.3.1 and proaq_fases.3.2 %}fas fa-check-circle{% elif proaq_fases.3.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                    <div class="evolucao-titulo">Exec. Contrato</div>
+                                </i>
+                        </div>
+                        <div class="evolucao-dados" 
+                            style="color: {% if proaq_fases.3.1 and proaq_fases.3.2 %}white{% elif proaq_fases.3.1 %}#004253{% else %}black{% endif %}">
+                            Entrada: {% if proaq_fases.3.1 %}{{ proaq_fases.3.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Saída: {% if proaq_fases.3.2 %}{{ proaq_fases.3.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Dias: {% if proaq_fases.3.3 %}{{ proaq_fases.3.3 }}{% else %}-{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Prestação de Contas -->
+                    <div class="evolucao-fase" data-value={{ proaq_fases.4.4 }} 
+                        style="background-color: {% if proaq_fases.4.1 and proaq_fases.4.2 %}#008d9f{% elif proaq_fases.4.1 %}#86d0c6{% else %}#898989{% endif %}">
+                        <div class="evolucao-simbolo" 
+                            style="color: {% if proaq_fases.4.1 and proaq_fases.4.2 %}white{% elif proaq_fases.4.1 %}#004253{% else %}black{% endif %}">
+                                <i class="{% if proaq_fases.4.1 and proaq_fases.4.2 %}fas fa-check-circle{% elif proaq_fases.4.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                    <div class="evolucao-titulo">Prest. Contas</div>
+                                </i>
+                        </div>
+                        <div class="evolucao-dados" 
+                            style="color: {% if proaq_fases.4.1 and proaq_fases.4.2 %}white{% elif proaq_fases.41 %}#004253{% else %}black{% endif %}">
+                            Entrada: {% if proaq_fases.4.1 %}{{ proaq_fases.4.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Saída: {% if proaq_fases.4.2 %}{{ proaq_fases.4.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Dias: {% if proaq_fases.4.3 %}{{ proaq_fases.4.3 }}{% else %}-{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Encerrado -->
+                    <div class="evolucao-fase" data-value={{ proaq_fases.5.4 }} 
+                        style="background-color: {% if proaq_fases.5.1 and proaq_fases.5.2 %}#008d9f{% elif proaq_fases.5.1 %}#86d0c6{% else %}#898989{% endif %}">
+                        <div class="evolucao-simbolo" 
+                            style="color: {% if proaq_fases.5.1 and proaq_fases.5.2 %}white{% elif proaq_fases.5.1 %}#004253{% else %}black{% endif %}">
+                                <i class="{% if proaq_fases.5.1 and proaq_fases.5.2 %}fas fa-check-circle{% elif proaq_fases.5.1 %}fas fa-exclamation-circle{% else %}fas fa-times-circle{% endif %}">
+                                    <div class="evolucao-titulo">Encerrado</div>
+                                </i>
+                        </div>
+                        <div class="evolucao-dados" 
+                            style="color: {% if proaq_fases.5.1 and proaq_fases.5.2 %}white{% elif proaq_fases.5.1 %}#004253{% else %}black{% endif %}">
+                            Entrada: {% if proaq_fases.5.1 %}{{ proaq_fases.5.1|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Saída: {% if proaq_fases.5.2 %}{{ proaq_fases.5.2|date:"d/m/Y" }}{% else %}-{% endif %}<br>
+                            Dias: {% if proaq_fases.5.3 %}{{ proaq_fases.5.3 }}{% else %}-{% endif %}
+                        </div>
+                    </div>
+
+
+
+
+                    
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Dados Administrativos -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Identificação do Processo Aquisitivo
+                </div>
+                <div class="grid">
+                    <div class="box">
+                        <div class="box-titulo">Status</div>
+                        <div class="box-conteudo">{{ proaq.get_status_display }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Unidade DAF</div>
+                        <div class="box-conteudo">{{ proaq.get_unidade_daf_display }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Modalidade de Aquisição</div>
+                        <div class="box-conteudo">{{ proaq.get_modalidade_aquisicao_display }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Nº do Processo SEI</div>
+                        <div class="box-conteudo">{{ proaq.numero_processo_sei }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Nº do ETP</div>
+                        <div class="box-conteudo">{{ proaq.numero_etp }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Técnico</div>
+                        <div class="box-conteudo">{{ proaq.responsavel_tecnico_proaq }}</div>
+                    </div>
+                    
+                </div>
+                <div class="grid full-width">
+                    <div class="box full-width">
+                        <div class="box-titulo">Denominação Genérica</div>
+                        <div class="box-conteudo">{{ proaq.denominacao }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Itens do Processo Aquisitivo -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Itens do Processo Aquisitivo
+                </div>
+                
+                <div class="grid" style="justify-content:center !important;" >
+                    <table class="tabela-relatorio" style="font-size: 10px; ">
+                        <thead>
+                            <tr>
+                                <th class="col-texto4">Item</th>
+                                <th class="col-texto25">Produto</th>
+                                <th class="col-texto8">Tipo de Cota</th>
+                                <th class="col-valor5">CMM</th>
+                                <th class="col-valor10">Qtd</th>
+                                <th class="col-valor5">Cob. Meses</th>
+                                <th class="col-valor5">Valor Unit. R$</th>
+                                <th class="col-valor10">Valor Total R$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in tab_proaq_itens %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="col-texto4">{{ item.numero_item }}</td>
+                                <td class="col-texto25">{{ item.produto.produto }}</td>
+                                <td class="col-texto8">{{ item.get_tipo_cota_display }}</td>
+                                <td class="col-valor5">{{ item.cmm_estimado|floatformat:0|intcomma }}</td>
+                                <td class="col-valor10">{{ item.qtd_a_ser_contratada|floatformat:0|intcomma }}</td>
+                                <td class="col-valor5">{{ item.cobertura_meses|floatformat:0|intcomma }}</td>
+                                <td class="col-valor5">{{ item.valor_unitario_estimado|custom_number_format }}</td>
+                                <td class="col-valor10">{{ item.valor_total|custom_number_format }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table> 
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tramitações -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Tramitações do Processo Aquisitivo
+                </div>
+                
+                <div class="grid" style="justify-content:center !important;" >
+                    <table class="tabela-relatorio" style="font-size: 10px; ">
+                        <thead>
+                            <tr>
+                                <th class="col-texto4">ID</th>
+                                <th class="col-texto6">Doc SEI</th>
+                                <th class="col-texto6">Setor</th>
+                                <th class="col-texto25">Etapa</th>
+                                <th class="col-texto6">Entrada</th>
+                                <th class="col-texto6">Previsão</th>
+                                <th class="col-texto6">Saída</th>
+                                <th class="col-texto4" style="text-align: right !important;">Dias</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in tab_proaq_tramitacoes %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="col-texto4">{{ item.id }}</td>
+                                <td class="col-texto6">{{ item.documento_sei }}</td>
+                                <td class="col-texto6">{{ item.setor.setor }}</td>
+                                <td class="col-texto25">{{ item.etapa_tramitacao }}</td>
+                                <td class="col-texto6">{{ item.data_entrada|date:"d/m/Y" }}{% if not item.data_entrada %}-{% endif %}</td>
+                                <td class="col-texto6">{{ item.previsao_saida|date:"d/m/Y" }}{% if not item.data_entrada %}-{% endif %}</td>
+                                <td class="col-texto6">{{ item.data_saida|date:"d/m/Y" }}{% if not item.data_entrada %}-{% endif %}</td>
+                                <td class="col-texto4" style="text-align: right !important;">{{ item.dias_tramitacao }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table> 
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Observações gerais -->
+        <div class="horizontal-section log">
+            <div class="section full-width">
+                <div class="section-titulo">
+                    Observações Gerais
+                </div>
+                <div class="grid">
+                    <div class="box-observacoes">
+                        <div class="box-conteudo">{{ proaq.observacoes_gerais }}</div>
+                    </div>
+                    
+                    
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <div class="relatorio-log">
+            {{ usuario }} - {{ data_hora }}
+        </div>
+        
+        <div class="footer-pagina">
+            Página <b>1</b> de <b>1</b>
+        </div>
+    </div>
+</body>
+</html>

@@ -94,7 +94,9 @@
     font-weight: bold;
 }
 
-
+.filtro{
+    cursor: pointer;
+}
 
 .filter {
     display: flex;

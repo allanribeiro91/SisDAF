@@ -12,3 +12,58 @@
 table tbody tr:hover {
     cursor: pointer;
 }
+
+
+.col-id {
+  width: 2% !important;
+}
+.col-texto4 {
+  width: 4% !important;
+  text-align: left !important;
+}
+.col-texto6 {
+  width: 6% !important;
+  text-align: left !important;
+}
+.col-texto8 {
+  width: 8% !important;
+  text-align: left !important;
+}
+.col-texto10 {
+  width: 10% !important;
+  text-align: left !important;
+}
+.col-texto12 {
+  width: 12% !important;
+  text-align: left !important;
+}
+.col-texto15 {
+  width: 15% !important;
+  text-align: left !important;
+}
+.col-texto18 {
+  width: 18% !important;
+  text-align: left !important;
+}
+.col-texto20 {
+  width: 20%;
+  text-align: left;
+}
+.col-texto25 {
+  width: 25%;
+  text-align: left;
+}
+
+.col-valor3 {
+  width: 20px !important;
+  text-align: right;
+}
+
+.col-valor5 {
+  width: 5% !important;
+  text-align: right;
+}
+.col-valor10 {
+  width: 10% !important;
+  text-align: right;
+}

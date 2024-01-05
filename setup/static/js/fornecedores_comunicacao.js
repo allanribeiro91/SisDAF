@@ -48,15 +48,16 @@ $('#btnExportarComunicacoes').on('click', function() {
 
 // Quando a página é carregada
 document.addEventListener('DOMContentLoaded', function() {
-    if (localStorage.getItem('openModalAfterReload') === 'true') {
+    if (localStorage.getItem('comunicacaoSalva') === 'true') {
         const comunicacaoId = localStorage.getItem('comunicacaoId');
         const id_fornecedor = localStorage.getItem('id_fornecedor');
         console.log('ID Comunicação' + comunicacaoId)
-
+        
         openModal(comunicacaoId, id_fornecedor);
+        sweetAlert('Dados salvos com sucesso!', 'success', 'top-end');
 
         // Limpa o localStorage
-        localStorage.removeItem('openModalAfterReload');
+        localStorage.removeItem('comunicacaoSalva');
         localStorage.removeItem('comunicacaoId');
         localStorage.removeItem('id_fornecedor');
     }
@@ -73,80 +74,84 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function() {
 
-document.getElementById('btnSalvarComunicacao').addEventListener('click', function(e) {
-    e.preventDefault(); // Evita o envio padrão do formulário
+    document.getElementById('btnSalvarComunicacao').addEventListener('click', function(e) {
+        e.preventDefault(); // Evita o envio padrão do formulário
+        
+        console.log('Salvar Comunicação')
     
-    console.log('Salvar Comunicação')
-
-    let id_fornecedor = document.getElementById('id_fornecedor').value
-    console.log(id_fornecedor)
-    if(id_fornecedor=='None'){
-        alert('Salve primeiro os dados gerais do fornecedor.')
-        return
-    }
-
-    // Avaliar preenchimento dos campos obrigatórios
-    let unidade_daf = document.getElementById('comunicforn_unidade_daf').value;
-    let tipo_comunicacao = document.getElementById('comunicforn_tipo_comunicacao').value;
-    let topico_comunicacao = document.getElementById('comunicforn_topico_comunicacao').value;
-    let status_envio = document.getElementById('comunicforn_status_envio').value;
-
-    if (unidade_daf === 'nao_informado' || unidade_daf === '' ||
-        tipo_comunicacao === 'nao_informado' || tipo_comunicacao === '' ||
-        topico_comunicacao === 'nao_informado' || topico_comunicacao === '' ||
-        status_envio === 'nao_informado' || status_envio === '') {
-        alert("Preencha os campos obrigatórios!");
-        return;
-    }
-
-
-    let postURL = '/fornecedores/comunicacoes/' + id_fornecedor + '/';
-    let formData = new FormData(document.getElementById('comunicacaoFornecedorForm'));
-    const comunicacaoId = document.getElementById('id_comunicacao_fornecedor').value;
-    if (comunicacaoId) {
-        formData.append('id_comunicacao', comunicacaoId);
-    }
-
-    // Avaliar o responsável
-    let responsavel = document.getElementById('comunicforn_responsavel').value;
+        let id_fornecedor = document.getElementById('id_fornecedor').value
+        console.log(id_fornecedor)
+        if(id_fornecedor=='None'){
+            alert('Salve primeiro os dados gerais do fornecedor.')
+            return
+        }
     
-    if (responsavel === 'outro') {
-        // Limpa ou remove o campo 'comunicforn_responsavel' do formData
-        //formData.set('comunicforn_responsavel', '');
-        console.log('Reponsavel ', responsavel)
-        formData.delete('responsavel_resposta');
-    }
-
-    fetch(postURL, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+        // Avaliar preenchimento dos campos obrigatórios
+        let unidade_daf = document.getElementById('comunicforn_unidade_daf').value;
+        let tipo_comunicacao = document.getElementById('comunicforn_tipo_comunicacao').value;
+        let topico_comunicacao = document.getElementById('comunicforn_topico_comunicacao').value;
+        let status_envio = document.getElementById('comunicforn_status_envio').value;
+    
+        if (unidade_daf === 'nao_informado' || unidade_daf === '' ||
+            tipo_comunicacao === 'nao_informado' || tipo_comunicacao === '' ||
+            topico_comunicacao === 'nao_informado' || topico_comunicacao === '' ||
+            status_envio === 'nao_informado' || status_envio === '') {
+            alert("Preencha os campos obrigatórios!");
+            return;
         }
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error('Erro ao salvar comunicação');
+    
+    
+        let postURL = '/fornecedores/comunicacoes/' + id_fornecedor + '/';
+        let formData = new FormData(document.getElementById('comunicacaoFornecedorForm'));
+        const comunicacaoId = document.getElementById('id_comunicacao_fornecedor').value;
+        if (comunicacaoId) {
+            formData.append('id_comunicacao', comunicacaoId);
         }
-    })
-    .then(data => {
-        if (data.redirect_url) {
-            // Antes de recarregar a página
-            var comunicacaoId = data.comunicacao_id;
-            localStorage.setItem('comunicacaoId', comunicacaoId);
-            localStorage.setItem('id_fornecedor', id_fornecedor);
-            localStorage.setItem('openModalAfterReload', 'true');
-            //Recarregar a páigna
-            window.location.href = data.redirect_url;
+    
+        // Avaliar o responsável
+        let responsavel = document.getElementById('comunicforn_responsavel').value;
+        
+        if (responsavel === 'outro') {
+            // Limpa ou remove o campo 'comunicforn_responsavel' do formData
+            //formData.set('comunicforn_responsavel', '');
+            console.log('Reponsavel ', responsavel)
+            formData.delete('responsavel_resposta');
         }
-    })
-    .catch(error => {
-        console.log(error);
+    
+        fetch(postURL, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Erro ao salvar comunicação');
+            }
+        })
+        .then(data => {
+            if (data.redirect_url) {
+                // Antes de recarregar a página
+                var comunicacaoId = data.comunicacao_id;
+                localStorage.setItem('comunicacaoId', comunicacaoId);
+                localStorage.setItem('id_fornecedor', id_fornecedor);
+                localStorage.setItem('comunicacaoSalva', 'true');
+                //Recarregar a páigna
+                window.location.href = data.redirect_url;
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        });
     });
+
 });
+
 
 
 

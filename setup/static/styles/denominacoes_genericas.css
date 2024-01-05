@@ -129,8 +129,12 @@
     padding-left: 10px;
     flex-grow: 0;
     flex-shrink: 0;
-    font-size: 13px;
-    width: 30%;
+    font-size: 14px;
+    width: 25%;
+}
+
+.filtro-unidade {
+    cursor: pointer;
 }
 
 .numbers {

@@ -130,3 +130,10 @@ function converterDataParaFormatoInternacional(dataStr) {
     }
     return null; // Retorna null se a data não estiver no formato esperado
 }
+
+function formatarData(data) {
+    const dia = data.getUTCDate().toString().padStart(2, '0');
+    const mes = (data.getUTCMonth() + 1).toString().padStart(2, '0');
+    const ano = data.getUTCFullYear();
+    return `${ano}-${mes}-${dia}`;
+}

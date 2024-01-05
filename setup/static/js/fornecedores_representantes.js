@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if(value.length == 11) {
             verificacao_cpf = isValidCPF(value)
             if(verificacao_cpf == false){
-                alert("CPF inválido: " + cpfInput.value)
+                sweetAlert("CPF inválido: " + cpfInput.value)
                 value = ''
             }
         }
@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('ID Representante' + representanteId)
 
         openModal(representanteId, id_fornecedor);
+        sweetAlert('Dados salvos com sucesso!', 'success', 'top-end');
 
         // Limpa o localStorage
         localStorage.removeItem('openModalAfterReload');
@@ -123,6 +124,12 @@ function isValidCPF(cpf) {
     return false; // CPF com menos de 11 dígitos não é válido
 }
 
+$('#btnNovoRepresentante').click(function() {
+    document.getElementById('representanteFornecedorForm').reset();
+    
+    var modal = new bootstrap.Modal(document.getElementById('representanteFornecedorModal'));
+    modal.show();
+});
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -185,57 +192,62 @@ document.addEventListener('DOMContentLoaded', function () {
             cargo_outro.value = '';
         }
     });
-});
 
 
-document.getElementById('btnSalvarRepresentante').addEventListener('click', function(e) {
-    e.preventDefault(); // Evita o envio padrão do formulário
+    const botao_salvar_representante = document.getElementById('btnSalvarRepresentante')
+    botao_salvar_representante.addEventListener('click', function(e) {
+        e.preventDefault(); // Evita o envio padrão do formulário
+        
+        console.log('Salvar representante')
     
-    console.log('Salvar representante')
-
-    let id_fornecedor = document.getElementById('id_fornecedor').value
-    console.log(id_fornecedor)
-    if(id_fornecedor=='None'){
-        alert('Salve primeiro os dados gerais do fornecedor.')
-        return
-    }
-
-    let postURL = '/fornecedores/representantes/' + id_fornecedor + '/';
-    let formData = new FormData(document.getElementById('representanteFornecedorForm'));
-    const representanteId = document.getElementById('id_representante_fornecedor').value;
-    if (representanteId) {
-        formData.append('id_representante', representanteId);
-    }
-
-    fetch(postURL, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+        let id_fornecedor = document.getElementById('id_fornecedor').value
+        console.log(id_fornecedor)
+        if(id_fornecedor=='None'){
+            alert('Salve primeiro os dados gerais do fornecedor.')
+            return
         }
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error('Erro ao salvar representante');
+    
+        let postURL = '/fornecedores/representantes/' + id_fornecedor + '/';
+        let formData = new FormData(document.getElementById('representanteFornecedorForm'));
+        const representanteId = document.getElementById('id_representante_fornecedor').value;
+        if (representanteId) {
+            formData.append('id_representante', representanteId);
         }
-    })
-    .then(data => {
-        if (data.redirect_url) {
-            // Antes de recarregar a página
-            var representanteId = data.representante_id;
-            localStorage.setItem('representanteId', representanteId);
-            localStorage.setItem('id_fornecedor', id_fornecedor);
-            localStorage.setItem('openModalAfterReload', 'true');
-            //Recarregar a páigna
-            window.location.href = data.redirect_url;
-        }
-    })
-    .catch(error => {
-        console.log(error);
+    
+        fetch(postURL, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Erro ao salvar representante');
+            }
+        })
+        .then(data => {
+            if (data.redirect_url) {
+                // Antes de recarregar a página
+                var representanteId = data.representante_id;
+                localStorage.setItem('representanteId', representanteId);
+                localStorage.setItem('id_fornecedor', id_fornecedor);
+                localStorage.setItem('openModalAfterReload', 'true');
+                //Recarregar a páigna
+                window.location.href = data.redirect_url;
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        });
     });
+
 });
+
+
+
 
 
 
@@ -316,6 +328,4 @@ function closeModalAndReload() {
     //window.location.reload();
 }
 
-// Adicionando o mesmo evento de clique ao botão
-document.getElementById('btnCancelarRepresentante').addEventListener('click', closeModalAndReload);
 

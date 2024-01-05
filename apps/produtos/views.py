@@ -24,8 +24,11 @@ def produtos(request):
     numero_produtos = produtos.count()
     produtos = produtos[:100]
 
+    denominacoes = DenominacoesGenericas.objects.values_list('id', 'denominacao')
+
     conteudo = {
         'produtos': produtos,
+        'denominacoes': denominacoes,
         'TIPO_PRODUTO': TIPO_PRODUTO,
         'numero_produtos': numero_produtos,
     }
@@ -192,18 +195,20 @@ def delete_produto(request, product_id):
 def get_filtros_produtos(request):
     tipo_produto = request.GET.get('tipo_produto', None)
     produto = request.GET.get('produto', None)
+    denominacao = request.GET.get('denominacao', None)
     basico = request.GET.get('basico', None)
     especializado = request.GET.get('especializado', None)
     estrategico = request.GET.get('estrategico', None)
     farmacia_popular = request.GET.get('farmacia_popular', None)
     hospitalar = request.GET.get('hospitalar', None)
-    print('Basico: ', basico)
     filters = {}
     filters['del_status'] = False
     if tipo_produto:
         filters['denominacao__tipo_produto'] = tipo_produto
     if produto:
         filters['produto__icontains'] = produto
+    if denominacao:
+        filters['denominacao'] = denominacao
     if basico:
         filters['comp_basico'] = 1
     if especializado:
@@ -225,8 +230,20 @@ def get_filtros_produtos(request):
     except EmptyPage:
         produtos_paginados = paginator.page(paginator.num_pages)
 
-    #data = list(produtos_paginados.object_list.values())
-    data = list(produtos_paginados.object_list.values('id', 'denominacao__tipo_produto', 'produto', 'comp_basico', 'comp_especializado', 'comp_estrategico', 'disp_farmacia_popular', 'hospitalar'))
+    data = []
+    for produto in produtos_paginados:
+        produto_data = {
+            'id': produto.id,
+            'denominacao__tipo_produto': produto.denominacao.tipo_produto,
+            'produto': produto.produto,
+            'comp_basico': produto.comp_basico,
+            'comp_especializado': produto.comp_especializado,
+            'comp_estrategico': produto.comp_estrategico,
+            'disp_farmacia_popular': produto.disp_farmacia_popular,
+            'hospitalar': produto.hospitalar,
+            'produtos_tags': produto.produtos_tags()
+        }
+        data.append(produto_data)
 
     return JsonResponse({
         'data': data,
@@ -245,6 +262,7 @@ def exportar_produtos(request):
         data = json.loads(request.body)
         tipo_produto = data.get('tipo_produto')
         produto = data.get('produto')
+        denominacao = data.get('denominacao')
         basico = data.get('basico')
         especializado = data.get('especializado')
         estrategico = data.get('estrategico')
@@ -255,6 +273,8 @@ def exportar_produtos(request):
         filters['del_status'] = False
         if tipo_produto:
             filters['denominacao__tipo_produto'] = tipo_produto
+        if denominacao:
+            filters['denominacao'] = denominacao
         if produto:
             filters['produto__icontains'] = produto
         if basico:
@@ -268,77 +288,68 @@ def exportar_produtos(request):
         if hospitalar:
             filters['hospitalar'] = hospitalar
         
-        produtos = ProdutosFarmaceuticos.objects.filter(**filters)
+        tab_produtos = ProdutosFarmaceuticos.objects.filter(**filters)
         current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()
-        ws = wb.active
-        ws.title = "denominacoes_genericas"
+        produtos = wb.active
+        produtos.title = "Produtos"
+        tags = wb.create_sheet(title="Tags")
 
-        headers = [
-        'ID', 'Usuário Registro', 'Usuário Atualização', 'Data de Registro', 'Data da Última Atualização',
-        'N Edições', 'Tipo Produto', 'Produto Farmacêutico', 'Concentração', 'Forma Farmacêutica', 'Oncológico', 'Biológico',
+        produtos.append([
+        'ID', 'Data de Registro', 'Usuário Registro', 'Data da Última Atualização', 'Usuário Atualização', 'N Edições',
+        'Tipo Produto', 'Produto Farmacêutico', 'Concentração', 'Forma Farmacêutica', 'Oncológico', 'Biológico',
         'AWaRe', 'ATC - Código', 'ATC - Descrição', 'Incorporação SUS', 'Data Incorporação', 'Portaria Incorp.',
         'Link Portaria Incorp.', 'Data Exclusão', 'Portaria Exclusão', 'Link Exclusão',
         'Comp. Básico', 'Comp. Especializado', 'Comp. Estratégico', 'Disp. Farmácia Popular', 'Hospitalar',
-        'SIGTAP', 'SIGTAP Cód.', 'SIGTAP Nome', 'SISMAT', 'SISMAT Cód.', 'SISMAT Nome', 'CATMAT', 'CATMAT Cód.', 'CATMAT Nome',
-        'OBM', 'OBM Cód.', 'OBM Nome', 'Observações gerais', 'Data Exportação'
-        ]
+        'SIGTAP', 'SIGTAP Cód.', 'SIGTAP Nome', 'SISMAT', 'SISMAT Cód.', 'SISMAT Nome', 
+        'CATMAT', 'CATMAT Cód.', 'CATMAT Nome', 'OBM', 'OBM Cód.', 'OBM Nome',
+        'Observações gerais', 'Data Exportação'
+        ])
+        tags.append([
+        'ID Registro', 
+        'Data de Registro', 'Usuário Registro', 'Data da Última Atualização', 'Usuário Atualização', 'N Edições',
+        'ID Denominação', 'ID Produto', 'Denominação Genérica', 'Produto Farmacêutico',
+        'Tag ID', 'Tag',
+        'Data Exportação'
+        ])
 
-        for col_num, header in enumerate(headers, 1):
-            col_letter = get_column_letter(col_num)
-            ws['{}1'.format(col_letter)] = header
-            ws.column_dimensions[col_letter].width = 15
-
-        # Adicionar dados da tabela
-        for row_num, produto in enumerate(produtos, 2):
-            ws.cell(row=row_num, column=1, value=produto.id)
-            ws.cell(row=row_num, column=2, value=str(produto.usuario_registro.primeiro_ultimo_nome()))
-            ws.cell(row=row_num, column=3, value=str(produto.usuario_atualizacao.primeiro_ultimo_nome()))
+        for produto in tab_produtos:
             registro_data = produto.registro_data.replace(tzinfo=None)
             ult_atual_data = produto.ult_atual_data.replace(tzinfo=None)
-            ws.cell(row=row_num, column=4, value=registro_data)
-            ws.cell(row=row_num, column=5, value=ult_atual_data)
-            ws.cell(row=row_num, column=6, value=produto.log_n_edicoes)
-            ws.cell(row=row_num, column=7, value=produto.denominacao.tipo_produto)
-            ws.cell(row=row_num, column=8, value=produto.produto)
-            ws.cell(row=row_num, column=9, value=produto.concentracao)
-            ws.cell(row=row_num, column=10, value=produto.get_forma_farmaceutica_display())
-            ws.cell(row=row_num, column=11, value=produto.oncologico)
-            ws.cell(row=row_num, column=12, value=produto.biologico)
-            ws.cell(row=row_num, column=13, value=produto.aware)
-            ws.cell(row=row_num, column=14, value=produto.atc)
-            ws.cell(row=row_num, column=15, value=produto.atc_descricao)
-            ws.cell(row=row_num, column=16, value=produto.incorp_status)
-            ws.cell(row=row_num, column=17, value=produto.incorp_portaria)
-            ws.cell(row=row_num, column=18, value=produto.incorp_link)
-            ws.cell(row=row_num, column=19, value=produto.exclusao_data)
-            ws.cell(row=row_num, column=20, value=produto.exclusao_portaria)
-            ws.cell(row=row_num, column=21, value=produto.exclusao_link)
-            ws.cell(row=row_num, column=22, value=produto.comp_basico)
-            ws.cell(row=row_num, column=23, value=produto.comp_especializado)
-            ws.cell(row=row_num, column=24, value=produto.comp_estrategico)
-            ws.cell(row=row_num, column=25, value=produto.disp_farmacia_popular)
-            ws.cell(row=row_num, column=26, value=produto.hospitalar)
-            ws.cell(row=row_num, column=27, value=produto.sigtap_possui)
-            ws.cell(row=row_num, column=28, value=produto.sigtap_codigo)
-            ws.cell(row=row_num, column=29, value=produto.sigtap_nome)
-            ws.cell(row=row_num, column=30, value=produto.sismat_possui)
-            ws.cell(row=row_num, column=31, value=produto.sismat_codigo)
-            ws.cell(row=row_num, column=32, value=produto.sismat_nome)
-            ws.cell(row=row_num, column=33, value=produto.catmat_possui)
-            ws.cell(row=row_num, column=34, value=produto.catmat_codigo)
-            ws.cell(row=row_num, column=35, value=produto.catmat_nome)
-            ws.cell(row=row_num, column=36, value=produto.obm_possui)
-            ws.cell(row=row_num, column=37, value=produto.obm_codigo)
-            ws.cell(row=row_num, column=38, value=produto.obm_nome)
-            ws.cell(row=row_num, column=39, value=produto.observacoes_gerais)
-            ws.cell(row=row_num, column=15, value=current_date_str)
-        
-        output = BytesIO()
-        wb.save(output)
-        output.seek(0)  # Reposition to the start of the stream
+            #Produtos
+            produtos.append([
+                produto.id,
+                registro_data, str(produto.usuario_registro.primeiro_ultimo_nome()),
+                ult_atual_data, str(produto.usuario_atualizacao.primeiro_ultimo_nome()), produto.log_n_edicoes,
+                
+                produto.denominacao.tipo_produto, produto.produto, produto.concentracao, produto.forma_farmaceutica,
+                produto.oncologico, produto.biologico, produto.get_aware_display(),
+                produto.atc, produto.atc_descricao,
+                produto.get_incorp_status_display(), produto.incorp_data, produto.incorp_portaria, produto.incorp_link,
+                produto.exclusao_data, produto.exclusao_portaria, produto.exclusao_link,
+                produto.comp_basico, produto.comp_especializado, produto.comp_especializado, produto.comp_estrategico,
+                produto.disp_farmacia_popular, produto.hospitalar,
+                produto.sigtap_possui, produto.sigtap_codigo, produto.sigtap_nome,
+                produto.sismat_possui, produto.sismat_codigo, produto.sismat_nome,
+                produto.catmat_possui, produto.catmat_codigo, produto.catmat_nome,
+                produto.obm_possui, produto.obm_codigo, produto.obm_nome,
+                produto.observacoes_gerais, current_date_str
+            ])
+
+            #Tags
+            for tag in produto.produto_tag.filter(del_status=False):
+                registro_data = tag.registro_data.replace(tzinfo=None)
+                ult_atual_data = tag.ult_atual_data.replace(tzinfo=None)
+                tags.append([
+                    tag.id, 
+                    registro_data, str(tag.usuario_registro.primeiro_ultimo_nome()),
+                    ult_atual_data, str(tag.usuario_atualizacao.primeiro_ultimo_nome()), tag.log_n_edicoes,
+                    tag.produto.denominacao.id, tag.produto.id, tag.produto.denominacao.denominacao, tag.produto.produto,
+                    tag.tag_id, tag.tag,
+                    current_date_str
+                ])
 
         # Registrar a ação no CustomLog
         log_entry = CustomLog(
@@ -353,10 +364,11 @@ def exportar_produtos(request):
         )
         log_entry.save()
 
-        # Configurar a resposta
+        # Salva o workbook em um arquivo Excel
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename="exportar_denominacoes.xlsx"'
-        response.write(output.getvalue())
+        response['Content-Disposition'] = 'attachment; filename=proaq.xlsx'
+        wb.save(response)
+        
         return response
 
 @login_required

@@ -5,8 +5,8 @@ from apps.processos_aquisitivos.models import (PROAQ_ETAPA, ProaqDadosGerais, Pr
 def run():
     # Apagar todos os registros
     #PROAQ_ETAPA.objects.all().delete()
-    ProaqEvolucao.objects.all().delete()
-    #ProaqTramitacao.objects.all().delete()
+    #ProaqEvolucao.objects.all().delete()
+    ProaqTramitacao.objects.all().delete()
     #ProaqProdutos.objects.all().delete()
     #ProaqItens.objects.all().delete()
     #ProaqDadosGerais.objects.all().delete()

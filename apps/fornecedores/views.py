@@ -31,7 +31,6 @@ def fornecedores(request):
     return render(request, 'fornecedores/fornecedores.html', conteudo)
 
 def fornecedor_ficha(request, fornecedor_id=None):
-    
     if fornecedor_id:
          try:
              fornecedor = Fornecedores.objects.get(id=fornecedor_id)
@@ -253,16 +252,9 @@ def fornecedores_exportar(request):
         cnpj_porte = data.get('cnpj_porte')
         tipo_direito = data.get('tipo_direito')
         uf_fornecedor = data.get('uf_fornecedor')
-        fornecedor = data.get('fornecedor_nome')
-    
-        print('Hierarquia: ', hierarquia)
-        print(cnpj_porte)
-        print(tipo_direito)
-        print(uf_fornecedor)
-        print(fornecedor)
+        fornecedor_nome = data.get('fornecedor_nome')
 
-        filters = {}
-        filters['del_status'] = False
+        filters = {'del_status': False}
         if hierarquia:
             filters['hierarquia'] = hierarquia
         if cnpj_porte:
@@ -271,62 +263,88 @@ def fornecedores_exportar(request):
             filters['tipo_direito'] = tipo_direito
         if uf_fornecedor:
             filters['end_uf'] = uf_fornecedor
-        if fornecedor:
-            filters['nome_fantasia__icontains'] = fornecedor
+        if fornecedor_nome:
+            filters['nome_fantasia__icontains'] = fornecedor_nome
         
-        fornecedores = Fornecedores.objects.filter(**filters)
+        tab_fornecedores = Fornecedores.objects.filter(**filters)
         current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         # Criar um workbook e adicionar uma planilha
         wb = Workbook()
-        ws = wb.active
-        ws.title = "fornecedores"
+        fornecedores = wb.active
+        fornecedores.title = "Fornecedores"
+        representantes = wb.create_sheet(title="Representantes")
+        comunicacoes = wb.create_sheet(title="Comunicações")
 
-        headers = [
+        fornecedores.append([
         'ID', 'Usuário Registro', 'Usuário Atualização', 'Data de Registro', 'Data da Última Atualização',
         'N Edições', 'CNPJ', 'Razão Social', 'Nome Fantasia', 'Hierarquia', 'Porte', 'Tipo de Direito',
         'Data de Abertura', 'Código NatJud', 'Natureza Jurídica', 'Código AtivPri', 'Atividade Principal',
         'CEP', 'UF', 'Município', 'Logradouro', 'Número', 'Bairro', 'Observações Gerais', 'Data Exportação'
-        ]
+        ])
+        representantes.append([
+            'ID', 'ID Fornecedor', 'CNPJ', 
+            'Data Registro', 'Responsável Registro', 'Últ. Atualização', 'Responsável Últ. Atualização', 'N Edições',
+            'CPF', 'Nome Completo', 'Data Nascimento', 'Gênero Sexual', 'Cargo_Função', 
+            'Telefone', 'Celular', 'Email', 'LinkedIn',
+            'Observações', 'Data Exportação'
+        ])
+        comunicacoes.append([
+            'ID', 'ID Fornecedor', 'CNPJ', 
+            'Data Registro', 'Responsável Registro', 'Últ. Atualização', 'Responsável Últ. Atualização', 'N Edições',
+            'Unidade DAF', 'Tipo de Comunicação', 'Tópico da Comunicação', 'Assunto',
+            'Demanda Original', 'Destinatário', 'Mensagem Encaminhada',
+            'Status do Envio', 'Data do Envio', 'Responsável pela Resposta',
+            'Observações', 'Data Exportação'
+        ])
 
-        for col_num, header in enumerate(headers, 1):
-            col_letter = get_column_letter(col_num)
-            ws['{}1'.format(col_letter)] = header
-            ws.column_dimensions[col_letter].width = 25
-
-        # Adicionar dados da tabela
-        for row_num, fornecedor in enumerate(fornecedores, 2):
-            ws.cell(row=row_num, column=1, value=fornecedor.id)
-            ws.cell(row=row_num, column=2, value=str(fornecedor.usuario_registro.primeiro_ultimo_nome()))
-            ws.cell(row=row_num, column=3, value=str(fornecedor.usuario_atualizacao.primeiro_ultimo_nome()))
+        for fornecedor in tab_fornecedores:
             registro_data = fornecedor.registro_data.replace(tzinfo=None)
             ult_atual_data = fornecedor.ult_atual_data.replace(tzinfo=None)
-            ws.cell(row=row_num, column=4, value=registro_data)
-            ws.cell(row=row_num, column=5, value=ult_atual_data)
-            ws.cell(row=row_num, column=6, value=fornecedor.log_n_edicoes)
-            ws.cell(row=row_num, column=7, value=fornecedor.cnpj)
-            ws.cell(row=row_num, column=8, value=fornecedor.razao_social)
-            ws.cell(row=row_num, column=9, value=fornecedor.nome_fantasia)
-            ws.cell(row=row_num, column=10, value=fornecedor.hierarquia)
-            ws.cell(row=row_num, column=11, value=fornecedor.porte)
-            ws.cell(row=row_num, column=12, value=fornecedor.tipo_direito)
-            ws.cell(row=row_num, column=13, value=fornecedor.data_abertura)
-            ws.cell(row=row_num, column=14, value=fornecedor.natjuridica_codigo)
-            ws.cell(row=row_num, column=15, value=fornecedor.natjuridica_descricao)
-            ws.cell(row=row_num, column=16, value=fornecedor.ativ_principal_cod)
-            ws.cell(row=row_num, column=17, value=fornecedor.ativ_principal_descricao)
-            ws.cell(row=row_num, column=18, value=fornecedor.end_cep)
-            ws.cell(row=row_num, column=19, value=fornecedor.end_uf)
-            ws.cell(row=row_num, column=20, value=fornecedor.end_municipio)
-            ws.cell(row=row_num, column=21, value=fornecedor.end_logradouro)
-            ws.cell(row=row_num, column=22, value=fornecedor.end_numero)
-            ws.cell(row=row_num, column=23, value=fornecedor.end_bairro)
-            ws.cell(row=row_num, column=24, value=fornecedor.observacoes_gerais)
-            ws.cell(row=row_num, column=25, value=current_date_str)
-        
-        output = BytesIO()
-        wb.save(output)
-        output.seek(0)  # Reposition to the start of the stream
+            #Fornecedores
+            fornecedores.append([
+                fornecedor.id,
+                registro_data, str(fornecedor.usuario_registro.primeiro_ultimo_nome()),
+                ult_atual_data, str(fornecedor.usuario_atualizacao.primeiro_ultimo_nome()), fornecedor.log_n_edicoes,
+                
+                fornecedor.cnpj, fornecedor.razao_social, fornecedor.nome_fantasia,
+                fornecedor.hierarquia, fornecedor.porte, fornecedor.tipo_direito,
+                fornecedor.data_abertura, fornecedor.natjuridica_codigo, fornecedor.natjuridica_descricao,
+                fornecedor.ativ_principal_cod, fornecedor.ativ_principal_descricao,
+                fornecedor.end_cep, fornecedor.end_uf, fornecedor.end_municipio, fornecedor.end_logradouro,
+                fornecedor.end_numero, fornecedor.end_bairro,
+                fornecedor.observacoes_gerais, current_date_str
+            ])
+
+            #Representantes
+            for representante in fornecedor.fornecedor_representante.filter(del_status=False):
+                registro_data = representante.registro_data.replace(tzinfo=None)
+                ult_atual_data = representante.ult_atual_data.replace(tzinfo=None)
+                representantes.append([
+                    representante.id, representante.fornecedor.id, representante.fornecedor.cnpj,
+                    registro_data, str(representante.usuario_registro.primeiro_ultimo_nome()),
+                    ult_atual_data, str(representante.usuario_atualizacao.primeiro_ultimo_nome()), representante.log_n_edicoes,
+                    representante.cpf, representante.nome_completo, representante.data_nascimento, representante.genero_sexual,
+                    representante.cargo_funcao(), representante.telefone, representante.celular, 
+                    representante.email, representante.linkedin,
+                    representante.observacoes_gerais, current_date_str
+                ])
+            
+            #Comunicações
+            for comunicacao in fornecedor.fornecedor_comunicacao.filter(del_status=False):
+                registro_data = comunicacao.registro_data.replace(tzinfo=None)
+                ult_atual_data = comunicacao.ult_atual_data.replace(tzinfo=None)
+                comunicacoes.append([
+                    comunicacao.id, comunicacao.fornecedor.id, comunicacao.fornecedor.cnpj,
+                    registro_data, str(comunicacao.usuario_registro.primeiro_ultimo_nome()),
+                    ult_atual_data, str(comunicacao.usuario_atualizacao.primeiro_ultimo_nome()), comunicacao.log_n_edicoes,
+                    comunicacao.get_unidade_daf_display(), comunicacao.get_tipo_comunicacao_display(),
+                    comunicacao.get_topico_comunicacao_display(), comunicacao.assunto, comunicacao.demanda_original,
+                    comunicacao.destinatario, comunicacao.mensagem_encaminhada, comunicacao.get_status_envio_display(),
+                    comunicacao.data_envio, comunicacao.responsavel_mensagem(),
+                    comunicacao.observacoes_gerais, current_date_str
+                ])
+            
 
         # Registrar a ação no CustomLog
         log_entry = CustomLog(
@@ -341,10 +359,11 @@ def fornecedores_exportar(request):
         )
         log_entry.save()
 
-        # Configurar a resposta
+        # Salva o workbook em um arquivo Excel
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename="exportar_fornecedores.xlsx"'
-        response.write(output.getvalue())
+        response['Content-Disposition'] = 'attachment; filename=fornecedores.xlsx'
+        wb.save(response)
+
         return response
     
 def fornecedores_buscar(request):

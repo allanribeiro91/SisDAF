@@ -194,7 +194,6 @@ class Fornecedores_Representantes(models.Model):
                 self.usuario_atualizacao = user
         super(Fornecedores_Representantes, self).save(*args, **kwargs)
 
-
     def soft_delete(self, user):
         """
         Realiza uma "deleção lógica" do registro.
@@ -203,6 +202,9 @@ class Fornecedores_Representantes(models.Model):
         self.del_data = timezone.now()
         self.del_usuario = user
         self.save()
+
+    def cargo_funcao(self):
+        return self.cargo_outro if self.cargo_outro else self.get_cargo_display()
 
 class Fornecedores_Comunicacoes(models.Model):
     #relacionamento
@@ -259,3 +261,6 @@ class Fornecedores_Comunicacoes(models.Model):
         self.del_data = timezone.now()
         self.del_usuario = user
         self.save()
+    
+    def responsavel_mensagem(self):
+        return self.responsavel_resposta.primeiro_ultimo_nome() if self.responsavel_resposta else self.outro_responsavel

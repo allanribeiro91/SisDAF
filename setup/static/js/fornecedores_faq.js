@@ -25,7 +25,10 @@ $(document).ready(function() {
             success: function(response) {
                 // Redireciona para a lista de denominações após a deleção bem-sucedida
                 //alert(response.message);
-                window.location.href = `/fornecedores/faq/`;
+                sweetAlert('Registro deletado com sucesso!', 'success', 'green')
+                setTimeout(function() {
+                    window.location.href = `/fornecedores/faq/`;
+                  }, 1500);
             },
             error: function(error) {
                 // Aqui você pode adicionar qualquer lógica que deseja executar se houver um erro ao tentar deletar o fornecedor.
@@ -89,6 +92,13 @@ $(document).ready(function() {
     
 
 document.addEventListener('DOMContentLoaded', function () {
+
+    //Verificar se há mensagem de salvamento com sucesso
+    if (localStorage.getItem('faqSalvo') === 'true') {
+        sweetAlert('FAQ salvo com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('faqSalvo');
+    }
+
     var faq_topico = document.getElementById('topico');
     var faq_outro_topico = document.getElementById('topico_outro');
 
@@ -187,37 +197,14 @@ function getTopico(topico) {
     return topicos[topico] || topico;
 }
 
-// //Salvar dados
-// document.getElementById('btnSaveFaq').addEventListener('click', function(e) {
-//     e.preventDefault(); // Evita o envio padrão do formulário
-    
-//     let postURL = document.getElementById('fornecedorFaqForm').getAttribute('data-post-url');
-//     let formData = new FormData(document.getElementById('fornecedorFaqForm'));
-
-//     fetch(postURL, {
-//         method: 'POST',
-//         body: formData,
-//         headers: {
-//             'X-Requested-With': 'XMLHttpRequest'
-//         }
-//     })
-//     console.log(postURL)
-//     .then(response => response.json())
-//     .then(data => {
-        
-//         if (data.data) {
-//             // Armazenar os dados no localStorage
-//             localStorage.setItem('temporaryFormData', JSON.stringify(data.data));
-//         }
-        
-//         // Redirecione para a nova URL
-//         window.location.href = data.redirect_url;
-
-//     });
-// });
-
 document.getElementById('btnSaveFaq').addEventListener('click', function(e) {
     e.preventDefault();
+
+    //Verificar preenchimento dos campos
+    let preenchimento_incorreto = verificar_campos_faq()
+    if (preenchimento_incorreto === false) {
+        return;
+    }
 
     let postURL = document.getElementById('fornecedorFaqForm').getAttribute('data-post-url');
     let formData = new FormData(document.getElementById('fornecedorFaqForm'));
@@ -245,6 +232,7 @@ document.getElementById('btnSaveFaq').addEventListener('click', function(e) {
             localStorage.setItem('temporaryFormData', JSON.stringify(data.data));
         }
         if (data.redirect_url) {
+            localStorage.setItem('faqSalvo', 'true');
             window.location.href = data.redirect_url;
         } else {
             throw new Error('No redirect URL in the response');
@@ -255,6 +243,30 @@ document.getElementById('btnSaveFaq').addEventListener('click', function(e) {
         console.error('Fetch operation error:', error);
     });
 });
+
+function verificar_campos_faq() {
+    const campos = [
+        { id: 'topico', mensagem: 'Informe o <b>Tópico</b>!' },
+        { id: 'contexto', mensagem: 'Informe o <b>Contexto/Pergunta/Situação</b>!' },
+        { id: 'resposta', mensagem: 'Informe a <b>Resposta/Encaminhamento</b>!' },
+    ];
+
+    let mensagensErro = campos.reduce((mensagens, campo) => {
+        const elemento = document.getElementById(campo.id);
+        if (!elemento || elemento.value === '' || elemento.value == 0) {
+            mensagens.push(campo.mensagem);
+        }
+        return mensagens;
+    }, []);
+
+    if (mensagensErro.length > 0) {
+        const campos = mensagensErro.join('<br>')
+        sweetAlertPreenchimento(campos)
+        return false;
+    }
+    
+    return true;
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     let formData = JSON.parse(localStorage.getItem('temporaryFormData'));
