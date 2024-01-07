@@ -8,7 +8,7 @@
     }
 
     .custom-modal-width-parcela {
-        min-width: 80%;  /* ou qualquer largura que você desejar */
+        min-width: 85%;  /* ou qualquer largura que você desejar */
         font-size: 16px !important;
     }
 
@@ -20,8 +20,8 @@
         height: 75px;
     }
 
-    .modal-content{
-        height: 60%;
+    .modal-content.parcela{
+        min-height: 70% !important;
     }
 
     .modal-body{
@@ -34,7 +34,7 @@
 <!-- Modal -->
 <div class="modal fade" id="contratoParcelaModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-parcela" role="document">
-        <div class="modal-content">
+        <div class="modal-content parcela">
             
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Parcela do Contrato</h5>
@@ -46,6 +46,8 @@
                 
                 <form id="parcelaForm">
                     {% csrf_token %}
+
+                    <!-- Log -->
                     <div class="horizontal-sections-modal-parcela" >
                         <div class="section" style="border: 0px !important;">
                             <div class="grid" style="font-size: 10px;">
@@ -77,9 +79,14 @@
                         </div>
                     </div>
     
+
+    
                     <div class="horizontal-sections-modal-parcela">
                         <div class="section" style="border: 0px !important;">
+
+                            <h3>Item da Parcela</h3>
                             <div class="grid" style="font-size: 14px;">
+                                
                                 <div class="form-floating mb-3" style="width: 100px !important;">
                                     {{ form_parcela.numero_parcela }}
                                     <label>{{ form_parcela.numero_parcela.label }}</label>
@@ -98,57 +105,131 @@
                                     <label>Saldo da ARP</label>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-    
-                    <div class="horizontal-sections-modal-parcela">
-                        <div class="section" style="border: 0px !important;">
+
+                            <!-- Quantidades e Datas -->
                             <div class="grid" style="font-size: 14px;">
-                                <div class="form-floating mb-3" >
-                                    <input type="text" id="id_parcela_fator_embalagem" class="form-control" style="width: 100px; text-align: right;" readonly>
-                                    <label>Fator Emb.</label>
-                                </div>
-                                <div class="form-floating mb-3" style="width: 150px">
-                                    {{ form_parcela.qtd_contratada }}
-                                    <label>{{ form_parcela.qtd_contratada.label }}</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_qtd_entregue" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Qtd Entregue</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_qtd_a_entregar" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Qtd a Entregar</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_unitario" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Valor Unitário</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_total" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Valor Total</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_valor_empenhado" class="form-control" style="width: 150px; text-align: right;" readonly>
-                                    <label>Valor Empenhado</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" id="id_parcela_percentual_empenhado" class="form-control" style="width: 120px; text-align: right;" readonly>
-                                    <label>% Empenho</label>
+                                
+                                <!-- Quantidades -->
+                                <div class="subgrid">
+                                    <h3>Fator Emb.</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3" >
+                                            <input type="text" id="id_parcela_fator_embalagem" class="form-control" style="width: 100px; text-align: right;" readonly>
+                                            <label>Fator Emb.</label>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" style="width: 160px;" id="id_parcela_previsao_entrega" name="data_previsao_entrega">
-                                    <label for="id_parcela_previsao_entrega">Previsão Entrega</label>
+                                <!-- Quantidade Adquirida -->
+                                <div class="subgrid">
+                                    <h3>Qtd Adquirida</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3" style="width: 130px;">
+                                            {{ form_parcela.qtd_contratada }}
+                                            <label>{{ form_parcela.qtd_contratada.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="width: 130px">
+                                            {{ form_parcela.qtd_doada }}
+                                            <label>{{ form_parcela.qtd_doada.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_qtd_total" class="form-control" style="width: 130px; text-align: right;" readonly>
+                                            <label>Qtd Total</label>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" style="width: 160px;" id="id_parcela_ultima_entrega" readonly>
-                                    <label for="id_parcela_ultima_entrega">Última Entrega</label>
+                                <!-- Quantidade Empenhada -->
+                                <div class="subgrid">
+                                    <h3>Qtd Empenhada</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_qtd_empenhada" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                            <label>Qtd Empenhada</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_qtd_a_empenhar" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                            <label>Qtd a Empenhar</label>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <!-- Qtd Entregue -->
+                                <div class="subgrid">
+                                    <h3>Qtd Entregue</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_qtd_entregue" class="form-control" style="width: 130px; text-align: right;" readonly>
+                                            <label>Qtd Entregue</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_qtd_a_entregar" class="form-control" style="width: 130px; text-align: right;" readonly>
+                                            <label>Qtd a Entregar</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Datas -->
+                                <div class="subgrid" style="margin-left: 40px;">
+                                    <h3>Datas</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3">
+                                            <input type="date" class="form-control" style="width: 160px;" id="id_parcela_previsao_entrega" name="data_previsao_entrega">
+                                            <label for="id_parcela_previsao_entrega">Previsão Entrega</label>
+                                        </div>
+        
+                                        <div class="form-floating mb-3">
+                                            <input type="date" class="form-control" style="width: 140px;" id="id_parcela_ultima_entrega" readonly>
+                                            <label for="id_parcela_ultima_entrega">Última Entrega</label>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                
                             </div>
 
+                            <!-- Valores -->
                             <div class="grid" style="font-size: 14px;">
+
+                                <!-- Valores do Contrato -->
+                                <div class="subgrid">
+                                    <h3>Valores do Contrato</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_valor_unitario" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                            <label>Valor Unitário</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_valor_total" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                            <label>Valor Total</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Valores do Empenho -->
+                                <div class="subgrid" style="margin-left: 20px;">
+                                    <h3>Valores do Empenho</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_valor_empenhado" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                            <label>Valor Empenhado</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_valor_a_empenhar" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                            <label>Valor a Empenhar</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_parcela_percentual_empenhado" class="form-control" style="width: 120px; text-align: right;" readonly>
+                                            <label>% Empenho</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            <h3>Observações</h3>
+                            <div class="grid" style="font-size: 14px;">
+                                
                                 <div class="form-floating mb-3 full-width">
                                     {{ form_parcela.observacoes_gerais }}
                                     <label>{{ form_parcela.observacoes_gerais.label }}</label>

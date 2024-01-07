@@ -222,12 +222,12 @@ input[name="processo_sei"]{
 }
 
 .col-tipo {
-    width: 7% !important;
+    width: 6% !important;
     text-align: left;
 }
 
 .col-valor {
-    width: 10% !important;
+    width: 6% !important;
     text-align: right;
 }
 
@@ -239,3 +239,5 @@ input[name="processo_sei"]{
 table tbody tr:hover {
     cursor: pointer;
 }
+
+

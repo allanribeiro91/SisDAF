@@ -44,6 +44,7 @@
                     {% csrf_token %}
                     <div class="horizontal-sections-modal">
                         <div class="section" style="border: 0px !important;">
+                            
                             <h3>Log</h3>
                             <div class="grid" style="font-size: 10px;">
                                 <div class="form-floating mb-3" style="font-size: 12px;">
@@ -71,12 +72,14 @@
                                     <label for="floatingInput">Nº Edições</label>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
                     
                     <div class="horizontal-sections-modal">
                         <div class="section" style="border: 0px !important;">
+                            
                             <h3>Identificação do Item</h3>
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3">
@@ -97,11 +100,13 @@
                                     <label>{{ form_item.produto.label }}</label>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
                     <div class="horizontal-sections-modal">
                         <div class="section" style="border: 0px !important;">
+                            
                             <h3>Preços e Quantidades Registrados na Ata</h3>
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3">
@@ -124,47 +129,56 @@
                                     <label for="arp_valor_total">Valor Total</label>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
                     <div class="horizontal-sections-modal">
                         <div class="section" style="border: 0px !important;">
+                            
                             <h3>Quantidades Contratadas</h3>
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="arp_valor_reequilibrio" name="arp_valor_reequilibrio" readonly>
-                                    <label for="arp_valor_reequilibrio">Número de Contratos</label>
+                                    <input type="text" class="form-control" id="arp_item_contratos" style="width: 100px; text-align: right;" readonly>
+                                    <label for="arp_valor_reequilibrio">Contratos</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="arp_valor_reequilibrio" name="arp_valor_reequilibrio" readonly>
+                                    <input type="text" class="form-control" id="arp_item_qtd_contratada" style="text-align: right;" readonly>
                                     <label for="arp_valor_reequilibrio">Quantidade Contratada</label>
                                 </div>
                                 
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="arp_valor_reequilibrio" name="arp_valor_reequilibrio" readonly>
-                                    <label for="arp_valor_reequilibrio">Valor Contratado</label>
+                                    <input type="text" class="form-control" id="arp_item_valor_contratado" style="text-align: right;" readonly>
+                                    <label for="arp_valor_reequilibrio">Valor Contratado R$</label>
                                 </div>
                                 <div class="form-floating mb-3" style="margin-left: 40px;">
-                                    <input type="text" class="form-control" id="arp_valor_reequilibrio" name="arp_valor_reequilibrio" readonly>
+                                    <input type="text" class="form-control" id="arp_item_saldo_quantidade" style="text-align: right;" readonly>
                                     <label for="arp_valor_reequilibrio">Quantidade de Saldo</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="arp_valor_reequilibrio" name="arp_valor_reequilibrio" readonly>
-                                    <label for="arp_valor_reequilibrio">Valor do Saldo</label>
+                                    <input type="text" class="form-control" id="arp_item_saldo_valor" style="text-align: right;" readonly>
+                                    <label for="arp_valor_reequilibrio">Valor do Saldo R$</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="arp_item_saldo_percentual" style="width: 100px; text-align: right;" readonly>
+                                    <label for="arp_valor_reequilibrio">% do Saldo</label>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
                     <div class="horizontal-sections-modal">
                         
                         <div class="section" style="border: 0px !important;">
+                            
                             <h3>Observações gerais</h3>
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3 full-width">
                                     {{ form_item.observacoes_gerais }}
                                 </div> 
                             </div>
+
                         </div>
                     </div>
                 </form>

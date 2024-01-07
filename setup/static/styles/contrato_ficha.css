@@ -98,11 +98,36 @@
 .grid {
     display: flex;
     justify-content: flex-start;  /* Alinha os itens à esquerda */
-    
-    /*align-items: center;  /* Alinha os itens verticalmente */
     flex-wrap: wrap;  /* Permite que os itens ocupem várias linhas */
     gap: 10px;  /* Espaçamento entre os itens */
 }
+
+.subgrid {
+    display: flex;
+    flex-direction: column; /* Organiza os elementos verticalmente */
+    margin-right: 20px;
+}
+
+
+
+.subgrid-elementos {
+    display: flex; /* Organiza os filhos horizontalmente */
+    flex-wrap: wrap; /* Permite que os elementos passem para a próxima linha se necessário */
+    gap: 10px; /* Espaçamento entre os elementos do formulário */
+    width: 100%; /* Ocupa toda a largura disponível */
+}
+
+.subgrid .form-floating {
+    flex-grow: 1; /* Os elementos se expandem para ocupar o espaço disponível */
+    margin-bottom: 0; /* Remover a margem inferior padrão */
+    /* Ajuste a largura de acordo com a necessidade, por exemplo: */
+    width: auto; /* ou um valor fixo, como 150px */
+}
+
+
+
+
+
 
 .filter-title {
     position: absolute;
@@ -244,11 +269,11 @@ select[name="numero_processo"] {
     text-align: left;
 }
 .col-produto {
-    width: 22% !important;
+    width: 20% !important;
     text-align: left;
 }
 .col-parcelas {
-    width: 4% !important;
+    width: 3% !important;
     text-align: right;
 }
 .col-data {
@@ -256,7 +281,7 @@ select[name="numero_processo"] {
     text-align: right;
 }
 .col-valor {
-    width: 8% !important;
+    width: 7% !important;
     text-align: right;
 }
 .col-local-entrega {

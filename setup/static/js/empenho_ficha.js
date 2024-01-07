@@ -176,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
     empenho_selecionar_parcela.addEventListener('change', function(){
         const selectedOption = empenho_selecionar_parcela.options[empenho_selecionar_parcela.selectedIndex];
         empenho_parcela_qtd_a_empenhar.value = selectedOption.getAttribute('data-qtd-a-empenhar');
+        empenho_parcela_qtd_a_empenhar.value = parseFloat(empenho_parcela_qtd_a_empenhar.value).toLocaleString('pt-BR')
         empenho_parcela_id.value = empenho_selecionar_parcela.value
     })
     
@@ -213,16 +214,87 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         else{
             modal_empenho_contrato_selecionar.hide()
+
+            limparDadosItemEmpenho();
+            buscarDadosDaParcela();
+
             modal_empenho_item.show()
         }
     })
 
+    function buscarDadosDaParcela() {
+        const id_parcela = document.getElementById('empenho_parcela_id').value
+        const url = `/contratos/buscar_parcela/${id_parcela}/`;
 
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const dados_json = data.parcela
+                carregar_dados_parcela_item_empenho(dados_json)
+            })
+            .catch(error => console.error('Erro ao buscar Parcela:', error));
+    }
+
+    function carregar_dados_parcela_item_empenho(dados){
+
+        //dados da parcela
+        $('#id_item_contrato').val(dados.numero_contrato)
+        $('#id_item_numero_item').val(dados.numero_item)
+        $('#id_item_numero_parcela').val(dados.numero_parcela)
+        $('#id_item_produto').val(dados.produto)
+
+        //Parâmetros
+        $('#itemEmpenho_fatorEmbalagem').val(dados.fator_embalagem)
+        $('#itemEmpenho_valorUnitario').val(formatarComoMoeda(dados.valor_unitario))
+        $('#itemEmpenho_qtdEmpenhar').val(dados.qtd_a_empenhar.toLocaleString('pt-BR'))
+        $('#itemEmpenho_valorEmpenhar').val(formatarComoMoeda(dados.valor_a_empenhar))
+
+        //Campos ocultos
+        $('#id_empenhoItem_contrato').val(dados.contrato_id)
+    }
+
+
+    function limparDadosItemEmpenho(){
+        //logs
+        document.getElementById('item_id').value = ''
+        document.getElementById('item_log_data_registro').value = ''
+        document.getElementById('item_log_responsavel_registro').value = ''
+        document.getElementById('item_log_ult_atualizacao').value = ''
+        document.getElementById('item_log_responsavel_atualizacao').value = ''
+        document.getElementById('item_log_edicoes').value = ''
+        
+        //dados da parcela
+        document.getElementById('id_item_contrato').value = ''
+        document.getElementById('id_item_numero_item').value = ''
+        document.getElementById('id_item_numero_parcela').value = ''
+        document.getElementById('id_item_produto').value = ''
+
+        //Parâmetros
+        document.getElementById('itemEmpenho_fatorEmbalagem').value = ''
+        document.getElementById('itemEmpenho_valorUnitario').value = ''
+        document.getElementById('itemEmpenho_qtdEmpenhar').value = ''
+        document.getElementById('itemEmpenho_valorEmpenhar').value = ''
+
+        //Empenho
+        document.getElementById('itemEmpenho_embalagens').value = ''
+        document.getElementById('itemEmpenho_qtdEmpenho').value = ''
+        document.getElementById('itemEmpenho_valorEmpenho').value = ''
+
+        //Observações
+        document.getElementById('itemEmpenho_observacoes').value = ''
+
+        //Campos ocultos
+        document.getElementById('id_empenhoItem_empenho').value = ''
+        document.getElementById('id_empenhoItem_contrato').value = ''
+        document.getElementById('id_empenhoItem_qtd_empenhada').value = ''
+
+    }
     
     //regras de qtd e valor do empenho
     const fator_embalagem = document.getElementById('itemEmpenho_fatorEmbalagem')
     const valor_unitario = document.getElementById('itemEmpenho_valorUnitario')
     const qtd_a_empenhar = document.getElementById('itemEmpenho_qtdEmpenhar')
+    const valor_a_empenhar = document.getElementById('itemEmpenho_valorEmpenhar')
     const qtd_empenho = document.getElementById('itemEmpenho_qtdEmpenho')
     const embalagens_empenho = document.getElementById('itemEmpenho_embalagens')
     const valor_empenho = document.getElementById('itemEmpenho_valorEmpenho')
@@ -235,11 +307,25 @@ document.addEventListener('DOMContentLoaded', function() {
         formatoValorMonetario('itemEmpenho_valorEmpenho'); 
     })
 
+    qtd_empenho.addEventListener('input', function(){
+        formatoQuantidade(qtd_empenho.id)
+    })
+
+    qtd_empenho.addEventListener('dblclick', function(){
+        qtd_empenho.value = qtd_a_empenhar.value
+        qtd_empenho_inserida()
+    })
+
     qtd_empenho.addEventListener('change', function(){
         qtd_empenho_inserida()
     })
 
     valor_empenho.addEventListener('change', function(){
+        valor_empenho_inserida()
+    })
+
+    valor_empenho.addEventListener('dblclick', function(){
+        valor_empenho.value = valor_a_empenhar.value
         valor_empenho_inserida()
     })
 

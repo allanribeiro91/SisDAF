@@ -463,6 +463,15 @@ class ContratosParcelasForm(forms.ModelForm):
         label='Qtd Contratada',
         required=False,
     )
+    qtd_doada = forms.FloatField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_parcela_qtd_doada',
+            'style': 'text-align: right',
+        }),
+        label='Qtd Doada',
+        required=False,
+    )
     data_previsao_entrega = forms.DateField(
         widget=forms.DateInput(attrs={
             'class': 'form-control',
@@ -788,11 +797,20 @@ class EmpenhoForm(forms.ModelForm):
 
 class EmpenhosItensForm(forms.ModelForm):
     #valor empenhado
+    qtd_empenhado = forms.FloatField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'itemEmpenho_qtdEmpenho',
+            'style': 'width: 180px !important; text-align: right;'
+        }),
+        label='Qtd Empenhada',
+        required=False,
+    )
     valor_empenhado = forms.FloatField(
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'id': 'empenhoItem_valor_empenhado',
-            'style': 'width: 180px !important;'
+            'id': 'itemEmpenho_valorEmpenho',
+            'style': 'width: 180px !important; text-align: right;'
         }),
         label='Valor Empenhado',
         required=False,
@@ -803,7 +821,7 @@ class EmpenhosItensForm(forms.ModelForm):
             'class': 'form-control auto-expand',
             'rows': 1,
             'style': 'padding-top: 30px; height: 80px;',
-            'id': 'empenhoItem_observacoes'
+            'id': 'itemEmpenho_observacoes'
             }),
         required=False,
         label='Observações Gerais'

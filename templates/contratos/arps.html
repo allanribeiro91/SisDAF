@@ -128,7 +128,8 @@
                     <th class="col-arp-data">Prazo (dias)</th>
                     <th class="col-arp-denominacao">Denominação</th>
                     <th class="col-arp-fornecedor">Fornecedor</th>
-                    <th class="col-arp-data" style="text-align: center !important;">Valor Total R$</th>
+                    <th class="col-arp-contratos">Contratos</th>
+                    <th class="col-arp-valor" style="text-align: right !important;">Valor Total R$</th>
                 </tr>
             </thead>
             <tbody>
@@ -158,6 +159,7 @@
                     <td class="col-arp-data">{{ item.prazo_vigencia }}</td>
                     <td class="col-arp-denominacao">{{ item.denominacao.denominacao }}</td>
                     <td class="col-arp-fornecedor">{{ item.fornecedor.nome_fantasia }}</td>
+                    <th class="col-arp-contratos" style="font-weight: normal;">{{ item.contratos }}</th>
                     <th class="col-arp-valor" style="font-weight: normal; text-align: right !important;">{{ item.valor_total_arp|custom_number_format }}</th>
                 </tr>
                 {% endfor %}

@@ -107,6 +107,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const selecionar_objeto_parcela = document.getElementById('parcela_selecionar_objeto')
     const parcela_objeto_id = document.getElementById('parcela_objeto_id')
     const parcela_qtd_contratada = document.getElementById('id_parcela_qtd_contratada')
+    const parcela_qtd_doada = document.getElementById('id_parcela_qtd_doada')
+    const parcela_qtd_total = document.getElementById('id_parcela_qtd_total')
     const parcela_numero = document.getElementById('id_numero_parcela')
     const botao_inserir_nova_parcela = document.getElementById('inserirNovaParcela')
     const botao_salvar_parcela = document.getElementById('botaoSalvarParcela')
@@ -362,7 +364,9 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('parcela_log_edicoes').value = ''
         
         document.getElementById('id_numero_parcela').value = ''
-        document.getElementById('id_parcela_qtd_contratada').value = ''
+        document.getElementById('id_parcela_qtd_contratada').value = 0
+        document.getElementById('id_parcela_qtd_doada').value = 0
+        document.getElementById('id_parcela_qtd_total').value = 0
         document.getElementById('id_parcela_qtd_a_entregar').value = ''
         document.getElementById('id_parcela_previsao_entrega').value = ''
         document.getElementById('id_parcela_valor_total').value = ''
@@ -383,8 +387,33 @@ document.addEventListener("DOMContentLoaded", function() {
 
     //Formatar quantidade contratada da parcela
     parcela_qtd_contratada.addEventListener('input', function(){
-        formatoQuantidade(parcela_qtd_contratada)
+        formatoQuantidade(parcela_qtd_contratada.id)
+        parcela_quantidade_total()
+
     })
+    parcela_qtd_doada.addEventListener('input', function(){
+        formatoQuantidade(parcela_qtd_doada.id)
+        parcela_quantidade_total()
+
+    })
+
+    function parcela_quantidade_total(){
+        var qtd_contratada = 0
+        if (parcela_qtd_contratada.value != ''){
+            qtd_contratada = parcela_qtd_contratada.value.replace(".", "")
+            qtd_contratada = parseFloat(qtd_contratada)
+        }
+
+        var qtd_doada = 0
+        if (parcela_qtd_doada.value != ''){
+            qtd_doada = parcela_qtd_doada.value.replace(".", "")
+            qtd_doada = parseFloat(qtd_doada)
+        }
+
+        var total = qtd_contratada + qtd_doada
+        parcela_qtd_total.value = total.toLocaleString('pt-BR');
+
+    }
     
     //Avaliar número da parcela
     parcela_numero.addEventListener('change', function(){
@@ -1016,11 +1045,25 @@ document.addEventListener("DOMContentLoaded", function() {
                 $('#ctobjeto_produto').val(produto);
                 $('#ctobjeto_produto_hidden').val(produto);
                 $('#ctobjeto_arpItem_hidden').val(data.arp_item);
+                
+                //Parcelas
                 $('#ctobjeto_parcelas').val(data.numero_parcelas);
-                $('#ctobjeto_valor_unitario').val(formatarComoMoeda(data.valor_unitario));
+                $('#ctobjeto_parcelas_entregues').val(data.parcelas_entregues);
+                $('#ctobjeto_parcelas_atraso').val(data.parcelas_atraso);
+                $('#ctobjeto_parcelas_dias_atraso').val(data.parcelas_dias_atraso);
+                
+                //Quantidades
                 $('#ctobjeto_qtd_contratada').val(data.qtd_contratada.toLocaleString('pt-BR'));
+                $('#ctobjeto_qtd_doada').val(data.qtd_doada.toLocaleString('pt-BR'));
+                $('#ctobjeto_qtd_total').val(data.qtd_total.toLocaleString('pt-BR'));
                 $('#ctobjeto_qtd_entregue').val(data.qtd_entregue.toLocaleString('pt-BR'));
-                $('#qtd_entregue').val(data.qtd_contratada.toLocaleString('pt-BR'));
+                $('#ctobjeto_qtd_a_entregar').val(data.qtd_a_entregar.toLocaleString('pt-BR'));
+                
+                //Valores
+                $('#ctobjeto_valor_unitario').val(formatarComoMoeda(data.valor_unitario));
+                $('#ctobjeto_valor_total').val(formatarComoMoeda(data.valor_total));
+                                
+                //Observações
                 $('#ctobjeto_observacoes').val(data.observacoes);
     
                 // Abrir o modal
@@ -1203,6 +1246,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const campos = [
             { id: 'id_numero_parcela', mensagem: 'Informe o <b>Número da Parcela</b>!' },
             { id: 'id_parcela_qtd_contratada', mensagem: 'Informe a <b>Qtd Contratada</b>!' },
+            { id: 'id_parcela_qtd_doada', mensagem: 'Informe a <b>Qtd Doada</b>!' },
             { id: 'id_parcela_previsao_entrega', mensagem: 'Informe a <b>Previsão de Entrega</b>!' },
         ];
     
@@ -1294,6 +1338,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 $('#id_objeto_produto').val(produto);
                 $('#id_parcela_fator_embalagem').val(data.fator_embalagem);
                 $('#id_parcela_qtd_contratada').val(data.qtd_contratada.toLocaleString('pt-BR'));
+                $('#id_parcela_qtd_doada').val(data.qtd_doada.toLocaleString('pt-BR'));
                 $('#id_parcela_qtd_entregue').val(data.qtd_entregue.toLocaleString('pt-BR'));
                 $('#id_parcela_qtd_a_entregar').val(data.qtd_a_entregar.toLocaleString('pt-BR'));
                 $('#id_parcela_valor_unitario').val(formatarComoMoeda(data.valor_unitario));
@@ -1304,9 +1349,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 $('#id_qtd_saldo_arp').val(data.saldo_arp.toLocaleString('pt-BR'));
                 $('#id_qtd_contratada_hidden').val(data.qtd_contratada);
+
+                //Empenho
+                $('#id_parcela_qtd_empenhada').val(data.qtd_empenhada.toLocaleString('pt-BR'));
+                $('#id_parcela_qtd_a_empenhar').val(data.qtd_a_empenhar.toLocaleString('pt-BR'));
+                $('#id_parcela_valor_empenhado').val(formatarComoMoeda(data.valor_empenhado));
+                $('#id_parcela_valor_a_empenhar').val(formatarComoMoeda(data.valor_a_empenhar));
+                $('#id_parcela_percentual_empenhado').val(data.empenho_percentual);
                 
                 // Abrir o modal
                 const modal = new bootstrap.Modal(document.getElementById('contratoParcelaModal'));
+                parcela_quantidade_total();
                 modal.show();
 
                 

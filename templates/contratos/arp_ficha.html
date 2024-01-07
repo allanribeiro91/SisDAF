@@ -35,7 +35,10 @@
                     <i class="fas fa-trash-alt"></i>
                     Deletar
                 </button>
-                
+                <button type="button" class="btn btn-danger" id="btnArpRelatorio" style="font-size: 12px; background-color: #039153; border-color: #039153;">
+                    <i class="fa-regular fa-file-pdf"></i>
+                    &nbsp;Relatório
+                </button>
                 <button class="btn btn-primary me-md-2" type="submit" id="btnSaveArp" style="font-size: 12px;">
                     <i class="fas fa-save me-1"></i> 
                     Salvar
@@ -76,8 +79,7 @@
 
             <div class="horizontal-sections">
                 <div class="section">
-                    <h3>Dados da ARP*</h3>
-                    
+                    <h3>Dados da ARP</h3>               
                     <div class="grid" style="font-size: 14px;">
                         <div class="form-floating">                            
                             {{ form.unidade_daf }}
@@ -127,6 +129,7 @@
                         <div class="form-floating mb-3" style="min-width: 49.5%;">
                             {{ form.fornecedor }}
                             <label>{{ form.fornecedor.label }}</label>
+                            <input type="hidden" name="arp_fornecedor_hidden" id="arp_fornecedor_hidden">
                         </div>
                     </div>  
                 </div>
@@ -151,12 +154,15 @@
                                     <th class="col-produto">Produto</th>
                                     <th class="col-tipo">Tipo de Cota</th>
                                     <th class="col-tipo">Empate Ficto</th>
-                                    <th class="col-valor">Valor Unit. Homol.</th>
+                                    <th class="col-valor">Valor Unit. R$</th>
                                     <th class="col-valor">Qtd Registrada</th>
-                                    <th class="col-valor">Valor Total</th>
-                                    <th class="col-valor">Qtd Contratada</th>
-                                    <th class="col-valor">Saldo</th>
-                                    <th class="col-valor">%</th>
+                                    <th class="col-valor">Valor Total R$</th>
+                                    <th class="col-valor">Contratos</th>
+                                    <th class="col-valor">Qtd Contrat.</th>
+                                    <th class="col-valor">Valor Contrat. R$</th>
+                                    <th class="col-valor">Saldo Qtd</th>
+                                    <th class="col-valor">Saldo Valor R$</th>
+                                    <th class="col-valor">Saldo %</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -180,21 +186,29 @@
                                         {% endif %}
                                     </td>
                                     <td class="col-valor">{{ item.qtd_registrada|floatformat:0|intcomma }}</td>
-                                    <td class="col-valor">{{ item.valor_total|format_number }}</td>
+                                    <td class="col-valor">{{ item.valor_total_arp_item|format_number }}</td>
+                                    <td class="col-valor">{{ item.contratos }}</td>
                                     <td class="col-valor">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor">{{ item.valor_contratado|format_number }}</td>
                                     <td class="col-valor">{{ item.qtd_saldo|floatformat:0|intcomma}}</td>
+                                    <td class="col-valor">{{ item.valor_saldo|format_number }}</td>
                                     <td class="col-valor">{{ item.qtd_saldo_percentual|format_percent}}</td>
                                 </tr>
                                 {% endfor %}
+
                                 <!-- Linha do Valor Total -->
                                 <tr>
-                                    <td colspan="5" style="text-align: right; font-weight: bold;">Valor Total:</td>
-                                    <td class="col-valor" style="font-weight: bold;">{{ qtd_registrada_total_arp|floatformat:0|intcomma }}</td>
-                                    <td class="col-valor" style="font-weight: bold;">{{ valor_total_arp|format_number }}</td>
-                                    <td class="col-valor" style="font-weight: bold;">0</td>
-                                    <td class="col-saldo" style="font-weight: bold;">{{ qtd_saldo_total_arp|floatformat:0|intcomma }}</td>
-                                    <td class="col-saldo" style="font-weight: bold;">{{ qtd_saldo_total_arp_percentual|format_percent}}</td>
+                                    <td colspan="5" style="text-align: right; font-weight: bold;">Total</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ arp.qtd_registrada_total_arp|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ arp.valor_total_arp|format_number }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ arp.contratos }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ arp.qtd_contratada_arp|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ arp.valor_contratado_arp|format_number }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ arp.saldo_qtd_arp|floatformat:0|intcomma }}</td>
+                                    <td class="col-saldo" style="font-weight: bold;">{{ arp.saldo_valor_arp|format_number }}</td>
+                                    <td class="col-saldo" style="font-weight: bold;">{{ arp.saldo_arp_percentual|format_percent}}</td>
                                 </tr>
+
                             </tbody>
                         </table> 
                     </div>
@@ -206,7 +220,6 @@
                 <h3>Observações Gerais</h3>
                 <div class="grid" style="font-size: 14px;">
                     <div class="form-floating mb-3 full-width">
-                        <!-- <textarea class="form-control auto-expand" id="arp_observacoes_gerais" name="observacoes_gerais" rows="1" style="padding-top: 10px; height: 120px;">{{ form.instance.observacoes_gerais|default_if_none:'Sem observações.' }}</textarea> -->
                         {{ form.observacoes_gerais }}
                     </div> 
                     
@@ -214,25 +227,6 @@
             </div>
         </form>
     </div>
-    
-    <script>
-        // $(document).ready(function() {
-
-
-        //     // Quando o botão é clicado
-        //     $(".open-proaq-produtos-modal").on('click', function(event) {
-                
-        //         document.getElementById('arpItemForm').reset();
-
-        //         var modal = new bootstrap.Modal(document.getElementById('proaqProdutosModal'));
-        //         modal.show();
-
-        //         // $('#proaqProdutosModal').modal('show');  // Mostre o modal
-        //     });
-
-            
-        // });
-    </script>
 
     <!-- Modal -->
     {% include "contratos/arp_ficha_modal.html" %}  

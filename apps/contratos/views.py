@@ -14,7 +14,7 @@ from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos,
                                    ContratosFiscais, Empenhos)
 from apps.contratos.forms import (ContratosArpsForm, ContratosArpsItensForm, ContratosForm, 
                                   ContratosObjetosForm, ContratosParcelasForm, ContratosEntregasForm,
-                                  ContratosFiscaisForm, EmpenhoForm)
+                                  ContratosFiscaisForm, EmpenhoForm, EmpenhosItensForm)
 from setup.choices import UNIDADE_DAF, MODALIDADE_AQUISICAO, STATUS_ARP, YES_NO, TIPO_COTA
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
@@ -333,12 +333,33 @@ def contrato_objeto_modal(request, id_objeto=None):
             'produto': produto_id,
             'arp_item': arp_item_id,
             'fator_embalagem': item.fator_embalagem,
-            'valor_unitario': item.valor_unitario,
             'parcelas': item.numero_parcelas(),
-            'qtd_contratada': item.qtd_contratada(),
-            'qtd_entregue': item.qtd_entregue(),
+
+            #parcelas
             'numero_parcelas': item.numero_parcelas(),
+            'parcelas_entregues': item.numero_parcelas_entregues(),
+            'parcelas_atraso': item.numero_parcelas_atraso(),
+            'parcelas_dias_atraso': item.dias_atraso(),
+
+            #quantidades
+            'qtd_contratada': item.qtd_contratada(),
+            'qtd_doada': item.qtd_doada_objeto(),
+            'qtd_total': item.qtd_total_objeto(),
+            'qtd_entregue': item.qtd_entregue(),
+            'qtd_a_entregar': item.qtd_a_entregar(),
+
+            #empenho
+            'qtd_empenhada': item.qtd_a_entregar(),
+            'qtd_a_empenhar': item.qtd_a_entregar(),
+            'valor_empenhado': item.qtd_a_entregar(),
+            'valor_a_empenhar': item.qtd_a_entregar(),
+            'empenho_percentual': item.qtd_a_entregar(),
+
+            #valores
+            'valor_unitario': item.valor_unitario,
             'valor_total': item.valor_total(),
+
+            #observações
             'observacoes': item.observacoes_gerais if item.observacoes_gerais else '',
         }
         return JsonResponse(data)
@@ -534,6 +555,10 @@ def contrato_parcela_salvar(request, id_parcela=None):
         qtd_contratada = request.POST.get('qtd_contratada')
         qtd_contratada = float(qtd_contratada.replace('.', ''))
 
+        #Qtd Contratada
+        qtd_doada = request.POST.get('qtd_doada')
+        qtd_doada = float(qtd_doada.replace('.', ''))
+
         #Fazer uma cópia mutável do request.POST
         modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
 
@@ -541,6 +566,7 @@ def contrato_parcela_salvar(request, id_parcela=None):
         modificacoes_post['objeto'] = objeto_instance
         modificacoes_post['contrato'] = contrato_instance
         modificacoes_post['qtd_contratada'] = qtd_contratada
+        modificacoes_post['qtd_doada'] = qtd_doada
 
         #Criar o formulário com os dados atualizados
         parcela_form = ContratosParcelasForm(modificacoes_post, instance=parcela_form.instance)
@@ -601,6 +627,7 @@ def contrato_parcela_modal(request, id_parcela=None):
             'objeto': item.objeto.id,
             'fator_embalagem': item.objeto.fator_embalagem,
             'qtd_contratada': item.qtd_contratada,
+            'qtd_doada': item.qtd_doada,
             'qtd_entregue': item.qtd_entregue(),
             'qtd_a_entregar': item.qtd_a_entregar(),
             'valor_unitario': item.valor_unitario(),
@@ -608,6 +635,13 @@ def contrato_parcela_modal(request, id_parcela=None):
             'data_previsao_entrega': item.data_previsao_entrega,
             'data_ultima_entrega': item.data_ultima_entrega(),
             'observacoes': item.observacoes_gerais,
+
+            #empenho
+            'qtd_empenhada': item.qtd_empenhada(),
+            'qtd_a_empenhar': item.qtd_a_empenhar(),
+            'valor_empenhado': item.valor_empenhado(),
+            'valor_a_empenhar': item.valor_a_empenhar(),
+            'empenho_percentual': item.empenho_percentual(),
 
             'saldo_arp': item.objeto.arp_item.qtd_saldo()
         }
@@ -617,28 +651,38 @@ def contrato_parcela_modal(request, id_parcela=None):
 
 def buscar_parcela(request, id_parcela=None):
     parcela = ContratosParcelas.objects.get(id=id_parcela)
+    numero_contrato = parcela.contrato.numero_contrato
     numero_item = parcela.objeto.numero_item
     numero_parcela = parcela.numero_parcela
     contrato_id = parcela.contrato.id
     parcela_id = parcela.id
     produto = parcela.objeto.produto.produto
+    fator_embalagem = parcela.objeto.fator_embalagem
+    valor_unitario = parcela.objeto.valor_unitario
+    qtd_a_empenhar = parcela.qtd_a_empenhar()
+    valor_a_empenhar = parcela.valor_a_empenhar()
     qtd_a_entregar = parcela.qtd_a_entregar()
     parcela_dados = {
+            'numero_contrato': numero_contrato,
             'numero_item': numero_item,
             'numero_parcela': numero_parcela,
             'contrato_id': contrato_id,
             'parcela_id': parcela_id,
             'produto': produto,
+            'fator_embalagem': fator_embalagem,
+            'valor_unitario': valor_unitario,
+            'qtd_a_empenhar': qtd_a_empenhar,
+            'valor_a_empenhar': valor_a_empenhar,
             'qtd_a_entregar': qtd_a_entregar,
         }
     return JsonResponse({'parcela': parcela_dados})
 
 def buscar_parcelas(request, id_contrato=None):
-    parcelas = ContratosParcelas.objects.filter(contrato=id_contrato)
+    parcelas = ContratosParcelas.objects.filter(contrato=id_contrato).order_by('objeto__numero_item', 'numero_parcela')
     parcelas_list = []
     for parcela in parcelas:
         parcela_qtd_a_empenhar = parcela.qtd_a_empenhar()
-        parcela_detalhe = f"Parcela: {parcela.numero_parcela} - {parcela.objeto.produto.produto}"
+        parcela_detalhe = f"Item: {parcela.objeto.numero_item} - Parcela: {parcela.numero_parcela} - {parcela.objeto.produto.produto}"
         parcelas_list.append({'id': parcela.id, 'detalhe': parcela_detalhe, 'qtd_a_empenhar': parcela_qtd_a_empenhar})
     return JsonResponse({'parcelas': parcelas_list})
 
@@ -668,6 +712,7 @@ def contrato_parcela_delete(request, id_entrega=None):
         return JsonResponse({
             "message": "Parcela do Contrato não encontrada."
             })
+
 
 
 
@@ -1011,7 +1056,7 @@ def arp_ficha(request, arp_id=None):
         denominacao_instance = DenominacoesGenericas.objects.get(id=denominacao_id)
     
         #Passar o objeto Fornecedor
-        fornecedor_id = request.POST.get('fornecedor')
+        fornecedor_id = request.POST.get('arp_fornecedor_hidden')
         fornecedor_instance =  Fornecedores.objects.get(id=fornecedor_id)
         
         #Fazer uma cópia mutável do request.POST
@@ -1074,11 +1119,7 @@ def arp_ficha(request, arp_id=None):
                 })
             
     #Form ARP
-    valor_total_arp = 0
     tab_itens_arp = None
-    qtd_registrada_total_arp = 0
-    qtd_saldo_total_arp = 0
-    qtd_saldo_total_arp_percentual = 0
     if arp:
         form = ContratosArpsForm(instance=arp)
         
@@ -1093,22 +1134,6 @@ def arp_ficha(request, arp_id=None):
                 output_field=models.FloatField()
                 )
             )
-        
-        #valores
-        valor_total_arp = tab_itens_arp.aggregate(total=Sum('valor_total'))['total']
-        if valor_total_arp == None:
-            valor_total_arp = 0
-        
-        qtd_registrada_total_arp = tab_itens_arp.aggregate(total=Sum('qtd_registrada'))['total']
-        if qtd_registrada_total_arp == None:
-            qtd_registrada_total_arp = 0
-        
-        qtd_saldo_total_arp = 0
-        for item in tab_itens_arp:
-            qtd_saldo_total_arp += item.qtd_saldo()
-
-        if qtd_saldo_total_arp > 0:
-            qtd_saldo_total_arp_percentual = qtd_saldo_total_arp / qtd_registrada_total_arp
     else:
         form = ContratosArpsForm()
 
@@ -1122,10 +1147,6 @@ def arp_ficha(request, arp_id=None):
         'form_item': form_item,
         'arp': arp,
         'tab_itens_arp': tab_itens_arp,
-        'valor_total_arp': valor_total_arp,
-        'qtd_registrada_total_arp': qtd_registrada_total_arp,
-        'qtd_saldo_total_arp': qtd_saldo_total_arp,
-        'qtd_saldo_total_arp_percentual': qtd_saldo_total_arp_percentual,
     })
 
 def arp_delete(request, arp_id=None):   
@@ -1310,6 +1331,9 @@ def arp_buscar_dados_sei(request, id_arp=None):
     return JsonResponse({'arp': arp_list})
 
 
+
+
+
 #ITENS DAS ARPS
 def arp_item_ficha(request, arp_item_id=None):
     if arp_item_id:
@@ -1437,7 +1461,6 @@ def arp_item_formulario(request, arp_item_id=None):
     try:
         item = ContratosArpsItens.objects.get(id=arp_item_id)
         produto_id = item.produto_id
-        produto_nome = item.produto.produto
         data = {
             'id': item.id,
             'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
@@ -1454,6 +1477,12 @@ def arp_item_formulario(request, arp_item_id=None):
             'valor_unit_reequilibrio': item.valor_unit_reequilibrio,
             'qtd_registrada': item.qtd_registrada,
             'observacoes': item.observacoes_gerais if item.observacoes_gerais else '',
+            'contratos': item.contratos(),
+            'qtd_contratada': item.qtd_contratada(),
+            'valor_contratado': item.valor_contratado(),
+            'saldo_quantidade': item.qtd_saldo(),
+            'saldo_valor': item.valor_saldo(),
+            'saldo_percentual': item.qtd_saldo_percentual(),
         }
         return JsonResponse(data)
     except ContratosArpsItens.DoesNotExist:
@@ -1578,13 +1607,39 @@ def empenho_ficha(request, id_empenho=None):
     else:
         empenho_form = EmpenhoForm()
 
+    form_empenho_item = EmpenhosItensForm()
+
     conteudo = {
         'form': empenho_form,
+        'form_empenho_item': form_empenho_item,
         'empenho': empenho,
         'list_contratos': list_contratos,
     }
     return render(request, 'contratos/empenho_ficha.html', conteudo)
 
+
+
+
 #TEDs
 def teds(request):
     return render(request, 'contratos/teds.html')
+
+
+
+#RELATÓRIOS
+def contratos_relatorios_arp(request, arp_id=None):
+    arp = ContratosArps.objects.get(id=arp_id)
+    arp_itens = ContratosArpsItens.objects.filter(del_status=False, arp=arp_id)
+    
+    #Log Relatório
+    usuario_nome = request.user.usuario_relacionado.primeiro_ultimo_nome
+    data_hora_atual = datetime.now()
+    data_hora = data_hora_atual.strftime('%d/%m/%Y %H:%M:%S')
+    
+    conteudo = {
+        'arp': arp,
+        'arp_itens': arp_itens,
+        'usuario': usuario_nome,
+        'data_hora': data_hora,
+    }
+    return render(request, 'contratos/relatorio_arp.html', conteudo)

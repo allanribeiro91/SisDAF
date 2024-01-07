@@ -7,7 +7,7 @@ from apps.contratos.views import (
     contrato_objeto_modal, contrato_objeto_salvar, contrato_objeto_delete, buscar_objeto, contrato_parcela_salvar,
     contrato_parcela_modal, contrato_dados_arp, buscar_parcela, contrato_entrega_salvar, contrato_entrega_modal,
     contrato_entrega_delete, contrato_parcela_delete, contrato_anotacoes, contrato_fiscal_salvar,
-    contrato_fiscal_modal, empenhos, empenho_ficha, teds, buscar_parcelas
+    contrato_fiscal_modal, empenhos, empenho_ficha, teds, buscar_parcelas, contratos_relatorios_arp
 )
 
 
@@ -77,5 +77,8 @@ urlpatterns = [
 
     #TEDs
     path('contratos/teds/', teds, name='teds'),
+
+    #RELATÓRIOS
+    path('contratos/relatorio/arp/<int:arp_id>/', contratos_relatorios_arp, name='contratos_relatorios_arp')
 
 ]

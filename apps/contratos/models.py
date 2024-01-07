@@ -73,7 +73,7 @@ class ContratosArps(models.Model):
         itens = self.arp_item.all()  # Acessa todos os itens relacionados a esta ARP
         for item in itens:
             if not item.del_status:  # Se o item não estiver deletado
-                total += item.valor_total()
+                total += item.valor_total_arp_item()
         return total
 
     def qtd_registrada_total_arp(self):
@@ -81,7 +81,48 @@ class ContratosArps(models.Model):
         itens = self.arp_item.all()  # Acessa todos os itens relacionados a esta ARP
         for item in itens:
             if not item.del_status:  # Se o item não estiver deletado
-                total += item.qtd_registrada()
+                total += item.qtd_registrada
+        return total
+
+    def contratos(self):
+        return self.arp_contrato.filter(del_status=False).count()
+
+    def qtd_contratada_arp(self):
+        total = 0
+        itens = self.arp_item.all()  # Acessa todos os itens relacionados a esta ARP
+        for item in itens:
+            if not item.del_status:  # Se o item não estiver deletado
+                total += item.qtd_contratada()
+        return total
+    
+    def saldo_qtd_arp(self):
+        total = 0
+        itens = self.arp_item.all()  # Acessa todos os itens relacionados a esta ARP
+        for item in itens:
+            if not item.del_status:  # Se o item não estiver deletado
+                total += item.qtd_saldo()
+        return total
+    
+    def saldo_valor_arp(self):
+        total = 0
+        itens = self.arp_item.all()  # Acessa todos os itens relacionados a esta ARP
+        for item in itens:
+            if not item.del_status:  # Se o item não estiver deletado
+                total += item.valor_saldo()
+        return total
+    
+    def saldo_arp_percentual(self):
+        v_total_arp = self.valor_total_arp()
+        v_contratado_arp = self.valor_contratado_arp()
+        percentual = 1 - (v_contratado_arp / v_total_arp)
+        return percentual
+
+    def valor_contratado_arp(self):
+        total = 0
+        itens = self.arp_item.all()  # Acessa todos os itens relacionados a esta ARP
+        for item in itens:
+            if not item.del_status:  # Se o item não estiver deletado
+                total += item.valor_contratado()
         return total
 
     @property
@@ -155,22 +196,39 @@ class ContratosArpsItens(models.Model):
         self.del_usuario = user
         self.save()
 
-    def valor_total(self):
+    def valor_total_arp_item(self):
+        qtd_registrada = self.qtd_registrada if self.qtd_registrada else 0
+        valor_homologado = self.valor_unit_homologado if self.valor_unit_homologado else 0
         if self.valor_unit_reequilibrio_bool:
-            return self.valor_unit_reequilibrio * self.qtd_registrada
+            return self.valor_unit_reequilibrio * qtd_registrada
         else:
-            return self.valor_unit_homologado * self.qtd_registrada
+            return valor_homologado * qtd_registrada
 
     def qtd_contratada(self):
         total = 0
         for objeto in self.arp_item_objeto.filter(del_status=False):
             total += objeto.qtd_contratada()
         return total
+    
+    def valor_contratado(self):
+        total = 0
+        for objeto in self.arp_item_objeto.filter(del_status=False):
+            total += objeto.valor_total()
+        return total
 
+    def contratos(self):
+        return self.arp_item_objeto.filter(del_status=False).count()
 
     def qtd_saldo(self):
         qtd_saldo = self.qtd_registrada - self.qtd_contratada()
         return qtd_saldo
+    
+    def valor_saldo(self):
+        valor_total = self.valor_total_arp_item()
+        valor_contratado = self.valor_contratado()
+        saldo = valor_total - valor_contratado
+        return saldo
+
     
     def qtd_saldo_percentual(self):
         qtd_saldo_percentual = self.qtd_saldo() / self.qtd_registrada
@@ -324,22 +382,35 @@ class ContratosObjetos(models.Model):
         self.save()
 
     def qtd_contratada(self):
-        return self.parcela_objeto.aggregate(Sum('qtd_contratada'))['qtd_contratada__sum'] or 0
+        return self.parcela_objeto.filter(del_status=False).aggregate(Sum('qtd_contratada'))['qtd_contratada__sum'] or 0
+
+    def qtd_doada_objeto(self):
+        return self.parcela_objeto.filter(del_status=False).aggregate(Sum('qtd_doada'))['qtd_doada__sum'] or 0
+    
+    def qtd_total_objeto(self):
+        qtd_total = self.qtd_contratada() + self.qtd_doada_objeto()
+        return qtd_total
 
     def qtd_entregue(self):
         total_entregue = 0
         for parcela in self.parcela_objeto.filter(del_status=False):
             total_entregue += parcela.qtd_entregue()
-
         return total_entregue
     
     def qtd_a_entregar(self):
-        qtd_a_entregar = self.qtd_contratada() - self.qtd_entregue()
+        qtd_a_entregar = self.qtd_total_objeto() - self.qtd_entregue()
         return qtd_a_entregar
 
     def numero_parcelas(self):
         return self.parcela_objeto.filter(del_status=False).count()
     
+    def numero_parcelas_entregues(self):
+        entregues = 0
+        for parcela in self.parcela_objeto.filter(del_status=False):
+            if parcela.parcela_entregue() == True:
+                entregues += 1
+        return entregues
+
     def numero_parcelas_atraso(self):
         contador_atrasos = 0
         for parcela in self.parcela_objeto.filter(del_status=False):
@@ -372,6 +443,7 @@ class ContratosParcelas(models.Model):
     #dados da parcela
     numero_parcela = models.IntegerField(null=False, blank=False)
     qtd_contratada = models.IntegerField(null=False, blank=False)
+    qtd_doada = models.IntegerField(null=False, blank=False, default=0)
     data_previsao_entrega = models.DateField(null=False, blank=False)
 
     #objeto
@@ -426,13 +498,24 @@ class ContratosParcelas(models.Model):
                 contador_atrasos += 1
         return contador_atrasos
 
+    def qtd_total_parcela(self):
+        qtd_total = self.qtd_contratada + self.qtd_doada
+        return qtd_total
+
     def qtd_entregue(self):
         total_entregue = self.entrega_parcela.filter(del_status=False).aggregate(Sum('qtd_entregue'))['qtd_entregue__sum'] or 0
         return total_entregue 
     
     def qtd_a_entregar(self):
-        qtd_a_entregar = self.qtd_contratada - self.qtd_entregue()
+        qtd_a_entregar = self.qtd_total_parcela() - self.qtd_entregue()
         return qtd_a_entregar
+    
+    def parcela_entregue(self):
+        qtd_a_entregar = self.qtd_a_entregar()
+        if (qtd_a_entregar > 0):
+            return True
+        else:
+            return False
 
     def numero_entregas(self):
         return self.entrega_parcela.filter(del_status=False).count()
@@ -444,13 +527,26 @@ class ContratosParcelas(models.Model):
         return self.valor_unitario() * self.qtd_contratada
     
     def qtd_empenhada(self):
-        return 1
+        # Soma a quantidade empenhada de todos os itens de empenho relacionados
+        resultado = self.empenho_parcela.filter(del_status=False).aggregate(Sum('qtd_empenhado'))
+        return resultado['qtd_empenhado__sum'] or 0
     
     def qtd_a_empenhar(self):
-        return 1
+        quantidade = self.qtd_contratada - self.qtd_empenhada()
+        return quantidade
 
     def valor_empenhado(self):
-        return 10
+        # Soma o valor empenhado de todos os itens de empenho relacionados
+        resultado = self.empenho_parcela.filter(del_status=False).aggregate(Sum('valor_empenhado'))
+        return resultado['valor_empenhado__sum'] or 0
+
+    def valor_a_empenhar(self):
+        valor = self.valor_total() - self.valor_empenhado()
+        return valor
+
+    def empenho_percentual(self):
+        percentual = self.valor_empenhado() / self.valor_total()
+        return percentual
 
     def __str__(self):
         return f"Parcela do contrato: {self.numero_parcela} - Contrato: {self.objeto.contrato.numero_contrato} - Produto: ({self.objeto.produto.produto}) - ID ({self.id})"
@@ -573,7 +669,6 @@ class ContratosFiscais(models.Model):
     def __str__(self):
         return f"Fiscal do contrato: {self.fiscal_nome()}"
 
-
 class Empenhos(models.Model):
     #relacionamento
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='empenho_usuario_registro')
@@ -638,7 +733,6 @@ class Empenhos(models.Model):
     def __str__(self):
         return f"Empenho: {self.numero_empenho()}"
     
-
 class EmpenhosItens(models.Model):
     #relacionamento
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='empenho_item_usuario_registro')
@@ -650,6 +744,7 @@ class EmpenhosItens(models.Model):
     log_n_edicoes = models.IntegerField(default=1)
 
     #dados do empenho
+    qtd_empenhado = models.FloatField(null=False, blank=False)
     valor_empenhado = models.FloatField(null=False, blank=False)
     
     #relacionamentos
@@ -674,7 +769,7 @@ class EmpenhosItens(models.Model):
             if user:
                 self.usuario_registro = user
                 self.usuario_atualizacao = user
-        super(EmpenhoItens, self).save(*args, **kwargs)
+        super(EmpenhosItens, self).save(*args, **kwargs)
 
     def soft_delete(self, user):
         self.del_status = True
@@ -684,3 +779,4 @@ class EmpenhosItens(models.Model):
     
     def __str__(self):
         return f"Fiscal do contrato: {self.fiscal_nome()}"
+

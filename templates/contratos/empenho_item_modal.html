@@ -8,7 +8,7 @@
     }
 
     .custom-modal-width-empenho-item {
-        min-width: 60%; 
+        min-width: 70%; 
         font-size: 16px !important;
     }
 
@@ -21,7 +21,7 @@
     }
 
     .modal-content{
-        height: 50%;
+        height: 60%;
     }
 
     .modal-body{
@@ -48,101 +48,124 @@
                     {% csrf_token %}
                     <div class="horizontal-sections-modal-parcela" >
                         <div class="section" style="border: 0px !important;">
+                            
+                            <h3>Logs</h3>
                             <div class="grid" style="font-size: 10px;">
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_data" id="entrega_id" style="width: 100px;"  readonly>
-                                    <label for="entrega_id">ID</label>
+                                    <input type="text" class="form-control log_data" id="item_id" style="width: 100px;"  readonly>
+                                    <label for="item_id">ID</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_data" id="entrega_log_data_registro" name="log_data_registro" readonly value="{{ denominacao.registro_data|date:"d/m/Y H:i:s" }}">
-                                    <label for="entrega_log_data_registro">Data do Registro</label>
+                                    <input type="text" class="form-control log_data" id="item_log_data_registro" readonly>
+                                    <label for="item_log_data_registro">Data do Registro</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_responsavel" id="entrega_log_responsavel_registro" name="log_responsavel_registro" readonly value="{{ denominacao.usuario_registro.dp_nome_completo }}">
-                                    <label for="entrega_log_responsavel_registro">Responsável pelo Registro</label>
+                                    <input type="text" class="form-control log_responsavel" id="item_log_responsavel_registro" readonly>
+                                    <label for="item_log_responsavel_registro">Responsável pelo Registro</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_data" id="entrega_log_ult_atualizacao" name="log_data_registro" readonly value="{{ denominacao.ult_atual_data|date:"d/m/Y H:i:s" }}">
-                                    <label for="entrega_log_ult_atualizacao">Última Atualização</label>
+                                    <input type="text" class="form-control log_data" id="item_log_ult_atualizacao" readonly>
+                                    <label for="item_log_ult_atualizacao">Última Atualização</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_responsavel" id="entrega_log_responsavel_atualizacao" name="log_responsavel_atualizacao" readonly value="{{ denominacao.usuario_atualizacao.dp_nome_completo }}">
-                                    <label for="entrega_log_responsavel_atualizacao">Responsável Atualização</label>
+                                    <input type="text" class="form-control log_responsavel" id="item_log_responsavel_atualizacao" readonly>
+                                    <label for="item_log_responsavel_atualizacao">Responsável Atualização</label>
                                 </div>
                                 <div class="form-floating mb-3" style="font-size: 12px;">
-                                    <input type="text" class="form-control log_edicoes" id="entrega_log_edicoes" name="log_edicoes" readonly value="{{ denominacao.log_n_edicoes }}">
-                                    <label for="entrega_log_edicoes">Nº Edições</label>
+                                    <input type="text" class="form-control log_edicoes" id="item_log_edicoes" readonly>
+                                    <label for="item_log_edicoes">Nº Edições</label>
                                 </div>
                             </div>
+
                         </div>
                     </div>
     
-                    <div class="horizontal-sections-modal-parcela">
+                    <div class="horizontal-sections-modal-parcela" style="margin-top: 20px;">
                         <div class="section" style="border: 0px !important;">
+                            
+                            <h3>Dados da Parcelas</h3>
                             <div class="grid" style="font-size: 14px;">
-                                
+                                <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                    <input type="text" class="form-control" id="id_item_contrato" readonly>
+                                    <label>Contrato</label>
+                                </div>
                                 <div class="form-floating mb-3" style="max-width: 100px !important;">
-                                    <input type="text" class="form-control" id="id_entrega_item" readonly>
+                                    <input type="text" class="form-control" id="id_item_numero_item" readonly>
                                     <label>Nº do Item</label>
                                 </div>
                                 <div class="form-floating mb-3" style="max-width: 120px !important;">
-                                    <input type="text" class="form-control" id="id_entrega_parcela" readonly>
+                                    <input type="text" class="form-control" id="id_item_numero_parcela" readonly>
                                     <label>Nº da Parcela</label>
                                 </div>
                                 <div class="form-floating mb-3 full-width">
-                                    <input type="text" class="form-control" id="id_entrega_produto" readonly>
+                                    <input type="text" class="form-control" id="id_item_produto" readonly>
                                     <label>Produto Farmacêutico</label>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <div class="horizontal-sections-modal-parcela">
-                        <div class="section" style="border: 0px !important;">
-                            <div class="grid" style="font-size: 14px;">
                                 
-                                <div class="form-floating mb-3" style="max-width: 150px !important;">
-                                    <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_fatorEmbalagem" value="140" readonly>
-                                    <label>Fator Embalagem</label>
+                            </div>
+
+                            <div class="grid" style="font-size: 14px;">
+
+                                <!-- Parâmetros -->
+                                <div class="subgrid">
+                                    <h3>Parâmetros</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_fatorEmbalagem" value="140" readonly>
+                                            <label>Fator Embalagem</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_valorUnitario" value="R$ 151,23" readonly>
+                                            <label>Valor Unitário R$</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_qtdEmpenhar" value="349.842" readonly>
+                                            <label>Qtd a Empenhar</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_valorEmpenhar" value="349.842" readonly>
+                                            <label>Valor a Empenhar</label>
+                                        </div>
+                                    </div>
+                                    
                                 </div>
-                                <div class="form-floating mb-3" style="max-width: 150px !important;">
-                                    <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_valorUnitario" value="R$ 151,23" readonly>
-                                    <label>Valor Unitário R$</label>
-                                </div>
-                                <div class="form-floating mb-3" style="max-width: 150px !important;">
-                                    <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_qtdEmpenhar" value="349.842" readonly>
-                                    <label>Qtd a Empenhar</label>
-                                </div>
-                                <div class="form-floating mb-3" style="margin-left: 30px; max-width: 150px !important;">
-                                    <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_qtdEmpenho">
-                                    <label>Qtd Empenho</label>
-                                </div>
-                                <div class="form-floating mb-3" style="max-width: 150px !important;">
-                                    <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_embalagens" readonly>
-                                    <label>Embalagens</label>
-                                </div>
-                                <div class="form-floating mb-3" style="max-width: 180px !important;">
-                                    <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_valorEmpenho">
-                                    <label>Valor do Empenho</label>
+                                
+                                <!-- Empenho -->
+                                <div class="subgrid" style="margin-left: 30px;">
+                                    <h3>Empenho</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_embalagens" readonly>
+                                            <label>Embalagens</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            {{ form_empenho_item.qtd_empenhado }}
+                                            <label>{{ form_empenho_item.qtd_empenhado.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            {{ form_empenho_item.valor_empenhado }}
+                                            <label>{{ form_empenho_item.valor_empenhado.label }}</label>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                             </div>
 
+                            <h3>Observações</h3>
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3 full-width">
-                                    {{ form_ct_entrega.observacoes_gerais }}
-                                    <label>{{ form_ct_entrega.observacoes_gerais.label }}</label>
+                                    {{ form_empenho_item.observacoes_gerais }}
+                                    <label>{{ form_empenho_item.observacoes_gerais.label }}</label>
                                 </div>
-                            </div>
 
-                            <input type="hidden" id="id_entrega_contrato_hidden" name="id_entrega_contrato_hidden" readonly>
-                            <input type="hidden" id="id_entrega_parcela_hidden" name="id_entrega_parcela_hidden" readonly>
-                            
-                            <input type="hidden" id="id_qtd_entregue_hidden" readonly>
-                            
+                                <input type="text" id="id_empenhoItem_empenho" name="id_empenhoItem_empenho" readonly>
+                                <input type="text" id="id_empenhoItem_contrato" name="id_empenhoItem_contrato" readonly>
+                                <input type="text" id="id_empenhoItem_qtd_empenhada" readonly>
+                            </div>
                         </div>
                     </div>
     
+
                     
     
                 </form>

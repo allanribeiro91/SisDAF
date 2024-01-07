@@ -156,7 +156,7 @@
                 </div>
             </div>
             
-            <!-- Objetos do Contrato -->
+            <!-- Objetos -->
             <div class="horizontal-sections">
                 <div class="section">
                     <h3>Objetos do Contrato</h3>
@@ -167,6 +167,7 @@
                         </button>
                     </div>
 
+                    <!-- Tabela de Objetos -->
                     <div class="grid" style="font-size: 14px; text-align: right !important;">
                         <table class="table table-striped table-hover fixed-size-table" style="font-size: 12px;" id="tabObjetosContrato">
                             <thead>
@@ -178,9 +179,11 @@
                                     <th class="col-parcelas">Parcelas C/ Atraso</th>
                                     <th class="col-parcelas">Tot. Dias de Atraso</th>
                                     <th class="col-valor">Qtd Contratada</th>
+                                    <th class="col-valor">Qtd Doada</th>
+                                    <th class="col-valor">Qtd Total</th>
                                     <th class="col-valor">Qtd Entregue</th>
                                     <th class="col-valor">Qtd a Entregar</th>
-                                    <th class="col-valor">Valor Unitário R$</th>
+                                    <th class="col-valor">Valor Unit. R$</th>
                                     <th class="col-valor">Valor Total R$</th>
                                 </tr>
                             </thead>
@@ -209,7 +212,10 @@
                                     </td>
                                     
                                     <td class="col-valor">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
-
+                                    <td class="col-valor">{{ item.qtd_doada_objeto|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor">{{ item.qtd_total_objeto|floatformat:0|intcomma }}</td>
+                                    
+                                    
                                     <td class="col-data">
                                         {% if item.qtd_a_entregar > 0 %}
                                             {{ item.qtd_entregue|floatformat:0|intcomma }}
@@ -238,7 +244,7 @@
                 </div>
             </div>
 
-            <!-- Parcelas do Contrato -->
+            <!-- Parcelas -->
             <div class="horizontal-sections">
                 <div class="section">
                     <h3>Parcelas do Contrato</h3>
@@ -331,6 +337,7 @@
                 </div>
             </div>
 
+            <!-- Entregas -->
             <div class="horizontal-sections">
                 <div class="section">
                     <h3>Entregas</h3>

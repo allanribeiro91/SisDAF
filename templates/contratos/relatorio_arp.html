@@ -1,0 +1,218 @@
+{% load static %}
+{% load custom_filters %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '/styles/relatorio_arp.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>ARP {{ arp.numero_arp }}</title>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-sisdaf">
+            <!-- <img src="\setup\static\assets/logo/logo_sisdaf_transparente.png" alt="Logo SisDAF" class="top-logo"> -->
+            <img src="{% static '/assets/logo/logo_sisdaf_transparente.png' %}" alt="Logo SisDAF" class="top-logo">
+        </div>
+        <div class="titulo-relatorio">
+            <b>SisDAF</b> - Relatório da Ata de Registro de Preços
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Log -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Log
+                </div>
+                <div class="grid">
+                    <div class="box">
+                        <div class="box-titulo">ID</div>
+                        <div class="box-conteudo">{{ arp.id }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Registro</div>
+                        <div class="box-conteudo">{{ arp.usuario_registro.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Data Registro</div>
+                        <div class="box-conteudo">{{ arp.registro_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Últ. Atualização</div>
+                        <div class="box-conteudo">{{ arp.usuario_atualizacao.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Última Atualização</div>
+                        <div class="box-conteudo">{{ arp.ult_atual_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Nº Edições</div>
+                        <div class="box-conteudo">{{ arp.log_n_edicoes }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados Administrativos -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Identificação da Ata de Registro de Preços
+                </div>
+                <div class="grid">
+                    <div class="box {% if arp.status == 'vigente' %}status-vigente{% elif arp.status == 'encerrado' %}status-encerrado{% elif arp.status == 'suspenso' %}status-suspenso{% elif arp.status == 'cancelado' %}status-cancelado{% endif %}" id="relatorio_box_status">
+                        <div class="box-titulo">Status</div>
+                        <div class="box-conteudo">{{ arp.get_status_display }}</div>
+                    </div>                    
+
+                    <div class="box">
+                        <div class="box-titulo">Nº ARP</div>
+                        <div class="box-conteudo">{{ arp.numero_arp }}</div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-titulo">Data Publicação</div>
+                        <div class="box-conteudo">{{ arp.data_publicacao|date:"d/m/Y" }}</div>
+                    </div>
+
+                    
+
+                    <div class="box">
+                        <div class="box-titulo">Unidade DAF</div>
+                        <div class="box-conteudo">{{ arp.get_unidade_daf_display }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Lei de Licitação</div>
+                        <div class="box-conteudo">{{ arp.get_lei_licitacao_display }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Processo SEI</div>
+                        <div class="box-conteudo">{{ arp.numero_processo_sei }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Documento SEI</div>
+                        <div class="box-conteudo">{{ arp.numero_documento_sei }}</div>
+                    </div>
+                    
+                </div>
+                <div class="grid">
+                    <div class="box" style="width: 47%;">
+                        <div class="box-titulo">Denominação Genérica</div>
+                        <div class="box-conteudo">{{ arp.denominacao }}</div>
+                    </div>
+                    <div class="box" style="width: 47%;">
+                        <div class="box-titulo">Fornecedor</div>
+                        <div class="box-conteudo">{{ arp.fornecedor }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Itens da ARP -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Itens da ARP
+                </div>
+                
+                <div class="grid" style="justify-content:center !important;" >
+                    <table class="tabela-relatorio" style="font-size: 10px; ">
+                        <thead>
+                            <tr>
+                                <th class="col-id">Item</th>
+                                <th class="col-produto">Produto</th>
+                                <th class="col-tipo">Tipo Cota</th>
+                                <!-- <th class="col-tipo">Empate Ficto</th> -->
+                                <th class="col-valor" style="text-align: right !important;">Valor<br> Un. R$</th>
+                                <th class="col-valor">Qtd Regist.</th>
+                                <th class="col-valor">Valor <br>Total R$</th>
+                                <th class="col-contrato" style="text-align: right;">Nº de<br> Contrat.</th>
+                                <th class="col-valor">Qtd Contrat.</th>
+                                <th class="col-valor">Valor <br>Contrat. R$</th>
+                                <th class="col-valor">Saldo<br> Qtd</th>
+                                <th class="col-valor">Saldo<br> Valor R$</th>
+                                <th class="col-valor">Saldo<br> %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in arp_itens %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="col-id">{{ item.numero_item }}</td>
+                                <td class="col-produto">{{ item.produto.produto }}</td>
+                                <td class="col-tipo" style="text-transform: capitalize;">{{ item.tipo_cota }}</td>
+                                
+                                <td class="col-valor">
+                                    {% if item.valor_unit_reequilibrio_bool %}
+                                        {{ item.valor_unit_reequilibrio|format_number }}
+                                    {% else %}
+                                        {{ item.valor_unit_homologado|format_number }}
+                                    {% endif %}
+                                </td>
+                                <td class="col-valor">{{ item.qtd_registrada|floatformat:0|intcomma }}</td>
+                                <td class="col-valor">{{ item.valor_total_arp_item|format_number }}</td>
+                                <td class="col-contrato" style="text-align: right;">{{ item.contratos }}</td>
+                                <td class="col-valor">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
+                                <td class="col-valor">{{ item.valor_contratado|format_number }}</td>
+                                <td class="col-valor">{{ item.qtd_saldo|floatformat:0|intcomma}}</td>
+                                <td class="col-valor">{{ item.valor_saldo|format_number }}</td>
+                                <td class="col-valor">{{ item.qtd_saldo_percentual|format_percent}}</td>
+                            </tr>
+                            {% endfor %}
+
+                            <!-- Linha do Valor Total -->
+                            <tr>
+                                <td colspan="4" style="text-align: right; font-weight: bold;">Total</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ arp.qtd_registrada_total_arp|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ arp.valor_total_arp|format_number }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ arp.contratos }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ arp.qtd_contratada_arp|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ arp.valor_contratado_arp|format_number }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ arp.saldo_qtd_arp|floatformat:0|intcomma }}</td>
+                                <td class="col-saldo" style="font-weight: bold;">{{ arp.saldo_valor_arp|format_number }}</td>
+                                <td class="col-saldo" style="font-weight: bold;">{{ arp.saldo_arp_percentual|format_percent}}</td>
+                            </tr>
+
+                        </tbody>
+                    </table> 
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Observações gerais -->
+        <div class="horizontal-section log">
+            <div class="section full-width">
+                <div class="section-titulo">
+                    Observações Gerais
+                </div>
+                <div class="grid">
+                    <div class="box-observacoes">
+                        <div class="box-conteudo">{{ arp.observacoes_gerais }}</div>
+                    </div>
+                    
+                    
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <div class="relatorio-log">
+            {{ usuario }} - {{ data_hora }}
+        </div>
+        
+        <div class="footer-pagina">
+            Página <b>1</b> de <b>1</b>
+        </div>
+    </div>
+</body>
+
+
+</html>

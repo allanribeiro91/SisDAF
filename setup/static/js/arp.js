@@ -91,15 +91,17 @@ function ajustarCampoDenominacao() {
     var tabelaItens = document.getElementById('tabItensARP');
     var linhasTabela = tabelaItens.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
     var campoDenominacao = document.getElementById('arp_denominacao');
+    var campoFornecedor = document.getElementById('cnpj_fornecedor');
     var campoUnidadeDaf = document.getElementById('arp_unidade_daf');
 
     // Verifica se a tabela tem 1 ou mais linhas (excluindo a linha do valor total)
     if (linhasTabela.length > 1) {
         campoUnidadeDaf.setAttribute('disabled', 'disabled');
         campoDenominacao.setAttribute('disabled', 'disabled');
+        campoFornecedor.setAttribute('disabled', 'disabled');
         document.getElementById('arp_denominacao_hidden').value = campoDenominacao.value;
+        document.getElementById('arp_fornecedor_hidden').value = campoFornecedor.value;
     } else {
-        
         campoUnidadeDaf.removeAttribute('disabled');
         campoDenominacao.removeAttribute('disabled');
     }
@@ -115,12 +117,16 @@ function openModelItemArp(itemArpId) {
         })
         .then(data => {
             // Atualizar os campos do formulário no modal com os dados recebidos
+            
+            //Log
             $('#id_arp_item').val(data.id);
             $('#arp_item_log_data_registro').val(data.log_data_registro);
             $('#arp_item_log_responsavel_registro').val(data.log_responsavel_registro);
             $('#arp_item_log_ult_atualizacao').val(data.lot_ult_atualizacao);
             $('#arp_item_log_responsavel_atualizacao').val(data.log_responsavel_atualizacao);
             $('#arp_item_log_edicoes').val(data.log_edicoes);
+            
+            //Dados do Item
             $('#arp_n_item').val(data.numero_item);
             $('#arp_tipo_cota').val(data.tipo_cota);
             if (data.empate_ficto) {
@@ -145,6 +151,15 @@ function openModelItemArp(itemArpId) {
             }
             $('#arp_qtd_registrada').val(data.qtd_registrada.toLocaleString('pt-BR'));
             $('#arp_observacoes_gerais').val(data.observacoes);
+
+            //Quantidades Contratadas
+            $('#arp_item_contratos').val(data.contratos);
+            $('#arp_item_qtd_contratada').val(data.qtd_contratada.toLocaleString('pt-BR'));
+            $('#arp_item_valor_contratado').val(data.valor_contratado.toLocaleString('pt-BR'));
+            $('#arp_item_saldo_quantidade').val(data.saldo_quantidade.toLocaleString('pt-BR'));
+            $('#arp_item_saldo_valor').val(data.saldo_valor.toLocaleString('pt-BR'));
+            $('#arp_item_saldo_percentual').val((data.saldo_percentual * 100).toLocaleString('pt-BR') + '%');
+
 
             // Abrir o modal
             const modal = new bootstrap.Modal(document.getElementById('itemARPmodal'));
@@ -804,5 +819,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Atualizar as datas quando a página é carregada
     atualizarDatas();
+
+
+    //Relatório ARP
+    const botao_relatorio_arp = document.getElementById('btnArpRelatorio')
+    botao_relatorio_arp.addEventListener('click', function(){
+        const arp_id = document.getElementById('id_arp').value
+        if (arp_id == '') {
+            sweetAlert('Não há dados!', 'warning')
+            return
+        }
+        
+        var width = 1000;
+        var height = 700;
+        var left = (window.screen.width / 2) - (width / 2);
+        var top = (window.screen.height / 2) - (height / 2);
+        
+        var url = '/contratos/relatorio/arp/' + arp_id + '/';
+        window.open(url, 'newwindow', 'scrollbars=yes, width=' + width + ', height=' + height + ', top=' + top + ', left=' + left);
+    })
+
 });
 

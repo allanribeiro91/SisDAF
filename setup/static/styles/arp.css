@@ -328,6 +328,10 @@ table tbody tr:hover {
     width: 5% !important;
     text-align: left !important;
 }
+.col-arp-contratos {
+    width: 3% !important;
+    text-align: right !important;
+}
 .col-arp-processo-sei {
     width: 7% !important;
     text-align: left !important;
@@ -346,6 +350,10 @@ table tbody tr:hover {
 }
 .col-arp-fornecedor {
     width: 15% !important;
+    text-align: left !important;
+}
+.col-arp-valor {
+    width: 7% !important;
     text-align: left !important;
 }
 
