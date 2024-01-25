@@ -41,7 +41,11 @@
                 </a>
             {% endwith %}
         </div>
-        
+        <div>
+            {% with current_url=request.resolver_match.url_name %}
+            <a class="tab {% if current_url in 'gestao_pacientes, paciente_novo, paciente_ficha' %}active-tab{% endif %}" href="{% url 'pacientes' %}">Controle Especial</a>
+            {% endwith %}
+        </div>
         
         <div>
             {% with current_url=request.resolver_match.url_name %}

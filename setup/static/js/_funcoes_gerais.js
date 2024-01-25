@@ -90,7 +90,7 @@ function numeroSeparadorMilhar(valor) {
 
 function formatoValorMonetario(campoId) {
     var campo = document.getElementById(campoId);
-    
+
     campo.addEventListener('input', function (e) {
         // Impede caracteres não-numéricos de serem digitados
         var valor = this.value.replace(/[^0-9]/g, '');
@@ -136,4 +136,88 @@ function formatarData(data) {
     const mes = (data.getUTCMonth() + 1).toString().padStart(2, '0');
     const ano = data.getUTCFullYear();
     return `${ano}-${mes}-${dia}`;
+}
+
+
+function formatCPF(cpf) {
+    cpf = cpf.replace(/\D/g, ''); // Remove todos os não dígitos
+
+    if (cpf.length <= 3) {
+        return cpf;
+    } else if (cpf.length <= 6) {
+        return cpf.replace(/^(\d{3})(\d+)/, '$1.$2');
+    } else if (cpf.length <= 9) {
+        return cpf.replace(/^(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
+    } else {
+        return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d+)/, '$1.$2.$3-$4');
+    }
+}
+
+
+function validaCPF(cpf) {
+
+    cpf = cpf.replace(/\D/g, ''); // Remove todos os não dígitos
+
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+        return false; // CPF com todos os dígitos iguais é inválido
+    }
+
+    if (cpf.length === 11) {
+        var sum = 0;
+        var rest;
+        for (var i = 1; i <= 9; i++) {
+            sum = sum + parseInt(cpf.substring(i - 1, i)) * (11 - i);
+        }
+        rest = (sum * 10) % 11;
+        if (rest === 10 || rest === 11) {
+            rest = 0;
+        }
+        if (rest !== parseInt(cpf.substring(9, 10))) {
+            return false;
+        }
+
+        sum = 0;
+        for (var i = 1; i <= 10; i++) {
+            sum = sum + parseInt(cpf.substring(i - 1, i)) * (12 - i);
+        }
+        rest = (sum * 10) % 11;
+        if (rest === 10 || rest === 11) {
+            rest = 0;
+        }
+        if (rest !== parseInt(cpf.substring(10, 11))) {
+            return false;
+        }
+
+        return true; // CPF válido
+    }
+
+    return false; // CPF com menos de 11 dígitos não é válido
+}
+
+
+function validaCNS(cns) {
+    if (cns.match(/[1-2]\d{10}00[0-1]\d/) || cns.match(/[7-9]\d{14}/)) {
+        return cnsSomaPonderada(cns) % 11 === 0;
+    }
+    return false;
+}
+
+function cnsSomaPonderada(cns) {
+    let soma = 0;
+    for (let i = 0; i < cns.length; i++) {
+        soma += parseInt(cns.charAt(i), 10) * (15 - i);
+    }
+    return soma;
+}
+
+
+function calcular_idade(data_nascimento) {
+    var hoje = new Date();
+    var nascimento = new Date(data_nascimento);
+    var idade = hoje.getFullYear() - nascimento.getFullYear();
+    var m = hoje.getMonth() - nascimento.getMonth();
+    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+        idade--;
+    }
+    return idade;
 }

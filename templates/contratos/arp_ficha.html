@@ -81,6 +81,10 @@
                 <div class="section">
                     <h3>Dados da ARP</h3>               
                     <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating mb-3">
+                            {{ form.status }}
+                            <label>{{ form.status.label }}</label>
+                        </div>
                         <div class="form-floating">                            
                             {{ form.unidade_daf }}
                             <label>{{ form.unidade_daf.label }}</label>
@@ -103,10 +107,7 @@
                             <label>{{ form.numero_arp.label }}</label>
                         </div>
                         
-                        <div class="form-floating mb-3">
-                            {{ form.status }}
-                            <label>{{ form.status.label }}</label>
-                        </div>
+                        
                         <div class="form-floating mb-3">
                             <input type="date" class="form-control" id="data_publicacao" name="data_publicacao" value="{% if form.data_publicacao.value %}{{ form.data_publicacao.value|date:'Y-m-d' }}{% endif %}">
                             <label>{{ form.data_publicacao.label }}</label>

@@ -11,7 +11,7 @@ from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.fornecedores.models import Fornecedores
 from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos, 
                                    ContratosObjetos, ContratosParcelas, ContratosEntregas,
-                                   ContratosFiscais, Empenhos)
+                                   ContratosFiscais, Empenhos, EmpenhosItens)
 from apps.contratos.forms import (ContratosArpsForm, ContratosArpsItensForm, ContratosForm, 
                                   ContratosObjetosForm, ContratosParcelasForm, ContratosEntregasForm,
                                   ContratosFiscaisForm, EmpenhoForm, EmpenhosItensForm)
@@ -22,7 +22,6 @@ from django.utils import timezone
 import pytz
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
-from datetime import datetime
 from io import BytesIO
 import json
 
@@ -36,7 +35,7 @@ def contratos(request):
     lista_modalidades = [('', '')] + MODALIDADE_AQUISICAO
     lista_unidadesdaf = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
     
-    tabContratos = Contratos.objects.filter(del_status=False)
+    tabContratos = Contratos.objects.filter(del_status=False).order_by('-data_publicacao')
     
     conteudo = {
         'lista_unidadesdaf': lista_unidadesdaf,
@@ -159,7 +158,7 @@ def contrato_ficha(request, id_contrato=None):
         tab_parcelas = ContratosParcelas.objects.filter(del_status=False, contrato=id_contrato).order_by('objeto__numero_item', 'numero_parcela')
         tab_entregas = ContratosEntregas.objects.filter(del_status=False, contrato=id_contrato).order_by('parcela__objeto__numero_item', 'parcela__numero_parcela', 'numero_entrega')
         tab_fiscais = ContratosFiscais.objects.filter(del_status=False, contrato=id_contrato).order_by('-data_inicio')
-
+        
         if tab_objetos.count()>0:
             for objeto in tab_objetos:
                 objeto_id = objeto.id
@@ -315,6 +314,9 @@ def contrato_dados_arp(request, id_arp=None):
     }
     return render(request, 'contratos/contrato_ficha_arp.html', conteudo)
 
+
+
+
 #CONTRATOS/OBJETOS
 def contrato_objeto_modal(request, id_objeto=None):
     try:
@@ -349,11 +351,10 @@ def contrato_objeto_modal(request, id_objeto=None):
             'qtd_a_entregar': item.qtd_a_entregar(),
 
             #empenho
-            'qtd_empenhada': item.qtd_a_entregar(),
-            'qtd_a_empenhar': item.qtd_a_entregar(),
-            'valor_empenhado': item.qtd_a_entregar(),
-            'valor_a_empenhar': item.qtd_a_entregar(),
-            'empenho_percentual': item.qtd_a_entregar(),
+            'qtd_empenhada': item.qtd_empenhada_objeto(),
+            'qtd_a_empenhar': item.qtd_a_empenhar_objeto(),
+            'valor_empenhado': item.valor_empenhado_objeto(),
+            'valor_a_empenhar': item.valor_a_empenhar_objeto(),
 
             #valores
             'valor_unitario': item.valor_unitario,
@@ -400,8 +401,10 @@ def contrato_objeto_salvar(request, id_objeto=None):
 
         #Instanciar: ARP Item
         arp_item_id = request.POST.get('arp_item')
-        print('ARP Item: ', arp_item_id)
-        arp_item_instance = ContratosArpsItens.objects.get(id=arp_item_id)
+        if arp_item_id:
+            print('ARP Item: ', arp_item_id)
+            arp_item_instance = ContratosArpsItens.objects.get(id=arp_item_id)
+            modificacoes_post['arp_item'] = arp_item_instance
 
         #Valor unitario
         valor_unitario = request.POST.get('valor_unitario')
@@ -414,7 +417,7 @@ def contrato_objeto_salvar(request, id_objeto=None):
         modificacoes_post['produto'] = produto_instance
         modificacoes_post['contrato'] = contrato_instance
         modificacoes_post['valor_unitario'] = valor_unitario
-        modificacoes_post['arp_item'] = arp_item_instance
+        
 
         #Criar o formulário com os dados atualizados
         objeto_form = ContratosObjetosForm(modificacoes_post, instance=objeto_form.instance)
@@ -508,7 +511,6 @@ def buscar_objeto(request, id_objeto=None):
         arp_item = ContratosArpsItens.objects.get(id=arp_item_id)
         arp_item_saldo = arp_item.qtd_saldo()
 
-    print('Saldo ARP: ', arp_item_saldo)
     objeto_dados = {
             'objeto_id': objeto_id,
             'objeto_numero_item': objeto_numero_item,
@@ -516,8 +518,11 @@ def buscar_objeto(request, id_objeto=None):
             'objeto_fator_embalagem': objeto_fator_embalagem,
             'objeto_valor_unitario': objeto_valor_unitario,
             'arp_item_saldo': arp_item_saldo,
+
         }
     return JsonResponse({'objeto': objeto_dados})
+
+
 
 
 #CONTRATOS/PARCELAS
@@ -614,6 +619,10 @@ def contrato_parcela_modal(request, id_parcela=None):
     try:
         item = ContratosParcelas.objects.get(id=id_parcela)
         produto = item.objeto.produto.produto
+        if item.objeto.arp_item:
+            saldo_arp = item.objeto.arp_item.qtd_saldo()
+        else:
+            saldo_arp = 'NSA'
         data = {
             'id': item.id,
             'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
@@ -642,8 +651,9 @@ def contrato_parcela_modal(request, id_parcela=None):
             'valor_empenhado': item.valor_empenhado(),
             'valor_a_empenhar': item.valor_a_empenhar(),
             'empenho_percentual': item.empenho_percentual(),
+            'saldo_arp': saldo_arp,
+            
 
-            'saldo_arp': item.objeto.arp_item.qtd_saldo()
         }
         return JsonResponse(data)
     except ContratosParcelas.DoesNotExist:
@@ -662,6 +672,9 @@ def buscar_parcela(request, id_parcela=None):
     qtd_a_empenhar = parcela.qtd_a_empenhar()
     valor_a_empenhar = parcela.valor_a_empenhar()
     qtd_a_entregar = parcela.qtd_a_entregar()
+    qtd_empenhada = parcela.qtd_empenhada()
+    qtd_doada = parcela.qtd_doada
+    total_entregue = parcela.qtd_entregue()
     parcela_dados = {
             'numero_contrato': numero_contrato,
             'numero_item': numero_item,
@@ -674,6 +687,9 @@ def buscar_parcela(request, id_parcela=None):
             'qtd_a_empenhar': qtd_a_empenhar,
             'valor_a_empenhar': valor_a_empenhar,
             'qtd_a_entregar': qtd_a_entregar,
+            'qtd_empenhada': qtd_empenhada,
+            'qtd_doada': qtd_doada,
+            'total_entregue': total_entregue,
         }
     return JsonResponse({'parcela': parcela_dados})
 
@@ -841,6 +857,10 @@ def contrato_entrega_modal(request, id_entrega=None):
             'id_entrega_contrato_hidden': contrato,
             'id_entrega_parcela_hidden': parcela,
             'id_qtd_a_entregar_hidden': qtd_a_entregar, 
+
+            'qtd_empenhada': item.parcela.qtd_empenhada(),
+            'qtd_doada': item.parcela.qtd_doada,
+            'total_entregue': item.parcela.qtd_entregue(),
         }
         return JsonResponse(data)
     except ContratosEntregas.DoesNotExist:
@@ -872,6 +892,7 @@ def contrato_entrega_delete(request, id_entrega=None):
         return JsonResponse({
             "message": "Entrega do Contrato não encontrada."
             })
+
 
 
 
@@ -986,6 +1007,7 @@ def contrato_fiscal_modal(request, id_fiscal=None):
             'id_fiscal_outro_checkbox': fiscal_outro_checkbox,
             'id_fiscal_outro': fiscal_outro,
             'id_fiscal_status': item.status,
+            'id_fiscal_documento_sei': item.documento_sei,
 
             'id_fiscal_data_inicio': item.data_inicio,
             'id_fiscal_data_fim': item.data_fim,
@@ -999,12 +1021,40 @@ def contrato_fiscal_modal(request, id_fiscal=None):
     except ContratosEntregas.DoesNotExist:
         return JsonResponse({'error': 'Fiscal não encontrado.'}, status=404)
 
+def contrato_fiscal_delete(request, id_fiscal=None):
+    try:
+        fiscal = ContratosFiscais.objects.get(id=id_fiscal)
+        fiscal.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Contratos_Fiscais",
+            model='ContratosFiscais',
+            model_id=fiscal.id,
+            item_id=0,
+            item_descricao="Deleção de Fiscal de Contrato.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o Fiscal do Contrato (ID {fiscal.id}, Nome: {fiscal.fiscal_nome}, Contrato: {fiscal.contrato.numero_contrato}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Fiscal do Contrato deletado com sucesso!"
+            })
+    except ContratosArps.DoesNotExist:
+        return JsonResponse({
+            "message": "Fiscal do Contrato não encontrado."
+            })
+
 
 
 
 #ANOTACOES DO CONTRATO
 def contrato_anotacoes(request, id_contrato):
     return render(request, 'contratos/contrato_anotacoes.html')
+
 
 
 
@@ -1048,7 +1098,7 @@ def arp_ficha(request, arp_id=None):
             return JsonResponse({
                     'retorno': 'Não houve mudanças'
                 })
-
+        
         #Passar o objeto Denominação Genérica
         denominacao_id = request.POST.get('denominacao')
         if denominacao_id == None:
@@ -1057,6 +1107,7 @@ def arp_ficha(request, arp_id=None):
     
         #Passar o objeto Fornecedor
         fornecedor_id = request.POST.get('arp_fornecedor_hidden')
+        print('Fornecedor: ', fornecedor_id)
         fornecedor_instance =  Fornecedores.objects.get(id=fornecedor_id)
         
         #Fazer uma cópia mutável do request.POST
@@ -1327,9 +1378,7 @@ def arp_exportar(request):
 def arp_buscar_dados_sei(request, id_arp=None):
     arp = ContratosArps.objects.filter(id=id_arp)
     arp_list = list(arp.values('id', 'numero_processo_sei', 'lei_licitacao'))
-    print(arp_list)
     return JsonResponse({'arp': arp_list})
-
 
 
 
@@ -1407,10 +1456,7 @@ def arp_item_ficha(request, arp_item_id=None):
             item_arp.save(current_user=request.user.usuario_relacionado)
             
             #logs
-            log_id = item_arp.id
-            log_atualizacao_usuario = item_arp.usuario_atualizacao.dp_nome_completo
-            log_atualizacao_data = item_arp.ult_atual_data.astimezone(tz).strftime('%d/%m/%Y %H:%M:%S')
-            log_edicoes = item_arp.log_n_edicoes
+            item_arp_id = item_arp.id
 
             # Registrar a ação no CustomLog
             current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
@@ -1430,10 +1476,7 @@ def arp_item_ficha(request, arp_item_id=None):
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'retorno': 'Salvo',
-                    'log_id': log_id,
-                    'log_atualizacao_usuario': log_atualizacao_usuario,
-                    'log_atualizacao_data': log_atualizacao_data,
-                    'log_edicoes': log_edicoes,
+                    'item_arp_id': item_arp_id,
                     'novo': novo_item_arp,
                     'redirect_url': reverse('arp_ficha', args=[item_arp.arp_id]),
                 })
@@ -1520,7 +1563,7 @@ def arp_item_delete(request, arp_item_id=None):
 
 #EMPENHOS
 def empenhos(request):
-    tabEmpenhos = Empenhos.objects.annotate(
+    tabEmpenhos = Empenhos.objects.filter(del_status=False).annotate(
             data_empenho_ordenada=Case(
                 When(data_empenho__isnull=True, then=Value(0)),
                 default=Value(1)
@@ -1596,16 +1639,18 @@ def empenho_ficha(request, id_empenho=None):
     if empenho:
         empenho_form = EmpenhoForm(instance=empenho)
         empenho_unidade_daf = empenho.unidade_daf
-        print('Unidade DAF: ', empenho_unidade_daf)
+        
         tab_contratos = Contratos.objects.filter(unidade_daf=empenho_unidade_daf, del_status=False, status='vigente')
         if tab_contratos.count()>0:
             for contrato in tab_contratos:
                 contrato_id = contrato.id
                 item_contrato = f'[ID: {contrato.id}] Contrato Nº {contrato.numero_contrato} - {contrato.denominacao.denominacao} - {contrato.fornecedor.nome_fantasia}'
                 list_contratos.append((contrato_id, item_contrato))
-
+        
+        tab_empenho_itens = EmpenhosItens.objects.filter(del_status=False, empenho=empenho.id)
     else:
         empenho_form = EmpenhoForm()
+        tab_empenho_itens = None
 
     form_empenho_item = EmpenhosItensForm()
 
@@ -1613,9 +1658,202 @@ def empenho_ficha(request, id_empenho=None):
         'form': empenho_form,
         'form_empenho_item': form_empenho_item,
         'empenho': empenho,
+        'tab_empenho_itens': tab_empenho_itens,
         'list_contratos': list_contratos,
     }
     return render(request, 'contratos/empenho_ficha.html', conteudo)
+
+def empenho_deletar(request, id_empenho=None):   
+    try:
+        empenho = Empenhos.objects.get(id=id_empenho)
+        empenho.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Contratos_Empenhos",
+            model='Empenhos',
+            model_id=empenho.id,
+            item_id=0,
+            item_descricao="Deleção do Empenho.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o Empenho (ID {empenho.id}, Nº Empenho: {empenho.numero_empenho}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Empenho deletado com sucesso!"
+            })
+    except ContratosArps.DoesNotExist:
+        return JsonResponse({
+            "message": "Empenho não encontrado."
+            })
+
+
+
+
+#ITENS DO EMPENHO
+def item_empenho_salvar(request, item_empenho_id=None):
+    if item_empenho_id:
+        try:
+            item_empenho = EmpenhosItens.objects.get(id=item_empenho_id)
+        except EmpenhosItens.DoesNotExist:
+            messages.error(request, "Item do Empenho não encontrado.")
+            return redirect('empenhos')
+    else:
+        item_empenho = None
+    
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if item_empenho:
+            item_empenho_form = EmpenhosItensForm(request.POST, instance=item_empenho)
+            novo_item_empenho = False
+        else:
+            item_empenho_form = EmpenhosItensForm(request.POST)
+            novo_item_empenho = True
+
+        #Verificar se houve alteração no formulário
+        if not item_empenho_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
+        #Passar o objeto Empenho
+        empenho_id = request.POST.get('id_empenhoItem_empenho')
+        empenho_instance = Empenhos.objects.get(id=empenho_id)
+
+        #Passar o objeto Contrato
+        parcela_id = request.POST.get('id_empenhoItem_parcela')
+        parcela_instance = ContratosParcelas.objects.get(id=parcela_id)
+
+        #valor total empenhado
+        valor_empenhado_str  = request.POST.get('valor_empenhado')
+        valor_empenhado_str = valor_empenhado_str.replace('R$', '').replace('.', '')
+        valor_empenhado_str = valor_empenhado_str.replace(',', '.')
+        valor_empenhado = float(valor_empenhado_str)
+
+        #qtd empenhada
+        qtd_empenhada_str = request.POST.get('qtd_empenhado')
+        qtd_empenhada_str = qtd_empenhada_str.replace('.', '')
+        qtd_empenhada = float(qtd_empenhada_str)
+
+        #Atualizar os valores no mutable_post
+        modificacoes_post['empenho'] = empenho_instance
+        modificacoes_post['parcela'] = parcela_instance
+        modificacoes_post['valor_empenhado'] = valor_empenhado
+        modificacoes_post['qtd_empenhado'] = qtd_empenhada
+
+        #Criar o formulário com os dados atualizados
+        item_empenho_form = EmpenhosItensForm(modificacoes_post, instance=item_empenho_form.instance)
+
+        #salvar
+        if item_empenho_form.is_valid():
+            #Salvar o produto
+            item_empenho = item_empenho_form.save(commit=False)
+            item_empenho.save(current_user=request.user.usuario_relacionado)
+
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Contratos_Empenhos_Itens",
+                model='EmpenhosItens',
+                model_id=item_empenho.id,
+                item_id=0,
+                item_descricao="Salvar edição de Item do Empenho.",
+                acao="Salvar",
+                observacoes=f"Usuário {request.user.username} salvou o Item do Empenho (ID {item_empenho.id}, ID Parcela: {item_empenho.parcela.id}, Produto: {item_empenho.parcela.objeto.produto}) em {current_date_str}."
+            )
+            log_entry.save()
+
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'novo': novo_item_empenho,
+                    'item_empenho_id': item_empenho.id,
+                    'redirect_url': reverse('empenho_ficha', args=[item_empenho.empenho.id]),
+                })
+        else:
+            print("Erro formulário Item da ARP")
+            print(item_empenho_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
+
+def item_empenho_modal(request, item_empenho_id=None):
+    try:
+        item = EmpenhosItens.objects.get(id=item_empenho_id)
+        produto = item.parcela.objeto.produto.produto
+        data = {
+            #log
+            'id': item.id,
+            'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',
+            'log_responsavel_registro': str(item.usuario_atualizacao.dp_nome_completo),
+            'lot_ult_atualizacao': item.ult_atual_data.strftime('%d/%m/%Y %H:%M:%S') if item.ult_atual_data else '',
+            'log_responsavel_atualizacao': str(item.usuario_atualizacao.dp_nome_completo),
+            'log_edicoes': item.log_n_edicoes,
+            
+            #item
+            'contrato': item.parcela.contrato.numero_contrato,
+            'numero_item': item.parcela.objeto.numero_item,
+            'numero_parcela': item.parcela.numero_parcela,
+            'produto': produto,
+
+            #parâmetros
+            'fator_embalagem': item.parcela.objeto.fator_embalagem,
+            'valor_unitario': item.parcela.objeto.valor_unitario,
+            'qtd_a_empenhar': item.parcela.qtd_a_empenhar(),
+            'valor_a_empenhar': item.parcela.valor_a_empenhar(),
+
+            #empenho
+            'qtd_embalagens': item.qtd_embalagens(),
+            'qtd_empenhada': item.qtd_empenhado,
+            'valor_empenhado': item.valor_empenhado,
+
+            #observações
+            'observacoes': item.observacoes_gerais,
+
+            #campos ocultos
+            'empenho_id': item.empenho.id,
+            'parcela_id': item.parcela.id,
+
+        }
+        return JsonResponse(data)
+    except ContratosArpsItens.DoesNotExist:
+        return JsonResponse({'error': 'Item do Empenho não encontrada'}, status=404)
+
+def item_empenho_deletar(request, item_empenho_id=None):   
+    try:
+        item_empenho = EmpenhosItens.objects.get(id=item_empenho_id)
+        item_empenho.soft_delete(request.user.usuario_relacionado)
+
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Contratos_Empenhos_Itens",
+            model='EmpenhoItens',
+            model_id=item_empenho.id,
+            item_id=0,
+            item_descricao="Deleção de Itens do Empenho.",
+            acao="Deletar",
+            observacoes=f"Usuário {request.user.username} deletou o Item da Empenho (ID {item_empenho.id}, Nº Empenho: {item_empenho.empenho.numero_empenho}, Nº Contrato: {item_empenho.parcela.contrato.numero_contrato}, Objeto: {item_empenho.parcela.objeto.produto.produto}, Parcela: {item_empenho.parcela.numero_parcela}) em {current_date_str}."
+        )
+        log_entry.save()
+
+        return JsonResponse({
+            "message": "Item da Empenho deletado com sucesso!"
+            })
+    except ContratosArps.DoesNotExist:
+        return JsonResponse({
+            "message": "Item da Empenho não encontrado."
+            })
 
 
 
@@ -1623,6 +1861,7 @@ def empenho_ficha(request, id_empenho=None):
 #TEDs
 def teds(request):
     return render(request, 'contratos/teds.html')
+
 
 
 
@@ -1643,3 +1882,43 @@ def contratos_relatorios_arp(request, arp_id=None):
         'data_hora': data_hora,
     }
     return render(request, 'contratos/relatorio_arp.html', conteudo)
+
+def contratos_relatorios_empenho(request, empenho_id=None):
+    empenho = Empenhos.objects.get(id=empenho_id)
+    empenho_itens = EmpenhosItens.objects.filter(del_status=False, empenho=empenho_id)
+    
+    #Log Relatório
+    usuario_nome = request.user.usuario_relacionado.primeiro_ultimo_nome
+    data_hora_atual = datetime.now()
+    data_hora = data_hora_atual.strftime('%d/%m/%Y %H:%M:%S')
+    
+    conteudo = {
+        'empenho': empenho,
+        'empenho_itens': empenho_itens,
+        'usuario': usuario_nome,
+        'data_hora': data_hora,
+    }
+    return render(request, 'contratos/relatorio_empenho.html', conteudo)
+
+def contratos_relatorios_contrato(request, contrato_id=None):
+    contrato = Contratos.objects.get(id=contrato_id)
+    contrato_objetos = ContratosObjetos.objects.filter(del_status=False, contrato=contrato_id)
+    contrato_parcelas = ContratosParcelas.objects.filter(del_status=False, contrato=contrato_id)
+    contrato_entregas = ContratosEntregas.objects.filter(del_status=False, contrato=contrato_id)
+    contrato_fiscais = ContratosFiscais.objects.filter(del_status=False, contrato=contrato_id)
+    
+    #Log Relatório
+    usuario_nome = request.user.usuario_relacionado.primeiro_ultimo_nome
+    data_hora_atual = datetime.now()
+    data_hora = data_hora_atual.strftime('%d/%m/%Y %H:%M:%S')
+    
+    conteudo = {
+        'contrato': contrato,
+        'contrato_objetos': contrato_objetos,
+        'contrato_parcelas': contrato_parcelas,
+        'contrato_entregas': contrato_entregas,
+        'contrato_fiscais': contrato_fiscais,
+        'usuario': usuario_nome,
+        'data_hora': data_hora,
+    }
+    return render(request, 'contratos/relatorio_contrato.html', conteudo)

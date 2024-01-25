@@ -21,7 +21,8 @@
     }
 
     .modal-content.parcela{
-        min-height: 70% !important;
+        min-height: 700px !important;
+        max-height: 70% !important;
     }
 
     .modal-body{
@@ -100,16 +101,24 @@
                                     <input type="text" class="form-control" id="id_objeto_produto" readonly>
                                     <label>Produto Farmacêutico</label>
                                 </div>
-                                <div class="form-floating mb-3" style="width: 120px;">
-                                    <input type="text" id="id_qtd_saldo_arp" style="text-align: right;" class="form-control" readonly>
-                                    <label>Saldo da ARP</label>
-                                </div>
+
                             </div>
 
                             <!-- Quantidades e Datas -->
                             <div class="grid" style="font-size: 14px;">
                                 
-                                <!-- Quantidades -->
+                                <!-- Saldo ARP -->
+                                <div class="subgrid">
+                                    <h3>Saldo ARP</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3" >
+                                            <input type="text" id="id_qtd_saldo_arp" style="text-align: right; width: 120px;" class="form-control" readonly>
+                                            <label>Saldo da ARP</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fator Embalagem -->
                                 <div class="subgrid">
                                     <h3>Fator Emb.</h3>
                                     <div class="subgrid-elementos">

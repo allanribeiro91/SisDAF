@@ -7,7 +7,9 @@ from apps.contratos.views import (
     contrato_objeto_modal, contrato_objeto_salvar, contrato_objeto_delete, buscar_objeto, contrato_parcela_salvar,
     contrato_parcela_modal, contrato_dados_arp, buscar_parcela, contrato_entrega_salvar, contrato_entrega_modal,
     contrato_entrega_delete, contrato_parcela_delete, contrato_anotacoes, contrato_fiscal_salvar,
-    contrato_fiscal_modal, empenhos, empenho_ficha, teds, buscar_parcelas, contratos_relatorios_arp
+    contrato_fiscal_modal, empenhos, empenho_ficha, teds, buscar_parcelas, contratos_relatorios_arp,
+    item_empenho_salvar, item_empenho_modal, item_empenho_deletar, contrato_fiscal_delete, empenho_deletar,
+    contratos_relatorios_empenho, contratos_relatorios_contrato
 )
 
 
@@ -63,6 +65,7 @@ urlpatterns = [
 
     #CONTRATOS/FISCAIS
     path('contratos/contrato/fiscal/<int:id_fiscal>/dados/', contrato_fiscal_modal, name='contrato_fiscal_modal'),
+    path('contratos/contrato/fiscal/deletar/<int:id_fiscal>/', contrato_fiscal_delete, name='contrato_fiscal_delete'),
     path('contratos/contrato/fiscal/salvar/novo/', contrato_fiscal_salvar, name='contrato_fiscal_salvar'),
     path('contratos/contrato/fiscal/salvar/<int:id_fiscal>/', contrato_fiscal_salvar, name='contrato_fiscal_salvar'),
 
@@ -74,11 +77,20 @@ urlpatterns = [
     path('contratos/empenhos/novo', empenho_ficha, name='empenho_novo'),
     path('contratos/empenhos/ficha/<int:id_empenho>/', empenho_ficha, name='empenho_ficha'),
     path('contratos/empenhos/ficha/novo/', empenho_ficha, name='empenho_salvar_novo'),
+    path('contratos/empenho/deletar/<int:id_empenho>/', empenho_deletar, name='empenho_deletar'),
+
+    #ITEM EMPENHO
+    path('contratos/empenho/item/<int:item_empenho_id>/dados/', item_empenho_modal, name='item_empenho_modal'),
+    path('contratos/empenho/item/salvar/<int:item_empenho_id>/', item_empenho_salvar, name='item_empenho_salvar'),
+    path('contratos/empenho/item/novo/', item_empenho_salvar, name='item_empenho_salvar_novo'),
+    path('contratos/empenho/item/deletar/<int:item_empenho_id>/', item_empenho_deletar, name='item_empenho_deletar'),
 
     #TEDs
     path('contratos/teds/', teds, name='teds'),
 
     #RELATÓRIOS
-    path('contratos/relatorio/arp/<int:arp_id>/', contratos_relatorios_arp, name='contratos_relatorios_arp')
+    path('contratos/relatorio/arp/<int:arp_id>/', contratos_relatorios_arp, name='contratos_relatorios_arp'),
+    path('contratos/relatorio/empenho/<int:empenho_id>/', contratos_relatorios_empenho, name='contratos_relatorios_empenho'),
+    path('contratos/relatorio/contrato/<int:contrato_id>/', contratos_relatorios_contrato, name='contratos_relatorios_contrato')
 
 ]

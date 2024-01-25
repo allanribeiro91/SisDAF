@@ -127,7 +127,12 @@ document.addEventListener("DOMContentLoaded", function() {
     //Formatação dos dados
     $('#ct_processo_sei').mask('00000.000000/0000-00');
     $('#ct_documento_sei').mask('000000');
-    //formatoQuantidade(entrega_qtd_entregue)
+    $('#id_fiscal_documento_sei').mask('000000');
+    
+    entrega_qtd_entregue.addEventListener('input', function(){
+
+        formatoQuantidade(entrega_qtd_entregue.id)
+    })
 
     //Dados da ARP
     arp_display.addEventListener('click', function() {
@@ -256,10 +261,12 @@ document.addEventListener("DOMContentLoaded", function() {
     })
 
     //Formatar moeda
-    objeto_valor_unitario.addEventListener('input', function(){
-        valor = formatoMoeda(objeto_valor_unitario.value)
-        objeto_valor_unitario.value = valor
-    })
+    // objeto_valor_unitario.addEventListener('input', function(){
+    //     // valor = formatoMoeda(objeto_valor_unitario.value)
+    //     // objeto_valor_unitario.value = valor
+    //     formatarValorMonetario(objeto_valor_unitario.id);
+    // })
+    formatoValorMonetario('ctobjeto_valor_unitario');
 
     //Produto
     objeto_produto.addEventListener('change', function() {
@@ -345,7 +352,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 id_objeto_produto.value = objeto_json.objeto_produto;
                 id_parcela_fator_embalagem.value = objeto_json.objeto_fator_embalagem;
                 id_parcela_valor_unitario.value = formatoMoeda(objeto_json.objeto_valor_unitario);
-                id_qtd_saldo_arp.value = objeto_json.arp_item_saldo;
+                id_qtd_saldo_arp.value = objeto_json.arp_item_saldo.toLocaleString('pt-BR');
             })
             .catch(error => console.error('Erro ao buscar Objeto:', error));
         modal_parcela_objeto.hide();
@@ -442,6 +449,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
     //Nova entrega
     botao_nova_entrega.addEventListener('click', function(){
+
         modal_entrega_parcela.show()
     })
     botao_inserir_nova_entrega.addEventListener('click', function(){
@@ -457,6 +465,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const id_entrega_numero_entrega = document.getElementById('id_entrega_numero_entrega')
         const id_entrega_produto = document.getElementById('id_entrega_produto')
         const qtd_a_entregar_hidden = document.getElementById('id_qtd_a_entregar_hidden')
+        const qtd_empenhada_entrega = document.getElementById('id_entrega_qtd_empenhada')
+        const qtd_doada_entrega = document.getElementById('id_entrega_qtd_doada_hidden')
+        const total_a_entregar = document.getElementById('id_entrega_total_a_entregar')
+        const total_entregue = document.getElementById('id_total_entregue')
 
         fetch(url)
             .then(response => response.json())
@@ -467,7 +479,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 id_entrega_contrato_hidden.value = parcela_json.contrato_id;
                 id_entrega_parcela_hidden.value = parcela_json.parcela_id;
                 id_entrega_produto.value = parcela_json.produto;
-                qtd_a_entregar_hidden.value = parseFloat(parcela_json.qtd_a_entregar);
+
+                total_a_entregar.value = (parseFloat(parcela_json.qtd_doada) + parseFloat(parcela_json.qtd_empenhada)).toLocaleString('pt-BR')
+                
+                qtd_a_entregar_hidden.value = parseFloat(parcela_json.qtd_a_entregar).toLocaleString('pt-BR');
+                qtd_empenhada_entrega.value = parseFloat(parcela_json.qtd_empenhada).toLocaleString('pt-BR');
+                qtd_doada_entrega.value = parseFloat(parcela_json.qtd_doada).toLocaleString('pt-BR');
+                total_entregue.value = parseFloat(parcela_json.total_entregue).toLocaleString('pt-BR');
             })
             .catch(error => console.error('Erro ao buscar Parcela:', error));
         
@@ -480,11 +498,12 @@ document.addEventListener("DOMContentLoaded", function() {
     function limpar_dados_modal_entrega() {
         //logs
         document.getElementById('id_entrega_item').value = ''
-        document.getElementById('parcela_log_data_registro').value = ''
-        document.getElementById('parcela_log_responsavel_registro').value = ''
-        document.getElementById('parcela_log_ult_atualizacao').value = ''
-        document.getElementById('parcela_log_responsavel_atualizacao').value = ''
-        document.getElementById('parcela_log_edicoes').value = ''
+        document.getElementById('entrega_id').value = ''
+        document.getElementById('entrega_log_data_registro').value = ''
+        document.getElementById('entrega_log_responsavel_registro').value = ''
+        document.getElementById('entrega_log_ult_atualizacao').value = ''
+        document.getElementById('entrega_log_responsavel_atualizacao').value = ''
+        document.getElementById('entrega_log_edicoes').value = ''
         
         //campos
         document.getElementById('id_entrega_item').value = ''
@@ -564,17 +583,27 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 $('#id_entrega_contrato_hidden').val(data.id_entrega_contrato_hidden);
                 $('#id_entrega_parcela_hidden').val(data.id_entrega_parcela_hidden);
-                $('#id_qtd_a_entregar_hidden').val(data.id_qtd_a_entregar_hidden);
+                $('#id_qtd_a_entregar_hidden').val(data.id_qtd_a_entregar_hidden.toLocaleString('pt-BR'));
                 $('#id_qtd_entregue_hidden').val(data.id_entrega_qtd_entregue);
+
+                $('#id_entrega_qtd_empenhada').val(data.qtd_empenhada.toLocaleString('pt-BR'));
+                $('#id_entrega_qtd_doada_hidden').val(data.qtd_doada.toLocaleString('pt-BR'));
+                
+                let total_a_entregar = (data.qtd_doada + data.qtd_empenhada)
+                $('#id_entrega_total_a_entregar').val(total_a_entregar.toLocaleString('pt-BR'));
+                $('#id_total_entregue').val(data.total_entregue.toLocaleString('pt-BR'));
+
                 
     
                 // Abrir o modal
-                modal_entrega.show()
+               modal_entrega.show()
             })
             .catch(error => {
                 console.log(error);
             });
     }
+
+    
 
     function salvarEntrega() {
 
@@ -595,7 +624,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         //Verificar Qtd a Entregar
-        const qtdAEntregarParcela = parseFloat(document.getElementById('id_qtd_a_entregar_hidden').value);
+        const qtdAEntregarParcela = parseFloat(document.getElementById('id_qtd_a_entregar_hidden').value.replace(/\./g, ''));
         const entregaQtdEntregue = parseFloat(document.getElementById('id_qtd_entregue_hidden').value);
         const entregaQtdEntregueInformada = parseFloat(entrega_qtd_entregue.value.replace(/\./g, ''));
         const isNovaEntrega = entrega_id === '';
@@ -901,12 +930,41 @@ document.addEventListener("DOMContentLoaded", function() {
             
     }
 
+
+    const status_contrato = document.getElementById('ct_status')
+    status_cor();   
+    status_contrato.addEventListener('change', function(){
+        status_cor();   
+    })
+
+    function status_cor(){
+        if (status_contrato.value == 'vigente') {
+            status_contrato.style.backgroundColor = '#c2f6ff';
+        }
+        if (status_contrato.value == 'nao_publicado') {
+            status_contrato.style.backgroundColor = '#d9b3ff';
+        }
+        if (status_contrato.value == 'encerrado') {
+            status_contrato.style.backgroundColor = '#b6b6b6';
+        }
+        if (status_contrato.value == 'suspenso') {
+            status_contrato.style.backgroundColor = '#ffffd4';
+        }
+        if (status_contrato.value == 'cancelado') {
+            status_contrato.style.backgroundColor = '#ffcbc2';
+        }
+        if (status_contrato.value == '') {
+            status_contrato.style.backgroundColor = 'white';
+        }
+    }
+
     function verificar_campos_contrato() {
         const campos = [
             { id: 'ct_unidade_daf_display', mensagem: 'Informe a <b>Unidade DAF</b>!' },
             { id: 'ct_lei_licitacao_valor', mensagem: 'Informe a <b>Lei de Licitação</b>!' },
             { id: 'ct_processo_sei', mensagem: 'Informe o <b>Processo SEI</b>!' },
             { id: 'ct_documento_sei', mensagem: 'Informe o <b>Documento SEI</b>!' },
+            { id: 'ct_tipo_contrato', mensagem: 'Informe o <b>Tipo de Contrato</b>!' },
             { id: 'ct_numero_contrato', mensagem: 'Informe o <b>Número do Contrato</b>!' },
             { id: 'ct_status', mensagem: 'Informe o <b>Status</b>!' },
             { id: 'data_publicacao', mensagem: 'Informe a <b>Data da Publicação</b>!' },
@@ -1056,12 +1114,16 @@ document.addEventListener("DOMContentLoaded", function() {
                 $('#ctobjeto_qtd_contratada').val(data.qtd_contratada.toLocaleString('pt-BR'));
                 $('#ctobjeto_qtd_doada').val(data.qtd_doada.toLocaleString('pt-BR'));
                 $('#ctobjeto_qtd_total').val(data.qtd_total.toLocaleString('pt-BR'));
+                $('#ctobjeto_qtd_empenhada').val(data.qtd_empenhada.toLocaleString('pt-BR'));
+                $('#ctobjeto_qtd_a_empenhar').val(data.qtd_a_empenhar.toLocaleString('pt-BR'));
                 $('#ctobjeto_qtd_entregue').val(data.qtd_entregue.toLocaleString('pt-BR'));
                 $('#ctobjeto_qtd_a_entregar').val(data.qtd_a_entregar.toLocaleString('pt-BR'));
                 
                 //Valores
                 $('#ctobjeto_valor_unitario').val(formatarComoMoeda(data.valor_unitario));
                 $('#ctobjeto_valor_total').val(formatarComoMoeda(data.valor_total));
+                $('#ctobjeto_valor_empenhado').val(formatarComoMoeda(data.valor_empenhado));
+                $('#ctobjeto_valor_a_empenhar').val(formatarComoMoeda(data.valor_a_empenhar));
                                 
                 //Observações
                 $('#ctobjeto_observacoes').val(data.observacoes);
@@ -1166,7 +1228,8 @@ document.addEventListener("DOMContentLoaded", function() {
         qtd_contratada_str = qtd_contratada_str.replace(/\./g, '');
         let qtd_contratada = parseFloat(qtd_contratada_str)
         let qtd_contratada_hidden = parseFloat(document.getElementById('id_qtd_contratada_hidden').value)
-        let saldo_arp = parseFloat(id_qtd_saldo_arp.value)        
+        let saldo_arp = id_qtd_saldo_arp.value.replace(/\./g, '');
+        saldo_arp = parseFloat(saldo_arp); 
         let saldo_total = saldo_arp + qtd_contratada_hidden
         if (arp.value != '') {
             
@@ -1246,10 +1309,9 @@ document.addEventListener("DOMContentLoaded", function() {
         const campos = [
             { id: 'id_numero_parcela', mensagem: 'Informe o <b>Número da Parcela</b>!' },
             { id: 'id_parcela_qtd_contratada', mensagem: 'Informe a <b>Qtd Contratada</b>!' },
-            { id: 'id_parcela_qtd_doada', mensagem: 'Informe a <b>Qtd Doada</b>!' },
             { id: 'id_parcela_previsao_entrega', mensagem: 'Informe a <b>Previsão de Entrega</b>!' },
         ];
-    
+
         let mensagensErro = campos.reduce((mensagens, campo) => {
             const elemento = document.getElementById(campo.id);
             if (!elemento || elemento.value === '' || elemento.value == 0) {
@@ -1355,13 +1417,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 $('#id_parcela_qtd_a_empenhar').val(data.qtd_a_empenhar.toLocaleString('pt-BR'));
                 $('#id_parcela_valor_empenhado').val(formatarComoMoeda(data.valor_empenhado));
                 $('#id_parcela_valor_a_empenhar').val(formatarComoMoeda(data.valor_a_empenhar));
-                $('#id_parcela_percentual_empenhado').val(data.empenho_percentual);
+                let percentual = (data.empenho_percentual * 100).toFixed(2) + '%';
+                $('#id_parcela_percentual_empenhado').val(percentual);
                 
                 // Abrir o modal
                 const modal = new bootstrap.Modal(document.getElementById('contratoParcelaModal'));
                 parcela_quantidade_total();
                 modal.show();
-
                 
             })
             .catch(error => {
@@ -1382,7 +1444,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const primeiraLinhaDados = tabela_fiscais.rows[1];
 
             // Supondo que a data de fim está na quarta coluna (índice 3)
-            maiorDataFim = primeiraLinhaDados.cells[3].innerText.trim();
+            maiorDataFim = primeiraLinhaDados.cells[4].innerText.trim();
 
             // Se a célula estiver vazia ou tiver um traço '-', define maiorDataFim como uma string vazia
             if (maiorDataFim === '-' || maiorDataFim === '') {
@@ -1398,8 +1460,8 @@ document.addEventListener("DOMContentLoaded", function() {
     botao_inserir_fiscal.addEventListener('click', function(){
         
         let status_fiscal_atual = fiscal_verificar_status()
-        if (!status_fiscal_atual){
-            sweetAlert('Inative primeiro o atuas Fiscal do contrato!')
+        if (status_fiscal_atual == false){
+            sweetAlert('<span style="font-weight: normal">Antes de inserir novo fiscal, <span style="font-weight: bold; color: red">INATIVE</span> o atual Fiscal do contrato!</span>')
             return
         }
 
@@ -1411,6 +1473,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const id_fiscal_data_fim_maior_hidden = document.getElementById('id_fiscal_data_fim_maior_hidden')
         id_fiscal_data_fim_maior_hidden.value = pegar_maior_data_fim_fiscais()
+        document.getElementById('id_fiscal_data_inicio').value = converterDataFormatoISO(id_fiscal_data_fim_maior_hidden.value)
         fiscal_data_fim.setAttribute('disabled', 'disabled')
         fiscal.removeAttribute('disabled')
         fiscal_outro_check.removeAttribute('disabled')
@@ -1443,10 +1506,15 @@ document.addEventListener("DOMContentLoaded", function() {
     const fiscal_data_fim_registrada = document.getElementById('id_fiscal_data_fim_hidden')
     
     fiscal_data_inicio.addEventListener('change', function(){
+        
+        if (fiscal_data_fim_maior.value == 'undefined'){
+            return
+        }
+        
         let verificacao = verificar_fiscal_data_inicio()
         if (verificacao == false){
             sweetAlert('A data de início não pode ser inferior à última data fim do último fiscal do contrato.')
-            fiscal_data_inicio.value = ''
+            fiscal_data_inicio.value = converterDataFormatoISO(fiscal_data_fim_maior.value)
         }
     })
 
@@ -1471,19 +1539,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const fiscal_id = document.getElementById('fiscal_id')
     const id_fiscal_usuario_hidden = document.getElementById('id_fiscal_usuario_hidden')
-    function verificar_fiscal_id(){
-        if(fiscal_id.value != ''){
-            fiscal_outro_check.setAttribute('disabled', 'disabled')
-            fiscal_outro.setAttribute('readonly', 'true')
-            fiscal.setAttribute('disabled', 'disabled')
-            id_fiscal_usuario_hidden.value = fiscal.value
-        }else{
-            fiscal_outro_check.removeAttribute('disabled')
-            fiscal_outro.removeAttribute('readonly')
-            fiscal.removeAttribute('disabled')
-            id_fiscal_usuario_hidden.value = ''
-        }
-    }
+    // function verificar_fiscal_id(){
+    //     if(fiscal_id.value != ''){
+    //         fiscal_outro_check.setAttribute('disabled', 'disabled')
+    //         fiscal_outro.setAttribute('readonly', 'true')
+    //         fiscal.setAttribute('disabled', 'disabled')
+    //         id_fiscal_usuario_hidden.value = fiscal.value
+    //     }else{
+    //         fiscal_outro_check.removeAttribute('disabled')
+    //         fiscal_outro.removeAttribute('readonly')
+    //         fiscal.removeAttribute('disabled')
+    //         id_fiscal_usuario_hidden.value = ''
+    //     }
+    // }
     
     fiscal.addEventListener('change', function(){
         id_fiscal_usuario_hidden.value = fiscal.value
@@ -1571,11 +1639,14 @@ document.addEventListener("DOMContentLoaded", function() {
         // Converte as datas para o formato ISO (YYYY-MM-DD) antes da comparação
         const dataInicioISO = converterDataFormatoISO(fiscal_data_inicio.value);
         const dataFimMaiorISO = converterDataFormatoISO(fiscal_data_fim_maior.value);
-    
         // Realiza a comparação
-        if (dataInicioISO < dataFimMaiorISO) {
-            return false;
+        
+        if (typeof dataFimMaiorISO !== 'undefined') {
+            if (dataInicioISO < dataFimMaiorISO) {
+                return false;
+            }
         }
+        
         return true;
     }
 
@@ -1641,6 +1712,7 @@ document.addEventListener("DOMContentLoaded", function() {
         fiscal_outro.value = ''
         fiscal_outro_check.value = false
         fiscal_observacoes.value = ''
+        $('#id_fiscal_documento_sei').val('');
         $('#id_fiscal_data_fim_maior_hidden').val('');
         $('#id_fiscal_data_fim_hidden').val('');
     }
@@ -1662,12 +1734,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 $('#fiscal_log_responsavel_atualizacao').val(data.log_responsavel_atualizacao);
                 $('#fiscal_log_edicoes').val(data.log_edicoes);
                 
-
+                // verificar_nome_fiscal(data.id_fiscal_outro_checkbox)
                 $('#id_fiscal').val(data.id_fiscal);
-                $('#id_fiscal_outro_checkbox').val(data.id_fiscal_outro_checkbox);
+                $('#id_fiscal_usuario_hidden').val(data.id_fiscal);
                 $('#id_fiscal_outro').val(data.id_fiscal_outro);
-
+                //$('#id_fiscal_outro_checkbox').val(data.id_fiscal_outro_checkbox);
+                if (data.id_fiscal_outro_checkbox){
+                    fiscal_outro_check.checked = true
+                    fiscal_outro.removeAttribute('readonly')
+                    fiscal.setAttribute('disabled', 'disabled')
+                } else {
+                    fiscal_outro_check.checked = false
+                    fiscal_outro.setAttribute('readonly', true)
+                    fiscal.removeAttribute('disabled')
+                }
+                
                 $('#id_fiscal_status').val(data.id_fiscal_status)
+                $('#id_fiscal_documento_sei').val(data.id_fiscal_documento_sei)
 
                 $('#id_fiscal_data_inicio').val(data.id_fiscal_data_inicio);
                 $('#id_fiscal_data_fim').val(data.id_fiscal_data_fim);
@@ -1676,14 +1759,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 $('#id_fiscal_contrato_hidden').val(data.id_fiscal_contrato_hidden);
 
-                $('#id_fiscal_data_fim_maior_hidden').val(maior_data_fim_tabela_fiscais);
-                $('#id_fiscal_data_fim_hidden').val(data.id_fiscal_data_fim);
+                $('#id_fiscal_data_fim_hidden').val(maior_data_fim_tabela_fiscais);
+                
                 
                 // Abrir o modal
-                //const modal = new bootstrap.Modal(document.getElementById('contratoFiscalFichaModal'));
-                //modal.show();
-                verificar_fiscal_id();
                 verificar_status_fiscal();
+
+                if ($('#id_fiscal_status').val()){
+                    fiscal_data_fim_maior.value = data.id_fiscal_data_inicio
+                }
+
                 modal_fiscal_ficha.show();
             })
             .catch(error => {
@@ -1719,17 +1804,59 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function fiscal_verificar_status(){
         if (tabela_fiscais && tabela_fiscais.rows.length > 1){
-            const primeiraLinha = tabela_fiscais.rows[1];
-    
-            const statusFiscal = primeiraLinha.cells[2].textContent;
 
+            const primeiraLinha = tabela_fiscais.rows[1];
+            const statusFiscal = primeiraLinha.cells[1].textContent;
             if (statusFiscal == 'Ativo') {
                 return false
             }
-        
+
             return true
         }
     }
+    
+    const botao_deletar_fiscal = document.getElementById('btnDeletarFiscal')
+    botao_deletar_fiscal.addEventListener('click', function() {
+        var id_fiscal = document.getElementById('fiscal_id').value
+
+        if (id_fiscal == ''){
+            modal_fiscal_ficha.hide()
+            modal_fiscais.show()
+            return
+        }
+
+        //parâmetros para deletar
+        const mensagem = "Deletar o Fiscal do Contrato."
+        const url_delete = "/contratos/contrato/fiscal/deletar/" + id_fiscal + "/"
+        const url_apos_delete = window.location.href;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    })
+
+
+    //Relatório ARP
+    const botao_relatorio_contrato = document.getElementById('btnContratoRelatorio')
+    botao_relatorio_contrato.addEventListener('click', function(){
+
+        if (contrato_id == '') {
+            sweetAlert('Não há dados!', 'warning')
+            return
+        }
+
+        var width = 1000;
+        var height = 700;
+        var left = (window.screen.width / 2) - (width / 2);
+        var top = (window.screen.height / 2) - (height / 2);
+        
+        var url = '/contratos/relatorio/contrato/' + contrato_id + '/';
+        window.open(url, 'newwindow', 'scrollbars=yes, width=' + width + ', height=' + height + ', top=' + top + ', left=' + left);
+    })
+
+
+
+    
     
 
 });

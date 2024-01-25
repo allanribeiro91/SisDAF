@@ -78,7 +78,6 @@ function sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete) {
   });
 }
 
-
 function sweetAlertGenerico(title='Atenção!', html, icon='warning', iconColor='red', confirmButtonText='Ok', confirmButtonColor='green', onConfirm){
   Swal.fire({
       title: title,

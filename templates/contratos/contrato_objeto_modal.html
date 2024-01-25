@@ -21,7 +21,8 @@
     }
 
     .modal-content.objeto{
-        min-height: 80% !important;
+        min-height: 700px !important;
+        max-height: 80%;
     }
 
 </style>
@@ -127,11 +128,7 @@
                             <div class="subgrid">
                                 <h3>Quantidades</h3>
                                 <div class="subgrid-elementos">
-                                    <div class="form-floating mb-3" style="width: 150px;">
-                                        {{ form_objeto.fator_embalagem }}
-                                        <label>{{ form_objeto.fator_embalagem.label }}</label>
-                                    </div>
-                                    <div class="form-floating mb-3" style="margin-left: 20px;">
+                                    <div class="form-floating mb-3">
                                         <input type="text" id="ctobjeto_qtd_contratada" class="form-control" style="width: 150px; text-align: right;" readonly>
                                         <label>Qtd Contratada</label>
                                     </div>
@@ -142,6 +139,14 @@
                                     <div class="form-floating mb-3">
                                         <input type="text" id="ctobjeto_qtd_total" class="form-control" style="width: 150px; text-align: right;" readonly>
                                         <label>Qtd Total</label>
+                                    </div>
+                                    <div class="form-floating mb-3" style="margin-left: 20px;">
+                                        <input type="text" id="ctobjeto_qtd_empenhada" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                        <label>Qtd Empenhada</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" id="ctobjeto_qtd_a_empenhar" class="form-control" style="width: 150px; text-align: right;" readonly>
+                                        <label>Qtd a Empenhar</label>
                                     </div>
                                     <div class="form-floating mb-3" style="margin-left: 20px;">
                                         <input type="text" id="ctobjeto_qtd_entregue" class="form-control" style="width: 150px; text-align: right;" readonly>
@@ -165,6 +170,17 @@
                                                         
                             <!-- Valores -->
                             <div class="subgrid">
+                                <h3>Fator Embalagem</h3>
+                                <div class="subgrid-elementos">
+                                    <div class="form-floating mb-3" style="width: 150px !important;">
+                                        {{ form_objeto.fator_embalagem }}
+                                        <label>{{ form_objeto.fator_embalagem.label }}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="subgrid">
                                 <h3>Valores</h3>
                                 <div class="subgrid-elementos">
                                     <div class="form-floating mb-3">
@@ -175,7 +191,16 @@
                                         <input type="text" id="ctobjeto_valor_total" class="form-control" style="width: 200px; text-align: right;" readonly>
                                         <label>Valor Total</label>
                                     </div>
-                                </div>
+
+                                    <div class="form-floating mb-3" style="margin-left: 20px;">
+                                        <input type="text" id="ctobjeto_valor_empenhado" class="form-control" style="width: 200px; text-align: right;" readonly>
+                                        <label>Valor Empenhado</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" id="ctobjeto_valor_a_empenhar" class="form-control" style="width: 200px; text-align: right;" readonly>
+                                        <label>Valor a Empenhar</label>
+                                    </div>
+                                </div>  
                             </div>
                             
                             

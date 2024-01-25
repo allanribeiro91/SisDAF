@@ -1,8 +1,53 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+    if (localStorage.getItem('ItemARPSalvo') === 'true') {
+        sweetAlert('Item da ARP salva com sucesso!', 'success', 'top-end');
+        let idItemARP = localStorage.getItem('id_item_arp');
+        localStorage.removeItem('ItemARPSalvo');
+        if (idItemARP) {
+            localStorage.removeItem('id_item_arp');
+            openModelItemArp(idItemARP)
+        }
+    }
+
+    const status_arp = document.getElementById('arp_status')
+    status_cor();   
+    status_arp.addEventListener('change', function(){
+        status_cor();   
+    })
+
+    function status_cor(){
+        if (status_arp.value == 'vigente') {
+            status_arp.style.backgroundColor = '#c2f6ff';
+        }
+        if (status_arp.value == 'nao_publicado') {
+            status_arp.style.backgroundColor = '#d9b3ff';
+        }
+        if (status_arp.value == 'encerrado') {
+            status_arp.style.backgroundColor = '#b6b6b6';
+        }
+        if (status_arp.value == 'suspenso') {
+            status_arp.style.backgroundColor = '#ffffd4';
+        }
+        if (status_arp.value == 'cancelado') {
+            status_arp.style.backgroundColor = '#ffcbc2';
+        }
+        if (status_arp.value == '') {
+            status_arp.style.backgroundColor = 'white';
+        }
+    }
+
     const select_unidade_daf = document.getElementById('arp_unidade_daf');
     const select_denominacao = document.getElementById('arp_denominacao');
     const arp_unidade_daf = document.getElementById('arp_unidade_daf');
     const arp_unidade_daf_display = document.getElementById('arp_unidade_daf_display');
+
+
+    const fornecedor_id = document.getElementById('cnpj_fornecedor')
+    const fornecedor_hidden = document.getElementById('arp_fornecedor_hidden')
+    fornecedor_id.addEventListener('change', function(){
+        fornecedor_hidden.value = fornecedor_id.value
+    })
 
     select_unidade_daf.addEventListener('change', function(){
         if (select_unidade_daf.value != '') {
@@ -192,10 +237,16 @@ $(document).ready(function() {
         window.location.href = `/contratos/arp/ficha/${arpId}/`;
     });  
     
+    const botao_novo_arp = document.getElementById('btnNovoItemARP')
+    const id_arp = document.getElementById('id_arp').value
     $('#btnNovoItemARP').click(function() {
         document.getElementById('arpItemForm').reset();
         $('#arp_denominacao').trigger('change');
 
+        if (id_arp == ''){
+            sweetAlert('Salve primeiro a ARP.')
+            return
+        }
 
         var modal = new bootstrap.Modal(document.getElementById('itemARPmodal'));
         modal.show();
@@ -569,20 +620,11 @@ document.getElementById('btnSalvarItemArp').addEventListener('click', function(e
     .then(data => {
         if (data.retorno === "Salvo") {
             
-            if (data.novo === false) {
-                //logs       
-                document.getElementById('arp_item_log_ult_atualizacao').value = data.log_atualizacao_data
-                document.getElementById('arp_item_log_responsavel_atualizacao').value = data.log_atualizacao_usuario
-                document.getElementById('arp_item_log_edicoes').value = data.log_edicoes
+            let item_arp_id = data.item_arp_id;
+            localStorage.setItem('ItemARPSalvo', 'true');
+            localStorage.setItem('id_item_arp', item_arp_id);
+            window.location.reload();
 
-                //alert
-                localStorage.setItem('showSuccessMessage', 'true');
-                //sweetAlert('Item da ARP salva com sucesso!', 'success', 'green')
-                window.location.href = data.redirect_url;
-            } else {
-                localStorage.setItem('showSuccessMessage', 'true');
-                window.location.href = data.redirect_url;
-            }
         }
 
         if (data.retorno === "Não houve mudanças") {

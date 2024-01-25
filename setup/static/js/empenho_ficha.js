@@ -5,6 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
         sweetAlert('Empenho Orçamentário salvo com sucesso!', 'success', 'top-end');
         localStorage.removeItem('empenhoSalvo');
     }
+    if (localStorage.getItem('itemEmpenhoSalvo') === 'true') {
+        sweetAlert('Item do Empenho salvo com sucesso!', 'success', 'top-end');
+        let idItemEmpenho = localStorage.getItem('item_empenho_id');
+        localStorage.removeItem('itemEmpenhoSalvo');
+        if (idItemEmpenho) {
+            localStorage.removeItem('item_empenho_id');
+            openModalItemEmpenho(idItemEmpenho)
+        }
+    }
 
     //Formato PROCESSO SEI e DOCUMENTO SEI
     $('#empenho_processo_sei').mask('00000.000000/0000-00');
@@ -37,8 +46,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    verificar_status_empenho()
-    empenho_status.addEventListener('change', verificar_status_empenho)
+    
+
+    const qtd_entregue_empenho = document.getElementById('qtd_entregue_empenho').value
+    const status_empenho_hidden = document.getElementById('status_empenho_hidden').value
+    function avaliar_entrega_antes_mudar_status(){
+        var qtd_entregue = parseFloat(qtd_entregue_empenho)
+        var status_empenho = status_empenho_hidden
+
+        if (status_empenho == 'empenhado' && qtd_entregue > 0){
+            empenho_status.value = 'empenhado'
+            sweetAlert('Não é possível alterar o status de um empenho com entregas já realizadas!')
+            return false
+        }
+
+        return true
+    }
+
+    function avaliar_entrega_antes_deletar(){
+        var qtd_entregue = parseFloat(qtd_entregue_empenho)
+
+        if (qtd_entregue > 0){
+            empenho_status.value = 'empenhado'
+            sweetAlert('Não é possível deletar um empenho com entregas já realizadas!')
+            return false
+        }
+
+        return true
+    }
+
+    verificar_status_empenho();
+    status_cor();  
+    empenho_status.addEventListener('change', function(){
+         
+        var avaliacao = avaliar_entrega_antes_mudar_status()
+        if (avaliacao == false){
+            return
+        }
+        status_cor(); 
+        verificar_status_empenho();
+        
+    })
 
     const botao_salvar_empenho = document.getElementById('btnSalvarEmpenho')
     botao_salvar_empenho.addEventListener('click', function(e){
@@ -200,6 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     const botao_selecionar_contrato_empenho = document.getElementById('inserirNovoItem')
+    const hidden_id_empenhoItem_empenho = document.getElementById('id_empenhoItem_empenho')
     const modal_empenho_item = new bootstrap.Modal(document.getElementById('empenhoItemModal'))
     botao_selecionar_contrato_empenho.addEventListener('click', function(){
 
@@ -217,6 +266,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             limparDadosItemEmpenho();
             buscarDadosDaParcela();
+
+            //
+            hidden_id_empenhoItem_empenho.value = id_empenho.value
 
             modal_empenho_item.show()
         }
@@ -250,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#itemEmpenho_valorEmpenhar').val(formatarComoMoeda(dados.valor_a_empenhar))
 
         //Campos ocultos
-        $('#id_empenhoItem_contrato').val(dados.contrato_id)
+        $('#id_empenhoItem_parcela').val(dados.parcela_id)
     }
 
 
@@ -285,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         //Campos ocultos
         document.getElementById('id_empenhoItem_empenho').value = ''
-        document.getElementById('id_empenhoItem_contrato').value = ''
+        document.getElementById('id_empenhoItem_parcela').value = ''
         document.getElementById('id_empenhoItem_qtd_empenhada').value = ''
 
     }
@@ -370,6 +422,257 @@ document.addEventListener('DOMContentLoaded', function() {
         qtd_empenho.value = v_qtd_empenho.toLocaleString('pt-BR');
         valor_empenho.value = formatarComoMoeda(v_valor_empenho)
     }
+
+
+
+
+    //Salvar Empenho
+    const botao_salvar_item_empenho = document.getElementById('botaoSalvarItemEmpenho')
+    botao_salvar_item_empenho.addEventListener('click', function(event){
+        event.preventDefault();
+        salvarItemEmpenho();
+    })
     
+    function salvarItemEmpenho() {
+        const id_item_empenho_modal = document.getElementById('item_id')
+        
+        if (qtd_empenho.value == 0 || valor_empenho == 0){
+            sweetAlert('A <b>Quantidade</b> ou <b>Valor</b> do Empenho não pode ser 0!')
+            return
+        }
+
+
+        //Verificar preenchimento dos campos
+        let preenchimento_incorreto = verificar_campos_item_empenho()
+        if (preenchimento_incorreto === false) {
+            return;
+        }
+        
+
+        //Enviar para o servidor
+            //definir o caminho
+            if (id_item_empenho_modal.value == '') {
+                postURL = '/contratos/empenho/item/novo/'
+            } else
+            {
+                postURL = `/contratos/empenho/item/salvar/${id_item_empenho_modal.value}/`
+            }
+
+            //pegar os dados
+            let formData = new FormData(document.getElementById('itemEmpenhoForm'));
+    
+            //enviar 
+            fetch(postURL, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+        
+        //Retorno do Servidor
+        .then(response => {
+            // Primeiro verifique se a resposta é ok
+            if (!response.ok) {
+                sweetAlert('Dados não foram salvos.', 'error', 'red');
+                throw new Error('Server response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.retorno === "Salvo") {
+                let item_empenho_id = data.item_empenho_id;
+                localStorage.setItem('itemEmpenhoSalvo', 'true');
+                localStorage.setItem('item_empenho_id', item_empenho_id);
+                window.location.href = data.redirect_url;
+            }
+    
+            if (data.retorno === "Não houve mudanças") {
+                //alert
+                sweetAlert('Dados não foram salvos.<br>Não houve mudanças.', 'warning', 'orange')
+            }
+    
+            if (data.retorno === "Erro ao salvar") {
+                //alert
+                sweetAlert('Dados não foram salvos.', 'error', 'red')
+            }
+        })
+        .catch(error => {
+            console.error('Fetch operation error:', error);
+        });
+            
+    }
+
+    function verificar_campos_item_empenho() {
+        const campos = [
+            { id: 'itemEmpenho_qtdEmpenho', mensagem: 'Informe a <b>Quantidade do Empenho</b>!' },
+            { id: 'itemEmpenho_valorEmpenho', mensagem: 'Informe o <b>Valor Total do Empenho</b>!' },
+        ];
+    
+        let mensagensErro = campos.reduce((mensagens, campo) => {
+            const elemento = document.getElementById(campo.id);
+            if (!elemento || elemento.value === '') {
+                mensagens.push(campo.mensagem);
+            }
+            return mensagens;
+        }, []);
+    
+        if (mensagensErro.length > 0) {
+            const campos = mensagensErro.join('<br>')
+            sweetAlertPreenchimento(campos)
+            return false;
+        }
+    
+        return true;
+    }
+
+    function openModalItemEmpenho(item_empenho_id) {
+        fetch(`/contratos/empenho/item/${item_empenho_id}/dados`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar dados do Item do Empenho.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Atualizar os campos do formulário no modal com os dados recebidos
+                //log
+                $('#item_id').val(data.id);
+                $('#item_log_data_registro').val(data.log_data_registro);
+                $('#item_log_responsavel_registro').val(data.log_responsavel_registro);
+                $('#item_log_ult_atualizacao').val(data.lot_ult_atualizacao);
+                $('#item_log_responsavel_atualizacao').val(data.log_responsavel_atualizacao);
+                $('#item_log_edicoes').val(data.log_edicoes);
+
+                //dados da parcela
+                $('#id_item_contrato').val(data.contrato)
+                $('#id_item_numero_item').val(data.numero_item)
+                $('#id_item_numero_parcela').val(data.numero_parcela)
+                $('#id_item_produto').val(data.produto)
+
+                //Parâmetros
+                $('#itemEmpenho_fatorEmbalagem').val(data.fator_embalagem)
+                $('#itemEmpenho_valorUnitario').val(formatarComoMoeda(data.valor_unitario))
+                $('#itemEmpenho_qtdEmpenhar').val(data.qtd_a_empenhar.toLocaleString('pt-BR'))
+                $('#itemEmpenho_valorEmpenhar').val(formatarComoMoeda(data.valor_a_empenhar))
+
+                //Empenho
+                $('#itemEmpenho_embalagens').val(data.qtd_embalagens.toLocaleString('pt-BR'))
+                $('#itemEmpenho_qtdEmpenho').val(data.qtd_empenhada.toLocaleString('pt-BR'))
+                $('#itemEmpenho_valorEmpenho').val(formatarComoMoeda(data.valor_empenhado))
+
+                //Observações
+                $('#itemEmpenho_observacoes').val(data.observacoes)
+
+                //Campos ocultos
+                $('#id_empenhoItem_empenho').val(data.empenho_id)
+                $('#id_empenhoItem_parcela').val(data.parcela_id)
+                $('#id_empenhoItem_qtd_empenhada').val(data.qtd_empenhada)
+
+                // Abrir o modal
+                modal_empenho_item.show();
+
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+    
+    //Abrir Item do Empenho
+    const tab_itens_empenho = document.getElementById('tabItensEmpenho')
+    tab_itens_empenho.addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.tagName === 'TD') {
+          const row = target.closest('tr');
+          const item_empenho_id = row.dataset.id;
+
+          limparDadosItemEmpenho();
+          openModalItemEmpenho(item_empenho_id);
+        }
+    });
+
+     
+    
+
+    function status_cor(){
+        if (empenho_status.value == 'empenhado') {
+            empenho_status.style.backgroundColor = '#c2f6ff';
+        }
+        if (empenho_status.value == 'pre_empenho') {
+            empenho_status.style.backgroundColor = '#ffffd4';
+        }
+        if (empenho_status.value == 'cancelado') {
+            empenho_status.style.backgroundColor = '#ffcbc2';
+        }
+        if (empenho_status.value == '') {
+            empenho_status.style.backgroundColor = 'white';
+        }
+    }
+
+
+    const botao_deletar_item_empenho = document.getElementById('btnDeletarItemEmpenho')
+    botao_deletar_item_empenho.addEventListener('click', function() {
+        var id_item_empenho = document.getElementById('item_id').value
+
+        if (id_item_empenho == ''){
+            modal_empenho_item.hide()
+            return
+        }
+
+        //parâmetros para deletar
+        const mensagem = "Deletar o Item do Empenho."
+        const url_delete = "/contratos/empenho/item/deletar/" + id_item_empenho + "/"
+
+        const url_apos_delete = window.location.href;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    })
+
+
+    const botao_deletar_empenho = document.getElementById('btnDeletarEmpenho')
+    botao_deletar_empenho.addEventListener('click', function() {
+        var id_empenho = document.getElementById('id_empenho').value
+
+        if (id_empenho == ''){
+            window.location.href = "/contratos/empenhos/"
+            return
+        }
+
+        var avaliar_qtd_entrega = avaliar_entrega_antes_deletar()
+        if (avaliar_qtd_entrega == false){
+            return
+        }
+
+        //parâmetros para deletar
+        const mensagem = "Deletar o Empenho."
+        const url_delete = "/contratos/empenho/deletar/" + id_empenho + "/"
+
+        const url_apos_delete = "/contratos/empenhos/";
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    })    
+
+
+    //Relatório ARP
+    const botao_relatorio_empenho = document.getElementById('btnEmpenhoRelatorio')
+    botao_relatorio_empenho.addEventListener('click', function(){
+        const id_empenho = document.getElementById('id_empenho').value
+        if (id_empenho == '') {
+            sweetAlert('Não há dados!', 'warning')
+            return
+        }
+
+        var width = 1000;
+        var height = 700;
+        var left = (window.screen.width / 2) - (width / 2);
+        var top = (window.screen.height / 2) - (height / 2);
+        
+        var url = '/contratos/relatorio/empenho/' + id_empenho + '/';
+        window.open(url, 'newwindow', 'scrollbars=yes, width=' + width + ', height=' + height + ', top=' + top + ', left=' + left);
+    })
 
 });

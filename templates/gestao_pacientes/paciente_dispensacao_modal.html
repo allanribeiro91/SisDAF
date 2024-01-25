@@ -1,0 +1,274 @@
+<!-- Modal -->
+{% load static %}
+<style>
+    .tags-column{
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width-empenho-item {
+        min-width: 75%; 
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal-parcela {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; 
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-content{
+        max-height: 80%;
+        min-height: 800px;
+    }
+
+    .modal-body{
+        height: auto;
+    }
+
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="pacienteDispensacaoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-empenho-item" role="document">
+        <div class="modal-content">
+            
+            <!-- Cabeçalho -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Dispensação de Medicamento</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <!-- Corpo -->
+            <div class="modal-body">
+                
+                <!-- Formulário -->
+                <form id="dispensacaoPacienteForm">
+                    {% csrf_token %}
+                    
+                    <!-- Logs -->
+                    <div class="horizontal-sections-modal-parcela" >
+                        <div class="section" style="border: 0px !important;">        
+                            <h3>Logs</h3>
+                            <div class="grid" style="font-size: 10px;">
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="dispensacao_id" style="width: 100px;"  readonly>
+                                    <label for="dispensacao_id">ID</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="dispensacao_log_data_registro" readonly>
+                                    <label for="dispensacao_log_data_registro">Data do Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="dispensacao_log_responsavel_registro" readonly>
+                                    <label for="dispensacao_log_responsavel_registro">Responsável pelo Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="dispensacao_log_ult_atualizacao" readonly>
+                                    <label for="dispensacao_log_ult_atualizacao">Última Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="dispensacao_log_responsavel_atualizacao" readonly>
+                                    <label for="dispensacao_log_responsavel_atualizacao">Responsável Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_edicoes" id="dispensacao_log_edicoes" readonly>
+                                    <label for="dispensacao_log_edicoes">Nº Edições</label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+    
+                    <div class="horizontal-sections-modal-parcela">
+                        <div class="section" style="border: 0px !important;">
+
+
+                            <!-- Dados Administrativos e Tratamento -->
+                            <div class="grid" style="font-size: 14px; margin-top: 15px;">
+                                
+                                <!-- Dados Administrativos -->
+                                <div class="subgrid">
+                                    <h3>Dados Administrativos</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3" style="width: 170px;">
+                                            {{ form_dispensacao.via_atendimento }}
+                                            <label>{{ form_dispensacao.via_atendimento.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="width: 170px;">
+                                            {{ form_dispensacao.origem_demanda_judicial }}
+                                            <label>{{ form_dispensacao.origem_demanda_judicial.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="width: 190px;">
+                                            {{ form_dispensacao.numero_processo_sei }}
+                                            <label>{{ form_dispensacao.numero_processo_sei.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="width: 170px;">
+                                            {{ form_dispensacao.uf_solicitacao }}
+                                            <label>{{ form_dispensacao.uf_solicitacao.label }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                            </div>
+
+                            <!-- Dados Administrativos e Tratamento -->
+                            <div class="grid" style="font-size: 14px; ">
+                                
+                                <!-- Produto e Quantidade -->
+                                <div class="subgrid">
+                                    <h3>Produto Farmacêutico</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" id="id_dispensacao_produto_id" class="form-control" style="width: 100px;" readonly>
+                                            <label>ID Produto</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="width: 600px;">
+                                            {{ form_dispensacao.produto }}
+                                            <label>{{ form_dispensacao.produto.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="width: 170px;">
+                                            {{ form_dispensacao.quantidade }}
+                                            <label>{{ form_dispensacao.quantidade.label }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tratamento -->
+                                <div class="subgrid">
+                                    <h3>Tratamento</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3" style="width: 90px;">
+                                            {{ form_dispensacao.cid }}
+                                            <label>{{ form_dispensacao.cid.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="width: 200px;">
+                                            {{ form_dispensacao.fase_tratamento }}
+                                            <label>{{ form_dispensacao.fase_tratamento.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            {{ form_dispensacao.ciclo }}
+                                            <label>{{ form_dispensacao.ciclo.label }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                            </div>
+
+                            <!-- Pedido -->
+                            <div class="grid" style="font-size: 14px;">
+
+                                <div class="subgrid">
+                                    <h3>Pedido</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3">
+                                            {{ form_dispensacao.status }}
+                                            <label>{{ form_dispensacao.status.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            {{ form_dispensacao.numero_pedido_sismat }}
+                                            <label>{{ form_dispensacao.numero_pedido_sismat.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="date" class="form-control" style="width: 160px;" id="id_dispensacao_data_solicitacao" name="data_solicitacao">
+                                            <label for="id_dispensacao_data_solicitacao">Data da Solicitação</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="date" class="form-control" style="width: 160px;" id="id_dispensacao_data_envio" name="data_envio" readonly>
+                                            <label for="id_dispensacao_data_envio">Data do Envio</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="date" class="form-control" style="width: 160px;" id="id_dispensacao_data_consumo" name="data_consumo" readonly>
+                                            <label for="id_dispensacao_data_consumo">Data do Consumo</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <!-- Aplicação -->
+                            <div class="grid" style="font-size: 14px;">
+
+                                <div class="subgrid">
+                                    <h3>Aplicação</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3">
+                                            {{ form_dispensacao.local_aplicacao_cod_ibge }}
+                                            <label>{{ form_dispensacao.local_aplicacao_cod_ibge.label }}</label>
+                                        </div>
+                                        <div class="form-floating" style="width: 100px">
+                                            <select class="form-select" id="id_dispensacao_uf">
+                                                <option value=""></option>
+                                                {% for value in lista_ufs %}
+                                                    <option value="{{ value }}" {% if paciente == value %}selected{% endif %}>{{ value }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <label for="id_dispensacao_uf">UF</label>
+                                        </div>
+                                        <div class="form-floating" style="max-width: 500px;">
+                                            <select class="form-select" id="id_dispensacao_municipio" disabled>
+                                                <option value=""></option>
+                                                {% for cod_ibge, municipio in municipios %}
+                                                    <option value="{{ cod_ibge }}" {% if form_dispensacao.instance.naturalidade_cod_ibge == cod_ibge %}selected{% endif %}>{{ municipio }}</option>
+                                                {% endfor %}
+                                            </select>                        
+                                            <label for="id_dispensacao_municipio">Município</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="width: 500px;">
+                                            {{ form_dispensacao.local_aplicacao_unidade_saude }}
+                                            <label>{{ form_dispensacao.local_aplicacao_unidade_saude.label }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            <h3>Observações</h3>
+                            <div class="grid" style="font-size: 14px;">
+                                
+                                <div class="form-floating mb-3 full-width">
+                                    {{ form_dispensacao.observacoes_gerais }}
+                                    <label>{{ form_dispensacao.observacoes_gerais.label }}</label>
+                                </div>
+                            </div>
+
+
+
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3">
+                                    <input type="hidden" id="id_parcela_objeto" name="parcela_objeto_hidden" readonly>
+                                    <input type="hidden" id="id_qtd_contratada_hidden" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+
+                    
+    
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnDeletarDispensacao" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-primary" id="botaoSalvarDispensacao" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#pacienteDispensacaoModal').modal('hide');
+        });
+    });
+</script>

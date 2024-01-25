@@ -1,0 +1,196 @@
+{% load static %}
+{% load custom_filters %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\relatorio_empenho.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Empenho {{ empenho.numero_empenho }}</title>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-sisdaf">
+            <img src="{% static '/assets/logo/logo_sisdaf_transparente.png' %}" alt="Logo SisDAF" class="top-logo">
+        </div>
+        <div class="titulo-relatorio">
+            <b>SisDAF</b> - Relatório do <b>EMPENHO ORÇAMENTÁRIO</b>
+        </div>
+        <div class="responsavel-exportacao">
+            {{ usuario }} - {{ data_hora }}
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Log -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Log
+                </div>
+                <div class="grid">
+                    <div class="box">
+                        <div class="box-titulo">ID</div>
+                        <div class="box-conteudo">{{ empenho.id }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Registro</div>
+                        <div class="box-conteudo">{{ empenho.usuario_registro.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Data Registro</div>
+                        <div class="box-conteudo">{{ empenho.registro_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Últ. Atualização</div>
+                        <div class="box-conteudo">{{ empenho.usuario_atualizacao.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Última Atualização</div>
+                        <div class="box-conteudo">{{ empenho.ult_atual_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Nº Edições</div>
+                        <div class="box-conteudo">{{ empenho.log_n_edicoes }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados Administrativos -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Dados do Empenho
+                </div>
+                <div class="grid">
+                    <div class="box {% if empenho.status == 'empenhado' %}status-vigente{% elif empenho.status == 'pre_empenho' %}status-suspenso{% elif empenho.status == 'cancelado' %}status-cancelado{% endif %}" id="relatorio_box_status">
+                        <div class="box-titulo">Status</div>
+                        <div class="box-conteudo">{{ empenho.get_status_display }}</div>
+                    </div>                    
+                    <div class="box">
+                        <div class="box-titulo">Nº do Empenho</div>
+                        <div class="box-conteudo">
+                            {% if empenho.numero_empenho %}
+                                {{ empenho.numero_empenho }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Data Publicação</div>
+                        <div class="box-conteudo">
+                            {% if empenho.data_empenho %}
+                                {{ empenho.data_empenho|date:"d/m/Y" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Unidade DAF</div>
+                        <div class="box-conteudo">{{ empenho.get_unidade_daf_display }}</div>
+                    </div>
+                    
+                    <div class="box">
+                        <div class="box-titulo">Processo SEI</div>
+                        <div class="box-conteudo">{{ empenho.processo_sei }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Documento SEI</div>
+                        <div class="box-conteudo">
+                            {% if empenho.documento_sei %}
+                                {{ empenho.documento_sei }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Itens do Empenho -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Itens do Empenho
+                </div>
+                
+                <div class="grid" style="justify-content:center !important;" >
+                    <table class="tabela-relatorio" style="font-size: 10px; ">
+                        <thead>
+                            <tr>
+                                <th class="col-texto4">Contrato</th>
+                                <th class="col-texto4">Item</th>
+                                <th class="col-texto4">Parcela</th>
+                                <th class="col-texto12">Produto</th>
+                                <th class="col-valor8">Qtd Empenhada</th>
+                                <th class="col-valor8">Valor Un. R$</th>
+                                <th class="col-valor8">Valor Total R$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in empenho_itens %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="col-texto4">{{ item.parcela.contrato.numero_contrato }}</td>
+                                <td class="col-texto4">{{ item.parcela.objeto.numero_item }}</td>
+                                <td class="col-texto4">{{ item.parcela.numero_parcela }}</td>
+                                <td class="col-texto12">{{ item.parcela.objeto.produto.produto }}</td>
+                                <td class="col-valor8">{{ item.qtd_empenhado|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.parcela.objeto.valor_unitario|format_number }}</td>
+                                <td class="col-valor8">{{ item.valor_empenhado|format_number }}</td>
+                            </tr>
+                            {% endfor %}
+
+                            <!-- Linha do Valor Total -->
+                            <tr>
+                                <td colspan="4" style="text-align: right; font-weight: bold;">Total</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ empenho.empenho_qtd_empenhada|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">-</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ empenho.valor_total|format_number }}</td>
+                            </tr>
+
+                        </tbody>
+                    </table> 
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Observações gerais -->
+        <div class="horizontal-section log">
+            <div class="section full-width">
+                <div class="section-titulo">
+                    Observações Gerais
+                </div>
+                <div class="grid">
+                    <div class="box-observacoes">
+                        <div class="box-conteudo">{{ empenho.observacoes_gerais }}</div>
+                    </div>
+                    
+                    
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- <div class="footer">
+        <div class="relatorio-log">
+            {{ usuario }} - {{ data_hora }}
+        </div>
+        
+        <div class="footer-pagina">
+            Página <b>1</b> de <b>1</b>
+        </div>
+    </div> -->
+</body>
+
+
+</html>

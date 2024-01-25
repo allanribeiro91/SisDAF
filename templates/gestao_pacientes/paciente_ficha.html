@@ -1,0 +1,199 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/paciente_ficha.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fa-solid fa-hospital-user"></i>&nbsp;Controle Especial / Gestão de Pacientes / Ficha do Paciente
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tab-voltar">
+            <a href="{% url 'pacientes' %}" style="color: black;">
+                <i class="fas fa-arrow-left"></i> 
+            </a>
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" id="paciente_ficha_dados_gerais">Dados Gerais</button>
+        </div>
+    </div>
+
+    <div class="area-scroll">
+        <!-- form denominacoes_genericas -->
+        <form id="formPaciente">
+        {% csrf_token %}
+        
+            <!-- Botões -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-danger" id="btnDeletarPaciente" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                    <i class="fas fa-trash-alt"></i>
+                    Deletar
+                </button>
+                
+                <button class="btn btn-primary me-md-2" id="btnSalvarPaciente" style="font-size: 12px;">
+                    <i class="fas fa-save me-1"></i> 
+                    Salvar
+                </button>
+            </div>
+            
+            <!-- Log -->
+            <div class="horizontal-sections">
+                <div class="section-log">
+                    <h3>Log</h3>
+                    <div class="grid-log">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" id="id_paciente" readonly value="{{ form_paciente.instance.id|default_if_none:'' }}">
+                            <label for="floatingInput">ID</label>
+                        </div>                        
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="paciente_log_data_registro" readonly value="{{ paciente.registro_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Data do Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="paciente_log_responsavel_registro" readonly value="{{ paciente.usuario_registro.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável pelo Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="paciente_log_ult_atualizacao" readonly value="{{ paciente.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                            <label for="floatingInput">Última Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="paciente_log_responsavel_atualizacao" readonly value="{{ paciente.usuario_atualizacao.dp_nome_completo }}">
+                            <label for="floatingInput">Responsável Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" style="width: 100px;" id="paciente_log_edicoes" readonly value="{{ paciente.log_n_edicoes }}">
+                            <label for="floatingInput">Nº Edições</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados do Paciente -->
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Dados do Paciente</h3>
+                    
+                    <!-- Dados do Paciente -->
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating" style="width: 160px">
+                            {{ form_paciente.cns }}
+                            <label>{{ form_paciente.cns.label }}</label>
+                        </div>
+                        <div class="form-floating" style="width: 130px">
+                            {{ form_paciente.cpf }}
+                            <label>{{ form_paciente.cpf.label }}</label>
+                        </div>
+                        <div class="form-floating" style="width: 350px">
+                            {{ form_paciente.nome }}
+                            <label>{{ form_paciente.nome.label }}</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="date" class="form-control" id="id_paciente_data_nascimento" name="data_nascimento" value="{% if form_paciente.data_nascimento.value %}{{ form_paciente.data_nascimento.value|date:'Y-m-d' }}{% endif %}">
+                            <label for="floatingInput">Data Nascimento</label>
+                        </div>
+                        <div class="form-floating mb-3" style="width: 100px;">
+                            <input type="text" class="form-control" id="id_paciente_idade" value="{{ paciente.idade_paciente }} anos" readonly>
+                            <label for="id_paciente_idade">Idade</label>
+                        </div>
+                        <div class="form-floating">
+                            {{ form_paciente.sexo }}
+                            <label>{{ form_paciente.sexo.label }}</label>
+                        </div>
+                        <div class="form-floating">
+                            {{ form_paciente.cor_pele }}
+                            <label>{{ form_paciente.cor_pele.label }}</label>
+                        </div>
+                        <div class="form-floating">
+                            {{ form_paciente.orientacao_sexual }}
+                            <label>{{ form_paciente.orientacao_sexual.label }}</label>
+                        </div>
+                        <div class="form-floating" style="width: 100px">
+                            {{ form_paciente.naturalidade_cod_ibge }}
+                            <label>{{ form_paciente.naturalidade_cod_ibge.label }}</label>
+                        </div>
+                        <div class="form-floating" style="width: 100px">
+                            <select class="form-select" id="id_paciente_uf">
+                                <option value=""></option>
+                                {% for value in lista_ufs %}
+                                    <option value="{{ value }}" {% if paciente.paciente_uf == value %}selected{% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_paciente_uf">UF</label>
+                        </div>
+                        <div class="form-floating full-width" style="max-width: 500px;">
+                            <select class="form-select" id="id_paciente_municipio" disabled>
+                                <option value=""></option>
+                                {% for cod_ibge, municipio in municipios %}
+                                    <option value="{{ cod_ibge }}" {% if form_paciente.instance.naturalidade_cod_ibge == cod_ibge %}selected{% endif %}>{{ municipio }}</option>
+                                {% endfor %}
+                            </select>                        
+                            <label for="id_paciente_municipio">Naturalidade</label>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Dispensações -->
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Dispensações</h3>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button class="btn btn-primary me-md-2" type="button" id="btnNovaDispensacao" style="font-size: 12px; background-color: green; border-color: green;">
+                            <i class="fas fa-plus" style="font-size: 14px;"></i> 
+                            &nbsp;Nova Dispensação
+                        </button>
+                    </div>
+                
+                    <!-- Tabela de Tramitações -->
+                    <div class="section-tabela" style="width: 100% !important; margin-left: 0px;">
+                        <table class="table table-striped table-hover fixed-size-table" style="font-size: 12px;" id="tabTramitacoes">
+                            <thead>
+                                <tr>
+                                    <th class="col-id">ID</th>
+                                    <th class="col-texto6">Documento SEI</th>
+                                    <th class="col-texto8">Setor</th>
+                                    <th class="col-texto25">Etapa</th>
+                                    <th class="col-texto6">Entrada</th>
+                                    <th class="col-texto6">Previsão</th>
+                                    <th class="col-texto6">Saída</th>
+                                    <th class="col-texto4">Dias</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tab_proaq_tramitacoes %}
+                                <tr data-id="{{ item.id }}" data-proaq-id="{{ item.proaq.id }}">
+                                    <td class="col-id">{{ item.id }}</td>
+                                    <td class="col-texto6">{{ item.documento_sei }}</td>
+                                    <td class="col-texto8">{{ item.setor }}</td>
+                                    <td class="col-texto25">{{ item.etapa_tramitacao }}</td>
+                                    <td class="col-texto6" id="tramitacao_data_entrada">{{ item.data_entrada|date:"d/m/Y" }}{% if not item.data_entrada %}-{% endif %}</td>
+                                    <td class="col-texto6">{{ item.previsao_saida|date:"d/m/Y" }}{% if not item.previsao_saida %}-{% endif %}</td>
+                                    <td class="col-texto6" id="tramitacao_data_saida">{{ item.data_saida|date:"d/m/Y" }}{% if not item.data_saida %}-{% endif %}</td>
+                                    <td class="col-texto4">{{ item.dias_tramitacao }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>  
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Scritps -->
+    <script src="{% static 'js/paciente_ficha.js' %}"></script>
+
+    <!-- Modais -->
+    {% include "gestao_pacientes/paciente_dispensacao_modal.html" %}
+
+{% endblock %}

@@ -22,6 +22,7 @@
 
     .modal-content{
         height: 40%;
+        min-height: 520px;
     }
 
     .modal-body{
@@ -101,6 +102,11 @@
                                 <div class="form-floating mb-3">
                                     {{ form_fiscal.status }}
                                     <label>{{ form_fiscal.status.label }}</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    {{ form_fiscal.documento_sei }}
+                                    <label>{{ form_fiscal.documento_sei.label }}</label>
                                 </div>
 
                                 <div class="form-floating mb-3">

@@ -2,8 +2,10 @@
 {% load static %}
 {% load humanize %}
 {% load contratos_filters %}
+{% load custom_filters %}
 {% block extra_head %}    
     <link rel="stylesheet" href="{% static 'styles/contrato_ficha.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/_tabelas.css' %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
 {% endblock %}
 {% block content %}    
@@ -23,7 +25,7 @@
         </div>
         <div class="tabs">
             <button class="tab-button active" id="contrato_ficha_dados_gerais">Dados Gerais</button>
-            <button class="tab-button" id="contrato_ficha_anotacoes">Anotações</button>
+            <!-- <button class="tab-button" id="contrato_ficha_anotacoes">Anotações</button> -->
         </div>
     </div>
 
@@ -31,18 +33,24 @@
         <!-- form contratos -->
             <form id="contratoForm" method="POST">
             {% csrf_token %}
+
+            <!-- Botões -->
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <button type="button" class="btn btn-danger" id="btnDeletarContrato" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
                     <i class="fas fa-trash-alt"></i>
                     Deletar
                 </button>
-                
+                <button type="button" class="btn btn-danger" id="btnContratoRelatorio" style="font-size: 12px; background-color: #039153; border-color: #039153;">
+                    <i class="fa-regular fa-file-pdf"></i>
+                    &nbsp;Relatório
+                </button>
                 <button class="btn btn-primary me-md-2" type="submit" id="btnSalvarContrato" style="font-size: 12px;">
                     <i class="fas fa-save me-1"></i> 
                     Salvar
                 </button>
             </div>
             
+            <!-- Logs -->
             <div class="horizontal-sections">
                 <div class="section-log">
                     <h3>Log</h3>
@@ -71,6 +79,11 @@
                             <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" name="log_edicoes" readonly value="{{ contrato.log_n_edicoes }}">
                             <label for="floatingInput">Nº Edições</label>
                         </div>
+                        <div class="form-floating mb-3">
+                            <button type="button" id="btnHistoricoLogs" style="font-size: 16px !important; background-color: transparent; border: none; border-radius: 10px; height: calc(3.5rem + 2px);">
+                                <i class="fas fa-history" style="font-size: 20px;" title="Histórico de Logs"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -80,6 +93,10 @@
                 <div class="section">
                     <h3>Dados do Contrato</h3>
                     <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating">                            
+                            {{ form.status }}
+                            <label>{{ form.status.label }}</label>
+                        </div>
                         <div class="form-floating">                            
                             {{ form.unidade_daf }}
                             <input type="text" id="ct_unidade_daf_display" class="form-control" style="width: 130px;" value="{% if form.unidade_daf.value %}{{ form.instance.get_unidade_daf_display }}{% endif %}" readonly>
@@ -109,13 +126,14 @@
                             <label>{{ form.numero_documento_sei.label }}</label>
                         </div>
                         <div class="form-floating">                            
+                            {{ form.tipo_contrato }}
+                            <label>{{ form.tipo_contrato.label }}</label>
+                        </div>
+                        <div class="form-floating">                            
                             {{ form.numero_contrato }}
                             <label>{{ form.numero_contrato.label }}</label>
                         </div>
-                        <div class="form-floating">                            
-                            {{ form.status }}
-                            <label>{{ form.status.label }}</label>
-                        </div>
+                        
                         <div class="form-floating mb-3">
                             <input type="date" class="form-control" id="data_publicacao" name="data_publicacao" value="{% if form.data_publicacao.value %}{{ form.data_publicacao.value|date:'Y-m-d' }}{% endif %}">
                             <label for="floatingInput">Data da Publicação</label>
@@ -142,7 +160,7 @@
                             <input type="text" id="ct_fornecedor_display" class="form-control" value="{% if form.instance.fornecedor %}{{ form.instance.fornecedor }}{% endif %}" readonly>
                             <label>Fornecedor</label>
                         </div>
-                        <div class="form-floating mb-3 full-width">
+                        <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="ct_fiscal" value="{{ contrato.fiscal_atual }}" readonly>
                             <label for="ct_fiscal">Atual Fiscal do Contrato</label>
                         </div>
@@ -173,70 +191,59 @@
                             <thead>
                                 <tr>
                                     <th class="col-item">Item</th>
-                                    <th class="col-produto">Produto</th>
-                                    <th class="col-valor">Fator Embalagem</th>
-                                    <th class="col-parcelas">Parcelas</th>
-                                    <th class="col-parcelas">Parcelas C/ Atraso</th>
-                                    <th class="col-parcelas">Tot. Dias de Atraso</th>
-                                    <th class="col-valor">Qtd Contratada</th>
-                                    <th class="col-valor">Qtd Doada</th>
-                                    <th class="col-valor">Qtd Total</th>
-                                    <th class="col-valor">Qtd Entregue</th>
-                                    <th class="col-valor">Qtd a Entregar</th>
-                                    <th class="col-valor">Valor Unit. R$</th>
-                                    <th class="col-valor">Valor Total R$</th>
+                                    <th class="col-texto12">Produto</th>
+                                    <th class="col-valor5">Fator Emb.</th>
+                                    <th class="col-valor5">Parcelas</th>
+                                    <th class="col-valor5">Qtd Contratada</th>
+                                    <th class="col-valor5">Qtd Doada</th>
+                                    <th class="col-valor5">Qtd Total</th>
+                                    <th class="col-valor5">Qtd Empenhada</th>
+                                    <th class="col-valor5">Qtd a Empenhar</th>
+                                    <th class="col-valor5">Qtd Entregue</th>
+                                    <th class="col-valor5">Qtd a Entregar</th>
+                                    <th class="col-valor5">Valor Unit. R$</th>
+                                    <th class="col-valor5">Valor Total R$</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for item in tab_objetos %}
                                 <tr data-id="{{ item.id }}">
                                     <td class="col-item">{{ item.numero_item }}</td>
-                                    <td class="col-produto">{{ item.produto.produto }}</td>
-                                    <td class="col-valor">{{ item.fator_embalagem }}</td>
-                                    <td class="col-valor">{{ item.numero_parcelas }}</td>
-
-                                    <td class="col-data">
-                                        {% if item.numero_parcelas_atraso > 0 %}
-                                            {{ item.numero_parcelas_atraso }}&nbsp;&nbsp;<i class="fas fa-exclamation-circle" style="color: rgb(255, 0, 0);"></i>
-                                        {% else %}
-                                            {{ item.numero_parcelas_atraso }}&nbsp;&nbsp;<i class="fas fa-check-circle" style="color: green;"></i>
-                                        {% endif %}
-                                    </td>
-                                    
-                                    <td class="col-data">
-                                        {% if item.dias_atraso > 0 %}
-                                            {{ item.dias_atraso }}&nbsp;&nbsp;<i class="fas fa-exclamation-circle" style="color: rgb(255, 0, 0);"></i>
-                                        {% else %}
-                                            {{ item.dias_atraso }}&nbsp;&nbsp;<i class="fas fa-check-circle" style="color: green;"></i>
-                                        {% endif %}
-                                    </td>
-                                    
-                                    <td class="col-valor">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
-                                    <td class="col-valor">{{ item.qtd_doada_objeto|floatformat:0|intcomma }}</td>
-                                    <td class="col-valor">{{ item.qtd_total_objeto|floatformat:0|intcomma }}</td>
-                                    
-                                    
-                                    <td class="col-data">
-                                        {% if item.qtd_a_entregar > 0 %}
-                                            {{ item.qtd_entregue|floatformat:0|intcomma }}
-                                        {% else %}
-                                            {{ item.qtd_entregue|floatformat:0|intcomma }}&nbsp;&nbsp;<i class="fas fa-check-circle" style="color: green;"></i>
-                                        {% endif %}
-                                    </td>
-
-                                    <td class="col-data">
+                                    <td class="col-texto12">{{ item.produto.produto }}</td>
+                                    <td class="col-valor5">{{ item.fator_embalagem }}</td>
+                                    <td class="col-valor5">{{ item.numero_parcelas }}</td>
+                                    <td class="col-valor5">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor5">{{ item.qtd_doada_objeto|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor5">{{ item.qtd_total_objeto|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor5">{{ item.qtd_empenhada_objeto|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor5">{{ item.qtd_a_empenhar_objeto|floatformat:0|intcomma }}</td>                                    
+                                    <td class="col-valor5">{{ item.qtd_entregue|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor5">
                                         {% if item.qtd_a_entregar > 0 %}
                                             {{ item.qtd_a_entregar|floatformat:0|intcomma }}&nbsp;&nbsp;<i class="fas fa-exclamation-circle" style="color: rgb(255, 0, 0);"></i>
                                         {% else %}
                                             {{ item.qtd_a_entregar|floatformat:0|intcomma }}
                                         {% endif %}
                                     </td>
-
-
-                                    <td class="col-valor">{{ item.valor_unitario|custom_number_format }}</td>
-                                    <td class="col-valor">{{ item.valor_total|custom_number_format }}</td>
+                                    <td class="col-valor5">{{ item.valor_unitario|custom_number_format }}</td>
+                                    <td class="col-valor5">{{ item.valor_total|custom_number_format }}</td>
                                 </tr>
                                 {% endfor %}
+
+                                <!-- Linha do Valor Total -->
+                                <tr>
+                                    <td colspan="3" style="text-align: right; font-weight: bold;">Total</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.total_parcelas|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_contratada_contrato|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_doada_contrato|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_total_contrato|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_empenhada_contrato|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_a_empenhar_contrato|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_entregue_contrato|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_a_entregar_contrato|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">-</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.valor_total|format_number }}</td>
+                                </tr>
                             </tbody>
                         </table> 
                     </div>
@@ -261,16 +268,17 @@
                                 <tr>
                                     <th class="col-parcela-item">Item</th>
                                     <th class="col-parcela-parcela">Parcela</th>
-                                    <th class="col-produto">Produto</th>
-                                    <th class="col-data">Previsão</th>
-                                    <th class="col-data">Últ. Entrega</th>
-                                    <th class="col-data">Dias de Atraso</th>
-                                    <th class="col-data">Entregas</th>
-                                    <th class="col-data">Entregas C/ Atraso</th>
-                                    <th class="col-valor">Qtd Contratada</th>
-                                    <th class="col-valor">Qtd Entregue</th>
-                                    <th class="col-valor">Qtd a Entregar</th>
-                                    <th class="col-valor">Valor Total R$</th>
+                                    <th class="col-texto12">Produto</th>
+                                    <th class="col-valor5">Previsão</th>
+                                    <th class="col-valor5">Últ. Entrega</th>
+                                    <th class="col-valor5">Dias de Atraso</th>
+                                    <th class="col-valor5">Entregas</th>
+                                    <th class="col-valor5">Entregas C/ Atraso</th>
+                                    <th class="col-valor5">Qtd Contratada</th>
+                                    <th class="col-valor5">Qtd Empenhada</th>
+                                    <th class="col-valor5">Qtd Entregue</th>
+                                    <th class="col-valor5">Qtd a Entregar</th>
+                                    <th class="col-valor5">Valor Total R$</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -278,9 +286,9 @@
                                 <tr data-id="{{ item.id }}">
                                     <td class="col-parcela-item">{{ item.objeto.numero_item }}</td>
                                     <td class="col-parcela-parcela">{{ item.numero_parcela }}</td>
-                                    <td class="col-produto">{{ item.objeto.produto.produto }}</td>
-                                    <td class="col-data">{{ item.data_previsao_entrega|date:"d/m/Y" }}</td>
-                                    <td class="col-data">
+                                    <td class="col-texto12">{{ item.objeto.produto.produto }}</td>
+                                    <td class="col-valor5">{{ item.data_previsao_entrega|date:"d/m/Y" }}</td>
+                                    <td class="col-valor5">
                                         {% if item.data_ultima_entrega %}
                                             {{ item.data_ultima_entrega|date:"d/m/Y" }}
                                         {% else %}
@@ -288,38 +296,36 @@
                                         {% endif %}
                                     </td>
                                     
-                                    <td class="col-data">
+                                    <td class="col-valor5">
                                         {% if item.dias_atraso > 0 %}
                                             {{ item.dias_atraso }}&nbsp;&nbsp;<i class="fas fa-exclamation-circle" style="color: rgb(255, 0, 0);"></i>
                                         {% else %}
-                                            {{ item.dias_atraso }}&nbsp;&nbsp;<i class="fas fa-check-circle" style="color: green;"></i>
+                                            {{ item.dias_atraso }}
                                         {% endif %}
                                     </td>
 
-                                    <td class="col-data">{{ item.numero_entregas }}</td>
+                                    <td class="col-valor5">{{ item.numero_entregas }}</td>
 
-                                    <td class="col-data">
+                                    <td class="col-valor5">
                                         {% if item.numero_entregas_atraso > 0 %}
                                             {{ item.numero_entregas_atraso }}&nbsp;&nbsp;<i class="fas fa-exclamation-circle" style="color: rgb(255, 0, 0);"></i>
                                         {% else %}
-                                            {{ item.numero_entregas_atraso }}&nbsp;&nbsp;<i class="fas fa-check-circle" style="color: green;"></i>
+                                            {{ item.numero_entregas_atraso }}
                                         {% endif %}
                                     </td>
-
                                     
+                                    <td class="col-valor5">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor5">{{ item.qtd_empenhada|floatformat:0|intcomma }}</td>
 
-                                    
-                                    <td class="col-valor">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
-
-                                    <td class="col-data">
+                                    <td class="col-valor5">
                                         {% if item.qtd_a_entregar > 0 %}
                                             {{ item.qtd_entregue|floatformat:0|intcomma }}
                                         {% else %}
-                                            {{ item.qtd_entregue|floatformat:0|intcomma }}&nbsp;&nbsp;<i class="fas fa-check-circle" style="color: green;"></i>
+                                            {{ item.qtd_entregue|floatformat:0|intcomma }}
                                         {% endif %}
                                     </td>
 
-                                    <td class="col-data">
+                                    <td class="col-valor5">
                                         {% if item.qtd_a_entregar > 0 %}
                                             {{ item.qtd_a_entregar|floatformat:0|intcomma }}&nbsp;&nbsp;<i class="fas fa-exclamation-circle" style="color: rgb(255, 0, 0);"></i>
                                         {% else %}
@@ -327,7 +333,7 @@
                                         {% endif %}
                                     </td>
                                     
-                                    <td class="col-valor">{{ item.valor_total|custom_number_format }}</td>
+                                    <td class="col-valor5">{{ item.valor_total|format_number }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -378,7 +384,7 @@
                                         {% if item.dias_atraso > 0 %}
                                             {{ item.dias_atraso }}&nbsp;&nbsp;<i class="fas fa-exclamation-circle" style="color: rgb(255, 0, 0);"></i>
                                         {% else %}
-                                            {{ item.dias_atraso }}&nbsp;&nbsp;<i class="fas fa-check-circle" style="color: green;"></i>
+                                            {{ item.dias_atraso }}
                                         {% endif %}
                                     </td>
             
@@ -392,6 +398,7 @@
                 </div>
             </div>
 
+            <!-- Observações -->
             <div class="section">
                 <h3>Observações Gerais</h3>
                 <div class="grid" style="font-size: 14px;">
@@ -403,9 +410,10 @@
         </form>
     </div>
     
-
+    
     <script src="{% static 'js/contrato_ficha.js' %}"></script>
     <script src="{% static 'js/contrato_abas.js' %}"></script>
+    
 
 
     <!-- Modais -->

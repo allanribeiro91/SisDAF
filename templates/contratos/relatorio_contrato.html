@@ -1,0 +1,413 @@
+{% load static %}
+{% load custom_filters %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '/styles/relatorio_contrato.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Contrato {{ contrato.numero_contrato }}</title>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-sisdaf">
+            <img src="{% static '/assets/logo/logo_sisdaf_transparente.png' %}" alt="Logo SisDAF" class="top-logo">
+        </div>
+        <div class="titulo-relatorio">
+            <b>SisDAF</b> - Relatório do <b>CONTRATO</b>
+        </div>
+        <div class="responsavel-exportacao">
+            {{ usuario }} - {{ data_hora }}
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Log -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Log
+                </div>
+                <div class="grid">
+                    <div class="box">
+                        <div class="box-titulo">ID</div>
+                        <div class="box-conteudo">{{ contrato.id }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Registro</div>
+                        <div class="box-conteudo">{{ contrato.usuario_registro.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Data Registro</div>
+                        <div class="box-conteudo">{{ contrato.registro_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Últ. Atualização</div>
+                        <div class="box-conteudo">{{ contrato.usuario_atualizacao.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Última Atualização</div>
+                        <div class="box-conteudo">{{ contrato.ult_atual_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Nº Edições</div>
+                        <div class="box-conteudo">{{ contrato.log_n_edicoes }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados Administrativos -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Dados do Contrato
+                </div>
+                
+                <div class="grid">
+                    <div class="box {% if contrato.status == 'vigente' %}status-vigente{% elif contrato.status == 'encerradp' %}status-encerradp{% elif contrato.status == 'suspenso' %}status-suspenso{% elif contrato.status == 'cancelado' %}status-cancelado{% endif %}" id="relatorio_box_status">
+                        <div class="box-titulo">Status</div>
+                        <div class="box-conteudo">{{ contrato.get_status_display }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Nº do Contrato</div>
+                        <div class="box-conteudo">{{ contrato.numero_contrato }}</div>
+                    </div>
+                    
+                    <div class="box">
+                        <div class="box-titulo">Modalidade de Aquisição</div>
+                        <div class="box-conteudo">{{ contrato.get_modalidade_aquisicao_display }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">ARP</div>
+                        <div class="box-conteudo">
+                            {% if contrato.arp.numero_arp %}
+                                {{ contrato.arp.numero_arp }}
+                            {% else %}
+                                NSA
+                            {% endif %}
+                        
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Tipo de Contrato</div>
+                        <div class="box-conteudo">{{ contrato.get_tipo_contrato_display }}</div>
+                    </div>              
+                    
+                    <div class="box">
+                        <div class="box-titulo">Data Publicação</div>
+                        <div class="box-conteudo">
+                            {% if contrato.data_publicacao %}
+                                {{ contrato.data_publicacao|date:"d/m/Y" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Vigência</div>
+                        <div class="box-conteudo">
+                            {% if contrato.data_vigencia %}
+                                {{ contrato.data_vigencia|date:"d/m/Y" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+
+                <div class="grid">                  
+                    <div class="box">
+                        <div class="box-titulo">Unidade DAF</div>
+                        <div class="box-conteudo">{{ contrato.get_unidade_daf_display }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Processo SEI</div>
+                        <div class="box-conteudo">{{ contrato.numero_processo_sei }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Documento SEI</div>
+                        <div class="box-conteudo">
+                            {% if contrato.numero_documento_sei %}
+                                {{ contrato.numero_documento_sei }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="box" style="width: 45%;">
+                        <div class="box-titulo">Fiscal Atual</div>
+                        <div class="box-conteudo">{{ contrato.fiscal_atual }}</div>
+                    </div>
+                    
+                </div>
+
+                <div class="grid">
+                    <div class="box" style="width: 47%;">
+                        <div class="box-titulo">Denominação Genérica</div>
+                        <div class="box-conteudo">{{ contrato.denominacao }}</div>
+                    </div>
+                    <div class="box" style="width: 47%;">
+                        <div class="box-titulo">Fornecedor</div>
+                        <div class="box-conteudo">{{ contrato.fornecedor }}</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Fiscais do Contrato -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Fiscais do Contrato
+                </div>
+                
+                <div class="grid" style="justify-content:center !important;" >
+                    <table class="tabela-relatorio" style="font-size: 10px; ">
+                        <thead>
+                            <tr>
+                                <th class="col-id" style="text-align: left;">ID</th>
+                                <th class="col-texto15">Fiscal</th>
+                                <th class="col-texto8">Status</th>
+                                <th class="col-texto8">Portaria (Doc. SEI)</th>
+                                <th class="col-texto6">Data Início</th>
+                                <th class="col-texto6">Data Fim </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in contrato_fiscais %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="col-id">{{ item.id }}</td>
+                                <td class="col-texto12">{{ item.fiscal_nome }}</td>
+                                <td class="col-texto8">{{ item.get_status_display }}</td>
+                                <td class="col-texto8">{{ item.documento_sei }}</td>
+                                <td class="col-texto6">{{ item.data_inicio|date:"d/m/Y" }}</td>
+                                <td class="col-texto6">{{ item.data_fim|date:"d/m/Y"|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table> 
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Objetos do Contrato -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Objetos do Contrato
+                </div>
+                
+                <div class="grid" style="justify-content:center !important;" >
+                    <table class="tabela-relatorio" style="font-size: 10px; ">
+                        <thead>
+                            <tr>
+                                <th class="col-texto4">Nº Item</th>
+                                <th class="col-texto12">Produto</th>
+                                <th class="col-valor5">Fator Emb.</th>
+                                <th class="col-valor5">Parcelas</th>
+                                <th class="col-valor8">Qtd<br> Contrat.</th>
+                                <th class="col-valor8">Qtd<br> Doada</th>
+                                <th class="col-valor8">Qtd<br> Total</th>
+                                <th class="col-valor8">Qtd<br> Empenh.</th>
+                                <th class="col-valor8">Qtd<br> Entregue</th>
+                                <th class="col-valor8">Valor<br> Unit. R$</th>
+                                <th class="col-valor10">Valor<br> Total R$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in contrato_objetos %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="col-texto4">{{ item.numero_item }}</td>
+                                <td class="col-texto12">{{ item.produto.produto }}</td>
+                                <td class="col-valor5">{{ item.fator_embalagem|floatformat:0|intcomma }}</td>
+                                <td class="col-valor5">{{ item.numero_parcelas }}</td>
+                                <td class="col-valor8">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.qtd_doada_objeto|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.qtd_total_objeto|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.qtd_empenhada_objeto|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.qtd_entregue|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.valor_unitario|format_number }}</td>
+                                <td class="col-valor10">{{ item.valor_total|format_number }}</td>
+                            </tr>
+                            {% endfor %}
+
+                            <!-- Linha do Valor Total -->
+                            <tr>
+                                <td colspan="4" style="text-align: right; font-weight: bold;">Total</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_contratada_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_doada_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_total_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_empenhada_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_entregue_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">-</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.valor_total|format_number }}</td>
+                            </tr>
+
+                        </tbody>
+                    </table> 
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Parcelas do Contrato -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Parcelas do Contrato
+                </div>
+                
+                <div class="grid" style="justify-content:center !important;" >
+                    <table class="tabela-relatorio" style="font-size: 10px; ">
+                        <thead>
+                            <tr>
+                                <th class="col-texto6">Nº<br> Item</th>
+                                <th class="col-texto6">Nº<br> Parc.</th>
+                                <th class="col-texto12">Produto</th>
+                                <th class="col-valor5">Previsão<br> Entrega</th>
+                                <th class="col-valor5">Última<br> Entrega</th>
+                                <th class="col-valor8">Qtd<br> Contrat.</th>
+                                <th class="col-valor8">Qtd<br> Doada</th>
+                                <th class="col-valor8">Qtd<br> Total</th>
+                                <th class="col-valor8">Qtd<br> Empenh.</th>
+                                <th class="col-valor8">Qtd<br> Entregue</th>
+                                <th class="col-valor10">Valor<br> Total R$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in contrato_parcelas %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="col-texto6">{{ item.objeto.numero_item }}</td>
+                                <td class="col-texto6">{{ item.numero_parcela }}</td>
+                                <td class="col-texto12">{{ item.objeto.produto.produto }}</td>
+                                <td class="col-valor5">{{ item.data_previsao_entrega|date:"d/m/Y" }}</td>
+                                <td class="col-valor5">
+                                    {% if item.data_ultima_entrega %}
+                                            {{ item.data_ultima_entrega|date:"d/m/Y" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="col-valor8">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.qtd_doada|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.qtd_total_parcela|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.qtd_empenhada|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.qtd_entregue|floatformat:0|intcomma }}</td>
+                                <td class="col-valor8">{{ item.valor_total|format_number }}</td>
+                            </tr>
+                            {% endfor %}
+
+                            <!-- Linha do Valor Total -->
+                            <tr>
+                                <td colspan="5" style="text-align: right; font-weight: bold;">Total</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_contratada_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_doada_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_total_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_empenhada_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_entregue_contrato|floatformat:0|intcomma }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.valor_total|format_number }}</td>
+                            </tr>
+
+                        </tbody>
+                    </table> 
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Entregas do Contrato -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Entregas do Contrato
+                </div>
+                
+                <div class="grid" style="justify-content:center !important;" >
+                    <table class="tabela-relatorio" style="font-size: 10px; ">
+                        <thead>
+                            <tr>
+                                <th class="col-texto6">Nº<br> Item</th>
+                                <th class="col-texto6">Nº<br> Parc.</th>
+                                <th class="col-texto6">Nº<br> Entrega</th>
+                                <th class="col-texto12">Produto</th>
+                                <th class="col-texto8">Local<br>de Entrega</th>
+                                <th class="col-valor5">Previsão<br> Entrega</th>
+                                <th class="col-valor5">Data<br> Entrega</th>
+                                <th class="col-valor5">Dias<br> Atraso</th>
+                                <th class="col-valor8">Qtd<br> Entregue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in contrato_entregas %}
+                            <tr data-id="{{ item.id }}">
+                                <td class="col-texto6">{{ item.parcela.objeto.numero_item }}</td>
+                                <td class="col-texto6">{{ item.parcela.numero_parcela }}</td>
+                                <td class="col-texto6">{{ item.numero_entrega }}</td>
+                                <td class="col-texto12">{{ item.parcela.objeto.produto.produto }}</td>
+                                <td class="col-texto8">{{ item.get_local_entrega_display }}</td>
+                                <td class="col-valor5">{{ item.previsao_entrega|date:"d/m/Y" }}</td>
+                                <td class="col-valor5">{{ item.data_entrega|date:"d/m/Y" }}</td>
+                                <td class="col-valor8">{{ item.dias_atraso }}</td>
+                                <td class="col-valor8">{{ item.qtd_entregue|floatformat:0|intcomma }}</td>
+                            </tr>
+                            {% endfor %}
+
+                            <!-- Linha do Valor Total -->
+                            <tr>
+                                <td colspan="8" style="text-align: right; font-weight: bold;">Total</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_entregue_contrato|floatformat:0|intcomma }}</td>
+                            </tr>
+
+                        </tbody>
+                    </table> 
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Observações gerais -->
+        <div class="horizontal-section log">
+            <div class="section full-width">
+                <div class="section-titulo">
+                    Observações Gerais
+                </div>
+                <div class="grid">
+                    <div class="box-observacoes">
+                        <div class="box-conteudo">{{ contrato.observacoes_gerais }}</div>
+                    </div>
+                    
+                    
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+</body>
+
+<script>
+    function cloneHeaderForPrint() {
+        const header = document.getElementById('header');
+        const allPages = document.querySelectorAll('.page');
+    
+        allPages.forEach(page => {
+            const headerClone = header.cloneNode(true);
+            page.insertBefore(headerClone, page.firstChild);
+        });
+    }
+    
+    window.onbeforeprint = cloneHeaderForPrint;
+</script>
+
+</html>

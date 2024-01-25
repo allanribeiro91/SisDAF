@@ -13,11 +13,13 @@
 <body>
     <div class="header">
         <div class="logo-sisdaf">
-            <!-- <img src="\setup\static\assets/logo/logo_sisdaf_transparente.png" alt="Logo SisDAF" class="top-logo"> -->
             <img src="{% static '/assets/logo/logo_sisdaf_transparente.png' %}" alt="Logo SisDAF" class="top-logo">
         </div>
         <div class="titulo-relatorio">
-            <b>SisDAF</b> - Relatório da Ata de Registro de Preços
+            <b>SisDAF</b> - Relatório da <b>ATA DE REGISTRO DE PREÇOS</b>
+        </div>
+        <div class="responsavel-exportacao">
+            {{ usuario }} - {{ data_hora }}
         </div>
     </div>
 
@@ -203,7 +205,7 @@
 
     </div>
 
-    <div class="footer">
+    <!-- <div class="footer">
         <div class="relatorio-log">
             {{ usuario }} - {{ data_hora }}
         </div>
@@ -211,7 +213,7 @@
         <div class="footer-pagina">
             Página <b>1</b> de <b>1</b>
         </div>
-    </div>
+    </div> -->
 </body>
 
 

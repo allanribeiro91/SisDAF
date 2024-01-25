@@ -19,7 +19,7 @@
         <div class="tabs">
             <button class="tab-button" id="abaARPS" onclick="location.href='{% url 'arps' %}'">ARPs</button>
             <button class="tab-button active" id="abaContratos" onclick="location.href='{% url 'contratos' %}'">Contratos</button>
-            <button class="tab-button" id="abaTEDs" onclick="location.href='{% url 'teds' %}'">TEDs</button>
+            <!-- <button class="tab-button" id="abaTEDs" onclick="location.href='{% url 'teds' %}'">TEDs</button> -->
             <button class="tab-button" id="abaEmpenhos" onclick="location.href='{% url 'empenhos' %}'">Empenhos</button>
         </div>
     </div>
@@ -122,6 +122,7 @@
                     <th class="col-unidadedaf">Unidade DAF</th>
                     <th class="col-modalidade">Mod. Aquisição</th>
                     <th class="col-contrato">ARP</th>
+                    <th class="col-contrato">Tipo Contrato</th>
                     <th class="col-contrato">Nº Contrato</th>
                     <th class="col-data">Publicação</th>
                     <th class="col-data">Vigência</th>
@@ -150,7 +151,14 @@
                     </td>
                     <td class="col-unidadedaf" style="text-transform: uppercase;">{{ item.unidade_daf }}</td>
                     <td class="col-modalidade">{{ item.get_modalidade_aquisicao_display }}</td>
-                    <td class="col-contrato">{{ item.arp.numero_arp }}</td>
+                    <td class="col-contrato">
+                        {% if item.arp.numero_arp %}
+                            {{ item.arp.numero_arp }}
+                        {% else %}
+                            NSA
+                        {% endif %}
+                    </td>
+                    <td class="col-contrato">{{ item.get_tipo_contrato_display }}</td>
                     <td class="col-contrato">{{ item.numero_contrato }}</td>
                     <td class="col-data">{{ item.data_publicacao|date:"d/m/Y" }}</td>
                     <td class="col-data">{{ item.data_vigencia|date:"d/m/Y" }}</td>

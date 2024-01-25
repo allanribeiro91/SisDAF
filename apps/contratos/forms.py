@@ -9,7 +9,7 @@ from apps.contratos.models import (ContratosArps, ContratosArpsItens, Contratos,
 from setup.choices import (STATUS_ARP, UNIDADE_DAF, UNIDADE_DAF3, TIPO_COTA, YES_NO, 
                            MODALIDADE_AQUISICAO, LEI_LICITACAO, LOCAL_ENTREGA_PRODUTOS,
                            NOTAS_RECEBIDAS, NOTAS_STATUS, NOTAS_PAGAMENTOS, STATUS_FISCAL_CONTRATO,
-                           STATUS_EMPENHO)
+                           STATUS_EMPENHO, TIPO_CONTRATO)
 
 UNIDADE_DAF = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
 
@@ -295,6 +295,16 @@ class ContratosForm(forms.ModelForm):
         label='Nº do Contrato',
         required=True,
     )
+    tipo_contrato = forms.ChoiceField(
+        choices=TIPO_CONTRATO,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id':'ct_tipo_contrato'
+        }),
+        label='Tipo de Contrato',
+        initial='',
+        required=True,
+    )
     status = forms.ChoiceField(
         choices=STATUS_ARP,
         widget=forms.Select(attrs={
@@ -422,7 +432,7 @@ class ContratosObjetosForm(forms.ModelForm):
         }),
         label='Item ARP',
         initial='',
-        required=True,
+        required=False,
     )
     observacoes_gerais = forms.CharField(
         widget=forms.Textarea(attrs={
@@ -648,6 +658,16 @@ class ContratosFiscaisForm(forms.ModelForm):
         label='Outro',
         required=False,
     )
+    documento_sei = forms.CharField(
+        max_length=10,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_fiscal_documento_sei',
+            'style': 'width: 160px !important;'
+        }),
+        label='Doc SEI - Nomeação',
+        required=True,
+    )
     status = forms.ChoiceField(
         choices=STATUS_FISCAL_CONTRATO,
         widget=forms.Select(attrs={
@@ -793,7 +813,6 @@ class EmpenhoForm(forms.ModelForm):
     def clean_observacoes_gerais(self):
         observacoes = self.cleaned_data.get('observacoes_gerais')
         return observacoes or "Sem observações."
-
 
 class EmpenhosItensForm(forms.ModelForm):
     #valor empenhado

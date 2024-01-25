@@ -1,0 +1,160 @@
+{% load static %}
+{% load custom_filters %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '/styles/relatorio_arp.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Ponto de Controle {{ ponto_controle.id }}</title>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-sisdaf">
+            <!-- <img src="\setup\static\assets/logo/logo_sisdaf_transparente.png" alt="Logo SisDAF" class="top-logo"> -->
+            <img src="{% static '/assets/logo/logo_sisdaf_transparente.png' %}" alt="Logo SisDAF" class="top-logo">
+        </div>
+        <div class="titulo-relatorio">
+            <b>SisDAF</b> - Ponto de Controle
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Log -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Log
+                </div>
+                <div class="grid">
+                    <div class="box">
+                        <div class="box-titulo">ID</div>
+                        <div class="box-conteudo">{{ ponto_controle.id }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Registro</div>
+                        <div class="box-conteudo">{{ ponto_controle.usuario_registro.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Data Registro</div>
+                        <div class="box-conteudo">{{ ponto_controle.registro_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Últ. Atualização</div>
+                        <div class="box-conteudo">{{ ponto_controle.usuario_atualizacao.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Última Atualização</div>
+                        <div class="box-conteudo">{{ ponto_controle.ult_atual_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Nº Edições</div>
+                        <div class="box-conteudo">{{ ponto_controle.log_n_edicoes }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DHL e Participantes -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Identificação do Ponto de Controle
+                </div>
+                <div class="grid">
+
+                    <div class="box">
+                        <div class="box-titulo">Data</div>
+                        <div class="box-conteudo">{{ ponto_controle.data|date:'d/m/Y' }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Hora - Início</div>
+                        <div class="box-conteudo">{{ ponto_controle.horario_inicio }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Hora - Fim</div>
+                        <div class="box-conteudo">{{ ponto_controle.horario_fim }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Tipo de Reunião</div>
+                        <div class="box-conteudo">{{ ponto_controle.get_tipo_reuniao_display }}</div>
+                    </div>                    
+                    <div class="box" style="width: 30%;">
+                        <div class="box-titulo">Local</div>
+                        <div class="box-conteudo">{{ ponto_controle.local }}</div>
+                    </div>      
+                    
+                    <div class="box">
+                        <div class="box-titulo">Responsável Registro</div>
+                        <div class="box-conteudo">{{ ponto_controle.responsavel_registro.primeiro_ultimo_nome }}</div>
+                    </div>    
+                    
+                </div>
+                <div class="grid">
+                    <div class="box" style="width: 100%;">
+                        <div class="box-titulo">Participantes</div>
+                        <div class="box-conteudo">{{ ponto_controle.participantes|safe }}</div>
+                    </div>
+                </div>
+
+
+                
+            </div>
+        </div>
+
+        <!-- Resumo -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Detalhamento
+                </div>
+                <div class="grid">
+                    <div class="box" style="width: 100%;">
+                        <div class="box-titulo">Pauta</div>
+                        <div class="box-conteudo">{{ ponto_controle.pauta|safe }}</div>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="box" style="width: 100%;">
+                        <div class="box-titulo">Detalhes</div>
+                        <div class="box-conteudo">{{ ponto_controle.detalhes|safe }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Observações gerais -->
+        <div class="horizontal-section log">
+            <div class="section full-width">
+                <div class="section-titulo">
+                    Encaminhamentos
+                </div>
+                
+                <div class="grid">
+                    <div class="box" style="width: 100%;">
+                        <div class="box-conteudo">{{ ponto_controle.encaminhamentos|safe }}</div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <div class="relatorio-log">
+            {{ usuario }} - {{ data_hora }}
+        </div>
+        
+        <div class="footer-pagina">
+            Página <b>1</b> de <b>1</b>
+        </div>
+    </div>
+</body>
+
+
+</html>

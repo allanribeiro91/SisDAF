@@ -14,6 +14,14 @@ COR_PELE = [
     ('nao_informado', 'Não Informado'),
 ]
 
+ORIENTACAO_SEXUAL = [
+    ('heterossexual', 'Heterossexual'),
+    ('homossexual', 'Homossexual'),
+    ('bissexual', 'Bissexual'),
+    ('outro', 'Outro'),
+    ('nao_informado', 'Não Informado'),
+]
+
 GENERO_SEXUAL = [
     ('masculino', 'Masculino'),
     ('feminino', 'Feminino'),
@@ -185,7 +193,14 @@ TIPO_COTA = [
     ('', 'Não Informado'),
     ('principal', 'Principal'),
     ('reservada', 'Reservada'),
+    ('exclusiva', 'Exclusiva'),
     ('nao_se_aplica', 'Não Se Aplica'),
+]
+
+TIPO_CONTRATO = [
+    ('', 'Não Informado'),
+    ('ordinario', 'Ordinário'),
+    ('nota_empenho', 'Nota de Empenho'),
 ]
 
 FAQ_FORNECEDOR_TOPICO = [
@@ -236,6 +251,7 @@ STATUS_ENVIO_COMUNICACAO = [
 ]
 
 LISTA_UFS_SIGLAS = [
+    ('', ''),
     ('AC', 'AC'),
     ('AL', 'AL'),
     ('AM', 'AM'),
@@ -263,6 +279,7 @@ LISTA_UFS_SIGLAS = [
     ('SE', 'SE'),
     ('SP', 'SP'),
     ('TO', 'TO'),
+    
 ]
 
 LISTA_TRIMESTRES = [
@@ -341,4 +358,67 @@ STATUS_EMPENHO = [
     ('pre_empenho', 'Pré-Empenho'),
     ('empenhado', 'Empenhado'),
     ('cancelado', 'Cancelado'),
+]
+
+TIPO_LOCAL = [
+    ('presencial', 'Presencial'),
+    ('online', 'Online'),
+    ('hibrido', 'Híbrido'),
+]
+
+STATUS_BACKLOG = [
+    ('nao_iniciado', 'Não Iniciado'),
+    ('em_desenvolvimento', 'Em desenvolvimento'),
+    ('entregue', 'Entregue'),
+    ('cancelado', 'Cancelado'),
+]
+
+TIPO_BACKLOG = [
+    ('corretivo', 'Corretivo'),
+    ('adaptativo', 'Adaptativo'),
+    ('evolutivo', 'Evolutivo'),
+]
+
+FASE_TRATAMENTO = [
+    ('ataque', 'Ataque'),
+    ('inicial', 'Inicial'),
+    ('manutencao', 'Manutenção'),
+    ('nao_se_aplica', 'Não se aplica'),
+    ('', 'Não Informado'),
+]
+
+VIA_ATENDIMENTO = [
+    ('administrativo', 'Administrativo'),
+    ('judicial', 'Judicial'),
+    ('', 'Não Informado'),
+]
+
+ORIGEM_DEMANDA_JUDICIAL = [
+    ('cgceaf', 'CGCEAF'),
+    ('djud', 'DJUD'),
+    ('nao_se_aplica', 'Não se Aplica'),
+    ('', 'Não Informado'),
+]
+
+STATUS_DISPENSACAO = [
+    ('em_analise', 'Em Análise'),
+    ('enviado', 'Enviado'),
+    ('consumido', 'Consumido'),
+    ('cancelado', 'Cancelado'),
+    ('', 'Não Informado'),
+]
+
+CICLO_TRATAMENTO = [
+    ('nao_se_aplica', 'Não se aplica'),
+    ('1', '1'),
+    ('2', '2'),
+    ('3', '3'),
+    ('4', '4'),
+    ('5', '5'),
+    ('6', '6'),
+    ('7', '7'),
+    ('8', '8'),
+    ('9', '9'),
+    ('10', '10'),
+    ('', 'Não Informado'),
 ]

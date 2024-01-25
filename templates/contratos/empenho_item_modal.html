@@ -8,7 +8,7 @@
     }
 
     .custom-modal-width-empenho-item {
-        min-width: 70%; 
+        min-width: 75%; 
         font-size: 16px !important;
     }
 
@@ -22,6 +22,7 @@
 
     .modal-content{
         height: 60%;
+        min-height: 600px;
     }
 
     .modal-body{
@@ -44,7 +45,7 @@
             </div>
             <div class="modal-body">
                 
-                <form id="entregaForm">
+                <form id="itemEmpenhoForm">
                     {% csrf_token %}
                     <div class="horizontal-sections-modal-parcela" >
                         <div class="section" style="border: 0px !important;">
@@ -83,7 +84,7 @@
                     <div class="horizontal-sections-modal-parcela" style="margin-top: 20px;">
                         <div class="section" style="border: 0px !important;">
                             
-                            <h3>Dados da Parcelas</h3>
+                            <h3>Dados da Parcela</h3>
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3" style="max-width: 150px !important;">
                                     <input type="text" class="form-control" id="id_item_contrato" readonly>
@@ -158,9 +159,9 @@
                                     <label>{{ form_empenho_item.observacoes_gerais.label }}</label>
                                 </div>
 
-                                <input type="text" id="id_empenhoItem_empenho" name="id_empenhoItem_empenho" readonly>
-                                <input type="text" id="id_empenhoItem_contrato" name="id_empenhoItem_contrato" readonly>
-                                <input type="text" id="id_empenhoItem_qtd_empenhada" readonly>
+                                <input type="hidden" id="id_empenhoItem_empenho" name="id_empenhoItem_empenho" readonly>
+                                <input type="hidden" id="id_empenhoItem_parcela" name="id_empenhoItem_parcela" readonly>
+                                <input type="hidden" id="id_empenhoItem_qtd_empenhada" readonly>
                             </div>
                         </div>
                     </div>
@@ -173,8 +174,8 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnDeletarEntrega" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
-                <button type="button" class="btn btn-primary" id="botaoSalvarEntrega" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+                <button type="button" class="btn btn-primary" id="btnDeletarItemEmpenho" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-primary" id="botaoSalvarItemEmpenho" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
             </div>
         </div>
     </div>

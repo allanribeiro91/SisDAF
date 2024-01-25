@@ -4,6 +4,8 @@ from apps.main.forms import LoginForms, CadastroForms
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.contratos.models import Contratos, ContratosArps
+from apps.fornecedores.models import UF_Municipio
+from django.http import JsonResponse
 from apps.main.models import CustomLog
 from apps.fornecedores.models import Fornecedores
 from apps.processos_aquisitivos.models import ProaqDadosGerais
@@ -158,3 +160,9 @@ def cadastro(request):
 
 def cadastro_confirmacao(request):
     return render(request, 'main/cadastro_confirmacao.html')
+
+
+def buscar_municipio(request, uf=None):
+    lista_municipios = UF_Municipio.objects.filter(uf_sigla=uf).values_list('municipio', flat=True).order_by('municipio')
+    municipios = list(lista_municipios.values('cod_ibge', 'municipio'))
+    return JsonResponse({'municipios': municipios})

@@ -1,0 +1,180 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% load contratos_filters %}
+{% block extra_head %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="stylesheet" href="{% static '\styles\_pagina_inicial_modulo.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_aderecos.css' %}">
+    
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fa-solid fa-hospital-user"></i>&nbsp;Gestão de Pacientes
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab-button active" id="aba_proaq">Lista de Pacientes</button>
+            
+        </div>
+    </div>
+    
+    <!-- cabeçalho -->
+    <div class="horizontal-sections">
+        
+        <!-- Total -->
+        <div class="section numbers">
+            <div class="filter-title">
+                Total de Pacientes
+            </div>
+            <div id="numeroProcessos" class="total-geral">{{ tab_pacientes.count }}</div>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="section filter">
+            <div class="filter-title">Filtros
+                Filtros
+            </div>
+            
+            <!-- Status -->
+            <div class="form-floating" style="max-width: 150px !important;">
+                <select class="form-select" id="status_proaq" >
+                    <option value=""></option>
+                    {% for value, display in lista_status %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="status_proaq">Status</label>
+            </div>
+
+            <!-- Unidade DAF -->
+            <div class="form-floating" style="max-width: 150px !important;">
+                <select class="form-select" id="unidade_daf">
+                    <option value=""></option>
+                    {% for value, display in lista_unidadesdaf %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="unidade_daf">Unidade DAF</label>
+            </div>
+
+            <!-- Fase de Evolução -->
+            <div class="form-floating" style="max-width: 250px !important;">
+                <select class="form-select" id="fase_evolucao">
+                    <option value=""></option>
+                    {% for value, display in lista_evolucao %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="unidade_daf">Fase</label>
+            </div>   
+
+            <!-- Modalidade de Aquisição -->
+            <div class="form-floating" style="max-width: 200px !important;">
+                <select class="form-select" id="modalidade_aquisicao">
+                    <option value=""></option>
+                    {% for value, display in lista_modalidades %}
+                    <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+                <label for="modalidade_aquisicao">Mod. de Aquisição</label>
+            </div>
+
+            <!-- Denominações Genéricas -->
+            <div class="form-floating full-width">
+                <select class="form-select" id="denominacao">
+                    <option value=""></option>
+                    {% for id, name in lista_denominacoes %}
+                    <option value="{{ id }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="denominacao">Denominações Genéricas</label>
+            </div>
+
+            <!-- Limpar Filtros -->
+            <button class="custom-btn limpar-filtro" id="limpar_filtros">
+                <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
+                <span style="font-size: 10px;">Limpar Filtros</span>
+            </button>
+
+        </div>
+
+        <!-- Funcionalidades -->
+        <div class="section funcionalidades">
+            <div style="font-size: 12px; font-weight: bold;">
+                Funcionalidades
+            </div>
+            <div class="btn-container">
+                
+                <!-- Inserir -->
+                <button class="custom-btn" id="btnInserirPaciente">
+                    <div class="icon-container">
+                        <i class="fa fa-plus-circle" style="font-size: 1.5vw"></i>
+                        <span>Inserir</span>
+                    </div>
+                </button>
+
+                <!-- Exportar -->
+                <button class="custom-btn" id="exportarProaqs">
+                    <div class="icon-container">
+                        <i class="fa fa-download" style="font-size: 1.5vw"></i>
+                        <span>Exportar</span>
+                    </div>                    
+                </button>
+                
+            </div>   
+        </div>
+        
+    </div>
+
+    <!-- tabela -->
+    <div class="section-tabela">
+    <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabPacientes">
+        <thead>
+            <tr>
+                <th class="col-id">ID</th>
+                <th class="col-texto6">CNS</th>
+                <th class="col-texto6">CPF</th>
+                <th class="col-texto20">Nome</th>
+                <th class="col-texto6">Sexo</th>
+                <th class="col-texto6">Idade</th>
+                <th class="col-texto6">Cor da Pele</th>
+                <th class="col-texto10">Naturalidade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in tab_pacientes %}
+            <tr data-id="{{ item.id }}">
+                <td class="col-id">{{ item.id }}</td>
+                <td class="col-texto6">{{ item.cns }}</td>
+                <td class="col-texto6">{{ item.cpf }}</td>
+                <td class="col-texto20">{{ item.nome }}</td>
+                <td class="col-texto6">{{ item.get_sexo_display }}</td>
+                <td class="col-texto6">{{ item.get_cor_pele_nome }}</td>
+                <td class="col-texto6"></td>
+                <td class="col-texto10"></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>  
+    </div>
+
+    <!-- paginação -->
+    <div id="pagination">
+        <button id="denominacaoPreviousPage" class="page" disabled>Anterior </button>
+        <span id="denominacaoCurrentPage">1</span>
+        <button id="denominacaoNextPage" class="page">Próximo</button>
+    </div>
+    
+    <!-- Scritps -->
+    <script src="{% static 'js/gestao_pacientes.js' %}"></script>
+    
+    <!-- Modais -->
+    {% include "processos_aquisitivos/proaq_inserir_modal.html" %}
+
+{% endblock %}

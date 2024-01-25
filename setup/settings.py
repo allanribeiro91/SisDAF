@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.programacao.apps.ProgramacaoConfig',
     'apps.sobre_sisdaf.apps.SobreSisdafConfig',
     'apps.consultores_tecnicos.apps.ConsultoresTecnicosConfig',
+    'apps.gestao_pacientes.apps.GestaoPacientesConfig'
 ]
 
 MIDDLEWARE = [
