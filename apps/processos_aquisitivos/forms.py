@@ -371,7 +371,7 @@ class ProaqTramitacaoForm(forms.ModelForm):
             'id': 'id_tramitacaoproaq_setor',
         }),
         label='Área do MS/Fornecedor',
-        initial='40',
+        # initial='40',
         empty_label='Selecione um Setor',
         required=True,
     )
