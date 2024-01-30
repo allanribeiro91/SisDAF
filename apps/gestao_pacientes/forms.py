@@ -130,15 +130,6 @@ class DispensacoesForm(forms.ModelForm):
         initial='',
         required=True,
     )
-    numero_processo_sei = forms.CharField(
-        max_length=20,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control full-width', 
-            'id': 'id_dispensacao_processo_sei', 
-        }),
-        label='Nº Processo SEI',
-        required=False,
-    )
     origem_demanda_judicial = forms.ChoiceField(
         choices=ORIGEM_DEMANDA_JUDICIAL,
         widget=forms.Select(attrs={
@@ -148,6 +139,15 @@ class DispensacoesForm(forms.ModelForm):
         }),
         label='Origem Demanda',
         initial='nao_se_aplica',
+        required=False,
+    )
+    numero_processo_sei = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control full-width', 
+            'id': 'id_dispensacao_processo_sei', 
+        }),
+        label='Nº Processo SEI',
         required=False,
     )
     uf_solicitacao = forms.ChoiceField(
@@ -169,6 +169,17 @@ class DispensacoesForm(forms.ModelForm):
         label='Qtd Dispensada',
         required=True,
     )
+    #produto
+    produto = forms.ModelChoiceField(
+        queryset=ProdutosFarmaceuticos.objects.all(),
+        widget=Select2Widget(attrs={
+            'class': 'form-control',
+            'id': 'id_dispensacao_produto',
+        }),
+        label='Produto Farmacêutico',
+        initial='',
+        required=True,
+    )
     #tratamento
     cid = forms.CharField(
         max_length=10,
@@ -178,7 +189,7 @@ class DispensacoesForm(forms.ModelForm):
         }),
         label='CID',
         initial='',
-        required=True,
+        required=False,
     )
     fase_tratamento = forms.ChoiceField(
         choices=FASE_TRATAMENTO,
@@ -201,6 +212,16 @@ class DispensacoesForm(forms.ModelForm):
         required=False,
     )
     #pedido
+    status = forms.ChoiceField(
+        choices=STATUS_DISPENSACAO,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id':'id_dispensacao_status'
+        }),
+        label='Status',
+        initial='',
+        required=True,
+    )
     numero_pedido_sismat = forms.CharField(
         max_length=15,
         widget=forms.TextInput(attrs={
@@ -226,7 +247,6 @@ class DispensacoesForm(forms.ModelForm):
         }),
         required=False,
     )
-    #consumo
     data_consumo = forms.DateField(
         widget=forms.DateInput(attrs={
             'class': 'form-control',
@@ -234,6 +254,7 @@ class DispensacoesForm(forms.ModelForm):
         }),
         required=False,
     )
+    #aplicação
     comprovante_doc_sei = forms.CharField(
         max_length=10,
         widget=forms.TextInput(attrs={
@@ -265,27 +286,6 @@ class DispensacoesForm(forms.ModelForm):
         initial='',
         required=False,
     )
-    status = forms.ChoiceField(
-        choices=STATUS_DISPENSACAO,
-        widget=forms.Select(attrs={
-            'class': 'form-select',
-            'id':'id_dispensacao_status'
-        }),
-        label='Status',
-        initial='',
-        required=True,
-    )
-    #produto
-    produto = forms.ModelChoiceField(
-        queryset=ProdutosFarmaceuticos.objects.all(),
-        widget=Select2Widget(attrs={
-            'class': 'form-control',
-            'id': 'id_dispensacao_produto',
-        }),
-        label='Produto Farmacêutico',
-        initial='',
-        required=True,
-    )
     #paciente
     paciente = forms.ModelChoiceField(
         queryset=Pacientes.objects.all(),
@@ -303,7 +303,7 @@ class DispensacoesForm(forms.ModelForm):
             'class': 'form-control auto-expand',
             'rows': 1,
             'style': 'padding-top: 30px; height: 80px;',
-            'id': 'empenho_observacoes'
+            'id': 'id_dispensacao_observacoes'
             }),
         required=False,
         label='Observações Gerais'

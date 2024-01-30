@@ -46,6 +46,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    empenho_status.addEventListener('change', function(){
+
+        avaliar_empenho_status = avaliar_entrega_antes_alterar_status()
+        if (avaliar_empenho_status == false){
+            empenho_status.value = 'empenhado'
+        }
+
+
+    })
+
     
 
     const qtd_entregue_empenho = document.getElementById('qtd_entregue_empenho').value
@@ -69,6 +79,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (qtd_entregue > 0){
             empenho_status.value = 'empenhado'
             sweetAlert('Não é possível deletar um empenho com entregas já realizadas!')
+            return false
+        }
+
+        return true
+    }
+
+    function avaliar_entrega_antes_alterar_status(){
+        var qtd_entregue = parseFloat(qtd_entregue_empenho)
+
+        if (qtd_entregue > 0){
+            empenho_status.value = 'empenhado'
+            sweetAlert('<span style="font-weight:normal">Não é possível alterar o <b>Status</b> de um empenho com entregas já realizadas!</span>')
             return false
         }
 
@@ -436,6 +458,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function salvarItemEmpenho() {
         const id_item_empenho_modal = document.getElementById('item_id')
         
+        //Empenho 0
+        if (qtd_empenho.value> qtd_a_empenhar.value){
+            sweetAlert('<span style="font-weight:normal">A <b>Quantidade do Empenho</b> <b style="color:red"> NÃO PODE SER MAIOR</b> que a <b>Quantidade a Empenhar!<b></span>')
+            return
+        }
+
+        //Empenho maior que quantidade a empenhar
         if (qtd_empenho.value == 0 || valor_empenho == 0){
             sweetAlert('A <b>Quantidade</b> ou <b>Valor</b> do Empenho não pode ser 0!')
             return

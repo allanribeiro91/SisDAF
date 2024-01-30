@@ -79,11 +79,11 @@
                             <input type="text" class="form-control log_edicoes" style="width: 100px;" id="log_edicoes" name="log_edicoes" readonly value="{{ contrato.log_n_edicoes }}">
                             <label for="floatingInput">Nº Edições</label>
                         </div>
-                        <div class="form-floating mb-3">
+                        <!-- <div class="form-floating mb-3">
                             <button type="button" id="btnHistoricoLogs" style="font-size: 16px !important; background-color: transparent; border: none; border-radius: 10px; height: calc(3.5rem + 2px);">
                                 <i class="fas fa-history" style="font-size: 20px;" title="Histórico de Logs"></i>
                             </button>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -160,7 +160,7 @@
                             <input type="text" id="ct_fornecedor_display" class="form-control" value="{% if form.instance.fornecedor %}{{ form.instance.fornecedor }}{% endif %}" readonly>
                             <label>Fornecedor</label>
                         </div>
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-3 full-width">
                             <input type="text" class="form-control" id="ct_fiscal" value="{{ contrato.fiscal_atual }}" readonly>
                             <label for="ct_fiscal">Atual Fiscal do Contrato</label>
                         </div>
@@ -273,8 +273,9 @@
                                     <th class="col-valor5">Últ. Entrega</th>
                                     <th class="col-valor5">Dias de Atraso</th>
                                     <th class="col-valor5">Entregas</th>
-                                    <th class="col-valor5">Entregas C/ Atraso</th>
                                     <th class="col-valor5">Qtd Contratada</th>
+                                    <th class="col-valor5">Qtd Doada</th>
+                                    <th class="col-valor5">Qtd Total</th>
                                     <th class="col-valor5">Qtd Empenhada</th>
                                     <th class="col-valor5">Qtd Entregue</th>
                                     <th class="col-valor5">Qtd a Entregar</th>
@@ -306,15 +307,10 @@
 
                                     <td class="col-valor5">{{ item.numero_entregas }}</td>
 
-                                    <td class="col-valor5">
-                                        {% if item.numero_entregas_atraso > 0 %}
-                                            {{ item.numero_entregas_atraso }}&nbsp;&nbsp;<i class="fas fa-exclamation-circle" style="color: rgb(255, 0, 0);"></i>
-                                        {% else %}
-                                            {{ item.numero_entregas_atraso }}
-                                        {% endif %}
-                                    </td>
                                     
                                     <td class="col-valor5">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor5">{{ item.qtd_doada|floatformat:0|intcomma }}</td>
+                                    <td class="col-valor5">{{ item.qtd_total_parcela|floatformat:0|intcomma }}</td>
                                     <td class="col-valor5">{{ item.qtd_empenhada|floatformat:0|intcomma }}</td>
 
                                     <td class="col-valor5">

@@ -7,6 +7,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const fornecedor = document.getElementById('inserir_ct_fornecedor');
     const btnInserirCT = document.getElementById('inserirNovoContrato')
 
+    const btn_inserir_contrato = document.getElementById('inserir_contrato')
+    btn_inserir_contrato.addEventListener('click', function(){
+        limpar_modal_novo_contrato()
+    })
+
+    function limpar_modal_novo_contrato(){
+        unidadeDaf.value = ''
+        modalidadeAquisicao.value = ''
+        arpSelect.value = ''
+        denominacaoGenerica.value = ''
+        fornecedor.value = ''
+    }
 
     btnInserirCT.addEventListener('click', function() {
         //Verificar preenchimento dos campos

@@ -1,6 +1,7 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
 {% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/_tabelas.css' %}">
     <link rel="stylesheet" href="{% static 'styles/paciente_ficha.css' %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
 {% endblock %}
@@ -35,7 +36,10 @@
                     <i class="fas fa-trash-alt"></i>
                     Deletar
                 </button>
-                
+                <button type="button" class="btn btn-danger" id="btnPacienteRelatorio" style="font-size: 12px; background-color: #039153; border-color: #039153;">
+                    <i class="fa-regular fa-file-pdf"></i>
+                    &nbsp;Relatório
+                </button>
                 <button class="btn btn-primary me-md-2" id="btnSalvarPaciente" style="font-size: 12px;">
                     <i class="fas fa-save me-1"></i> 
                     Salvar
@@ -98,6 +102,10 @@
                             <input type="date" class="form-control" id="id_paciente_data_nascimento" name="data_nascimento" value="{% if form_paciente.data_nascimento.value %}{{ form_paciente.data_nascimento.value|date:'Y-m-d' }}{% endif %}">
                             <label for="floatingInput">Data Nascimento</label>
                         </div>
+                        <div class="form-floating mb-3">
+                            <input type="date" class="form-control" id="id_paciente_data_obito" name="data_obito" value="{% if form_paciente.data_obito.value %}{{ form_paciente.data_obito.value|date:'Y-m-d' }}{% endif %}">
+                            <label for="floatingInput">Data Óbito</label>
+                        </div>
                         <div class="form-floating mb-3" style="width: 100px;">
                             <input type="text" class="form-control" id="id_paciente_idade" value="{{ paciente.idade_paciente }} anos" readonly>
                             <label for="id_paciente_idade">Idade</label>
@@ -138,7 +146,6 @@
                         </div>
 
                     </div>
-
                 </div>
             </div>
 
@@ -155,36 +162,61 @@
                 
                     <!-- Tabela de Tramitações -->
                     <div class="section-tabela" style="width: 100% !important; margin-left: 0px;">
-                        <table class="table table-striped table-hover fixed-size-table" style="font-size: 12px;" id="tabTramitacoes">
-                            <thead>
+                        <table class="table table-striped table-hover fixed-size-table" style="font-size: 12px;" id="tabDispensacoes">
+                            <thead  style="vertical-align: middle;">
                                 <tr>
                                     <th class="col-id">ID</th>
-                                    <th class="col-texto6">Documento SEI</th>
-                                    <th class="col-texto8">Setor</th>
-                                    <th class="col-texto25">Etapa</th>
-                                    <th class="col-texto6">Entrada</th>
-                                    <th class="col-texto6">Previsão</th>
-                                    <th class="col-texto6">Saída</th>
-                                    <th class="col-texto4">Dias</th>
+                                    <th class="col-texto6">Status<br> do Pedido</th>
+                                    <th class="col-texto6">Via<br> Atendimento</th>
+                                    <th class="col-texto6">Origem <br>Demanda</th>
+                                    <th class="col-texto4">UF/SES<br>Solicitou</th>
+                                    <th class="col-texto25">Produto Farmacêutico</th>
+                                    <th class="col-texto6">CID</th>
+                                    <th class="col-texto6">Fase<br> do Tratamento</th>
+                                    <th class="col-texto6">Ciclo<br> do Tratamento</th>
+                                    <th class="col-texto6">Data <br>Solicitação</th>
+                                    <th class="col-texto6">Data <br>Envio</th>
+                                    <th class="col-texto6">Data <br>Consumo</th>
+                                    <th class="col-texto6">Comprovante<br> (SEI)</th>
+                                    <th class="col-valor5">Quantidade<br> Dispensada</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for item in tab_proaq_tramitacoes %}
+                                {% for item in tab_dispensacoes %}
                                 <tr data-id="{{ item.id }}" data-proaq-id="{{ item.proaq.id }}">
                                     <td class="col-id">{{ item.id }}</td>
-                                    <td class="col-texto6">{{ item.documento_sei }}</td>
-                                    <td class="col-texto8">{{ item.setor }}</td>
-                                    <td class="col-texto25">{{ item.etapa_tramitacao }}</td>
-                                    <td class="col-texto6" id="tramitacao_data_entrada">{{ item.data_entrada|date:"d/m/Y" }}{% if not item.data_entrada %}-{% endif %}</td>
-                                    <td class="col-texto6">{{ item.previsao_saida|date:"d/m/Y" }}{% if not item.previsao_saida %}-{% endif %}</td>
-                                    <td class="col-texto6" id="tramitacao_data_saida">{{ item.data_saida|date:"d/m/Y" }}{% if not item.data_saida %}-{% endif %}</td>
-                                    <td class="col-texto4">{{ item.dias_tramitacao }}</td>
+                                    <td class="col-texto6">{{ item.get_status_display }}</td>
+                                    <td class="col-texto6">{{ item.get_via_atendimento_display }}</td>
+                                    <td class="col-texto6">{{ item.get_origem_demanda_judicial_display }}</td>
+                                    <td class="col-texto4">{{ item.uf_solicitacao }}</td>
+                                    <td class="col-texto25">{{ item.produto.produto }}</td>
+                                    <td class="col-texto6">{{ item.cid }}</td>
+                                    <td class="col-texto6">{{ item.get_fase_tratamento_display }}</td>
+                                    <td class="col-texto6">{{ item.get_ciclo_display }}</td>
+                                    <td class="col-texto6">{{ item.data_solicitacao|date:'d/m/Y'|default:'-' }}</td>
+                                    <td class="col-texto6">{{ item.data_envio|date:'d/m/Y'|default:'-' }}</td>
+                                    <td class="col-texto6">{{ item.data_consumo|date:'d/m/Y'|default:'-' }}</td>
+                                    <td class="col-texto6">{{ item.comprovante_doc_sei }}</td>
+                                    <td class="col-valor5">{{ item.quantidade }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>  
                     </div>
                 </div>
+            </div>
+
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Observações</h3>
+                    <div class="grid">
+                        <div class="form-floating full-width">
+                            {{ form_paciente.observacoes_gerais }}
+                            <label>{{ form_paciente.observacoes_gerais.label }}</label>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
 
         </form>

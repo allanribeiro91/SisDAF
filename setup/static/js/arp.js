@@ -230,12 +230,7 @@ function openModelItemArp(itemArpId) {
 
 $(document).ready(function() {
 
-    //Abrir a ficha da ARP
-    $('#tabARPs tbody').on('click', 'tr', function() {
-        // buscarAtualizarFornecedores();
-        const arpId = $(this).attr('data-id').toString();
-        window.location.href = `/contratos/arp/ficha/${arpId}/`;
-    });  
+    
     
     const botao_novo_arp = document.getElementById('btnNovoItemARP')
     const id_arp = document.getElementById('id_arp').value
@@ -294,46 +289,7 @@ $(document).ready(function() {
 
     });
 
-    //Exportar dados
-    $('#exportarARPs').on('click', function() {
-        // Coleta valores dos campos       
-        const status_arp = document.querySelector('#status_arp').value;
-        const unidade_daf = document.querySelector('#unidade_daf').value;
-        const denominacao = document.querySelector('#denominacao').value;
-        const fornecedor = document.querySelector('#fornecedor').value;
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        // Define dados a serem enviados
-        const data = {
-            status_arp: status_arp,
-            unidade_daf: unidade_daf,
-            denominacao: denominacao,
-            fornecedor: fornecedor,
-        };
-
-        console.log('Exportar ARPs')
-        
-        // Envia solicitação AJAX para o servidor
-        fetch('/contratos/arp/exportar/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.blob()) // Trata a resposta como um Blob
-        .then(blob => {
-            // Inicia o download do arquivo
-            const a = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            a.href = url;
-            a.download = 'arps.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        });
-    });
+    
     
     
 
@@ -378,76 +334,12 @@ $(document).ready(function() {
     // $('#cnpj_fornecedor').select2().next('.select2-container').addClass('form-control');
 
     
-        //Filtrar
-        $('#status_arp, #unidade_daf, #denominacao, #fornecedor').change(function() {
-            filtrarARPs();
-        });
+        
     
     
-    //Limpar Filtros
-    $('.limpar-filtro-arps').on('click', function() {
-        $('#status_arp').val('');
-        $('#unidade_daf').val('');
-        $('#denominacao').val('');
-        $('#fornecedor').val('');
-        filtrarARPs();
-    });
-    
-    //Renderizar tabela
-    function filtrarARPs(page = 1) {
-        var status_arp = $('#status_arp').val();
-        var unidade_daf = $('#unidade_daf').val();
-        var denominacao = $('#denominacao').val();
-        var fornecedor = $('#fornecedor').val();
-    
-        var dataToSend = {
-            'status_arp': status_arp,
-            'unidade_daf': unidade_daf,
-            'denominacao': denominacao,
-            'fornecedor': fornecedor,
-        };
-    
-        $.ajax({
-            url: "/contratos/arp/filtrar/",
-            data: { ...dataToSend, page: page },
-            dataType: 'json',
-            success: function(data) {
-                recarregarTabelaARPs(data.data);
-                $('#numeroARPs').text(data.total_arps.toLocaleString('pt-BR').replace(/,/g, '.'));
-                $('#currentPage').text(data.current_page);
-                $('#nextPage').prop('disabled', !data.has_next);
-                $('#previousPage').prop('disabled', !data.has_previous);
-                currentPage = data.current_page;
-            }
-        });
-    }
-    
-    
-    function recarregarTabelaARPs(arps) {
-        var $tableBody = $('.table tbody');
-        $tableBody.empty();
-    
-        arps.forEach(arp => {
-            let valor = formatarValorMonetario2(arp.valor_total_arp)
-            var row = `
-                <tr data-id="${ arp.id }">
-                        <td class="col-arp-id">${ arp.id }</td>
-                        <td class="col-arp-status" style="text-transform: uppercase;">${ arp.status }</td>
-                        <td class="col-arp-unidadedaf" style="text-transform: uppercase;">${ arp.unidade_daf }</td>
-                        <td class="col-arp-processo-sei">${ arp.numero_processo_sei }</td>
-                        <td class="col-arp-doc-sei">${ arp.numero_documento_sei }</td>
-                        <td class="col-arp-data">${ arp.data_publicacao }</td>
-                        <td class="col-arp-data">${ arp.data_vigencia }</td>
-                        <td class="col-arp-data">${ arp.prazo_vigencia }</td>
-                        <td class="col-arp-denominacao">${ arp.denominacao }</td>
-                        <td class="col-arp-fornecedor">${ arp.fornecedor }</td>
-                        <td class="col-arp-valor" style="font-weight: normal; text-align: right !important;">${valor}</td>
-                </tr>
-            `;
 
-            $tableBody.append(row);
-        });
-    }
+    
+    
 });
 
 
@@ -652,37 +544,37 @@ function formatarValorMonetario2(valor) {
 }
 
 
-function formatarValorMonetario(campoId) {
-    var campo = document.getElementById(campoId);
+// function formatarValorMonetario(campoId) {
+//     var campo = document.getElementById(campoId);
     
-    campo.addEventListener('input', function (e) {
-        // Impede caracteres não-numéricos de serem digitados
-        var valor = this.value.replace(/[^0-9]/g, '');
+//     campo.addEventListener('input', function (e) {
+//         // Impede caracteres não-numéricos de serem digitados
+//         var valor = this.value.replace(/[^0-9]/g, '');
 
-        // Converte valor para número
-        var numero = parseInt(valor, 10);
+//         // Converte valor para número
+//         var numero = parseInt(valor, 10);
 
-        // Se o valor for NaN, define como 0
-        if (isNaN(numero)) {
-            numero = 0;
-        }
+//         // Se o valor for NaN, define como 0
+//         if (isNaN(numero)) {
+//             numero = 0;
+//         }
 
-        // Formata o valor como um número com duas casas decimais
-        var valorFormatado = (numero / 100).toFixed(2);
+//         // Formata o valor como um número com duas casas decimais
+//         var valorFormatado = (numero / 100).toFixed(2);
 
-        // Substitui o ponto por uma vírgula
-        valorFormatado = valorFormatado.replace('.', ',');
+//         // Substitui o ponto por uma vírgula
+//         valorFormatado = valorFormatado.replace('.', ',');
 
-        // Adiciona pontos como separadores de milhar
-        valorFormatado = valorFormatado.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+//         // Adiciona pontos como separadores de milhar
+//         valorFormatado = valorFormatado.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-        // Adiciona o símbolo de real
-        valorFormatado = 'R$ ' + valorFormatado;
+//         // Adiciona o símbolo de real
+//         valorFormatado = 'R$ ' + valorFormatado;
 
-        // Atualiza o valor do campo
-        this.value = valorFormatado;
-    });
-}
+//         // Atualiza o valor do campo
+//         this.value = valorFormatado;
+//     });
+// }
 
 
 function formatarQuantidade(campoId) {
@@ -741,8 +633,8 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('showSuccessMessage'); // Limpar a bandeira
     }
 
-    formatarValorMonetario('arp_valor_reequilibrio');
-    formatarValorMonetario('arp_valor_unitario');
+    formatoValorMonetario('arp_valor_reequilibrio');
+    formatoValorMonetario('arp_valor_unitario');
     formatarQuantidade('arp_qtd_registrada')
 
     document.getElementById('arp_valor_reequilibrio').addEventListener('input', valor_total_item_arp);

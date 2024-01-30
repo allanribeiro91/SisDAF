@@ -32,14 +32,18 @@ tz = pytz.timezone("America/Sao_Paulo")
 #CONTRATOS
 def contratos(request):
 
-    lista_modalidades = [('', '')] + MODALIDADE_AQUISICAO
     lista_unidadesdaf = [item for item in UNIDADE_DAF if item[0] not in ['cofisc', 'gabinete']]
+    denominacoes = DenominacoesGenericas.objects.values_list('id', 'denominacao')
+    fornecedores = Fornecedores.objects.values_list('nome_fantasia', flat=True).distinct().order_by('nome_fantasia')
     
     tabContratos = Contratos.objects.filter(del_status=False).order_by('-data_publicacao')
     
     conteudo = {
         'lista_unidadesdaf': lista_unidadesdaf,
-        'lista_modalidades': lista_modalidades,
+        'lista_modalidades': MODALIDADE_AQUISICAO,
+        'lista_status': STATUS_ARP,
+        'lista_denominacoes': denominacoes,
+        'lista_fornecedores': fornecedores,
         'tabContratos': tabContratos,
     }
     return render(request, 'contratos/contratos.html', conteudo)
@@ -314,7 +318,223 @@ def contrato_dados_arp(request, id_arp=None):
     }
     return render(request, 'contratos/contrato_ficha_arp.html', conteudo)
 
+def contrato_filtrar(request):
+    status_contrato = request.GET.get('status_contrato', None)
+    modalidade_aquisicao = request.GET.get('modalidade_aquisicao', None)
+    unidade_daf = request.GET.get('unidade_daf', None)
+    denominacao = request.GET.get('denominacao', None)
+    fornecedor = request.GET.get('fornecedor', None)
 
+    filters = {}
+    filters['del_status'] = False
+    if status_contrato:
+        filters['status'] = status_contrato
+    if modalidade_aquisicao:
+        filters['modalidade_aquisicao'] = modalidade_aquisicao
+    if unidade_daf:
+        filters['unidade_daf'] = unidade_daf
+    if denominacao:
+        filters['denominacao_id'] = denominacao
+    if fornecedor:
+        filters['fornecedor__nome_fantasia__icontains'] = fornecedor
+
+    tab_contratos = Contratos.objects.filter(**filters).order_by('-data_publicacao')
+    total_contratos = tab_contratos.count()
+
+    page = int(request.GET.get('page', 1))
+    paginator = Paginator(tab_contratos, 100)  # Mostra 100 faqs por página
+    try:
+        contratos_paginados = paginator.page(page)
+    except EmptyPage:
+        contratos_paginados = paginator.page(paginator.num_pages)
+
+    data = []
+    for contrato in contratos_paginados.object_list:
+        valor_total = contrato.valor_total()
+        
+        if contrato.arp:
+            numero_arp = contrato.arp.numero_arp
+        else:
+            numero_arp = 'NSA'
+
+        contrato_data = {
+            'id': contrato.id,
+            'status': contrato.status,
+            'unidade_daf': contrato.unidade_daf,
+            'modalidade_aquisicao': contrato.get_modalidade_aquisicao_display(),
+            'arp': numero_arp,
+            'tipo_contrato': contrato.get_tipo_contrato_display(),
+            'numero_contrato': contrato.numero_contrato,
+            'data_publicacao': contrato.data_publicacao.strftime('%d/%m/%Y') if contrato.data_publicacao else '',
+            'data_vigencia': contrato.data_vigencia.strftime('%d/%m/%Y') if contrato.data_vigencia else '',
+            'denominacao': contrato.denominacao.denominacao,
+            'fornecedor': contrato.fornecedor.nome_fantasia,
+            'valor_total': valor_total,
+        }
+        data.append(contrato_data)
+    
+    return JsonResponse({
+        'data': data,
+        'total_contratos': total_contratos,
+        'has_next': contratos_paginados.has_next(),
+        'has_previous': contratos_paginados.has_previous(),
+        'current_page': page
+    })
+
+def contrato_exportar(request):
+    
+    if request.method == 'POST':
+        status_contrato = request.GET.get('status_contrato', None)
+        modalidade_aquisicao = request.GET.get('modalidade_aquisicao', None)
+        unidade_daf = request.GET.get('unidade_daf', None)
+        denominacao = request.GET.get('denominacao', None)
+        fornecedor = request.GET.get('fornecedor', None)
+
+        filters = {}
+        filters['del_status'] = False
+        if status_contrato:
+            filters['status'] = status_contrato
+        if modalidade_aquisicao:
+            filters['modalidade_aquisicao'] = modalidade_aquisicao
+        if unidade_daf:
+            filters['unidade_daf'] = unidade_daf
+        if denominacao:
+            filters['denominacao_id'] = denominacao
+        if fornecedor:
+            filters['fornecedor__nome_fantasia__icontains'] = fornecedor
+
+        tab_contratos = Contratos.objects.filter(**filters).order_by('-data_publicacao')
+        data_exportacao = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Cria o workbook e adiciona as abas
+        wb = Workbook()
+        contratos = wb.active
+        contratos.title = "Contratos"
+        contratos_objetos = wb.create_sheet(title="Contratos_Objetos")
+        contratos_parcelas = wb.create_sheet(title="Contratos_Parcelas")
+        contratos_entregas = wb.create_sheet(title="Contratos_Entregas")
+        contratos_fiscais = wb.create_sheet(title="Contratos_Fiscais")
+        
+        # Escreve os cabeçalhos
+        contratos.append([
+            'ID Proaq', 'Data Registro', 'Responsável Registro', 'Últ. Atualização', 'Responsável Últ. Atualização', 'N Edições',
+            'Unidade DAF', 'Modalidade Aquisicao', 'Denominacao', 'Numero Processo SEI', 'Numero ETP',
+            'Status', 'Responsavel Tecnico', 'Observacoes Gerais', 'Data Exportação'
+        ])
+        contratos_objetos.append([
+            'ID Item', 'ID Proaq', 'Data Registro', 'Responsável Registro', 'Últ. Atualização', 'Responsável Últ. Atualização', 'N Edições',
+            'Item', 'Tipo de Cota', 'Produto', 'ID Produto',
+            'CMM - Início', 'CMM - Fim', 'CMM - Referência', 'Qtd a ser adquirida', 
+            'Cobertura - dias', 'Cobertura - meses',
+            'Valor Unitário Estimado - R$', 'Valor Total R$', 'Observações'
+            'Data Exportação'
+        ])
+        contratos_parcelas.append([
+            'ID Evolução', 'ID Proaq', 'Data Registro', 'Responsável Registro', 'Últ. Atualização', 'Responsável Últ. Atualização', 'N Edições',
+            'N Fase', 'Fase', 'Data Início', 'Data Fim', 'Dias', 'Observações', 'Data Exportação'
+        ])
+        contratos_entregas.append([
+            'ID Tramitação', 'ID Proaq', 'Data Registro', 'Responsável Registro', 'Últ. Atualização', 'Responsável Últ. Atualização', 'N Edições',
+            'Documento SEI', 'Setor', 'Etapa Processo', 
+            'Data Entrada', 'Previsao Saida', 'Data Saida', 'Dias',
+            'Observacoes', 'Data Exportação'
+        ])
+        contratos_fiscais.append([
+            'ID Tramitação', 'ID Proaq', 'Data Registro', 'Responsável Registro', 'Últ. Atualização', 'Responsável Últ. Atualização', 'N Edições',
+            'Documento SEI', 'Setor', 'Etapa Processo', 
+            'Data Entrada', 'Previsao Saida', 'Data Saida', 'Dias',
+            'Observacoes', 'Data Exportação'
+        ])
+        
+        for contrato in tab_contratos:
+            registro_data = contrato.registro_data.replace(tzinfo=None)
+            ult_atual_data = contrato.ult_atual_data.replace(tzinfo=None)
+            #Contratos
+            contratos.append([
+                contrato.id,
+                registro_data, str(proaq.usuario_registro.primeiro_ultimo_nome()),
+                ult_atual_data, str(proaq.usuario_atualizacao.primeiro_ultimo_nome()), proaq.log_n_edicoes,
+                
+                proaq.get_unidade_daf_label(), proaq.get_modalidade_aquisicao_label(), proaq.get_denominacao_nome(),
+                proaq.numero_processo_sei, proaq.numero_etp, proaq.get_status_label(),
+                proaq.responsavel_tecnico_proaq(),  proaq.observacoes_gerais, data_exportacao
+            ])
+            
+            #Objetos
+            for objeto in contratos.contrato_objeto.filter(del_status=False):
+                registro_data = item.registro_data.replace(tzinfo=None)
+                ult_atual_data = item.ult_atual_data.replace(tzinfo=None)
+                contratos_objetos.append([
+                    item.id, item.proaq.id,
+                    registro_data, str(item.usuario_registro.primeiro_ultimo_nome()),
+                    ult_atual_data, str(item.usuario_atualizacao.primeiro_ultimo_nome()), item.log_n_edicoes,
+                    item.numero_item, item.tipo_cota, item.produto.produto, item.produto.id,
+                    item.cmm_data_inicio, item.cmm_data_fim, item.cmm_estimado, item.qtd_a_ser_contratada,
+                    item.cobertura_dias(), item.cobertura_meses(),
+                    item.valor_unitario_estimado, item.valor_total(),
+                    item.observacoes_gerais, data_exportacao
+                ])
+            
+            #Parcelas
+            for parcela in contratos.parcela_contrato.filter(del_status=False):
+                registro_data = evolucao.registro_data.replace(tzinfo=None)
+                ult_atual_data = evolucao.ult_atual_data.replace(tzinfo=None)
+                contratos_parcelas.append([
+                    evolucao.id, evolucao.proaq.id,
+                    registro_data, str(evolucao.usuario_registro.primeiro_ultimo_nome()),
+                    ult_atual_data, str(evolucao.usuario_atualizacao.primeiro_ultimo_nome()), evolucao.log_n_edicoes, 
+                    evolucao.fase_numero, evolucao.fase_numero,
+                    evolucao.data_entrada, evolucao.data_saida, evolucao.total_dias(),
+                    evolucao.observacoes_gerais, data_exportacao
+                ])
+            
+            #Entregas
+            for entrega in contratos.entrega_parcela.filter(del_status=False):
+                registro_data = proaq.registro_data.replace(tzinfo=None)
+                ult_atual_data = proaq.ult_atual_data.replace(tzinfo=None)
+                contratos_entregas.append([
+                    tramitacao.id, tramitacao.proaq.id, 
+                    registro_data, str(tramitacao.usuario_registro.primeiro_ultimo_nome()),
+                    ult_atual_data, str(tramitacao.usuario_atualizacao.primeiro_ultimo_nome()), tramitacao.log_n_edicoes,
+                    tramitacao.documento_sei, tramitacao.setor.setor, tramitacao.etapa_tramitacao(),
+                    tramitacao.data_entrada, tramitacao.previsao_saida, tramitacao.data_saida, tramitacao.dias_tramitacao(),
+                    tramitacao.observacoes, data_exportacao
+                ])
+        
+            #Fiscais
+            for fiscal in contratos.fiscal_contrato.filter(del_status=False):
+                registro_data = proaq.registro_data.replace(tzinfo=None)
+                ult_atual_data = proaq.ult_atual_data.replace(tzinfo=None)
+                contratos_fiscais.append([
+                    tramitacao.id, tramitacao.proaq.id, 
+                    registro_data, str(tramitacao.usuario_registro.primeiro_ultimo_nome()),
+                    ult_atual_data, str(tramitacao.usuario_atualizacao.primeiro_ultimo_nome()), tramitacao.log_n_edicoes,
+                    tramitacao.documento_sei, tramitacao.setor.setor, tramitacao.etapa_tramitacao(),
+                    tramitacao.data_entrada, tramitacao.previsao_saida, tramitacao.data_saida, tramitacao.dias_tramitacao(),
+                    tramitacao.observacoes, data_exportacao
+                ])
+        
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Processo Aquisitivo",
+            model='ProaqDadosGerais',
+            model_id=0,
+            item_id=0,
+            item_descricao="Exportação da lista de processos aquisitivos.",
+            acao="Exportação",
+            observacoes=f"Usuário {request.user.username} exportou dados de Processos Aquisitivos em {current_date_str}."
+        )
+        log_entry.save()
+
+        # Salva o workbook em um arquivo Excel
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=proaq.xlsx'
+        wb.save(response)
+        
+        return response
+    
 
 
 #CONTRATOS/OBJETOS
@@ -389,36 +609,35 @@ def contrato_objeto_salvar(request, id_objeto=None):
                     'retorno': 'Não houve mudanças'
                 })
 
+        #Fazer uma cópia mutável do request.POST
+        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
+
         #Instanciar: Produto
         produto_id = request.POST.get('ctobjeto_produto_hidden')
-        print('PRODUTO: ', produto_id)
         produto_instance = ProdutosFarmaceuticos.objects.get(id=produto_id)
     
         #Instanciar: Fornecedor
         contrato_id = request.POST.get('contrato')
-        print('CONTRATO: ', contrato_id)
         contrato_instance =  Contratos.objects.get(id=contrato_id)
 
         #Instanciar: ARP Item
         arp_item_id = request.POST.get('arp_item')
         if arp_item_id:
-            print('ARP Item: ', arp_item_id)
             arp_item_instance = ContratosArpsItens.objects.get(id=arp_item_id)
             modificacoes_post['arp_item'] = arp_item_instance
 
-        #Valor unitario
+        # Valor unitario
         valor_unitario = request.POST.get('valor_unitario')
-        valor_unitario = valor_unitario.replace('R$', '').replace('\xa0', '').replace(',', '.')
-
-        #Fazer uma cópia mutável do request.POST
-        modificacoes_post = QueryDict(request.POST.urlencode(), mutable=True)
-
+        valor_unitario = valor_unitario.replace('R$', '').replace('\xa0', '').strip()
+        partes = valor_unitario.split(',')
+        valor_unitario = partes[0].replace('.', '') + '.' + partes[1]
+        valor_unitario = float(valor_unitario)
+        
         #Atualizar os valores no mutable_post
         modificacoes_post['produto'] = produto_instance
         modificacoes_post['contrato'] = contrato_instance
         modificacoes_post['valor_unitario'] = valor_unitario
         
-
         #Criar o formulário com os dados atualizados
         objeto_form = ContratosObjetosForm(modificacoes_post, instance=objeto_form.instance)
         
@@ -1237,6 +1456,8 @@ def arp_filtrar(request):
     denominacao = request.GET.get('denominacao', None)
     fornecedor = request.GET.get('fornecedor', None)
 
+    print('Status ARP: ', status_arp)
+
     filters = {}
     filters['del_status'] = False
     if status_arp:
@@ -1247,7 +1468,7 @@ def arp_filtrar(request):
         filters['denominacao_id'] = denominacao
     if fornecedor:
         filters['fornecedor__nome_fantasia__icontains'] = fornecedor
-    
+    print('Filtros: ', filters)
     tab_arps = ContratosArps.objects.filter(**filters).order_by('-data_publicacao')
     total_arps = tab_arps.count()
 
@@ -1267,15 +1488,17 @@ def arp_filtrar(request):
             'unidade_daf': arp.unidade_daf,
             'numero_processo_sei': arp.numero_processo_sei,
             'numero_documento_sei': arp.numero_documento_sei,
+            'numero_arp': arp.numero_arp,
             'data_publicacao': arp.data_publicacao.strftime('%d/%m/%Y') if arp.data_publicacao else '',
             'data_vigencia': arp.data_vigencia.strftime('%d/%m/%Y') if arp.data_publicacao else '',
             'prazo_vigencia': arp.prazo_vigencia if arp.data_publicacao else '',
             'denominacao': arp.denominacao.denominacao,
             'fornecedor': arp.fornecedor.nome_fantasia,
+            'contratos': arp.contratos,
             'valor_total_arp': valor_total,
         }
         data.append(arp_data)
-
+    print('Dados: ', data)
     return JsonResponse({
         'data': data,
         'total_arps': total_arps,

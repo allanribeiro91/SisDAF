@@ -77,6 +77,12 @@ class Pacientes(models.Model):
 
         return idade
 
+    def paciente_obito(self):
+        if self.data_obito:
+            obito = 'Sim'
+        else:
+            obito = 'Não'
+        return obito
     
     def paciente_uf(self):
         cod_ibge = self.naturalidade_cod_ibge
@@ -93,7 +99,73 @@ class Pacientes(models.Model):
         localidade = UF_Municipio.objects.filter(cod_ibge=cod_ibge).get()
         municipio = localidade.municipio
         return municipio
+    
+    def paciente_naturalidade(self):
+        if self.paciente_municipio() and self.paciente_uf():
+            return f"{self.paciente_municipio()}-{self.paciente_uf()}"
+        return None
+
+
+    def paciente_idade(self):
+        """
+        Calcula a idade do paciente. Se o paciente faleceu, calcula a idade na data do óbito.
+        """
+        if not self.data_nascimento:
+            return None  # Retornar None se a data de nascimento não estiver definida
+
+        # Usar a data de óbito se disponível, caso contrário, usar a data atual
+        data_referencia = self.data_obito if self.data_obito else datetime.now()
+
+        # Calcula a diferença em anos
+        idade = data_referencia.year - self.data_nascimento.year - ((data_referencia.month, data_referencia.day) < (self.data_nascimento.month, self.data_nascimento.day))
+
+        return idade
+    
+    def paciente_produtos_recebidos(self):
+        """
+        Retorna uma string com todos os produtos farmacêuticos já recebidos pelo paciente, separados por vírgula.
+        """
+        dispensacoes = self.dispensacao_paciente.all().filter(del_status=False) 
+        produtos_recebidos = set() 
+
+        for dispensacao in dispensacoes:
+            if dispensacao.produto and dispensacao.produto.produto:
+                produtos_recebidos.add(dispensacao.produto.produto)
+
+        if not produtos_recebidos: 
+            return "NI"
+
+        produtos_recebidos = sorted(produtos_recebidos)
+        return ', '.join(produtos_recebidos)
+
+    def paciente_via_atendimento(self):
+        dispensacoes = self.dispensacao_paciente.all().filter(del_status=False) 
+        vias_atendimentos = set() 
+
+        for dispensacao in dispensacoes:
+            if dispensacao.via_atendimento:
+                vias_atendimentos.add(dispensacao.get_via_atendimento_display())
+
+        if not vias_atendimentos: 
+            return "NI"
+
+        vias_atendimentos = sorted(vias_atendimentos)
+        return ', '.join(vias_atendimentos)
+    
+    def paciente_ses_ufs(self):
+        dispensacoes = self.dispensacao_paciente.all().filter(del_status=False) 
+        ses_ufs = set() 
+
+        for dispensacao in dispensacoes:
+            if dispensacao.uf_solicitacao:
+                ses_ufs.add(dispensacao.get_uf_solicitacao_display())
+
+        if not ses_ufs: 
+            return "NI"
         
+        ses_ufs = sorted(ses_ufs)
+        return ', '.join(ses_ufs)
+
 
     def __str__(self):
         return f"{self.nome} ({self.cns})"
@@ -165,5 +237,22 @@ class Dispensacoes(models.Model):
         self.del_usuario = user
         self.save()
     
+    def local_aplicacao_uf(self):
+        cod_ibge = self.local_aplicacao_cod_ibge
+        if not cod_ibge:
+            return None
+        localidade = UF_Municipio.objects.filter(cod_ibge=cod_ibge).get()
+        uf = localidade.uf_sigla
+        return uf
+    
+    def local_aplicacao_municipio(self):
+        cod_ibge = self.local_aplicacao_cod_ibge
+        if not cod_ibge:
+            return None
+        localidade = UF_Municipio.objects.filter(cod_ibge=cod_ibge).get()
+        municipio = localidade.municipio
+        return municipio
+    
     def __str__(self):
         return f"{self.nome} ({self.cns})"
+

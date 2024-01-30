@@ -26,7 +26,7 @@
 
     <div class="horizontal-sections">
         
-        <div class="section numbers">
+        <div class="section numbers" style="width: 200px;">
             <div class="filter-title">
                 Total de ARPs
             </div>
@@ -40,7 +40,7 @@
             
             <!-- Status -->
             <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" id="status_arp">
+                <select class="form-select" aria-label="Floating label select example" id="filtro_status_arp">
                     <option value=""></option>
                     {% for value, display in lista_status %}
                     <option value="{{ value }}">{{ display }}</option>
@@ -51,7 +51,7 @@
 
              <!-- Unidade DAF -->
              <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" id="unidade_daf">
+                <select class="form-select" aria-label="Floating label select example" id="filtro_unidade_daf">
                     <option value=""></option>
                     {% for value, display in lista_unidadesdaf %}
                     <option value="{{ value }}">{{ display }}</option>
@@ -62,7 +62,7 @@
             
             <!-- Denominações Genéricas -->
             <div class="form-floating fornecedor">
-                <select class="form-select" aria-label="Floating label select example" id="denominacao">
+                <select class="form-select" aria-label="Floating label select example" id="filtro_denominacao">
                     <option value=""></option>
                     {% for id, name in lista_denominacoes %}
                     <option value="{{ id }}">{{ name }}</option>
@@ -73,7 +73,7 @@
 
             <!-- Denominações Genéricas -->
             <div class="form-floating fornecedor">
-                <select class="form-select" aria-label="Floating label select example" id="fornecedor">
+                <select class="form-select" aria-label="Floating label select example" id="filtro_fornecedor">
                     <option value=""></option>
                     {% for name in lista_fornecedores %}
                     <option value="{{ name }}">{{ name }}</option>
@@ -82,7 +82,7 @@
                 <label for="floatingSelect">Fornecedor</label>
             </div>
                 
-            <button class="custom-btn limpar-filtro-arps">
+            <button class="custom-btn limpar-filtro-arps" id="limpar_filtros">
                 <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
                 <span style="font-size: 10px;">Limpar Filtros</span>
             </button>
@@ -173,6 +173,7 @@
         </div>
     </div>
     
-    <script src="{% static 'js/arp.js' %}"></script>
+    <!-- <script src="{% static 'js/arp.js' %}"></script> -->
+    <script src="{% static 'js/arp_home.js' %}"></script>
 
 {% endblock %}

@@ -1,0 +1,209 @@
+{% load static %}
+{% load custom_filters %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '/styles/relatorio_ficha_paciente.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Paciente {{ paciente.nome }} ({{ paciente.cns }})</title>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-sisdaf">
+            <img src="{% static '/assets/logo/logo_sisdaf_transparente.png' %}" alt="Logo SisDAF" class="top-logo">
+        </div>
+        <div class="titulo-relatorio">
+            <b>SisDAF</b> - Ficha de <b>DISPENSAÇÕES DE MEDICAMENTOS DO PACIENTE</b>
+        </div>
+        <div class="responsavel-exportacao">
+            {{ usuario }} - {{ data_hora }}
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Log -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Log
+                </div>
+                <div class="grid" style="justify-content: left; gap:10px">
+                    <div class="box">
+                        <div class="box-titulo">ID</div>
+                        <div class="box-conteudo">{{ paciente.id }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Registro</div>
+                        <div class="box-conteudo">{{ paciente.usuario_registro.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Data Registro</div>
+                        <div class="box-conteudo">{{ paciente.registro_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Responsável Últ. Atualização</div>
+                        <div class="box-conteudo">{{ paciente.usuario_atualizacao.primeiro_ultimo_nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Última Atualização</div>
+                        <div class="box-conteudo">{{ paciente.ult_atual_data|date:"d/m/Y H:i:s" }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Nº Edições</div>
+                        <div class="box-conteudo">{{ paciente.log_n_edicoes }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados do Paciente -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Dados do Paciente
+                </div>
+                
+                <!-- CNS, CPF, Paciente, Sexo, Cor da Pele -->
+                <div class="grid" style="gap: 10px!important">
+                    <div class="box">
+                        <div class="box-titulo">CNS</div>
+                        <div class="box-conteudo">{{ paciente.cns }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">CPF</div>
+                        <div class="box-conteudo">{{ paciente.cpf }}</div>
+                    </div>
+                    
+                    <div class="box full-width">
+                        <div class="box-titulo">Paciente</div>
+                        <div class="box-conteudo">{{ paciente.nome }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Sexo</div>
+                        <div class="box-conteudo">{{ paciente.get_sexo_display }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Cor da Pele</div>
+                        <div class="box-conteudo">{{ paciente.get_cor_pele_display }}</div>
+                    </div>
+                </div>
+
+                <!-- Data Nascimento, Óbito, Idade, Orientação Sexual e Naturalidade -->
+                <div class="grid" style="gap: 10px!important">
+                    <div class="box">
+                        <div class="box-titulo">Data Nascimento</div>
+                        <div class="box-conteudo">{{ paciente.data_nascimento|date:'d/m/Y' }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Data Óbito</div>
+                        <div class="box-conteudo">{{ paciente.data_óbito|date:'d/m/Y'|default:'-' }}</div>
+                    </div>
+                    <div class="box">
+                        <div class="box-titulo">Idade</div>
+                        <div class="box-conteudo">{{ paciente.paciente_idade }} anos</div>
+                    </div>                   
+                    <div class="box">
+                        <div class="box-titulo">Orientação Sexual</div>
+                        <div class="box-conteudo">{{ paciente.get_orientacao_sexual_display }}</div>
+                    </div>
+                    <div class="box full-width">
+                        <div class="box-titulo">Naturalidade</div>
+                        <div class="box-conteudo">{{ paciente.paciente_municipio }}-{{ paciente.paciente_uf }} ({{ paciente.naturalidade_cod_ibge }})</div>
+                    </div>
+                    
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Dispensações -->
+        <div class="horizontal-section log">
+            <div class="section">
+                <div class="section-titulo">
+                    Dispensações de Medicamentos
+                </div>
+                
+                <div class="grid" style="justify-content:center !important;" >
+                    <table class="tabela-relatorio" style="font-size: 10px;" id="tabDispensacoes">
+                        <thead  style="vertical-align: middle;">
+                            <tr>
+                                <th class="col-id">ID</th>
+                                <th class="col-texto6">Status</th>
+                                <th class="col-texto6">Via<br> Atend.</th>
+                                <th class="col-texto6">Origem <br>Dem.</th>
+                                <th class="col-texto4">UF/SES</th>
+                                <th class="col-texto25">Produto Farmacêutico</th>
+                                <th class="col-texto6">CID</th>
+                                <th class="col-texto6">Fase<br> do Trat.</th>
+                                <th class="col-texto6">Ciclo<br> do Trat.</th>
+                                <th class="col-texto6">Data <br>Solicitação</th>
+                                <th class="col-texto6">Data <br>Envio</th>
+                                <th class="col-texto6">Data <br>Consumo</th>
+                                <th class="col-texto6">Comprov.<br> (SEI)</th>
+                                <th class="col-valor5">Qtd<br> Dispensada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in tab_dispensacoes %}
+                            <tr data-id="{{ item.id }}" data-proaq-id="{{ item.proaq.id }}">
+                                <td class="col-id">{{ item.id }}</td>
+                                <td class="col-texto6">{{ item.get_status_display }}</td>
+                                <td class="col-texto6">{{ item.get_via_atendimento_display }}</td>
+                                <td class="col-texto6">{{ item.get_origem_demanda_judicial_display }}</td>
+                                <td class="col-texto4">{{ item.uf_solicitacao }}</td>
+                                <td class="col-texto25">{{ item.produto.produto }}</td>
+                                <td class="col-texto6">{{ item.cid }}</td>
+                                <td class="col-texto6">{{ item.get_fase_tratamento_display }}</td>
+                                <td class="col-texto6">{{ item.get_ciclo_display }}</td>
+                                <td class="col-texto6">{{ item.data_solicitacao|date:'d/m/Y'|default:'-' }}</td>
+                                <td class="col-texto6">{{ item.data_envio|date:'d/m/Y'|default:'-' }}</td>
+                                <td class="col-texto6">{{ item.data_consumo|date:'d/m/Y'|default:'-' }}</td>
+                                <td class="col-texto6">{{ item.comprovante_doc_sei }}</td>
+                                <td class="col-valor5">{{ item.quantidade }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>   
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Observações gerais -->
+        <div class="horizontal-section log">
+            <div class="section full-width">
+                <div class="section-titulo">
+                    Observações Gerais
+                </div>
+                <div class="grid">
+                    <div class="box-observacoes">
+                        <div class="box-conteudo">{{ paciente.observacoes_gerais }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</body>
+
+<script>
+    function cloneHeaderForPrint() {
+        const header = document.getElementById('header');
+        const allPages = document.querySelectorAll('.page');
+    
+        allPages.forEach(page => {
+            const headerClone = header.cloneNode(true);
+            page.insertBefore(headerClone, page.firstChild);
+        });
+    }
+    
+    window.onbeforeprint = cloneHeaderForPrint;
+</script>
+
+</html>

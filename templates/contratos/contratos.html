@@ -26,7 +26,7 @@
 
     <div class="horizontal-sections">
         
-        <div class="section numbers">
+        <div class="section numbers" style="width: 200px;">
             <div class="filter-title">
                 Total de Contratos
             </div>
@@ -40,51 +40,62 @@
             
             <!-- Status -->
             <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" name="status_proaq" id="status_proaq">
+                <select class="form-select" id="filtro_status_contrato">
                     <option value=""></option>
-                    {% for value, display in STATUS_PROAQ %}
+                    {% for value, display in lista_status %}
                     <option value="{{ value }}">{{ display }}</option>
                     {% endfor %}
                 </select>
-                <label for="floatingSelect">Status</label>
+                <label for="filtro_status_contrato">Status</label>
             </div>
 
             <!-- Modalidade de Aquisição -->
-            <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" name="modalidade_aquisicao" id="modalidade_aquisicao">
+            <div class="form-floating tipo-fornecedor" style="width: 200px;">
+                <select class="form-select" id="filtro_modalidade_aquisicao">
                     <option value=""></option>
-                    {% for value, display in MODALIDADE_AQUISICAO %}
+                    {% for value, display in lista_modalidades %}
                     <option value="{{ value }}">{{ display }}</option>
                     {% endfor %}
                 </select>
-                <label for="floatingSelect">Mod. de Aquisição</label>
+                <label for="filtro_modalidade_aquisicao">Mod. de Aquisição</label>
             </div>
 
              <!-- Unidade DAF -->
-             <div class="form-floating tipo-fornecedor">
-                <select class="form-select" aria-label="Floating label select example" name="unidade_daf" id="unidade_daf">
+             <div class="form-floating tipo-fornecedor" style="width: 180px;">
+                <select class="form-select" id="filtro_unidade_daf">
                     <option value=""></option>
-                    {% for value, display in UNIDADE_DAF %}
+                    {% for value, display in lista_unidadesdaf %}
                     <option value="{{ value }}">{{ display }}</option>
                     {% endfor %}
                 </select>
-                <label for="floatingSelect">Unidade DAF</label>
+                <label for="filtro_unidade_daf">Unidade DAF</label>
             </div>            
             
             <!-- Denominações Genéricas -->
             <div class="form-floating fornecedor">
-                <select class="form-select" aria-label="Floating label select example" name="denominacao" id="denominacao">
+                <select class="form-select" id="filtro_denominacao">
                     <option value=""></option>
-                    {% for id, name in DENOMINACOES %}
+                    {% for id, name in lista_denominacoes %}
                     <option value="{{ id }}">{{ name }}</option>
                     {% endfor %}
                 </select>
-                <label for="floatingSelect">Denominações Genéricas</label>
+                <label for="filtro_denominacao">Denominação Genérica</label>
+            </div>
+
+            <!-- Fornecedores -->
+            <div class="form-floating fornecedor">
+                <select class="form-select" id="filtro_fornecedor">
+                    <option value=""></option>
+                    {% for name in lista_fornecedores %}
+                    <option value="{{ name }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="filtro_fornecedor">Fornecedor</label>
             </div>
 
             
                 
-            <button class="custom-btn limpar-filtro-fornecedores">
+            <button class="custom-btn limpar-filtro-fornecedores" id="limpar_filtros">
                 <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
                 <span style="font-size: 10px;">Limpar Filtros</span>
             </button>

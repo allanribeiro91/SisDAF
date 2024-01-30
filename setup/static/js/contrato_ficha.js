@@ -453,6 +453,12 @@ document.addEventListener("DOMContentLoaded", function() {
         modal_entrega_parcela.show()
     })
     botao_inserir_nova_entrega.addEventListener('click', function(){
+        
+        if (selecionar_parcela_entrega.value == ''){
+            modal_entrega_parcela.hide();
+            return
+        }
+        
         id_parcela = document.getElementById('entrega_parcela_id').value
 
         const url = `/contratos/buscar_parcela/${id_parcela}/`;
@@ -1002,7 +1008,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return
         }
             
-        if (tabela_objetos_contrato.rows.length == 1) {
+        if (tabela_objetos_contrato.rows.length ==2) {
             sweetAlertGenerico(
                 title='Contrato com ARP', 
                 html=(
@@ -1836,7 +1842,7 @@ document.addEventListener("DOMContentLoaded", function() {
     })
 
 
-    //Relatório ARP
+    //Relatório Contrato
     const botao_relatorio_contrato = document.getElementById('btnContratoRelatorio')
     botao_relatorio_contrato.addEventListener('click', function(){
 

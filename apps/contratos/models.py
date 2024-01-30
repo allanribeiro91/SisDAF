@@ -249,6 +249,9 @@ class ContratosArpsItens(models.Model):
     def __str__(self):
         return f"ARP: {self.arp.numero_arp} - Item: ({self.numero_item}) - Produto ({self.produto.produto})"
 
+
+
+
 class Contratos(models.Model):
     #relacionamento
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='contrato_registro')
@@ -746,6 +749,9 @@ class ContratosFiscais(models.Model):
 
     def __str__(self):
         return f"Fiscal do contrato: {self.fiscal_nome()}"
+
+
+
 
 class Empenhos(models.Model):
     #relacionamento

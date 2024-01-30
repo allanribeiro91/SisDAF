@@ -9,7 +9,7 @@ from apps.contratos.views import (
     contrato_entrega_delete, contrato_parcela_delete, contrato_anotacoes, contrato_fiscal_salvar,
     contrato_fiscal_modal, empenhos, empenho_ficha, teds, buscar_parcelas, contratos_relatorios_arp,
     item_empenho_salvar, item_empenho_modal, item_empenho_deletar, contrato_fiscal_delete, empenho_deletar,
-    contratos_relatorios_empenho, contratos_relatorios_contrato
+    contratos_relatorios_empenho, contratos_relatorios_contrato, contrato_exportar, contrato_filtrar,
 )
 
 
@@ -41,6 +41,8 @@ urlpatterns = [
     path('contratos/buscarcontrato/<int:id_contrato>/', buscar_contrato, name='buscar_contrato'),
     path('contratos/vincularitensarp/<int:id_arp>-<int:id_contrato>/', vincular_itens_arp, name='vincular_itens_arp'),
     path('contratos/ficha-arp/<int:id_arp>/', contrato_dados_arp, name='contrato_dados_arp'),
+    path('contratos/contratos/exportar/', contrato_exportar, name='contrato_exportar'),
+    path('contratos/contratos/filtrar/', contrato_filtrar, name='contrato_filtrar'),
     
     #CONTRATOS/OBJETO
     path('contratos/contrato/objeto/<int:id_objeto>/dados/', contrato_objeto_modal, name='contrato_objeto_modal'),

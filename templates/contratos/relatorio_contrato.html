@@ -68,7 +68,7 @@
                 </div>
                 
                 <div class="grid">
-                    <div class="box {% if contrato.status == 'vigente' %}status-vigente{% elif contrato.status == 'encerradp' %}status-encerradp{% elif contrato.status == 'suspenso' %}status-suspenso{% elif contrato.status == 'cancelado' %}status-cancelado{% endif %}" id="relatorio_box_status">
+                    <div class="box {% if contrato.status == 'vigente' %}status-vigente{% elif contrato.status == 'encerrado' %}status-encerradp{% elif contrato.status == 'suspenso' %}status-suspenso{% elif contrato.status == 'cancelado' %}status-cancelado{% endif %}" id="relatorio_box_status">
                         <div class="box-titulo">Status</div>
                         <div class="box-conteudo">{{ contrato.get_status_display }}</div>
                     </div>

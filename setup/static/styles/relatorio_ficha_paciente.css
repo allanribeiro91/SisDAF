@@ -1,12 +1,13 @@
 @page {
-    size: A4;
+    size: A4 landscape; /* Define o tamanho da página para A4 e a orientação para paisagem */
     margin: 0;
 }
+
 body {
-    width: 210mm;
-    height: 305mm;
+    width: 297mm; /* Largura da página A4 no modo paisagem */
+    height: 200mm; /* Altura da página A4 no modo paisagem */
     margin: 0 auto;
-    padding: 10mm;
+    padding: 10mm; /* Ajuste esta margem conforme necessário */
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     font-family: 'Open Sans', sans-serif;
 }
@@ -152,95 +153,17 @@ body {
     .tabela-relatorio td, .tabela-relatorio th {
         height: 25px; /* Ajuste este valor conforme necessário */
     }
-    
-
-/*--colunas--*/
-.col-id {
-    width: 4% !important;
-}
-.col-produto {
-    width: 15% !important;
-    text-align: left;
-}
-
-.col-tipo {
-    width: 6% !important;
-    text-align: left;
-}
-
-.col-valor {
-    width: 6% !important;
-    text-align: right;
-    margin-right: 1px;
-}
-
-.col-contrato {
-    width: 3% !important;
-    text-align: right !important;
-    margin-right: 1px;
-}
-
-.col-saldo {
-    width: 8% !important;
-    text-align: right;
-}
-
-.status-vigente {
-    background-color: #c2f6ff !important;
-}
-
-.status-encerrado {
-    background-color: #b6b6b6 !important;
-}
-
-.status-suspenso {
-    background-color: #ffffd4 !important;
-}
-
-.status-cancelado {
-    background-color: #ffcbc2 !important;
-}
-
-
-
-
-    
+       
 
     @media print {
+        
         .section-titulo {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
             background-color: #d4d4d4;
         }
+        
 
-    
-        .box.status-vigente {
-            background-color: #c2f6ff !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-        
-        .box.status-encerrado {
-            background-color: #b6b6b6;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-        
-        .box.status-suspenso {
-            background-color: #ffffd4;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-        
-        .box.status-cancelado {
-            background-color: #ffcbc2;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-
-        .page-break {
-            page-break-after: always;
-        }   
         
     }
 

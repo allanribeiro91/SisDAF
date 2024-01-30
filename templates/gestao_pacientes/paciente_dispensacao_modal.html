@@ -206,7 +206,7 @@
                                             <select class="form-select" id="id_dispensacao_uf">
                                                 <option value=""></option>
                                                 {% for value in lista_ufs %}
-                                                    <option value="{{ value }}" {% if paciente == value %}selected{% endif %}>{{ value }}</option>
+                                                    <option value="{{ value }}">{{ value }}</option>
                                                 {% endfor %}
                                             </select>
                                             <label for="id_dispensacao_uf">UF</label>
@@ -215,7 +215,7 @@
                                             <select class="form-select" id="id_dispensacao_municipio" disabled>
                                                 <option value=""></option>
                                                 {% for cod_ibge, municipio in municipios %}
-                                                    <option value="{{ cod_ibge }}" {% if form_dispensacao.instance.naturalidade_cod_ibge == cod_ibge %}selected{% endif %}>{{ municipio }}</option>
+                                                    <option value="{{ cod_ibge }}">{{ municipio }}</option>
                                                 {% endfor %}
                                             </select>                        
                                             <label for="id_dispensacao_municipio">Município</label>
@@ -223,6 +223,10 @@
                                         <div class="form-floating mb-3" style="width: 500px;">
                                             {{ form_dispensacao.local_aplicacao_unidade_saude }}
                                             <label>{{ form_dispensacao.local_aplicacao_unidade_saude.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            {{ form_dispensacao.comprovante_doc_sei }}
+                                            <label>{{ form_dispensacao.comprovante_doc_sei.label }}</label>
                                         </div>
                                     </div>
                                 </div>
@@ -242,8 +246,7 @@
 
                             <div class="grid" style="font-size: 14px;">
                                 <div class="form-floating mb-3">
-                                    <input type="hidden" id="id_parcela_objeto" name="parcela_objeto_hidden" readonly>
-                                    <input type="hidden" id="id_qtd_contratada_hidden" readonly>
+                                    <input type="hidden" id="id_dispensacao_paciente" name="id_dispensacao_paciente" readonly>
                                 </div>
                             </div>
                         </div>

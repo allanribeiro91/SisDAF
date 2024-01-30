@@ -5,7 +5,9 @@ function formatarComoMoeda(valor) {
     // Formata o número como moeda
     let formatado = numero.toLocaleString('pt-BR', {
         style: 'currency',
-        currency: 'BRL'
+        currency: 'BRL',
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 4 
     });
     return formatado;
 }
@@ -14,7 +16,7 @@ function formatarComoMoeda(valor) {
 function formatoMoeda(valor) {
     if (typeof valor === 'number') {
         // Se o valor for um número, formatar diretamente
-        valor = valor.toFixed(2);
+        valor = valor.toFixed(4);
     } else if (typeof valor === 'string') {
         // Se o valor for uma string, remover caracteres não numéricos e converter
         valor = valor.replace(/[^\d.,]/g, '');
@@ -23,10 +25,10 @@ function formatoMoeda(valor) {
         if (isNaN(valor)) {
             valor = 0;
         }
-        valor = valor.toFixed(2);
+        valor = valor.toFixed(4);
     } else {
         // Se o valor não for nem número nem string, definir como 0
-        valor = '0.00';
+        valor = '0.0000';
     }
 
     // Converter para string para fazer as substituições
@@ -103,14 +105,17 @@ function formatoValorMonetario(campoId) {
             numero = 0;
         }
 
-        // Formata o valor como um número com duas casas decimais
-        var valorFormatado = (numero / 100).toFixed(2);
+        // Formata o valor como um número com quatro casas decimais
+        var valorFormatado = (numero / 10000).toFixed(4);
 
-        // Substitui o ponto por uma vírgula
-        valorFormatado = valorFormatado.replace('.', ',');
+        // Divide o valor formatado em parte inteira e decimal
+        var partes = valorFormatado.split('.');
 
-        // Adiciona pontos como separadores de milhar
-        valorFormatado = valorFormatado.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        // Adiciona pontos como separadores de milhar na parte inteira
+        partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        // Junta as partes com uma vírgula
+        valorFormatado = partes.join(',');
 
         // Adiciona o símbolo de real
         valorFormatado = 'R$ ' + valorFormatado;
@@ -119,6 +124,8 @@ function formatoValorMonetario(campoId) {
         this.value = valorFormatado;
     });
 }
+
+
 
 function converterDataParaFormatoInternacional(dataStr) {
     const partes = dataStr.split('/');
@@ -211,13 +218,46 @@ function cnsSomaPonderada(cns) {
 }
 
 
-function calcular_idade(data_nascimento) {
-    var hoje = new Date();
+function calcular_idade(data_nascimento, data_obito) {
+    var dataReferencia = data_obito ? new Date(data_obito) : new Date();
     var nascimento = new Date(data_nascimento);
-    var idade = hoje.getFullYear() - nascimento.getFullYear();
-    var m = hoje.getMonth() - nascimento.getMonth();
-    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+    var idade = dataReferencia.getFullYear() - nascimento.getFullYear();
+    var m = dataReferencia.getMonth() - nascimento.getMonth();
+    if (m < 0 || (m === 0 && dataReferencia.getDate() < nascimento.getDate())) {
         idade--;
     }
     return idade;
 }
+
+
+function analisar_coerencia_datas(data1, data2, mensagem) {
+    var inputData1 = document.getElementById(data1);
+    var inputData2 = document.getElementById(data2);
+
+    if (inputData1 && inputData2) {
+        var valorData1 = new Date(inputData1.value);
+        var valorData2 = new Date(inputData2.value);
+
+        if (valorData2 < valorData1) {
+            inputData2.value = '';
+
+            // Usando SweetAlert para mostrar a mensagem
+            sweetAlert(mensagem);
+
+            return false
+        }
+    }
+
+    return true
+}
+
+
+// Função para limpar os filtros
+function limparFiltros(idsFiltros) {
+    for (let id of idsFiltros) {
+        document.getElementById(id).value = '';
+    }
+}
+
+
+
