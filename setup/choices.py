@@ -403,6 +403,7 @@ ORIGEM_DEMANDA_JUDICIAL = [
 STATUS_DISPENSACAO = [
     ('em_analise', 'Em Análise'),
     ('enviado', 'Enviado'),
+    ('entregue', 'Entregue'),
     ('consumido', 'Consumido'),
     ('cancelado', 'Cancelado'),
     ('', 'Não Informado'),

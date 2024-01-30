@@ -290,6 +290,7 @@ def dispensacao_modal(request, dispensacao_id=None):
             'numero_pedido_sismat': item.numero_pedido_sismat,
             'data_solicitacao': item.data_solicitacao,
             'data_envio': item.data_envio,
+            'data_entrega': item.data_entrega,
             'data_consumo': item.data_consumo,
 
             #aplicação

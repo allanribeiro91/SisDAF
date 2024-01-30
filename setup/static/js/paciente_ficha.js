@@ -287,6 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const dispensacao_numero_pedido = document.getElementById('id_dispensacao_numero_pedido_sismat')
         const dispensacao_data_solicitacao = document.getElementById('id_dispensacao_data_solicitacao')
         const dispensacao_data_envio = document.getElementById('id_dispensacao_data_envio')
+        const dispensacao_data_entrega = document.getElementById('id_dispensacao_data_entrega')
         const dispensacao_data_consumo = document.getElementById('id_dispensacao_data_consumo')
 
         dispensacao_status.addEventListener('change', function(){
@@ -298,6 +299,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 dispensacao_data_envio.setAttribute('readonly', 'readonly')
                 dispensacao_data_envio.value = ''
 
+                dispensacao_data_entrega.setAttribute('readonly', 'readonly')
+                dispensacao_data_entrega.value = ''
+
                 dispensacao_data_consumo.setAttribute('readonly', 'readonly')
                 dispensacao_data_consumo.value = ''
 
@@ -306,6 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (dispensacao_status.value == 'enviado') {
                 dispensacao_numero_pedido.removeAttribute('readonly')
                 dispensacao_data_envio.removeAttribute('readonly')
+                dispensacao_data_entrega.removeAttribute('readonly')
 
                 dispensacao_data_consumo.setAttribute('readonly', 'readonly')
                 dispensacao_data_consumo.value = ''
@@ -314,6 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (dispensacao_status.value == 'consumido') {
                 dispensacao_numero_pedido.removeAttribute('readonly')
                 dispensacao_data_envio.removeAttribute('readonly')
+                dispensacao_data_entrega.removeAttribute('readonly')
                 dispensacao_data_consumo.removeAttribute('readonly')
             }
 
@@ -322,6 +328,11 @@ document.addEventListener("DOMContentLoaded", function () {
         dispensacao_data_envio.addEventListener('change', function(){
             var mensagem = '<span style="font-weight:normal">A <b style="color:red">Data de Envio</b> não pode ser anterior à <b style="color:red">Data da Solicitação</b>!</span>' 
             analisar_coerencia_datas('id_dispensacao_data_solicitacao', 'id_dispensacao_data_envio', mensagem)
+        })
+
+        dispensacao_data_envio.addEventListener('change', function(){
+            var mensagem = '<span style="font-weight:normal">A <b style="color:red">Data de Entrega</b> não pode ser anterior à <b style="color:red">Data de Envio</b>!</span>' 
+            analisar_coerencia_datas('id_dispensacao_data_envio', 'id_dispensacao_data_entrega', mensagem)
         })
 
         dispensacao_data_consumo.addEventListener('change', function(){
@@ -500,6 +511,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     $('#id_dispensacao_numero_pedido_sismat').val(data.numero_pedido_sismat);
                     $('#id_dispensacao_data_solicitacao').val(data.data_solicitacao);
                     $('#id_dispensacao_data_envio').val(data.data_envio);
+                    $('#id_dispensacao_data_entrega').val(data.data_entrega);
                     $('#id_dispensacao_data_consumo').val(data.data_consumo);
 
                     //aplicação

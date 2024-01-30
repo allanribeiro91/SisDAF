@@ -193,6 +193,7 @@ class Dispensacoes(models.Model):
     numero_pedido_sismat = models.CharField(max_length=15, null=True, blank=True)
     data_solicitacao = models.DateField(null=True, blank=True)
     data_envio = models.DateField(null=True, blank=True)
+    data_entrega = models.DateField(null=True, blank=True)
     data_consumo = models.DateField(null=True, blank=True)
     comprovante_doc_sei = models.CharField(max_length=10, null=True, blank=True)
     local_aplicacao_cod_ibge = models.CharField(max_length=10, null=True, blank=True)

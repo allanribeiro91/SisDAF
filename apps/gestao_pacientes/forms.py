@@ -247,6 +247,13 @@ class DispensacoesForm(forms.ModelForm):
         }),
         required=False,
     )
+    data_entrega = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+        }),
+        required=False,
+    )
     data_consumo = forms.DateField(
         widget=forms.DateInput(attrs={
             'class': 'form-control',
