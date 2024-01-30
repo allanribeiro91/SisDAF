@@ -163,8 +163,8 @@
                                     <td class="col-valor10">{{ item.qtd_embalagens|floatformat:0|intcomma }}</td>
                                     <td class="col-valor10">{{ item.qtd_empenhado|floatformat:0|intcomma }}</td>
                                     <td class="col-valor10">{{ item.item_empenho_qtd_entregue|floatformat:0|intcomma }}</td>
-                                    <td class="col-valor10">{{ item.parcela.objeto.valor_unitario|format_number }}</td>
-                                    <td class="col-valor10">{{ item.valor_empenhado|format_number }}</td>
+                                    <td class="col-valor10">{{ item.parcela.objeto.valor_unitario|floatformat:2|intcomma }}</td>
+                                    <td class="col-valor10">{{ item.valor_empenhado|floatformat:2|intcomma }}</td>
                                 </tr>
                                 {% endfor %}
 
@@ -175,7 +175,7 @@
                                     <td class="col-valor" style="font-weight: bold;">{{ empenho.empenho_qtd_empenhada|floatformat:0|intcomma }}</td>
                                     <td class="col-valor" style="font-weight: bold;">{{ empenho.empenho_qtd_entregue|floatformat:0|intcomma }}</td>
                                     <td class="col-valor" style="font-weight: bold;">-</td>
-                                    <td class="col-valor" style="font-weight: bold;">{{ empenho.valor_total|format_number }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ empenho.valor_total|floatformat:2|intcomma }}</td>
                                 </tr>
 
                                 <input type="hidden" id="qtd_entregue_empenho" value="{{ empenho.empenho_qtd_entregue }}" readonly>
