@@ -242,7 +242,7 @@
                                     <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_entregue_contrato|floatformat:0|intcomma }}</td>
                                     <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_a_entregar_contrato|floatformat:0|intcomma }}</td>
                                     <td class="col-valor" style="font-weight: bold;">-</td>
-                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.valor_total|format_number }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ contrato.valor_total|floatformat:2|intcomma }}</td>
                                 </tr>
                             </tbody>
                         </table> 
@@ -329,7 +329,7 @@
                                         {% endif %}
                                     </td>
                                     
-                                    <td class="col-valor5">{{ item.valor_total|format_number }}</td>
+                                    <td class="col-valor5">{{ item.valor_total|floatformat:2|intcomma }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

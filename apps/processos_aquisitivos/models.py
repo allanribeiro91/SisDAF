@@ -394,3 +394,4 @@ class ProaqTramitacao(models.Model):
 
     def __str__(self):
         return f"Proaq ({self.proaq}) - Etapa ({self.etapa_processo})"
+    

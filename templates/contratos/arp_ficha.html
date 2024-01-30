@@ -181,18 +181,18 @@
                                     </td>
                                     <td class="col-valor">
                                         {% if item.valor_unit_reequilibrio_bool %}
-                                            {{ item.valor_unit_reequilibrio|format_number }}
+                                            {{ item.valor_unit_reequilibrio }}
                                         {% else %}
-                                            {{ item.valor_unit_homologado|format_number }}
+                                            {{ item.valor_unit_homologado|floatformat:2|intcomma }}
                                         {% endif %}
                                     </td>
                                     <td class="col-valor">{{ item.qtd_registrada|floatformat:0|intcomma }}</td>
-                                    <td class="col-valor">{{ item.valor_total_arp_item|format_number }}</td>
+                                    <td class="col-valor">{{ item.valor_total_arp_item|floatformat:2|intcomma }}</td>
                                     <td class="col-valor">{{ item.contratos }}</td>
                                     <td class="col-valor">{{ item.qtd_contratada|floatformat:0|intcomma }}</td>
-                                    <td class="col-valor">{{ item.valor_contratado|format_number }}</td>
+                                    <td class="col-valor">{{ item.valor_contratado|floatformat:2|intcomma }}</td>
                                     <td class="col-valor">{{ item.qtd_saldo|floatformat:0|intcomma}}</td>
-                                    <td class="col-valor">{{ item.valor_saldo|format_number }}</td>
+                                    <td class="col-valor">{{ item.valor_saldo|floatformat:2|intcomma }}</td>
                                     <td class="col-valor">{{ item.qtd_saldo_percentual|format_percent}}</td>
                                 </tr>
                                 {% endfor %}
@@ -201,12 +201,12 @@
                                 <tr>
                                     <td colspan="5" style="text-align: right; font-weight: bold;">Total</td>
                                     <td class="col-valor" style="font-weight: bold;">{{ arp.qtd_registrada_total_arp|floatformat:0|intcomma }}</td>
-                                    <td class="col-valor" style="font-weight: bold;">{{ arp.valor_total_arp|format_number }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ arp.valor_total_arp|floatformat:2|intcomma }}</td>
                                     <td class="col-valor" style="font-weight: bold;">{{ arp.contratos }}</td>
                                     <td class="col-valor" style="font-weight: bold;">{{ arp.qtd_contratada_arp|floatformat:0|intcomma }}</td>
-                                    <td class="col-valor" style="font-weight: bold;">{{ arp.valor_contratado_arp|format_number }}</td>
+                                    <td class="col-valor" style="font-weight: bold;">{{ arp.valor_contratado_arp|floatformat:2|intcomma }}</td>
                                     <td class="col-valor" style="font-weight: bold;">{{ arp.saldo_qtd_arp|floatformat:0|intcomma }}</td>
-                                    <td class="col-saldo" style="font-weight: bold;">{{ arp.saldo_valor_arp|format_number }}</td>
+                                    <td class="col-saldo" style="font-weight: bold;">{{ arp.saldo_valor_arp|floatformat:2|intcomma }}</td>
                                     <td class="col-saldo" style="font-weight: bold;">{{ arp.saldo_arp_percentual|format_percent}}</td>
                                 </tr>
 
