@@ -171,7 +171,7 @@ class ProdutosFarmaceuticos(models.Model):
     def produtos_tags(self):
         # Retorna uma lista de tags associadas ao produto
         try:
-            tags = [tag.tag for tag in self.produto_tag.all()]
+            tags = [tag.tag for tag in self.produto_tag.filter(del_status=False)]
             tags = str(tags).replace('[', '').replace(']', '').replace("'", "")
             if tags:
                 tags
