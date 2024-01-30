@@ -37,7 +37,9 @@ def contratos(request):
     fornecedores = Fornecedores.objects.values_list('nome_fantasia', flat=True).distinct().order_by('nome_fantasia')
     
     tabContratos = Contratos.objects.filter(del_status=False).order_by('-data_publicacao')
-    
+    if (tabContratos.count == 0):
+        tabContratos = None
+
     conteudo = {
         'lista_unidadesdaf': lista_unidadesdaf,
         'lista_modalidades': MODALIDADE_AQUISICAO,
