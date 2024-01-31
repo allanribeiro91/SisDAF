@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.core.paginator import Paginator, EmptyPage
 from apps.produtos.models import ProdutosFarmaceuticos
@@ -11,6 +12,7 @@ from datetime import datetime
 from django.utils import timezone
 from setup.choices import GENERO_SEXUAL, LISTA_UFS_SIGLAS, VIA_ATENDIMENTO
 
+@login_required
 def gestao_pacientes(request):
     tab_pacientes = Pacientes.objects.all().filter(del_status=False)
     lista_produtos = ProdutosFarmaceuticos.objects.all().filter(del_status=False).values_list('id', 'produto')
@@ -23,6 +25,7 @@ def gestao_pacientes(request):
     }
     return render(request, 'gestao_pacientes/gestao_pacientes.html', conteudo)
 
+@login_required
 def gestao_pacientes_filtro(request):
     obito = request.GET.get('obito', None)
     cns = request.GET.get('cns', None)
@@ -70,6 +73,7 @@ def gestao_pacientes_filtro(request):
 
 
 #PACIENTE
+@login_required
 def paciente_ficha(request, id_paciente=None):
 
     if id_paciente:
@@ -155,6 +159,7 @@ def paciente_ficha(request, id_paciente=None):
 
     return render(request, 'gestao_pacientes/paciente_ficha.html', conteudo)
 
+@login_required
 def paciente_deletar(request, id_paciente=None):   
     try:
         item = Pacientes.objects.get(id=id_paciente)
@@ -184,6 +189,7 @@ def paciente_deletar(request, id_paciente=None):
 
 
 #DISPENSACAO
+@login_required
 def dispensacao_salvar(request, dispensacao_id=None):
     if dispensacao_id:
         dispensacao = Dispensacoes.objects.get(id=dispensacao_id)
@@ -258,6 +264,7 @@ def dispensacao_salvar(request, dispensacao_id=None):
                     'retorno': 'Erro ao salvar'
                 })
 
+@login_required
 def dispensacao_modal(request, dispensacao_id=None):
     try:
         item = Dispensacoes.objects.get(id=dispensacao_id)
@@ -310,6 +317,7 @@ def dispensacao_modal(request, dispensacao_id=None):
     except Dispensacoes.DoesNotExist:
         return JsonResponse({'error': 'Dispensação não encontrada'}, status=404)
 
+@login_required
 def dispensacao_deletar(request, dispensacao_id=None):   
     try:
         item = Dispensacoes.objects.get(id=dispensacao_id)
@@ -339,6 +347,7 @@ def dispensacao_deletar(request, dispensacao_id=None):
 
 
 #RELATÓRIOS
+@login_required
 def paciente_ficha_relatorio(request, id_paciente=None):
     paciente = Pacientes.objects.get(id=id_paciente)
     tab_dispensacoes = Dispensacoes.objects.filter(del_status=False, paciente=id_paciente)
