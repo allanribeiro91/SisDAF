@@ -106,7 +106,7 @@
     margin: 0px 0px 10px 10px;
     width: 100%;
     padding-top: 20px;
-    
+    overflow: none;
 }
 
 .form-floating {
