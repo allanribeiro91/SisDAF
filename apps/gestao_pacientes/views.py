@@ -9,6 +9,9 @@ from apps.fornecedores.models import UF_Municipio
 from apps.main.models import CustomLog
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
+from openpyxl import Workbook
+from django.utils.timezone import localtime
+import json
 from django.utils import timezone
 from setup.choices import GENERO_SEXUAL, LISTA_UFS_SIGLAS, VIA_ATENDIMENTO
 
@@ -32,36 +35,65 @@ def gestao_pacientes_filtro(request):
     paciente = request.GET.get('paciente', None)
     sexo = request.GET.get('sexo', None)
     produto = request.GET.get('produto', None)
-    via_atendimento = request.GET.get('produto', None)
+    via_atendimento = request.GET.get('via_atendimento', None)
     ses = request.GET.get('ses', None)
-
+    
     filters = {'del_status': False}
-    if obito:
-        filters['paciente_obito'] = obito
     if cns:
         filters['cns__icontains'] = cns
     if paciente:
-        filters['paciente__icontains'] = paciente
+        filters['nome__icontains'] = paciente
     if sexo:
         filters['sexo'] = sexo
-    if produto:
-        filters['paciente_produtos_recebidos__icontains'] = produto
-    if via_atendimento:
-        filters['via_atendimento'] = via_atendimento
-    if ses:
-        filters['paciente_ses_ufs__icontains'] = ses
+    
+    #Filtragem inicial
+    pacientes = Pacientes.objects.filter(**filters).order_by('nome')
 
-    tab_pacientes = Pacientes.objects.filter(**filters).order_by('nome')
-    total_pacientes = Pacientes.objects.count()
+    #Filtrar Óbito
+    if obito:
+        pacientes = [paciente for paciente in pacientes if paciente.paciente_obito() == obito]
+
+    #Filtrar Produtos Recebidos
+    if produto:
+        print('Produto: ', produto)
+        pacientes = [paciente for paciente in pacientes if produto.lower() in paciente.paciente_produtos_recebidos().lower()]
+
+    #Filtrar Via de Atendimento
+    if via_atendimento:
+        print('Via de Atendimento: ', via_atendimento)
+        pacientes = [paciente for paciente in pacientes if via_atendimento.lower() in paciente.paciente_via_atendimento().lower()]
+
+    #Filtrar SES/UF
+    if ses:
+        pacientes = [paciente for paciente in pacientes if ses.lower() in paciente.paciente_ses_ufs().lower()]
+
+    # Aqui 'pacientes' agora contém a lista de objetos após todas as filtragens
+    # Se precisar da contagem total após a filtragem
+    total_pacientes = len(pacientes)
+
 
     page = int(request.GET.get('page', 1))
-    paginator = Paginator(tab_pacientes, 100)
+    paginator = Paginator(pacientes, 100)
     try:
         pacientes_paginados = paginator.page(page)
     except EmptyPage:
         pacientes_paginados = paginator.page(paginator.num_pages)
-
-    data = list(pacientes_paginados.object_list.values())
+    
+    data = []
+    for paciente in pacientes_paginados.object_list:
+        paciente_dict = {
+            'id': paciente.id,
+            'nome': paciente.nome,
+            'cns': paciente.cns,
+            'cpf': paciente.cpf,
+            'sexo': paciente.get_sexo_display(),
+            'paciente_obito': paciente.paciente_obito(),  
+            'paciente_idade': paciente.paciente_idade() if paciente.paciente_idade() is not None else "-",
+            'paciente_produtos_recebidos': paciente.paciente_produtos_recebidos(),  
+            'paciente_via_atendimento': paciente.paciente_via_atendimento(),  
+            'paciente_ses_ufs': paciente.paciente_ses_ufs(),  
+        }
+        data.append(paciente_dict)
     
     return JsonResponse({
         'data': data,
@@ -71,6 +103,108 @@ def gestao_pacientes_filtro(request):
         'current_page': page
     })
 
+@login_required
+def gestao_pacientes_exportar(request):
+    
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        obito = data.get('obito', None)
+        cns = data.get('cns', None)
+        paciente = data.get('paciente', None)
+        sexo = data.get('sexo', None)
+        produto = data.get('produto', None)
+        via_atendimento = data.get('via_atendimento', None)
+        ses = data.get('ses', None)
+        
+        filters = {'del_status': False}
+        if cns:
+            filters['cns__icontains'] = cns
+        if paciente:
+            filters['nome__icontains'] = paciente
+        if sexo:
+            filters['sexo'] = sexo
+        
+        #Filtragem inicial
+        pacientes = Pacientes.objects.filter(**filters).order_by('nome')
+
+        #Filtrar Óbito
+        if obito:
+            pacientes = [paciente for paciente in pacientes if paciente.paciente_obito() == obito]
+
+        #Filtrar Produtos Recebidos
+        if produto:
+            pacientes = [paciente for paciente in pacientes if produto.lower() in paciente.paciente_produtos_recebidos().lower()]
+
+        #Filtrar Via de Atendimento
+        if via_atendimento:
+            pacientes = [paciente for paciente in pacientes if via_atendimento.lower() in paciente.paciente_via_atendimento().lower()]
+
+        #Filtrar SES/UF
+        if ses:
+            pacientes = [paciente for paciente in pacientes if ses.lower() in paciente.paciente_ses_ufs().lower()]
+
+        data_exportacao = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Antes de criar o workbook, guarde a lista de pacientes em uma variável separada
+        lista_pacientes = pacientes
+
+        # Cria o workbook e adiciona as abas
+        wb = Workbook()
+        sheet = wb.active  # Use um nome diferente aqui, como 'sheet'
+        sheet.title = "Pacientes"
+
+        # Escreve os cabeçalhos na planilha
+        sheet.append([
+            'ID Paciente', 'Data Registro', 'Responsável Registro', 'Últ. Atualização', 'Responsável Últ. Atualização', 'N Edições',
+            'CNS', 'CPF', 'Nome do Paciente', 'Data de Nascimento', 'Data de Óbito',
+            'Sexo', 'Cor da Pele', 'Orientação Sexual', 
+            'COD_IBGE', 'UF', 'Município',
+            'Observacoes Gerais', 'Data Exportação'
+        ])
+
+        # No loop onde você está adicionando as linhas à planilha
+        for paciente in lista_pacientes:
+            # Converte 'registro_data' e 'ult_atual_data' para o fuso horário local e remove tzinfo
+            registro_data = localtime(paciente.registro_data).replace(tzinfo=None)
+            ult_atual_data = localtime(paciente.ult_atual_data).replace(tzinfo=None)
+            
+            # Agora 'registro_data' e 'ult_atual_data' não têm tzinfo e podem ser escritos no Excel
+            sheet.append([
+                paciente.id,
+                registro_data.strftime('%Y-%m-%d %H:%M:%S'),  # Formata como string, se necessário
+                str(paciente.usuario_registro.primeiro_ultimo_nome()),
+                ult_atual_data.strftime('%Y-%m-%d %H:%M:%S'),  # Formata como string, se necessário
+                str(paciente.usuario_atualizacao.primeiro_ultimo_nome()), paciente.log_n_edicoes,
+                
+                paciente.cns, paciente.cpf, paciente.nome, paciente.data_nascimento.date() if paciente.data_nascimento else '', paciente.data_obito.date() if paciente.data_obito else '',
+                paciente.get_sexo_display(), paciente.get_cor_pele_display(), paciente.get_orientacao_sexual_display(),
+                paciente.naturalidade_cod_ibge, paciente.paciente_uf(), paciente.paciente_municipio(),
+                
+                paciente.observacoes_gerais, data_exportacao
+            ])
+            
+        
+        # Registrar a ação no CustomLog
+        current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        log_entry = CustomLog(
+            usuario=request.user.usuario_relacionado,
+            modulo="Controle Especial_Gestao de Pacientes",
+            model='Pacientes',
+            model_id=0,
+            item_id=0,
+            item_descricao="Exportação da lista de pacientes.",
+            acao="Exportação",
+            observacoes=f"Usuário {request.user.username} exportou dados de Pacientes em {current_date_str}."
+        )
+        log_entry.save()
+
+        # Salva o workbook em um arquivo Excel
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=proaq.xlsx'
+        wb.save(response)
+        
+        return response
+    
 
 #PACIENTE
 @login_required

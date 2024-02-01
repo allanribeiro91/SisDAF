@@ -80,14 +80,14 @@
                 <select class="form-select" id="filtro_produtos_recebidos">
                     <option value=""></option>
                     {% for id, name in lista_produtos %}
-                    <option value="{{ id }}">{{ name }}</option>
+                    <option value="{{ name }}">{{ name }}</option>
                     {% endfor %}
                 </select>
                 <label for="filtro_produtos_recebidos">Produtos Recebidos</label>
             </div>
 
             <!-- Vias de Atendimento -->
-            <div class="form-floating" style="width: 250px !important;">
+            <div class="form-floating" style="width: 300px !important;">
                 <select class="form-select" id="filtro_vias_atendimento">
                     <option value=""></option>
                     {% for id, name in lista_via_atendimento %}
@@ -169,7 +169,7 @@
                 <td class="col-texto6">{{ item.cpf }}</td>
                 <td class="col-texto20">{{ item.nome }}</td>
                 <td class="col-texto6">{{ item.get_sexo_display }}</td>
-                <td class="col-texto4">{{ item.paciente_idade }}</td>
+                <td class="col-texto4">{{ item.paciente_idade|default:'-' }}</td>
                 <td class="col-texto15">{{ item.paciente_produtos_recebidos }}</td>
                 <td class="col-texto6">{{ item.paciente_via_atendimento }}</td>
                 <td class="col-texto6">{{ item.paciente_ses_ufs }}</td>
@@ -181,9 +181,9 @@
 
     <!-- paginação -->
     <div id="pagination">
-        <button id="denominacaoPreviousPage" class="page" disabled>Anterior </button>
-        <span id="denominacaoCurrentPage">1</span>
-        <button id="denominacaoNextPage" class="page">Próximo</button>
+        <button id="previousPage" class="page" disabled>Anterior </button>
+        <span id="currentPage">1</span>
+        <button id="nextPage" class="page">Próximo</button>
     </div>
     
     <!-- Scritps -->

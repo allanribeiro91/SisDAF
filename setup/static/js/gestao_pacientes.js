@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    $('#filtro_paciente_cns').mask('000 0000 0000 0000');
+
     //Inserir Novo Empenho
     const botao_inserir_paciente = document.getElementById('btnInserirPaciente')
     botao_inserir_paciente.addEventListener('click', function(){
@@ -30,6 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
     //FILTRAR TABELA
         //Filtrar
         $('#filtro_paciente_obito, #filtro_paciente_sexo, #filtro_produtos_recebidos, #filtro_vias_atendimento, #filtro_paciente_ses').change(function() {
+            filtrarTabelaPacientes();
+        });
+
+        $('#filtro_paciente_cns, #filtro_paciente_nome').on('input', function() {
             filtrarTabelaPacientes();
         });
 
@@ -92,33 +98,47 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
+    let currentPage = 1;
+
+    //Próxima página
+    $('#nextPage').on('click', function() {
+        filtrarTabelaPacientes(currentPage + 1);
+    });
+
+    //Página anterior
+    $('#previousPage').on('click', function() {
+        filtrarTabelaPacientes(currentPage - 1);
+    });
 
 
     //Exportar dados
     $('#exportarPacientes').on('click', function() {
 
-        sweetAlert('Funcionalidade em desenvolvimento!')
-        return
+        //sweetAlert('Funcionalidade em desenvolvimento!')
 
         // Coleta valores dos campos       
-        var status_contrato = $('#filtro_status_contrato').val();
-        var modalidade_aquisicao = $('#filtro_modalidade_aquisicao').val();
-        var unidade_daf = $('#filtro_unidade_daf').val();
-        var denominacao = $('#filtro_denominacao').val();
-        var fornecedor = $('#filtro_fornecedor').val();
+        var obito = $('#filtro_paciente_obito').val();
+        var cns = $('#filtro_paciente_cns').val();
+        var paciente = $('#filtro_paciente_nome').val();
+        var sexo = $('#filtro_paciente_sexo').val();
+        var produto = $('#filtro_produtos_recebidos').val();
+        var via_atendimento = $('#filtro_vias_atendimento').val();
+        var ses = $('#filtro_paciente_ses').val();
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         // Define dados a serem enviados
         const data = {
-            status_contrato: status_contrato,
-            modalidade_aquisicao: modalidade_aquisicao,
-            unidade_daf: unidade_daf,
-            denominacao: denominacao,
-            fornecedor: fornecedor,
+            'obito': obito,
+            'cns': cns,
+            'paciente': paciente,
+            'sexo': sexo,
+            'produto': produto,
+            'via_atendimento': via_atendimento,
+            'ses': ses
         };
         
         // Envia solicitação AJAX para o servidor
-        fetch('/contratos/contrato/exportar/', {
+        fetch('/gestao_pacientes/exportar/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -132,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const a = document.createElement('a');
             const url = URL.createObjectURL(blob);
             a.href = url;
-            a.download = 'contratos.xlsx';
+            a.download = 'pacientes.xlsx';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

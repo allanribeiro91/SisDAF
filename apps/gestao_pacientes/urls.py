@@ -3,13 +3,14 @@ from django.urls import path
 from apps.gestao_pacientes.views import (gestao_pacientes, paciente_ficha,
                                          dispensacao_modal, dispensacao_salvar, dispensacao_deletar,
                                          paciente_ficha_relatorio, paciente_deletar,
-                                         gestao_pacientes_filtro)
+                                         gestao_pacientes_filtro, gestao_pacientes_exportar)
 
 urlpatterns = [
 
     #GESTAO DE PACIENTES
     path('gestao_pacientes/', gestao_pacientes, name='pacientes'),
     path('gestao_pacientes/filtro/', gestao_pacientes_filtro, name='gestao_pacientes_filtro'),
+    path('gestao_pacientes/exportar/', gestao_pacientes_exportar, name='gestao_pacientes_exportar'),
 
     #PACIENTE
     path('gestao_pacientes/paciente/novo/', paciente_ficha, name='paciente_novo'),

@@ -127,13 +127,11 @@ $(document).ready(function() {
 
     //Próxima página
     $('#produtoNextPage').on('click', function() {
-        console.log('próxima página')
         fetchAndRenderTableData(produtoCurrentPage + 1);
     });
 
     //Página anterior
     $('#produtoPreviousPage').on('click', function() {
-        console.log('página anterior')
         fetchAndRenderTableData(produtoCurrentPage - 1);
     });
 
@@ -201,12 +199,10 @@ $(document).ready(function() {
 
 //Renderizar tabela
 function fetchAndRenderTableData(page = 1) {
-    console.log('fetchAndRenderTableData')
+
     var selectedTipo = $('#tipo_produto').val();
     var produto = $('#produto').val();
     var denominacao = $('#denominacao').val();
-    
-    console.log(produto)
 
     var dataToSend = {
         'tipo_produto': selectedTipo,

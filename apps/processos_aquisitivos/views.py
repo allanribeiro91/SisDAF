@@ -30,6 +30,7 @@ from django.db.models import Max, OuterRef, Subquery
 tz = pytz.timezone("America/Sao_Paulo")
 
 #Página inicial do módulo
+@login_required
 def proaq(request):
     tab_proaqs = ProaqDadosGerais.objects.filter(del_status=False).order_by('denominacao')
     lista_denominacoes = (
@@ -133,6 +134,7 @@ def proaq_filtro(request):
         'current_page': page
     })
 
+@login_required
 def proaq_exportar(request):
     print("Exportar Processos Aquisitivos")
     
@@ -285,6 +287,7 @@ def proaq_exportar(request):
 
 
 #PROAQ DADOS GERAIS
+@login_required
 def proaq_ficha(request, proaq_id=None):
     if proaq_id:
         proaq = ProaqDadosGerais.objects.get(id=proaq_id)
@@ -432,6 +435,7 @@ def proaq_ficha(request, proaq_id=None):
         'tab_proaq_tramitacoes': tab_proaq_tramitacoes,
     })
 
+@login_required
 def proaq_dados_gerais_deletar(request, proaq_id=None):
     try:
         proaq = ProaqDadosGerais.objects.get(id=proaq_id)
@@ -460,6 +464,7 @@ def proaq_dados_gerais_deletar(request, proaq_id=None):
         messages.error(request, "Processo Aquisitivo não encontrado.")
         return JsonResponse({"message": "Processo Aquisitivo não encontrado."})
 
+@login_required
 def proaq_relatorio_pdf(request, proaq_id=None):
     proaq = ProaqDadosGerais.objects.get(id=proaq_id)
     tab_proaq_itens = ProaqItens.objects.filter(del_status=False, proaq_id=proaq.id)
@@ -511,6 +516,7 @@ def proaq_relatorio_pdf(request, proaq_id=None):
 
 
 #PROAQ ITENS
+@login_required
 def proaq_item_salvar(request, proaq_item_id=None):
     if proaq_item_id:
         proaq_item = ProaqItens.objects.get(id=proaq_item_id)
@@ -605,6 +611,7 @@ def proaq_item_salvar(request, proaq_item_id=None):
                     'retorno': 'Erro ao salvar'
                 })
 
+@login_required
 def proaq_item_modal(request, proaq_item_id=None):
     try:
         item = ProaqItens.objects.get(id=proaq_item_id)
@@ -630,6 +637,7 @@ def proaq_item_modal(request, proaq_item_id=None):
     except ProaqItens.DoesNotExist:
         return JsonResponse({'error': 'Item do Processo Aquisitivo não encontrado.'}, status=404)
 
+@login_required
 def proaq_item_deletar(request, proaq_item_id=None):
     try:
         proaq_item = ProaqItens.objects.get(id=proaq_item_id)
@@ -660,6 +668,7 @@ def proaq_item_deletar(request, proaq_item_id=None):
 
 
 #PROAQ EVOLUÇÃO
+@login_required
 def proaq_ficha_evolucao(request, proaq_evolucao_id=None):
     if proaq_evolucao_id:
         proaq_evolucao = ProaqEvolucao.objects.get(id=proaq_evolucao_id)
@@ -733,6 +742,7 @@ def proaq_ficha_evolucao(request, proaq_evolucao_id=None):
                     'retorno': 'Erro ao salvar'
                 })
 
+@login_required
 def proaq_evolucao_modal(request, proaq_evolucao_id=None):
     try:
         item = ProaqEvolucao.objects.get(id=proaq_evolucao_id)
@@ -755,6 +765,7 @@ def proaq_evolucao_modal(request, proaq_evolucao_id=None):
     except ProaqEvolucao.DoesNotExist:
         return JsonResponse({'error': 'Evolução do Processo Aquisitivo não encontrado.'}, status=404)
 
+@login_required
 def proaq_evolucao_deletar(request, proaq_evolucao_id=None):
     try:
         proaq_evolucao = ProaqEvolucao.objects.get(id=proaq_evolucao_id)
@@ -785,6 +796,7 @@ def proaq_evolucao_deletar(request, proaq_evolucao_id=None):
 
 
 #PROAQ TRAMITACAO
+@login_required
 def proaq_tramitacao_salvar(request, tramitacao_id=None):
     if tramitacao_id:
         proaq_tramitacao = ProaqTramitacao.objects.get(id=tramitacao_id)
@@ -871,6 +883,7 @@ def proaq_tramitacao_salvar(request, tramitacao_id=None):
                     'retorno': 'Erro ao salvar'
                 })
 
+@login_required
 def proaq_tramitacao_modal(request, tramitacao_id=None):
     try:
         item = ProaqTramitacao.objects.get(id=tramitacao_id)
@@ -907,6 +920,7 @@ def proaq_tramitacao_modal(request, tramitacao_id=None):
     except ProaqTramitacao.DoesNotExist:
         return JsonResponse({'error': 'Tramitação do Processo Aquisitivo não encontrada.'}, status=404)
 
+@login_required
 def proaq_tramitacao_deletar(request, tramitacao_id=None):
     try:
         tramitacao = ProaqTramitacao.objects.get(id=tramitacao_id)
