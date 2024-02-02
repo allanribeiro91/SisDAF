@@ -10,10 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
             //log
             $('#informe_id').val(this.getAttribute('data-id'));
             $('#informe_log_data_registro').val(this.getAttribute('data-data-registro'));
-            $('#informe_log_responsavel_registro').val(this.getAttribute('data-data-registro'));
-            $('#informe_log_ult_atualizacao').val(this.getAttribute('data-data-registro'));
-            $('#informe_log_responsavel_atualizacao').val(this.getAttribute('data-data-registro'));
-            $('#informe_log_edicoes').val(this.getAttribute('data-data-registro'));
+            $('#informe_log_responsavel_registro').val(this.getAttribute('data-responsavel-registro'));
+            $('#informe_log_ult_atualizacao').val(this.getAttribute('data-ultima-atualizacao'));
+            $('#informe_log_responsavel_atualizacao').val(this.getAttribute('data-responsavel-ultima-atualizacao'));
+            $('#informe_log_edicoes').val(this.getAttribute('data-n-edicoes'));
 
             //dados do informe
             $('#informe_titutlo').val(this.getAttribute('data-titulo'));
