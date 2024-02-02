@@ -423,3 +423,47 @@ CICLO_TRATAMENTO = [
     ('10', '10'),
     ('', 'Não Informado'),
 ]
+
+STATUS_INFORME = [
+    ('ativo', 'Ativo'),
+    ('inativo', 'Inativo'),
+    ('', 'Não Informado'),
+]
+
+ALCANCE_INFORME = [
+    ('', 'Não Informado'), 
+    ('cgafb', "CGAFB"),
+    ('cgafme', "CGAFME"),
+    ('cgceaf', "CGCEAF"),
+    ('cgfp', "CGFP"),
+    ('cofisc', "COFISC"),
+    ('gabinete', "GABINETE"),
+    ('daf', "DAF")
+]
+
+IMAGENS_INFORME = [
+    ('arquivo', 'Arquivo'),
+    ('atencao', 'Atenção'),
+    ('atualizacao', 'Atualização'),
+    ('bloqueio', 'Bloqueio'),
+    ('calendario', 'Calendário'),
+    ('chat', 'Chat'),
+    ('check', 'Check'),
+    ('configuracao', 'Configuração'),
+    ('coracao', 'Coração'),
+    ('curtir', 'Curtir'),
+    ('descurtir', 'Descurtir'),
+    ('documento', 'Documento'),
+    ('ferramenta', 'Ferramenta'),
+    ('ideia', 'Ideia'),
+    ('lupa', 'Lupa'),
+    ('mais', 'Mais'),
+    ('mensagem', 'Mensagem'),
+    ('microfone', 'Microfone'),
+    ('mundo', 'Mundo'),
+    ('pacote', 'Pacote'),
+    ('play', 'Play'),
+    ('questao', 'Questão'),
+    ('relogio', 'Relógio')
+]
+

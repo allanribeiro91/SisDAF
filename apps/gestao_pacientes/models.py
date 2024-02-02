@@ -54,7 +54,6 @@ class Pacientes(models.Model):
                 self.usuario_atualizacao = user
         super(Pacientes, self).save(*args, **kwargs)
 
-
     def soft_delete(self, user):
         """
         Realiza uma "deleção lógica" do registro.

@@ -1,7 +1,11 @@
 from django.db import models
+import os
 import re
 from apps.usuarios.models import Usuario
-from setup.choices import LOGS_ACAO, NIVEL_ALERTA, UNIDADE_DAF
+from django.utils import timezone
+from datetime import datetime
+from setup.choices import (LOGS_ACAO, NIVEL_ALERTA, UNIDADE_DAF, STATUS_INFORME, 
+                           ALCANCE_INFORME, IMAGENS_INFORME)
 
 
 class CustomLog(models.Model):
@@ -33,7 +37,6 @@ class UserAccessLog(models.Model):
     def __str__(self):
         return f"{self.usuario} acessou em {self.timestamp}"
 
-
 class Alertas(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     unidade_daf = models.CharField(max_length=50, choices=UNIDADE_DAF, null=False, blank=False)
@@ -42,3 +45,53 @@ class Alertas(models.Model):
     mensagem = models.TextField(null=False, blank=False)
     status = models.BooleanField(default=True)
     data_desativacao = models.DateTimeField()
+
+class Informes(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='informe_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='informe_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados do informe
+    titulo = models.CharField(max_length=120, null=False, blank=False)
+    imagem_card = models.CharField(max_length=80, choices=IMAGENS_INFORME, null=False, blank=False)
+    resumo = models.TextField(null=False, blank=False)
+    descricao = models.TextField(null=False, blank=False)
+    status = models.CharField(max_length=10, choices=STATUS_INFORME, null=False, blank=False)
+    alcance = models.CharField(max_length=10, choices=ALCANCE_INFORME, null=False, blank=False)
+    link_mais_informacoes = models.TextField(default='Não possui.', null=True, blank=True)
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='informe_deletado')
+
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)
+        if self.id:
+            self.log_n_edicoes += 1
+            if user:
+                self.usuario_atualizacao = user
+        else:
+            if user:
+                self.usuario_registro = user
+                self.usuario_atualizacao = user
+        super(Informes, self).save(*args, **kwargs)
+
+    def soft_delete(self, user):
+        """
+        Realiza uma "deleção lógica" do registro.
+        """
+        self.del_status = True
+        self.del_data = timezone.now()
+        self.del_usuario = user
+        self.save()
+    
+    def endereco_imagem(self):
+        endereco = f'assets/ícones/{self.imagem_card}.svg'
+        return endereco
+    

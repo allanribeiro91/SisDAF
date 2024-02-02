@@ -3,9 +3,9 @@
 }
 
 .presentation-container {
-    background-color: #dee5e9;
+    /* background-color: #dee5e9; */
     width: 98%;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-left: 20px;
     margin-right: 10px;
     border-radius: 10px;
@@ -258,4 +258,112 @@
 .log-descricao {
     width: 40% !important;
     text-align: left !important;
+}
+
+
+
+
+.box-informe {
+    margin-top: 5px;
+
+    width: 100%;
+    height: auto;
+
+    border: rgb(183, 183, 183);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    background-color: #ededed;
+
+    padding: 10px;
+
+    display: flex;
+    justify-content: flex-start;
+
+}
+
+.imagem-card {
+    display: flex; /* Habilita flexbox */
+    align-items: center; /* Centraliza verticalmente */
+    justify-content: center; /* Centraliza horizontalmente */
+    width: 8%;
+    height: 100%;
+    background-color: #ededed;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.imagem-card img {
+    height: 50px; /* Define a altura fixa para a imagem */
+}
+
+
+.conteudo-informe {
+    width: 95%;
+    height: 100%;
+    /* background-color: #ededed; */
+    margin-left: 10px;
+    border-radius: 5px;
+    text-align: center;
+    vertical-align: center;
+}
+
+.titulo-informe {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left;
+    padding-left: 20px;
+    padding-top: 0px;
+    text-transform: uppercase;
+}
+
+.titulo-data {
+    font-size: 12px;
+    text-align: left;
+    padding-left: 20px;
+
+}
+
+.titulo-resumo {
+    font-size: 16px;
+    text-align: left;
+    padding-left: 20px;
+    padding-top: 5px;
+    
+}
+
+
+.horizontal-sections-modal {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;  /* Alinha os itens ao topo */
+    width: 100%;
+}
+
+.section {
+    position: relative;
+    padding: 0px 10px 10px 10px;
+    background-color: #FFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 5px;
+}
+
+.grid {
+    display: flex;
+    justify-content: flex-start;  /* Alinha os itens à esquerda */
+    /*align-items: center;  /* Alinha os itens verticalmente */
+    flex-wrap: wrap;  /* Permite que os itens ocupem várias linhas */
+    gap: 10px;  /* Espaçamento entre os itens */
+}
+
+h3 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.full-width {
+    flex-grow: 2;  /* Cresce para ocupar o espaço disponível */
+    margin-right: 5px;
 }

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.main.models import CustomLog, UserAccessLog
+from apps.main.models import CustomLog, UserAccessLog, Informes
 
 class CustomLogAdmin(admin.ModelAdmin):
     list_display = ('id', 'formatted_timestamp', 'get_cpf', 'get_nome', 'get_unidade', 'get_setor', 'modulo', 'acao', 'item_id', 'item_descricao')
@@ -57,5 +57,21 @@ class UserAccessLogAdmin(admin.ModelAdmin):
         return alocacao.setor if alocacao else '-'
     get_setor.short_description = 'Setor'
 
+class InformesAdmin(admin.ModelAdmin):
+    list_display = ('id', 'registro_data', 'status', 'get_nome', 'titulo', 'alcance', 'del_status' )
+    list_display_links = ('id', 'registro_data', 'status', 'get_nome', 'titulo', 'alcance', 'del_status' )
+    list_filter = ('registro_data', 'status', 'alcance')
+    ordering = ('-registro_data',)
+
+    def get_nome(self, obj):
+        return obj.usuario_registro.dp_nome_completo
+    get_nome.short_description = 'Nome'
+
+    def get_unidade(self, obj):
+        alocacao = obj.usuario_registro.alocacao_ativa()
+        return alocacao.unidade if alocacao else '-'
+    get_unidade.short_description = 'Unidade'
+
 admin.site.register(CustomLog, CustomLogAdmin)
 admin.site.register(UserAccessLog, UserAccessLogAdmin)
+admin.site.register(Informes, InformesAdmin)

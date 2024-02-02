@@ -6,7 +6,7 @@ from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
 from apps.contratos.models import Contratos, ContratosArps
 from apps.fornecedores.models import UF_Municipio
 from django.http import JsonResponse
-from apps.main.models import CustomLog
+from apps.main.models import CustomLog, Informes
 from apps.fornecedores.models import Fornecedores
 from apps.processos_aquisitivos.models import ProaqDadosGerais
 from apps.main.models import UserAccessLog
@@ -73,8 +73,10 @@ def home(request):
         unidade_daf = dict(UNIDADE_DAF2).get(unidade_daf_codigo, 'Não Informado')
     else:
         unidade_daf = 'Não Informado'  # Ou algum valor padrão, se apropriado
+
+    tab_informes = Informes.objects.filter(del_status=False, status='ativo')
     
-    tab_logs = CustomLog.objects.all().order_by('-timestamp')[:50]
+    # tab_logs = CustomLog.objects.all().order_by('-timestamp')[:50]
     conteudo ={
         'usuario': usuario,
         'tot_denominacoes': tot_denominacaoes,
@@ -84,7 +86,8 @@ def home(request):
         'tot_arps': tot_arps,
         'tot_contratos': tot_contratos,
         'unidade_daf': unidade_daf,
-        'tab_logs': tab_logs,
+        # 'tab_logs': tab_logs,
+        'tab_informes': tab_informes,
     }
     return render(request, 'main/home.html', conteudo)
 
