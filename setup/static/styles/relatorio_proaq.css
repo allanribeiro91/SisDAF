@@ -30,6 +30,14 @@ body {
         width: 100%; /* Ajustado para 70% da largura do cabeçalho */
     }
 
+    .responsavel-exportacao {
+        font-weight: normal;
+        font-size: 10px;
+        text-align: right;
+        width: 30%; /* Ajustado para 70% da largura do cabeçalho */
+    }
+
+
     .logo-sisdaf {
         display: flex;
         align-items: center; /* Alinha a imagem verticalmente no centro */

@@ -1,5 +1,4 @@
 {% load static %}
-{% load custom_filters %}
 {% load humanize %}
 <!DOCTYPE html>
 <html>
@@ -235,8 +234,8 @@
                                 <td class="col-valor8">{{ item.qtd_total_objeto|floatformat:0|intcomma }}</td>
                                 <td class="col-valor8">{{ item.qtd_empenhada_objeto|floatformat:0|intcomma }}</td>
                                 <td class="col-valor8">{{ item.qtd_entregue|floatformat:0|intcomma }}</td>
-                                <td class="col-valor8">{{ item.valor_unitario|format_number }}</td>
-                                <td class="col-valor10">{{ item.valor_total|format_number }}</td>
+                                <td class="col-valor8">{{ item.valor_unitario|floatformat:4|intcomma }}</td>
+                                <td class="col-valor10">{{ item.valor_total|floatformat:2|intcomma }}</td>
                             </tr>
                             {% endfor %}
 
@@ -249,7 +248,7 @@
                                 <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_empenhada_contrato|floatformat:0|intcomma }}</td>
                                 <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_entregue_contrato|floatformat:0|intcomma }}</td>
                                 <td class="col-valor" style="font-weight: bold;">-</td>
-                                <td class="col-valor" style="font-weight: bold;">{{ contrato.valor_total|format_number }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.valor_total|floatformat:2|intcomma }}</td>
                             </tr>
 
                         </tbody>
@@ -302,7 +301,7 @@
                                 <td class="col-valor8">{{ item.qtd_total_parcela|floatformat:0|intcomma }}</td>
                                 <td class="col-valor8">{{ item.qtd_empenhada|floatformat:0|intcomma }}</td>
                                 <td class="col-valor8">{{ item.qtd_entregue|floatformat:0|intcomma }}</td>
-                                <td class="col-valor8">{{ item.valor_total|format_number }}</td>
+                                <td class="col-valor8">{{ item.valor_total|floatformat:2|intcomma }}</td>
                             </tr>
                             {% endfor %}
 
@@ -314,7 +313,7 @@
                                 <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_total_contrato|floatformat:0|intcomma }}</td>
                                 <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_empenhada_contrato|floatformat:0|intcomma }}</td>
                                 <td class="col-valor" style="font-weight: bold;">{{ contrato.qtd_entregue_contrato|floatformat:0|intcomma }}</td>
-                                <td class="col-valor" style="font-weight: bold;">{{ contrato.valor_total|format_number }}</td>
+                                <td class="col-valor" style="font-weight: bold;">{{ contrato.valor_total|floatformat:2|intcomma }}</td>
                             </tr>
 
                         </tbody>
