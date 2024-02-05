@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from apps.main.forms import LoginForms, CadastroForms
 from apps.usuarios.models import Usuario
 from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
-from apps.contratos.models import Contratos, ContratosArps
+from apps.contratos.models import Contratos, ContratosArps, Empenhos
 from apps.fornecedores.models import UF_Municipio
 from django.http import JsonResponse
 from apps.main.models import CustomLog, Informes
@@ -64,6 +64,7 @@ def home(request):
     tot_proaqs = ProaqDadosGerais.objects.filter(del_status=False).count()
     tot_arps = ContratosArps.objects.filter(del_status=False).count()
     tot_contratos = Contratos.objects.filter(del_status=False).count()
+    tot_empenhos = Empenhos.objects.filter(del_status=False, status='empenhado').count()
     usuario = request.user.usuario_relacionado
     
     # Obter a alocação ativa do usuário
@@ -85,6 +86,7 @@ def home(request):
         'tot_proaqs': tot_proaqs,
         'tot_arps': tot_arps,
         'tot_contratos': tot_contratos,
+        'tot_empenhos': tot_empenhos,
         'unidade_daf': unidade_daf,
         # 'tab_logs': tab_logs,
         'tab_informes': tab_informes,
