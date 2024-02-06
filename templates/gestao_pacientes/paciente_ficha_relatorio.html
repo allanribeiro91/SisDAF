@@ -181,7 +181,7 @@
                 </div>
                 <div class="grid">
                     <div class="box-observacoes">
-                        <div class="box-conteudo">{{ paciente.observacoes_gerais }}</div>
+                        <div class="box-conteudo">{{ paciente.observacoes_gerais|default:'Sem observações.' }}</div>
                     </div>
                 </div>
             </div>

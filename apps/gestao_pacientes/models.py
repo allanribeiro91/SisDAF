@@ -5,9 +5,13 @@ from apps.produtos.models import ProdutosFarmaceuticos
 from django.utils import timezone
 from setup.choices import (GENERO_SEXUAL, COR_PELE, ORIENTACAO_SEXUAL, 
                            VIA_ATENDIMENTO, FASE_TRATAMENTO, ORIGEM_DEMANDA_JUDICIAL,
-                           LISTA_UFS_SIGLAS, STATUS_DISPENSACAO, CICLO_TRATAMENTO)
+                           LISTA_UFS_SIGLAS, STATUS_DISPENSACAO, CICLO_TRATAMENTO,
+                           MEIO_SOLICITACAO_JUDICIAL,SIM_NAO, ORIGEM_DEMANDA_JUDICIAL_SOLICITACAO, UNIDADE_DAF3,
+                           ANALISE_TECNICA_SOLICITACAO_JUDICIAL,TIPO_DISPONIBILIZACAO_SOLICITACAO_JUDICIAL)
 from datetime import datetime
 
+
+LISTA_UFS_SIGLAS += [('NI', 'Não Informado')]
 
 class Pacientes(models.Model):
     #relacionamento
@@ -256,3 +260,57 @@ class Dispensacoes(models.Model):
     def __str__(self):
         return f"{self.nome} ({self.cns})"
 
+
+class Atendimento_Judicial(models.Model):
+    #relacionamento
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='atendimentojudicial_registro')
+    usuario_atualizacao = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='atendimentojudicial_edicao')
+    
+    #log
+    registro_data = models.DateTimeField(auto_now_add=True)
+    ult_atual_data = models.DateTimeField(auto_now=True)
+    log_n_edicoes = models.IntegerField(default=1)
+
+    #dados da solicitacao judicial
+    data_solicitacao = models.DateTimeField(null=False, blank=False)
+    origem_solicitacao = models.CharField(max_length=10, choices=ORIGEM_DEMANDA_JUDICIAL_SOLICITACAO, null=False, blank=False)
+    meio_solicitacao = models.CharField(max_length=15, choices=MEIO_SOLICITACAO_JUDICIAL, null=False, blank=False)
+    uf_origem = models.CharField(max_length=2, choices=LISTA_UFS_SIGLAS, null=False, blank=False)
+    acao_civil_publica = models.CharField(max_length=10, choices=SIM_NAO, null=False, blank=False)
+    documento_sei_comprovante =  models.CharField(max_length=10, null=False, blank=False)
+    processo_sei_comprovante  =  models.CharField(max_length=20, null=False, blank=False)
+    produto = models.ForeignKey(ProdutosFarmaceuticos, on_delete=models.DO_NOTHING, related_name='atendimentojudicial_produto', null=True, blank=True)
+    total_produtos = models.FloatField( null=False, blank=False)
+    total_pacientes = models.IntegerField(null=True, blank=True)
+    
+    #analise tecnica daf
+    unidade_daf = models.CharField(max_length=10, choices=UNIDADE_DAF3, null=False, blank=False)
+    analise_tecnica = models.CharField(max_length=100, choices=ANALISE_TECNICA_SOLICITACAO_JUDICIAL, null=False, blank=False)
+    motivo_recusa = models.TextField(null=True, blank=True, default='Não informado.')
+    data_analise = models.DateTimeField(null=True, blank=True)
+
+    #pedido
+    ## DJUD
+    tipo_disponibilizacao = models.CharField(max_length=100, choices=TIPO_DISPONIBILIZACAO_SOLICITACAO_JUDICIAL, null=False, blank=False) 
+    data_disponibilizacao = models.DateTimeField(null=True, blank=True)
+    total_disponibilizado = models.FloatField( null=False, blank=False)
+
+    ## SISMAT
+    numero_pedido = models.CharField(max_length=10, null=True, blank=True)
+    total_pedido = models.FloatField( null=True, blank=True)
+    data_envio = models.DateTimeField(null=True, blank=True)
+    data_entrega = models.DateTimeField(null=True, blank=True)
+
+    #cancelamento solicitacao
+    cancelado = models.CharField(max_length=3, choices=SIM_NAO, null=False, blank=False, default='nao') 
+    motivo_cancelamento = models.TextField(null=True, blank=True, default='Não informado.')
+
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
+
+    #delete (del)
+    del_status = models.BooleanField(default=False)
+    del_data = models.DateTimeField(null=True, blank=True)
+    del_usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='atendimentojudicial_deletado')
+
+    

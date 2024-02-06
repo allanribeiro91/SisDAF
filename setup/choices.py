@@ -4,6 +4,11 @@ YES_NO = [
     (False, 'Não'),
 ]
 
+SIM_NAO = [
+    ('sim', 'Sim'),
+    ('nao', 'Não'),
+]
+
 COR_PELE = [
     ('branco', 'Branco'),
     ('preto', 'Preto'),
@@ -279,7 +284,6 @@ LISTA_UFS_SIGLAS = [
     ('SE', 'SE'),
     ('SP', 'SP'),
     ('TO', 'TO'),
-    
 ]
 
 LISTA_TRIMESTRES = [
@@ -467,3 +471,26 @@ IMAGENS_INFORME = [
     ('relogio', 'Relógio')
 ]
 
+MEIO_SOLICITACAO_JUDICIAL = [
+    ('email', 'E-mail'),
+    ('oficio', 'Ofício'),
+    ('processo_sei','Processo Sei')
+]
+
+ORIGEM_DEMANDA_JUDICIAL_SOLICITACAO = [
+    ('cgceaf', 'CGCEAF'),
+    ('djud', 'DJUD'),
+    ('', 'Não Informado'),
+]
+
+ANALISE_TECNICA_SOLICITACAO_JUDICIAL = [
+    ('aprovado', 'Aprovado'),
+    ('recusado', 'Recusado'),
+    ('nao_analisado', 'Não analisado'),
+]
+
+TIPO_DISPONIBILIZACAO_SOLICITACAO_JUDICIAL=[
+    ('remanejamento', 'Remanejamento'),
+    ('transferencia', 'Transferência')
+
+]
