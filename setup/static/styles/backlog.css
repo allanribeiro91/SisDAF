@@ -15,22 +15,22 @@
 }
 
 .tipo-corretivo {
-    background-color: #01a992 !important;
-    color: black;
+    background-color: #6f0194 !important;
+    color: white;
 }
 
 .status-naoiniciado {
-    background-color: #949494 !important;
+    background-color: #b3b3b3 !important;
     color: black;
 }
 
 .status-emdesenvolvimento {
-    background-color: #ffea00 !important;
+    background-color: #fff264 !important;
     color: black;
 }
 
 .status-entregue {
-    background-color: #0dff00 !important;
+    background-color: #86fd7f !important;
     color: black;
 }
 
