@@ -1,8 +1,11 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
-{% block extra_head %}    
+{% block extra_head %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="stylesheet" href="{% static 'styles/meusdados.css' %}">
     <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\contratos.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\backlog.css' %}">
 {% endblock %}
 {% block content %}    
     
@@ -10,6 +13,8 @@
     <div class="breadcrumb2">
         <i class="fas fa-info-circle"></i>&nbsp;Sobre o SisDAF / Backlogs
     </div>
+
+
 
     <!-- Barra Superior -->
     <div class="barra-superior">
@@ -24,41 +29,155 @@
         </div>
     </div>
 
-    <h3 style="text-align: left; margin-left: 15px; font-size: 16px;">Itens a serem desenvolvidos no SisDAF</h3>
 
-    <div class="section-tabela">
-        <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px;" id="tabelaPontosControle">
-            <thead>
-                <tr >
-                    <th class="col-id">ID</th>
-                    <th class="col-texto4">Tipo Item</th>
-                    <th class="col-texto6">Status</th>
-                    <th class="col-texto6">Responsável</th>
-                    <th class="col-texto6">Data Entrada</th>
-                    <th class="col-texto6">Data Entrega</th>
-                    <th class="col-texto4">Dias</th>
-                    <th class="col-texto25">Item</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in tab_backlog %}
-                <tr data-id="{{ item.id }}">
-                    <td class="col-id">{{ item.id }}</td>
-                    <td class="col-texto4">{{ item.get_tipo_item_display }}</td>
-                    <td class="col-texto6">{{ item.get_status_display }}</td>
-                    <th class="col-texto6" style="font-weight: normal;">{{ item.responsavel_realizacao.primeiro_ultimo_nome }}</th>
-                    <td class="col-texto6">{{ item.data_entrada|date:"d/m/Y" }}</td>
-                    <td class="col-texto6">{{ item.data_entrega|date:"d/m/Y" }}</td>
-                    <td class="col-texto4">{{ item.dias }}</td>
-                    <td class="col-texto25">{{ item.item }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>  
+    <!-- cabeçalho -->
+    <div class="horizontal-sections" >
+        
+        <!-- Total -->
+        <div class="section numbers" style="width: 200px;">
+            <div class="filter-title">
+                Total de Itens
+            </div>
+            <div id="numeroItens" class="total-geral">{{ tab_backlog.count }}</div>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="section filter" style="display: flex; justify-content: flex-start !important;">
+            <div class="filter-title">
+                Filtros
+            </div>
+            
+            <!-- Tipo de Item -->
+            <div class="form-floating" style="width: 150px !important;">
+                <select class="form-select" id="filtro_tipo_item">
+                    <option value=""></option>
+                    <option value="adaptativo">Adaptativo</option>
+                    <option value="corretivo">Corretivo</option>
+                    <option value="evolutivo">Evolutivo</option>
+                </select>
+                <label for="filtro_tipo_item">Tipo de Item</label>
+            </div>
+
+            <!-- Status -->
+            <div class="form-floating" style="width: 200px !important;">
+                <select class="form-select" id="filtro_status">
+                    <option value=""></option>
+                    <option value="nao_iniciado">Não iniciado</option>
+                    <option value="em_desenvolvimento">Em desenvolvimento</option>
+                    <option value="entregue">Entregue</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+                <label for="filtro_status">Status</label>
+            </div>
+
+            <!-- Responsável
+            <div class="form-floating full-width">
+                <select class="form-select" id="filtro_responsavel">
+                    <option value=""></option>
+                    {% for id, name in lista_produtos %}
+                    <option value="{{ name }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="filtro_responsavel">Responsável</label>
+            </div> -->
+
+            <!-- Limpar Filtros -->
+            <button class="custom-btn limpar-filtro" id="limpar_filtros">
+                <i class="fa fa-times" style="font-size: 1.5vw" title="Limpar filtros"></i>
+                <span style="font-size: 10px;">Limpar Filtros</span>
+            </button>
+
+        </div>
+
+        <!-- Funcionalidades -->
+        <div class="section funcionalidades">
+            <div style="font-size: 12px; font-weight: bold;">
+                Funcionalidade
+            </div>
+            <div class="btn-container">
+                <!-- Exportar -->
+                <button class="custom-btn" id="exportarBacklogs">
+                    <div class="icon-container">
+                        <i class="fa fa-download" style="font-size: 1.5vw"></i>
+                        <span>Exportar</span>
+                    </div>                    
+                </button>
+                
+            </div>   
         </div>
         
     </div>
 
-<script src="{% static 'js/sobre_sisdaf.js' %}"></script>
+    <!-- <h3 style="text-align: left; margin-left: 15px; font-size: 16px;">Itens a serem desenvolvidos no SisDAF</h3> -->
+
+        <div class="section-tabela">
+            <table class="table table-striped table-hover fixed-size-table" style="font-size: 14px; vertical-align: middle;" id="tabelaBacklogs">
+                <thead>
+                    <tr >
+                        <th class="col-id">ID</th>
+                        <th class="col-texto4">Tipo Item</th>
+                        <th class="col-texto6">Status</th>
+                        <th class="col-texto6">Responsável</th>
+                        <th class="col-texto6">Data Entrada</th>
+                        <th class="col-texto6">Data Entrega</th>
+                        <th class="col-texto4">Dias</th>
+                        <th class="col-texto25">Item</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in tab_backlog %}
+                    <tr data-id="{{ item.id }}">
+                        <td class="col-id">{{ item.id }}</td>
+
+                        {% if item.get_tipo_item_display == 'Adaptativo' %}
+                            <td class="col-texto4"><span class="fundo-destaque tipo-adaptativo">{{ item.get_tipo_item_display }}</span></td>
+                        {% endif %}
+                        {% if item.get_tipo_item_display == 'Evolutivo' %}
+                            <td class="col-texto4"><span class="fundo-destaque tipo-evolutivo">{{ item.get_tipo_item_display }}</span></td>
+                        {% endif %}
+                        {% if item.get_tipo_item_display == 'Corretivo' %}
+                            <td class="col-texto4"><span class="fundo-destaque tipo-corretivo">{{ item.get_tipo_item_display }}</span></td>
+                        {% endif %}
+
+
+                        {% if item.get_status_display == 'Não iniciado' %}
+                            <td class="col-texto6"><span class="fundo-destaque status-naoiniciado">{{ item.get_status_display }}</span></td>
+                        {% endif %}
+                        {% if item.get_status_display == 'Em desenvolvimento' %}
+                            <td class="col-texto6"><span class="fundo-destaque status-emdesenvolvimento">{{ item.get_status_display }}</span></td>
+                        {% endif %}
+                        {% if item.get_status_display == 'Entregue' %}
+                            <td class="col-texto6"><span class="fundo-destaque status-entregue">{{ item.get_status_display }}</span></td>
+                        {% endif %}
+                        {% if item.get_status_display == 'Cancelado' %}
+                            <td class="col-texto6"><span class="fundo-destaque status-cancelado">{{ item.get_status_display }}</span></td>
+                        {% endif %}
+                        
+                        <th class="col-texto6" style="font-weight: normal;">{{ item.responsavel_realizacao.primeiro_ultimo_nome }}</th>
+                        <td class="col-texto6">{{ item.data_entrada|date:"d/m/Y" }}</td>
+                        <td class="col-texto6">{{ item.data_entrega|date:"d/m/Y" }}</td>
+                        <td class="col-texto4">{{ item.dias }}</td>
+                        <td class="col-texto25">{{ item.item }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>  
+        </div>
+
+        <!-- paginação -->
+        <!-- <div id="pagination">
+            <button id="previousPage" class="page" disabled>Anterior </button>
+            <span id="currentPage">1</span>
+            <button id="nextPage" class="page">Próximo</button>
+        </div> -->
+        
+    </div>
+
+
+    <!-- Modais -->
+    {% include "sobre_sisdaf/backlog_modal.html" %}
+    
+
+<script src="{% static 'js/backlog.js' %}"></script>
 
 {% endblock %}

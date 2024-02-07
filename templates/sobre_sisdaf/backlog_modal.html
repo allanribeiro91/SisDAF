@@ -1,0 +1,140 @@
+<!-- Modal -->
+{% load static %}
+<style>
+    .tags-column{
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width-empenho-item {
+        min-width: 75%; 
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; 
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-content{
+        height: 60%;
+        min-height: 600px;
+    }
+
+    .modal-body{
+        height: auto;
+    }
+
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="backlogModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-empenho-item" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-regular fa-file"></i>&nbsp;Backlog SisDAF</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    
+                <!-- Log -->
+                <div class="horizontal-sections-modal" style="margin-bottom: 20px;">
+                    <div class="section" style="border: 0px !important;">
+                        
+                        <h3>Logs</h3>
+                        <div class="grid" style="font-size: 10px;">
+                            <div class="form-floating mb-3" style="font-size: 12px;">
+                                <input type="text" class="form-control log_data" id="backlog_id" style="width: 100px;"  readonly>
+                                <label for="backlog_id">ID</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px;">
+                                <input type="text" class="form-control log_data" id="log_data_registro" readonly>
+                                <label for="log_data_registro">Data do Registro</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px;">
+                                <input type="text" class="form-control log_responsavel" id="log_responsavel_registro" readonly>
+                                <label for="log_responsavel_registro">Responsável pelo Registro</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px;">
+                                <input type="text" class="form-control log_data" id="log_ult_atualizacao" readonly>
+                                <label for="log_ult_atualizacao">Última Atualização</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px;">
+                                <input type="text" class="form-control log_responsavel" id="log_responsavel_atualizacao" readonly>
+                                <label for="log_responsavel_atualizacao">Responsável Atualização</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px; width: 100px;">
+                                <input type="text" class="form-control log_edicoes" id="log_edicoes" readonly>
+                                <label for="log_edicoes">Nº Edições</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Dados do Informe -->
+                <div class="horizontal-sections-modal" >
+                    <div class="section full-width" style="border: 0px !important; ">
+                        <h3>Dados do Backlog</h3>
+                        <div class="grid" style="font-size: 10px; gap: 15px !important;">
+                            <div class="form-floating mb-3" style="font-size: 12px; width: 150px;">
+                                <input type="text" class="form-control" id="tipo_item"  readonly>
+                                <label for="tipo_item">Tipo de Item</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px; width: 150px;">
+                                <input type="text" class="form-control" id="status" readonly>
+                                <label for="status">Status</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px; width: 110px;">
+                                <input type="text" class="form-control" id="data_entrada"  readonly>
+                                <label for="data_entrada">Entrada</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px; width: 110px;">
+                                <input type="text" class="form-control" id="data_entrega" readonly>
+                                <label for="data_entrega">Entrega</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px; width: 80px;">
+                                <input type="text" class="form-control" id="dias"  value='Teste' readonly>
+                                <label for="dias">Dias</label>
+                            </div>
+                            <div class="form-floating mb-3" style="font-size: 12px; width: 200px;">
+                                <input type="text" class="form-control" id="responsavel"  value='Adaptativo' readonly>
+                                <label for="responsavel">Responsável</label>
+                            </div>
+                            <div class="form-floating mb-3 full-width" style="font-size: 12px; width: 100%;">
+                                <textarea class="form-control" id="item" style="height: 80px;" readonly>Teste</textarea>
+                                <label for="item">Item</label>
+                            </div>
+                            <div class="form-floating mb-3 full-width" style="font-size: 12px; width: 100%;">
+                                <textarea class="form-control" id="detalhamento" style="height: 120px;" readonly>Teste</textarea>
+                                <label for="detalhamento">Detalhamento</label>
+                            </div>
+                            <div class="form-floating mb-3 full-width" style="font-size: 12px; width: 100%;">
+                                <input type="text" class="form-control" id="observacoes_gerais" readonly>
+                                <label for="observacoes_gerais">Observações Gerais</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#backlogModal').modal('hide');
+        });
+    });
+</script>

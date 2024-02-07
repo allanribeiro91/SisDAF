@@ -80,7 +80,7 @@
     border-radius: 5px;
     min-height: 12vh;
     max-height: 12vh;
-    overflow-y: auto;
+    overflow-y: none;
 }
 
 .grid {
@@ -209,6 +209,13 @@
 }
 
 .custom-btn.limpar-filtro-fornecedores {
+    padding: 6px 5px;
+    max-width: 5%;
+    border: 0px;
+    background: transparent;
+}
+
+.custom-btn.limpar-filtro {
     padding: 6px 5px;
     max-width: 5%;
     border: 0px;
