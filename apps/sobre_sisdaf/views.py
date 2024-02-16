@@ -40,7 +40,7 @@ def sisdaf_pontos_controle(request):
 #BACKLOG
 @login_required
 def sisdaf_backlog(request):
-    tab_backlog = Backlog.objects.all().filter(del_status=False).order_by('-data_entrada')
+    tab_backlog = Backlog.objects.all().filter(del_status=False).order_by('-id')
     conteudo = {
        'tab_backlog': tab_backlog,
     }

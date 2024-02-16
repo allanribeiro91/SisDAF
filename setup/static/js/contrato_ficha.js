@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Calcula a data de vigência (data_publicacao + 365 dias)
             let dataPublicacao = new Date(data_publicacao.value);
             let dataVigencia = new Date(dataPublicacao);
-            dataVigencia.setDate(dataVigencia.getDate() + 365);
+            dataVigencia.setFullYear(dataVigencia.getFullYear() + 1);
 
             // Formata a data de vigência para o formato apropriado (YYYY-MM-DD)
             let dataVigenciaFormatada = dataVigencia.toISOString().split('T')[0];
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     //Formatação dos dados
     $('#ct_processo_sei').mask('00000.000000/0000-00');
-    $('#ct_documento_sei').mask('000000');
+    $('#ct_documento_sei').mask('0000000000');
     $('#id_fiscal_documento_sei').mask('000000');
     
     entrega_qtd_entregue.addEventListener('input', function(){

@@ -1729,6 +1729,9 @@ def arp_item_formulario(request, arp_item_id=None):
     try:
         item = ContratosArpsItens.objects.get(id=arp_item_id)
         produto_id = item.produto_id
+        
+        
+        print("Empate: ", item.empate_ficto)
         data = {
             'id': item.id,
             'log_data_registro': item.registro_data.strftime('%d/%m/%Y %H:%M:%S') if item.registro_data else '',

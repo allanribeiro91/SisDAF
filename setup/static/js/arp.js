@@ -176,7 +176,10 @@ function openModelItemArp(itemArpId) {
             $('#arp_tipo_cota').val(data.tipo_cota);
             if (data.empate_ficto) {
                 $('#arp_empate_ficto').val('True');
-            } else {
+            } else if (data.empate_ficto == null) {
+                $('#arp_empate_ficto').val('');
+            } 
+            else {
                 $('#arp_empate_ficto').val('False');
             }
             let produto = data.produto;
@@ -327,7 +330,7 @@ $(document).ready(function() {
 
     $('#arp_processo_sei').mask('00000.000000/0000-00');
     
-    $('#arp_documento_sei').mask('000000');
+    $('#arp_documento_sei').mask('0000000000');
     
     // $('#arp_denominacao').select2().next('.select2-container').addClass('form-control');
     
@@ -697,7 +700,6 @@ function verificar_campos_item_arp() {
     const campos = [
         { id: 'arp_n_item', mensagem: 'Informe o <b>Número</b> do Item!' },
         { id: 'arp_tipo_cota', mensagem: 'Informe o <b>Tipo de Cota</b>!' },
-        { id: 'arp_empate_ficto', mensagem: 'Informe se o item é <b>Empate Ficto</b>!' },
         { id: 'arp_produto_farmaceutico', mensagem: 'Informe o <b>Produto Farmacêutico</b>!' },
         { id: 'arp_valor_unitario', mensagem: 'Informe o <b>Valor Unitário</b>!' },
         { id: 'arp_qtd_registrada', mensagem: 'Informe a <b>Quantidade Registrada</b>!' }

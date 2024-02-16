@@ -114,8 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var valorItem = this.value;
 
         // Verifica se o valor está fora do intervalo permitido
-        if (valorItem < 1 || valorItem > 20) {
-            sweetAlert('<span style="font-weight:normal">O número do item <span style="font-weight:bold; color:red">não pode</span> <br>ser maior que 20!</span>')
+        if (valorItem < 1 || valorItem > 80) {
+            sweetAlert('<span style="font-weight:normal">O número do item <span style="font-weight:bold; color:red">não pode</span> <br>ser maior que 80!</span>')
             numero_item.value = ''
             return
         }

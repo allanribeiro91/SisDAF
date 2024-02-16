@@ -155,7 +155,7 @@ class ContratosArpsItensForm(forms.ModelForm):
         required=True,
     )
     empate_ficto = forms.ChoiceField(
-        choices=[('', '')] + YES_NO,
+        choices=[('', 'Não se Aplica')] + YES_NO,
         widget=forms.Select(attrs={
             'class': 'form-select',
             'id': 'arp_empate_ficto',
@@ -163,7 +163,7 @@ class ContratosArpsItensForm(forms.ModelForm):
         }),
         label='Empate Ficto',
         initial='',
-        required=True,
+        required=False,
     )
     produto = forms.ModelChoiceField(
         queryset=ProdutosFarmaceuticos.objects.all(),

@@ -160,7 +160,7 @@ class ContratosArpsItens(models.Model):
     arp = models.ForeignKey(ContratosArps, on_delete=models.DO_NOTHING, related_name='arp_item')
     numero_item = models.IntegerField(null=False, blank=False)
     tipo_cota = models.CharField(max_length=20, choices=TIPO_COTA, null=False, blank=False)
-    empate_ficto = models.BooleanField(null=False, blank=False)
+    empate_ficto = models.BooleanField(null=True, blank=True)
     produto = models.ForeignKey(ProdutosFarmaceuticos, on_delete=models.DO_NOTHING, related_name='arp_item_produto')
 
     #precos e quantidades registradas na ata

@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
    
     //Máscara de Número do Processo SEI
     $('#id_proaq_numero_processo_sei').mask('00000.000000/0000-00');
-    $('#id_tramitacaoproaq_documento_sei').mask('000000')
+    $('#id_tramitacaoproaq_documento_sei').mask('0000000000')
 
 
     //Salvar Processo Aquisitivo

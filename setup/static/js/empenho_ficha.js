@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //Formato PROCESSO SEI e DOCUMENTO SEI
     $('#empenho_processo_sei').mask('00000.000000/0000-00');
-    $('#empenho_documento_sei').mask('000000');
+    $('#empenho_documento_sei').mask('0000000000');
 
     const empenho_unidade_daf_display = document.getElementById('empenho_unidade_daf_display')
     const empenho_unidade_daf = document.getElementById('empenho_unidade_daf')
