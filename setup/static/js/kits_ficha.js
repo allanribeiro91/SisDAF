@@ -108,4 +108,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
+
+    const modal_kit_produto = new bootstrap.Modal(document.getElementById('kitProdutoModal'))
+    const novoProduto = document.getElementById('btnNovoProduto')
+    novoProduto.addEventListener('click', function() {
+        modal_kit_produto.show()
+    })
+
 });

@@ -183,7 +183,7 @@ class KitsProdutosFarmaceuticosForms(forms.ModelForm):
         queryset=Kits.objects.all(),
         widget=forms.Select(attrs={
             'class': 'form-control',
-            'id': 'id_kits',
+            'id': 'kits_produtos_kit',
         }),
         label='Kit',
         initial='',
@@ -193,11 +193,25 @@ class KitsProdutosFarmaceuticosForms(forms.ModelForm):
         queryset=ProdutosFarmaceuticos.objects.all(),
         widget=forms.Select(attrs={
             'class': 'form-select',
-            'id': 'id_produto_farmaceutico',
+            'id': 'kits_produtos_produto',
         }),
         label='Produto Farmacêutico',
         required=True,
     )
+    observacoes_gerais = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control auto-expand',
+            'rows': 1,
+            'style': 'padding-top: 10px; height: 80px;',
+            'id': 'kits_produtos_observacoes'
+            }),
+        required=False,
+        label='Observações Gerais'
+    )
     class Meta:
         model = Kits
         exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+    def clean_observacoes_gerais(self):
+        observacoes = self.cleaned_data.get('observacoes_gerais')
+        return observacoes or "Sem observações."

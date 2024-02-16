@@ -314,7 +314,6 @@ class Kits(models.Model):
         self.del_usuario = user
         self.save()
 
-
 class KitsProdutosFarmaceuticos(models.Model):
     #relacionamento
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name='usuario_kits_produtos')
@@ -328,6 +327,9 @@ class KitsProdutosFarmaceuticos(models.Model):
     #relacionamento
     kit = models.ForeignKey(Kits, on_delete=models.DO_NOTHING, related_name='kit_kit')
     produto = models.ForeignKey(ProdutosFarmaceuticos, on_delete=models.DO_NOTHING, related_name='kit_produto')
+
+    #observações gerais
+    observacoes_gerais = models.TextField(null=True, blank=True)
 
     #delete (del)
     del_status = models.BooleanField(default=False)

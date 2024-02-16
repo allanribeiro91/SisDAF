@@ -815,9 +815,13 @@ def kit_ficha(request, id_kit=None):
         form_kits = KitsForms(instance=kit)
     else:
         form_kits = KitsForms(instance=None)
+
+    form_kit_produto = KitsProdutosFarmaceuticosForms(instance=None)
+
     conteudo = {
         'kit': kit,
         'form_kits': form_kits,
+        'form_kit_produto': form_kit_produto,
     }
     return render(request, 'produtos/kits_produtos_ficha.html', conteudo)
 

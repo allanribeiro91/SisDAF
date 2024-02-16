@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //Mudar de aba
     $('#tabKits tbody').on('click', 'tr', function() {
-        const id_empenho = $(this).attr('data-id').toString();
-        window.location.href = `/contratos/empenhos/ficha/${id_empenho}/`;
+        const idKit = $(this).attr('data-id').toString();
+        window.location.href = `/produtosdaf/kits/ficha/${idKit}/`;
     });
 
     //Exportar dados

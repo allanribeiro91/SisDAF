@@ -1,0 +1,191 @@
+<!-- Modal -->
+{% load static %}
+<style>
+    .tags-column{
+        float: left;
+        width: 33.33%;
+        padding: 5px;
+    }
+
+    .custom-modal-width-empenho-item {
+        min-width: 75%; 
+        font-size: 16px !important;
+    }
+
+    .horizontal-sections-modal-parcela {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; 
+        width: 100%;
+        height: 75px;
+    }
+
+    .modal-content{
+        height: 60%;
+        min-height: 600px;
+    }
+
+    .modal-body{
+        height: auto;
+    }
+
+
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="kitProdutoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable custom-modal-width-empenho-item" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Produto do Kit</h5>
+                <button type="button" class="close closeModalButton" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <form id="itemEmpenhoForm">
+                    {% csrf_token %}
+                    <div class="horizontal-sections-modal-parcela" >
+                        <div class="section" style="border: 0px !important;">
+                            
+                            <h3>Logs</h3>
+                            <div class="grid" style="font-size: 10px;">
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="item_id" style="width: 100px;"  readonly>
+                                    <label for="item_id">ID</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="item_log_data_registro" readonly>
+                                    <label for="item_log_data_registro">Data do Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="item_log_responsavel_registro" readonly>
+                                    <label for="item_log_responsavel_registro">Responsável pelo Registro</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_data" id="item_log_ult_atualizacao" readonly>
+                                    <label for="item_log_ult_atualizacao">Última Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_responsavel" id="item_log_responsavel_atualizacao" readonly>
+                                    <label for="item_log_responsavel_atualizacao">Responsável Atualização</label>
+                                </div>
+                                <div class="form-floating mb-3" style="font-size: 12px;">
+                                    <input type="text" class="form-control log_edicoes" id="item_log_edicoes" readonly>
+                                    <label for="item_log_edicoes">Nº Edições</label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+    
+                    <div class="horizontal-sections-modal-parcela" style="margin-top: 20px;">
+                        <div class="section" style="border: 0px !important;">
+                            
+                            <h3>Dados da Parcela</h3>
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                    <input type="text" class="form-control" id="id_item_contrato" readonly>
+                                    <label>Contrato</label>
+                                </div>
+                                <div class="form-floating mb-3" style="max-width: 100px !important;">
+                                    <input type="text" class="form-control" id="id_item_numero_item" readonly>
+                                    <label>Nº do Item</label>
+                                </div>
+                                <div class="form-floating mb-3" style="max-width: 120px !important;">
+                                    <input type="text" class="form-control" id="id_item_numero_parcela" readonly>
+                                    <label>Nº da Parcela</label>
+                                </div>
+                                <div class="form-floating mb-3 full-width">
+                                    <input type="text" class="form-control" id="id_item_produto" readonly>
+                                    <label>Produto Farmacêutico</label>
+                                </div>
+                                
+                            </div>
+
+                            <div class="grid" style="font-size: 14px;">
+
+                                <!-- Parâmetros -->
+                                <div class="subgrid">
+                                    <h3>Parâmetros</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_fatorEmbalagem" value="140" readonly>
+                                            <label>Fator Embalagem</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_valorUnitario" value="R$ 151,23" readonly>
+                                            <label>Valor Unitário R$</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_qtdEmpenhar" value="349.842" readonly>
+                                            <label>Qtd a Empenhar</label>
+                                        </div>
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_valorEmpenhar" value="349.842" readonly>
+                                            <label>Valor a Empenhar</label>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                
+                                <!-- Empenho -->
+                                <div class="subgrid" style="margin-left: 30px;">
+                                    <h3>Empenho</h3>
+                                    <div class="subgrid-elementos">
+                                        <div class="form-floating mb-3" style="max-width: 150px !important;">
+                                            <input type="text" class="form-control" style="text-align: right;" id="itemEmpenho_embalagens" readonly>
+                                            <label>Embalagens</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            {{ form_empenho_item.qtd_empenhado }}
+                                            <label>{{ form_empenho_item.qtd_empenhado.label }}</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            {{ form_empenho_item.valor_empenhado }}
+                                            <label>{{ form_empenho_item.valor_empenhado.label }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <h3>Observações</h3>
+                            <div class="grid" style="font-size: 14px;">
+                                <div class="form-floating mb-3 full-width">
+                                    {{ form_empenho_item.observacoes_gerais }}
+                                    <label>{{ form_empenho_item.observacoes_gerais.label }}</label>
+                                </div>
+
+                                <input type="hidden" id="id_empenhoItem_empenho" name="id_empenhoItem_empenho" readonly>
+                                <input type="hidden" id="id_empenhoItem_parcela" name="id_empenhoItem_parcela" readonly>
+                                <input type="hidden" id="id_empenhoItem_qtd_empenhada" readonly>
+                            </div>
+                        </div>
+                    </div>
+    
+
+                    
+    
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary closeModalButton" data-dismiss="modal" style="background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnDeletarItemEmpenho" style="background-color: rgb(221, 0, 0); border-color: rgb(221, 0, 0);">Deletar</button>
+                <button type="button" class="btn btn-primary" id="botaoSalvarItemEmpenho" style="background-color: rgb(13, 110, 253); border-color: rgb(13, 110, 253);">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<script>
+    document.querySelectorAll('.closeModalButton').forEach(button => {
+        button.addEventListener('click', function() {
+            $('#empenhoItemModal').modal('hide');
+        });
+    });
+</script>
