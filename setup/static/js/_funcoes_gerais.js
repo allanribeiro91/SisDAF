@@ -261,3 +261,33 @@ function limparFiltros(idsFiltros) {
 
 
 
+function formatoTelefone(id) {
+    var campo = document.getElementById(id);
+  
+    campo.addEventListener('input', function(e) {
+      var valor = e.target.value;
+  
+      // Remove tudo o que não é dígito
+      valor = valor.replace(/\D/g, '');
+  
+      // Limita o tamanho do número a 10 dígitos
+      valor = valor.substring(0, 10);
+  
+      // Formata o número para o formato (00) 0000-0000
+      var valorFormatado = '';
+      if (valor.length > 2) {
+        valorFormatado += '(' + valor.substring(0, 2) + ') ';
+        if (valor.length > 6) {
+          valorFormatado += valor.substring(2, 6) + '-';
+          valorFormatado += valor.substring(6, 10);
+        } else {
+          valorFormatado += valor.substring(2);
+        }
+      } else {
+        valorFormatado = valor;
+      }
+  
+      e.target.value = valorFormatado; // Atualiza o campo com o valor formatado
+    });
+  }
+  

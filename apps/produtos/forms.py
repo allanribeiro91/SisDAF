@@ -1,5 +1,5 @@
 from django import forms
-from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos
+from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos, Kits, KitsProdutosFarmaceuticos
 from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO
 
 class DenominacoesGenericasForm(forms.ModelForm):    
@@ -117,3 +117,87 @@ class ProdutosFarmaceuticosForm(forms.ModelForm):
             'observacoes_gerais': forms.Textarea(attrs={'class':'form-control'}),
         }
 
+class KitsForms(forms.ModelForm):
+    nome = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_nome',
+        }),
+        label='Nome do Kit',
+        initial='',
+        required=True,
+    )
+    descricao = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'id': 'id_descricao',
+            'rows': 1,
+            'style': 'padding-top: 30px; height: 100px;',
+        }),
+        label='Descrição',
+        initial='',
+        required=False,
+    )
+    daf_cgceaf = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-control',
+            'id': 'id_cgceaf',
+        }),
+        label='CGCEAF',
+        initial='',
+        required=False,
+    )
+    daf_cgafb = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-control',
+            'id': 'id_cgafb',
+        }),
+        label='CGAFB',
+        initial='',
+        required=False,
+    )
+    daf_cgafme = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-control',
+            'id': 'id_cgafme',
+        }),
+        label='CGAFME',
+        initial='',
+        required=False,
+    )
+    daf_farmacia_popular = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-control',
+            'id': 'id_farmacia_popular',
+        }),
+        label='Farmácia Popular',
+        initial='',
+        required=False,
+    )
+    class Meta:
+        model = Kits
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']
+
+class KitsProdutosFarmaceuticosForms(forms.ModelForm):
+    kit = forms.ModelChoiceField(
+        queryset=Kits.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'id_kits',
+        }),
+        label='Kit',
+        initial='',
+        required=True,
+    )
+    produto = forms.ModelChoiceField(
+        queryset=ProdutosFarmaceuticos.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'id': 'id_produto_farmaceutico',
+        }),
+        label='Produto Farmacêutico',
+        required=True,
+    )
+    class Meta:
+        model = Kits
+        exclude = ['usuario_registro', 'usuario_atualizacao', 'log_n_edicoes', 'del_status', 'del_data', 'del_usuario']

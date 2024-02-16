@@ -5,6 +5,32 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('fornecedorSalvo');
     }
 
+    formatoTelefone('id_telefone1')
+    formatoTelefone('id_telefone2')
+
+
+    const botao_deletar_fornecedor = document.getElementById('btnDeletarFornecedor')
+    botao_deletar_fornecedor.addEventListener('click', function() {
+        var fornecedorId = document.getElementById('id_fornecedor').value
+
+        if (fornecedorId == ''){
+            window.location.href = `/fornecedores/`
+            return
+        }
+
+        //parâmetros para deletar
+        const mensagem = "Deletar o Fornecedor."
+        const url_delete = `/fornecedores/ficha/deletar/${fornecedorId}/`
+
+        const url_apos_delete = "/fornecedores/";
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        //chamar sweetAlert
+        sweetAlertDelete(mensagem, url_delete, csrfToken, url_apos_delete)
+    })
+
+
+
 });
 
 
@@ -36,30 +62,30 @@ $(document).ready(function() {
     });
 
     //Deletar
-    $('#deletar_fornecedor').on('click', function() {
-        const fornecedorId = $('#id_fornecedor').val(); 
+    // $('#deletar_fornecedor').on('click', function() {
+    //     const fornecedorId = $('#id_fornecedor').val(); 
     
-        if (!fornecedorId) { //Trata-se de um novo registro que ainda não foi salvo
-            window.location.href = `/fornecedores/`;
-            return; // Sai da função
-        }
-        $.ajax({
-            url: `/fornecedores/ficha/deletar/${fornecedorId}/`,
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')  // Pega o token CSRF para autenticação
-            },
-            success: function(response) {
-                // Redireciona para a lista de denominações após a deleção bem-sucedida
-                //alert(response.message);
-                window.location.href = `/fornecedores/`;
-            },
-            error: function(error) {
-                // Aqui você pode adicionar qualquer lógica que deseja executar se houver um erro ao tentar deletar o fornecedor.
-                alert('Ocorreu um erro ao tentar deletar o fornecedor. Por favor, tente novamente.');
-            }
-        });
-    });
+    //     if (!fornecedorId) { //Trata-se de um novo registro que ainda não foi salvo
+    //         window.location.href = `/fornecedores/`;
+    //         return; // Sai da função
+    //     }
+    //     $.ajax({
+    //         url: `/fornecedores/ficha/deletar/${fornecedorId}/`,
+    //         method: 'POST',
+    //         headers: {
+    //             'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')  // Pega o token CSRF para autenticação
+    //         },
+    //         success: function(response) {
+    //             // Redireciona para a lista de denominações após a deleção bem-sucedida
+    //             //alert(response.message);
+    //             window.location.href = `/fornecedores/`;
+    //         },
+    //         error: function(error) {
+    //             // Aqui você pode adicionar qualquer lógica que deseja executar se houver um erro ao tentar deletar o fornecedor.
+    //             alert('Ocorreu um erro ao tentar deletar o fornecedor. Por favor, tente novamente.');
+    //         }
+    //     });
+    // });
 
     function formatCNPJ() {
         var cnpj = document.getElementById('cnpj');

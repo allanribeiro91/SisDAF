@@ -66,6 +66,12 @@ class Fornecedores(models.Model):
     end_numero =  models.CharField(max_length=10, null=True, blank=True, default='NI')
     end_bairro =  models.CharField(max_length=100, null=True, blank=True, default='Não informado')
     
+    #contato
+    telefone1 = models.CharField(max_length=14, null=True, blank=True)
+    telefone2 = models.CharField(max_length=14, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    site = models.URLField(null=True, blank=True)
+
     #observações gerais
     observacoes_gerais = models.TextField(null=True, blank=True, default='Sem observações.')
 

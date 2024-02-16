@@ -11,7 +11,7 @@
         </div>
         <div>
             {% with current_url=request.resolver_match.url_name %}
-            <a class="tab {% if current_url in 'produtos,produtos_ficha,produtos_cmm,novo_produto,denominacoes,denominacoes_ficha,nova_denominacao' %}active-tab{% endif %}" href="{% url 'produtos' %}">Produtos DAF</a>
+            <a class="tab {% if current_url in 'produtos,produtos_ficha,produtos_cmm,novo_produto,denominacoes,denominacoes_ficha,nova_denominacao,kits, kit_novo, kit_ficha' %}active-tab{% endif %}" href="{% url 'produtos' %}">Produtos DAF</a>
             {% endwith %}    
         </div> 
         

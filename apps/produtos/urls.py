@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.urls import path
-from apps.produtos.views import produtos, produtos_ficha, produtos_cmm, get_filtros_produtos, exportar_produtos, delete_produto, salvar_tags, produto_exportar_pdf
-from apps.produtos.views import denominacoes, denominacoes_ficha, get_filtros_denominacoes, exportar_denominacoes, delete_denominacao
-from apps.produtos.views import denominacoes_buscar
+from apps.produtos.views import (
+                produtos, produtos_ficha, produtos_cmm, get_filtros_produtos, 
+                exportar_produtos, delete_produto, salvar_tags, produto_exportar_pdf, 
+                denominacoes, denominacoes_ficha, get_filtros_denominacoes, 
+                exportar_denominacoes, delete_denominacao, denominacoes_buscar,
+                kits, kit_ficha, kit_deletar)
 
 urlpatterns = [
     
@@ -25,5 +28,11 @@ urlpatterns = [
     path('produtosdaf/produtos/exportar/', exportar_produtos, name='exportar_produtos'),
     path('produtosdaf/produtos/salvartags/<int:product_id>/', salvar_tags, name='salvar_tags'),
     path('produtosdaf/produtos', produtos, name='produtos'),
+
+    #kits
+    path('produtosdaf/kits/', kits, name='kits'),
+    path('produtosdaf/kits/novo/', kit_ficha, name='kit_novo'),
+    path('produtosdaf/kits/ficha/<int:id_kit>/', kit_ficha, name='kit_ficha'),
+    path('produtosdaf/kits/deletar/<int:id_kit>/', kit_deletar, name='kit_deletar'),
     
 ]

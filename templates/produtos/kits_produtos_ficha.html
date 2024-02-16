@@ -1,0 +1,171 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load humanize %}
+{% block extra_head %}    
+    <link rel="stylesheet" href="{% static 'styles/kit_ficha.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}    
+    
+    <!-- Caminho da Área de Trabalho -->
+    <div class="breadcrumb2">
+        <i class="fa-solid fa-file-contract"></i>&nbsp;Produtos DAF / Kits de Produtos Farmacêuticos / Ficha do Kit
+    </div>
+
+    <!-- Barra Superior -->
+    <div class="barra-superior">
+        <!-- Abas -->
+        <div class="tab-voltar">
+            <a href="{% url 'kits' %}" style="color: black;">
+                <i class="fas fa-arrow-left"></i> 
+            </a>
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" id="kit_ficha_dados_gerais">Dados Gerais</button>
+        </div>
+    </div>
+
+    <div class="area-scroll">
+        <!-- form kit -->
+            <form id="kitForm" method="POST">
+            {% csrf_token %}
+            
+            <!-- Botões -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-danger" id="btnDeletarKit" style="font-size: 12px; background-color: rgb(58, 58, 58); border-color: rgb(58, 58, 58);">
+                    <i class="fas fa-trash-alt"></i>
+                    Deletar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnKitRelatorio" style="font-size: 12px; background-color: #039153; border-color: #039153;">
+                    <i class="fa-regular fa-file-pdf"></i>
+                    &nbsp;Relatório
+                </button>
+                <button class="btn btn-primary me-md-2" type="submit" id="btnSalvarKit" style="font-size: 12px;">
+                    <i class="fas fa-save me-1"></i> 
+                    Salvar
+                </button>
+            </div>
+            
+            <!-- Logs -->
+            <div class="horizontal-sections">
+                <div class="section-log">
+                    <h3>Log</h3>
+                    <div class="grid-log">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" id="id_kit" readonly value="{{ form_kits.instance.id|default_if_none:'' }}">
+                            <label for="id_kit">ID</label>
+                        </div>                        
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="kit_log_data_registro" readonly value="{{ kit.registro_data|date:"d/m/Y H:i:s" }}">
+                            <label for="kit_log_data_registro">Data do Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="kit_log_responsavel_registro" readonly value="{{ kit.usuario_registro.dp_nome_completo }}">
+                            <label for="kit_log_responsavel_registro">Responsável pelo Registro</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_data" id="kit_log_ult_atualizacao" readonly value="{{ kit.ult_atual_data|date:"d/m/Y H:i:s" }}">
+                            <label for="kit_log_ult_atualizacao">Última Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_responsavel" id="kit_log_responsavel_atualizacao" readonly value="{{ kit.usuario_atualizacao.dp_nome_completo }}">
+                            <label for="kit_log_responsavel_atualizacao">Responsável Atualização</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control log_edicoes" style="width: 100px;" id="kit_log_edicoes" readonly value="{{ kit.log_n_edicoes }}">
+                            <label for="kit_log_edicoes">Nº Edições</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Identificação do Kit -->
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Identificação do Kit</h3>
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating" style="width: 30%;">                            
+                            {{ form_kits.nome }}
+                            <label>{{ form_kits.nome.label }}</label>
+                        </div>
+                        <!-- Unidades -->
+                        <div class="unidades" style="margin-left: 15px; width: 40%; font-size: 14px !important;">
+                            <span>Unidades</span></br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input unidade-check" type="checkbox" id="id_daf_cgafb" name="daf_cgafb" value="1" {% if kit.daf_cgafb %}checked{% endif %}>
+                                <label class="form-check-label unidade-check" for="id_daf_cgafb">Básico</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input unidade-check" type="checkbox" id="id_daf_cgceaf" name="daf_cgceaf" value="1" {% if kit.daf_cgceaf %}checked{% endif %}>
+                                <label class="form-check-label unidade-check" for="id_daf_cgceaf">Especializado</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input unidade-check" type="checkbox" id="id_daf_cgafme" name="daf_cgafme" value="1" {% if kit.daf_cgafme %}checked{% endif %}>
+                                <label class="form-check-label unidade-check" for="id_daf_cgafme">Estratégico</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input unidade-check" type="checkbox" id="id_daf_farmacia_popular" name="daf_farmacia_popular" value="1" {% if kit.daf_farmacia_popular %}checked{% endif %}>
+                                <label class="form-check-label unidade-check" for="id_daf_farmacia_popular">Farmácia Popular</label> <!-- Corrigido aqui -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid" style="font-size: 14px;">
+                        <div class="form-floating" style="margin-top: 15px; width: 100%;">                            
+                            {{ form_kits.descricao }}
+                            <label>{{ form_kits.descricao.label }}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produtos Farmacêuticos -->
+            <div class="horizontal-sections">
+                <div class="section">
+                    <h3>Produtos Farmacêuticos</h3>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="font-size: 14px; text-align: right !important;">
+                        <button class="btn btn-primary me-md-2" type="button" data-bs-toggle="modal"  id="btnNovoProduto" style="font-size: 12px; background-color: green; border-color: green;">
+                            <i class="fas fa-plus" style="font-size: 14px;"></i> 
+                            &nbsp;Inserir Item
+                        </button>
+                    </div>
+
+                    <div class="grid" style="font-size: 14px;">
+                        <table class="table table-striped table-hover fixed-size-table" style="font-size: 12px;" id="tabKitsProdutos">
+                            <thead>
+                                <tr>
+                                    <th>Produto Farmacêutico</th>
+                                    <th>Observações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tab_empenho_itens %}
+                                <tr data-id="{{ item.id }}">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.parcela.contrato.numero_contrato }}</td>
+                                </tr>
+                                {% endfor %}
+
+                                <input type="hidden" id="qtd_entregue_empenho" value="{{ empenho.empenho_qtd_entregue }}" readonly>
+                                <input type="hidden" id="status_empenho_hidden" value="{{ empenho.status }}" readonly>
+
+                            </tbody>
+                        </table> 
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+    </div>
+    
+
+    <!-- Modal -->
+    {% include "contratos/empenho_contrato_definir_modal.html" %}
+    {% include "contratos/empenho_item_modal.html" %}
+
+    <script src="{% static 'js/kits_ficha.js' %}"></script>
+    
+
+{% endblock %}

@@ -21,6 +21,36 @@ class FornecedoresForm(forms.ModelForm):
     end_logradouro = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
     end_numero = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
     end_bairro = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    telefone1= forms.CharField(
+        required=False, 
+        widget=forms.TextInput(attrs={
+            'class':'form-control',
+            'id': 'id_telefone1'
+            }),
+        label="Telefone 1"
+        )
+    telefone2= forms.CharField(
+        required=False, 
+        widget=forms.TextInput(attrs={
+            'class':'form-control',
+            'id': 'id_telefone2'
+            }),
+        label="Telefone 2"
+        )
+    email= forms.EmailField(
+        required=False, 
+        widget=forms.EmailInput(attrs={
+            'class':'form-control',
+            'id': 'id_email',
+            }),
+            label="Email")
+    site= forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={
+            'class':'form-control',
+            'id': 'id_site',
+            }),
+        label="Site")
     observacoes_gerais = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control'}))
     
     class Meta:

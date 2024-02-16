@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from apps.usuarios.models import Usuario
-from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos, Tags, ListaATC, ProdutosTags, ProdutoConsumoMedio
-from apps.produtos.forms import DenominacoesGenericasForm, ProdutosFarmaceuticosForm
+from apps.produtos.models import DenominacoesGenericas, ProdutosFarmaceuticos, Tags, ListaATC, ProdutosTags, ProdutoConsumoMedio, Kits, KitsProdutosFarmaceuticos
+from apps.produtos.forms import DenominacoesGenericasForm, ProdutosFarmaceuticosForm, KitsForms, KitsProdutosFarmaceuticosForms
 from apps.main.models import CustomLog
 from setup.choices import TIPO_PRODUTO, FORMA_FARMACEUTICA, STATUS_INCORPORACAO, CONCENTRACAO_TIPO, YES_NO, CLASSIFICACAO_AWARE
 from django.http import JsonResponse, HttpResponse
@@ -742,6 +742,84 @@ def denominacoes_buscar(request, unidade_daf=None):
     return JsonResponse({'denominacoes_list': denominacoes_list})
 
 
+def kits(request):
+    kits = Kits.objects.filter(del_status=False).order_by('nome')
 
+    conteudo = {
+        'kits': kits,
+    }
+    return render(request, 'produtos/kits_produtos.html', conteudo)
 
+def kit_ficha(request, id_kit=None):
+    if id_kit:
+        kit = Kits.objects.get(id=id_kit)
+    else:
+        kit = None
+    
+    #salvar
+    if request.method == 'POST':
+        #Carregar formulário
+        if kit:
+            kit_form = KitsForms(request.POST, instance=kit)
+            novo_kit = False
+        else:
+            kit_form = KitsForms(request.POST)
+            novo_kit = True
+        
+        #Verificar se houve alteração no formulário
+        if not kit_form.has_changed():
+            return JsonResponse({
+                    'retorno': 'Não houve mudanças'
+                })
+        
+        #salvar
+        if kit_form.is_valid():
+            #Salvar o produto
+            kit = kit_form.save(commit=False)
+            kit.save(current_user=request.user.usuario_relacionado)
+            # Registrar a ação no CustomLog
+            current_date_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            observacoes = (
+                f"Usuário {request.user.username} salvou o Kit de Produtos Farmacêuticos "
+                f"(ID: {kit.id}, Nome: {kit.nome}) "
+                f"em {current_date_str}."
+            )
+            
+            log_entry = CustomLog(
+                usuario=request.user.usuario_relacionado,
+                modulo="Produtos_Kits",
+                model='Kits',
+                model_id=kit.id,
+                item_id=0,
+                item_descricao="Salvar edição de Kit de Produtos Farmacêutico.",
+                acao="Salvar",
+                observacoes=observacoes
+            )
+            log_entry.save()
+            
+            #Retornar
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'retorno': 'Salvo',
+                    'novo': novo_kit,
+                    'kit_id': kit.id,
+                })
+        else:
+            print("Erro formulário Kit de Produtos Farmacêuticos")
+            print(kit_form.errors)
+            return JsonResponse({
+                    'retorno': 'Erro ao salvar'
+                })
 
+    if kit:
+        form_kits = KitsForms(instance=kit)
+    else:
+        form_kits = KitsForms(instance=None)
+    conteudo = {
+        'kit': kit,
+        'form_kits': form_kits,
+    }
+    return render(request, 'produtos/kits_produtos_ficha.html', conteudo)
+
+def kit_deletar():
+    pass
