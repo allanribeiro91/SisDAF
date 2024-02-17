@@ -52,6 +52,11 @@ $('#btnExportarLogs').on('click', function() {
 });
 
 document.addEventListener("DOMContentLoaded", function() {
+
+    if (localStorage.getItem('senhaSalva') === 'true') {
+        sweetAlert('Nova Senha salva com sucesso!', 'success', 'top-end');
+        localStorage.removeItem('senhaSalva');
+    }
         
     const tipoVinculo = document.getElementById('tipo_vinculo');
     const orgaoOrigem = document.getElementById('orgao_origem');
@@ -208,10 +213,11 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.retorno === "Salvo") {
-                sweetAlert('Nova senha salva com sucesso!', 'success', 'top-end');
                 modalAlterarSenha.hide();
                 novaSenha.value = '';
                 confirmarSenha.value = '';
+                localStorage.setItem('senhaSalva', 'true');
+                window.location.reload();                
             }
     
             if (data.retorno === "Não houve mudanças") {

@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -190,9 +191,15 @@ def alterar_senha(request):
         senha = body.get('senha', '')
 
         if senha:
+            user = request.user
             hashed_password = make_password(senha)
-            request.user.password = hashed_password
-            request.user.save()
+            user.password = hashed_password
+            user.save()
+
+            #reautenticar o usuário
+            user = authenticate(request, username=user.username, password=senha)
+            login(request, user)
+
             return JsonResponse({'retorno': 'Salvo'})
         else:
             return JsonResponse({'retorno': 'Erro ao salvar'}, status=400)
