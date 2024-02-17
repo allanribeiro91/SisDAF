@@ -1,0 +1,45 @@
+.bolinha {
+    height: 15px;
+    width: 15px;
+    border-radius: 20%;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.bolinha-vigente, .bolinha-empenho {
+    background-color: #01a71a;
+}
+
+.bolinha-suspenso, .bolinha-pre-empenho {
+    background-color: #ff7700;
+}
+
+.bolinha-encerrado {
+    background-color: #414141;
+}
+
+.bolinha-cancelado {
+    background-color: #bf0000;
+}
+
+.produto-unidadedaf{
+    background-color: #008d9f;
+    border-radius: 5px;
+    color: white;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.fundo-destaque {
+    padding: 5px 10px; /* Ajuste o padding conforme necessário */
+    border-radius: 10px; /* Ajuste o border-radius conforme desejado */
+    display: inline-block; /* Faz o elemento se comportar como bloco, mas apenas ocupando o espaço necessário */
+}
+
+.status-ativo {
+    background-color: #07285d !important;
+    color: white;
+}
+
+
