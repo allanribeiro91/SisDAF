@@ -4,7 +4,7 @@
         <div class="cabecalho">
             <img src="{% static 'assets/logo/logo_sisdaf_negativo.png' %}" alt="Logo SisDAF" class="top-logo">
             <span class="titulo">SisDAF</span>
-            <span class="versao">Versão Beta 0.2.6</span>
+            <span class="versao">Versão Beta 0.2.7</span>
         </div>
         <div>
             <a class="tab {% if request.resolver_match.url_name == 'home' %}active-tab{% endif %}" href="{% url 'home' %}">Home</a>
@@ -71,8 +71,8 @@
                 <i class="fas fa-user"></i>
                 &nbsp;Meus Dados</a>
             <a href="{% url 'sisdaf_ajuda' %}">
-                <i class="fas fa-info-circle"></i>
-                &nbsp;Sobre o SisDAF</a>
+                <i class="fa-solid fa-bars"></i>
+                &nbsp;Mais Opções</a>
             <a href="{% url 'logout' %}">
                 <i class="fas fa-sign-out-alt"></i>
                 &nbsp;Sair</a>

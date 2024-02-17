@@ -31,5 +31,15 @@
     font-weight: bold;
 }
 
+.fundo-destaque {
+    padding: 5px 10px; /* Ajuste o padding conforme necessário */
+    border-radius: 10px; /* Ajuste o border-radius conforme desejado */
+    display: inline-block; /* Faz o elemento se comportar como bloco, mas apenas ocupando o espaço necessário */
+}
+
+.status-ativo {
+    background-color: #07285d !important;
+    color: white;
+}
 
 

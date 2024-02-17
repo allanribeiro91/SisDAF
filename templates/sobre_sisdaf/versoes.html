@@ -2,13 +2,15 @@
 {% load static %}
 {% block extra_head %}    
     <link rel="stylesheet" href="{% static 'styles/meusdados.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_tabelas.css' %}">
+    <link rel="stylesheet" href="{% static '\styles\_aderecos.css' %}">
     <!-- <link rel="stylesheet" href="{% static 'styles/fornecedores.css' %}"> -->
 {% endblock %}
 {% block content %}    
     
     <!-- Caminho da Área de Trabalho -->
     <div class="breadcrumb2">
-        <i class="fas fa-info-circle"></i>&nbsp;Sobre o SisDAF / Versões
+        <i class="fa-solid fa-bars"></i>&nbsp;Mais Opções / Versões
     </div>
 
     <!-- Barra Superior -->
@@ -32,22 +34,25 @@
             <thead>
                 <tr >
                     
-                    <th>Versão</th>
-                    <th>Status</th>
-                    <th style="text-align: center;">Data</th>
+                    <th class="col-texto4">Versão</th>
+                    <th class="col-texto12">Status</th>
+                    <th class="col-texto10">Data</th>
                     <th>Informações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in tab_versoes %}
                 <tr data-id="{{ item.id }}">
-                    <td style="width: 5%;">{{ item.versao }}</td>
+                    <td class="col-texto4">{{ item.versao }}</td>
                     {% if item.status == 'em_desenvolvimento' %}
-                        <td style="width: 10%;">Em desenvolvimento</td>
+                        <td class="col-texto12">Em desenvolvimento</td>
+                    {% elif item.status == 'ativo' %}
+
+                        <td class="col-texto12"><span class="fundo-destaque status-ativo">{{ item.status|capfirst }}</span></td>
                     {% else %}
-                    <td style="width: 10%;">{{ item.status|capfirst }}</td>
+                        <td class="col-texto12">{{ item.status|capfirst }}</td>
                     {% endif %}
-                    <td style="width: 8%; text-align: center;">{{ item.data_versao|date:"d/m/Y" }}</td>
+                    <td class="col-texto10">{{ item.data_versao|date:"d/m/Y" }}</td>
                     <td style="width: 75% !important;">{{ item.informacoes }}</td>
                 </tr>
                 {% endfor %}

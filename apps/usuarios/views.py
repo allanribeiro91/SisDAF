@@ -1,6 +1,7 @@
 from django import forms
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from setup.choices import GENERO_SEXUAL, COR_PELE, VINCULO_MS, ORGAO_PUBLICO
 from datetime import datetime
@@ -43,6 +44,7 @@ def meuslogs(request):
         'tab_logs': tab_logs,
     })
 
+@login_required
 def meuslogs_exportar(request):
     print("Exportar Logs")
     
@@ -101,7 +103,7 @@ def meuslogs_exportar(request):
         response.write(output.getvalue())
         return response
 
-
+@login_required
 def meusacessos(request):
     usuario = request.user.usuario_relacionado
     tab_acessos = UserAccessLog.objects.filter(usuario=usuario).order_by('-timestamp')
@@ -110,9 +112,8 @@ def meusacessos(request):
         'tab_acessos': tab_acessos,
     })
 
-def meusacessos_exportar(request):
-    print("Exportar Acessos")
-    
+@login_required
+def meusacessos_exportar(request):    
     if request.method == 'POST':
         usuario = request.user.usuario_relacionado
         tab_acessos = UserAccessLog.objects.filter(usuario=usuario).order_by('-timestamp')
@@ -181,3 +182,20 @@ def editar_meusdados(request):
             print(usuario_form.errors)
             return False
 
+@login_required
+def alterar_senha(request):
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        senha = body.get('senha', '')
+
+        if senha:
+            hashed_password = make_password(senha)
+            request.user.password = hashed_password
+            request.user.save()
+            return JsonResponse({'retorno': 'Salvo'})
+        else:
+            return JsonResponse({'retorno': 'Erro ao salvar'}, status=400)
+    else:
+        return JsonResponse({'retorno': 'Método inválido ou requisição não é Ajax'}, status=400)
+    

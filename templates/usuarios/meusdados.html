@@ -26,6 +26,11 @@
     <form id="usuarioForm" method="POST" action="{% url 'meusdados' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            
+            <button class="btn btn-primary me-md-2" id="btnAlterarSenha" style="font-size: 12px; background-color:#31005f; border-color: #31005f;">
+                <i class="fa-solid fa-key"></i>
+                Alterar Senha
+            </button>   
             <button class="btn btn-primary me-md-2" type="submit" id="btnSave" style="font-size: 12px;">
                 <i class="fas fa-save me-1"></i> <!-- Ícone com margem à direita -->
                 Salvar
@@ -175,6 +180,9 @@
         </div>
     </div>
 </form>
+
+<!-- Modal -->
+{% include "usuarios/alterar_senha_modal.html" %}
 
 <script src="{% static 'js/meus_dados.js' %}"></script>
 

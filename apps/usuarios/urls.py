@@ -1,5 +1,7 @@
 from django.urls import path
-from apps.usuarios.views import meusdados, meuslogs, meuslogs_exportar, meusacessos, meusacessos_exportar
+from apps.usuarios.views import (meusdados, meuslogs, meuslogs_exportar, 
+                                 meusacessos, meusacessos_exportar,
+                                 alterar_senha)
 
 urlpatterns = [
     path('usuario/meusdados/', meusdados, name='meusdados'),
@@ -9,4 +11,6 @@ urlpatterns = [
     
     path('usuario/meusacessos/', meusacessos, name='meusacessos'),
     path('usuario/meusacessos/exportar/', meusacessos_exportar, name='meusacessos_exportar'),
+
+    path('usuario/alterarsenha/', alterar_senha, name='alterar_senha')
 ]

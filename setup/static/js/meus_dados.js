@@ -52,6 +52,7 @@ $('#btnExportarLogs').on('click', function() {
 });
 
 document.addEventListener("DOMContentLoaded", function() {
+        
     const tipoVinculo = document.getElementById('tipo_vinculo');
     const orgaoOrigem = document.getElementById('orgao_origem');
     const orgaoOutro = document.getElementById('orgao_outro');
@@ -97,34 +98,34 @@ document.addEventListener("DOMContentLoaded", function() {
     ramalMs.addEventListener('input', function(e) {
         this.value = this.value.replace(/[^0-9]/g, '');
     });
-});
 
 
 
-document.getElementById("file-input").addEventListener("change", function(){
-    const file = this.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.addEventListener("load", function() {
-            document.getElementById("preview").setAttribute("src", this.result);
-        });
-        reader.readAsDataURL(file);
+
+    document.getElementById("file-input").addEventListener("change", function(){
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.addEventListener("load", function() {
+                document.getElementById("preview").setAttribute("src", this.result);
+            });
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+    
+            reader.onload = function(e) {
+                document.getElementById('foto_usuario').src = e.target.result;
+            };
+    
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 });
-
-
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function(e) {
-            document.getElementById('foto_usuario').src = e.target.result;
-        };
-
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
 
 document.addEventListener('DOMContentLoaded', function() {
     const clickableInputs = document.querySelectorAll('.clickable-input');
@@ -137,5 +138,97 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+
+    const alterarSenha = document.getElementById('btnAlterarSenha')
+    const modalAlterarSenha = new bootstrap.Modal(document.getElementById('alterarSenhaModal'))
+    alterarSenha.addEventListener('click', function(event) {
+        event.preventDefault();
+        modalAlterarSenha.show();
+    })
+
+    const novaSenha = document.getElementById('novaSenha')
+    const confirmarSenha = document.getElementById('confirmarSenha')
+    novaSenha.addEventListener('change', function(){
+        compararSenhas()
+    })
+    confirmarSenha.addEventListener('change', function(){
+        compararSenhas()
+    })
+
+    function compararSenhas(){
+
+        if (novaSenha.value == "" | confirmarSenha.value == "") {
+            return
+        }
+
+        if (novaSenha.value !== confirmarSenha.value) {
+            sweetAlert('Senhas diferentes!')
+            confirmarSenha.value = ""
+        }
+    }
+
+    const botaoSalvarSenha = document.getElementById('botaoSalvarSenha')
+    botaoSalvarSenha.addEventListener('click', function(e){
+        e.preventDefault();
+        salvarNovaSenha();
+    })
+    
+    function salvarNovaSenha(){
+
+        if (novaSenha.value == '' || confirmarSenha.value == ''){
+            sweetAlert('Informe a nova senha')
+            return
+        }
+        
+        const postURL = '/usuario/alterarsenha/'
+        let senha = novaSenha.value
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        //enviar 
+        fetch(postURL, {
+            method: 'POST',
+            body: JSON.stringify({senha: senha}),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            }
+        })
+        
+
+        //Retorno do Servidor
+        .then(response => {
+            // Primeiro verifique se a resposta é ok
+            if (!response.ok) {
+                sweetAlert('Dados não foram salvos.', 'error', 'red');
+                throw new Error('Server response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.retorno === "Salvo") {
+                sweetAlert('Nova senha salva com sucesso!', 'success', 'top-end');
+                modalAlterarSenha.hide();
+                novaSenha.value = '';
+                confirmarSenha.value = '';
+            }
+    
+            if (data.retorno === "Não houve mudanças") {
+                //alert
+                sweetAlert('Dados não foram salvos.<br>Não houve mudanças.', 'warning', 'orange')
+            }
+    
+            if (data.retorno === "Erro ao salvar") {
+                //alert
+                sweetAlert('Dados não foram salvos.', 'error', 'red')
+            }
+        })
+        .catch(error => {
+            console.error('Fetch operation error:', error);
+        });
+
+    }
+
 });
 
