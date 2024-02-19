@@ -4,7 +4,7 @@ from apps.usuarios.forms import AlocacaoForm
 from django.core.exceptions import ValidationError
 
 class ListandoUsuario(admin.ModelAdmin):
-    list_display = ("dp_cpf", "dp_nome_completo", "ctt_celular", "vms_vinculo", "del_status")
+    list_display = ("dp_cpf", "dp_nome_completo", "ctt_celular", "vms_vinculo", "alocacao_ativa", "del_status")
     list_display_links = ("dp_cpf", "dp_nome_completo")
     search_fields = ("dp_cpf", "dp_nome_completo")
     list_filter = ("vms_vinculo", )
