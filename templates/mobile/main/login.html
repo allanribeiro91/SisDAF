@@ -25,10 +25,11 @@
 
     <div class="logo-sisdaf">
         <img src="{% static 'mobile/images/logo_sisdaf_transparente.png' %}" alt="Imagem do SisDAF">
+        <b>SisDAF</b>
     </div>
 
     <div class="login-container">
-        <form>
+        <form action="{% url 'mobile_home' %}">
             {% csrf_token %}
             <div class="form-floating mb-3" style="font-size: 12px;">
                 <input class="form-control" type="text" id="cpf" name="cpf" >

@@ -1,0 +1,46 @@
+/* Estilos gerais */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Header fixo no topo */
+.header-app {
+    position: fixed;
+    height: 8vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #007bff; /* Cor de fundo exemplo */
+    color: white; /* Cor do texto exemplo */
+    z-index: 1000; /* Garante que o header fique acima de outros conteúdos */
+    padding: 10px 0; /* Espaçamento interno */
+    text-align: center; /* Alinhamento do texto */
+}
+
+/* Navbar fixo na base */
+.navbar-app {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10vh;
+    background-color: #343a40; /* Cor de fundo exemplo */
+    color: white; /* Cor do texto exemplo */
+    z-index: 1000; /* Garante que a navbar fique acima de outros conteúdos */
+    padding: 10px 0; /* Espaçamento interno */
+    text-align: center; /* Alinhamento do texto */
+}
+
+/* Conteúdo principal com espaçamento para não ficar escondido */
+.body-app {
+    padding-top: 60px; /* Ajuste conforme a altura do seu header */
+    padding-bottom: 60px; /* Ajuste conforme a altura da sua navbar */
+    /* overflow-auto: scroll; Habilita a rolagem se o conteúdo exceder a tela */
+
+}

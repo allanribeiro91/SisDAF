@@ -1,6 +1,6 @@
 {
     "short_name": "SisDAF",
-    "name": "Aplicativo Mobile SisDAF",
+    "name": "SisDAF",
     "icons": [
       {
         "src": "/static/mobile/images/icon-192x192.png",
@@ -14,7 +14,7 @@
       }
     ],
     "start_url": "/mobile/",
-    "background_color": "#FFFFFF",
+    "background_color": "#001332",
     "display": "standalone",
     "scope": "/mobile/",
     "theme_color": "#000000"
