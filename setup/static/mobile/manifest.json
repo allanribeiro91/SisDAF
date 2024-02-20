@@ -14,7 +14,7 @@
       }
     ],
     "start_url": "/mobile/",
-    "background_color": "#001332",
+    "background_color": "#031025",
     "display": "standalone",
     "scope": "/mobile/",
     "theme_color": "#000000"
