@@ -1,0 +1,42 @@
+/* Estilos gerais */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+
+.header-modulo {
+    position: fixed;
+    height: 8vh;
+    display: flex;
+    justify-content: left;
+    gap: 4px;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Garante que o header fique acima de outros conteúdos */
+    padding-left: 1vh;
+    text-align: left; /* Alinhamento do texto */
+    font-size: 2.5vh;
+    font-weight: normal;
+    font-family: 'Ubuntu', sans-serif;
+    background-color: #031025;
+    color: white;
+}
+
+
+
+.nome-modulo {
+    font-size: 2vh;
+}
+
+.body-app {
+    padding: 9vh 4vw 11vh;
+    /* overflow-auto: scroll; Habilita a rolagem se o conteúdo exceder a tela */
+
+    height: 100%;
+}

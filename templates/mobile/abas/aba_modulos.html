@@ -1,0 +1,35 @@
+{% extends 'mobile/_partials/aba_main.html' %}
+{% load static %}
+{% block extra_head %}
+    <title>Módulos</title>
+    <link rel="stylesheet" href="{% static '\mobile\styles\aba_modulos.css' %}">
+{% endblock %}
+{% block content %}    
+
+    <div class="cards">
+        
+        <div class="card-modulo">
+            <i class="fa-solid fa-pills imagem-modulo" id="moduloProdutosDAF"></i>
+            <div class="card-titulo">Produtos DAF</div>
+        </div>
+
+        <div class="card-modulo">
+            <i class="fa-solid fa-warehouse imagem-modulo"></i>
+            <div class="card-titulo">Fornecedores</div>
+        </div>
+
+        <div class="card-modulo">
+            <i class="fa-solid fa-folder-tree imagem-modulo"></i>
+            <div class="card-titulo">Proc. Aquisitivos</div>
+        </div>
+
+        <div class="card-modulo">
+            <i class="fa-solid fa-file-signature imagem-modulo"></i>
+            <div class="card-titulo">Contratos</div>
+        </div>
+
+    </div>
+    
+
+
+{% endblock %}

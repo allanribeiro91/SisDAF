@@ -1,0 +1,25 @@
+.cards {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2vh;
+    justify-content: space-between;
+}
+
+.card-modulo {
+    background-color: #c2f0ef7e;
+    border-radius: 10px;
+    width: 43vw;
+    color:#031025;
+    padding: 20px;
+    text-align: center;
+}
+
+.imagem-modulo {
+    font-size: 6vh;
+}
+
+.card-titulo {
+    font-size: 2vh;
+    margin-top: 0.5vh;
+}

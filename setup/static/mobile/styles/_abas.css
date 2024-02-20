@@ -52,6 +52,7 @@ body, html {
 .nav-item {
     text-align: center; /* Centraliza o texto abaixo do ícone */
     font-size: 80%;
+    text-decoration: none;
     padding: 5vw;
     color: #767676;
 }
@@ -77,5 +78,4 @@ body, html {
     /* overflow-auto: scroll; Habilita a rolagem se o conteúdo exceder a tela */
 
     height: 100%;
-
 }
