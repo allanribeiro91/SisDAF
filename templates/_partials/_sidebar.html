@@ -47,7 +47,7 @@
             {% endwith %}
         </div>
         
-        <!-- <div>
+        <div>
             {% with current_url=request.resolver_match.url_name %}
             <a class="tab {% if current_url in 'prog_basico, prog_especializado, prog_estrategico' %}active-tab{% endif %}" href="{% url 'prog_basico' %}">Programação</a>
             {% endwith %}
@@ -56,7 +56,7 @@
             {% with current_url=request.resolver_match.url_name %}
             <a class="tab {% if current_url in 'consultores_tecnicos' %}active-tab{% endif %}" href="{% url 'consultores_tecnicos' %}">Consultores Técnicos</a>
             {% endwith %}
-        </div> -->
+        </div>
 
         <!-- Usuário -->
         <div id="toggleButton" class="toggle-button">

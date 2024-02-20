@@ -1,0 +1,49 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="manifest" href="{% static 'mobile/manifest.json' %}">
+    <!-- CSS do Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Folhas de estilos intenros -->
+    <link rel="stylesheet" href="{% static 'mobile/styles/login.css' %}">
+    <style>
+        .bg{
+            /* Imagem de fundo */
+            background-image: url("{% static 'mobile/images/login.jpg' %}");
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg">
+
+    <div class="logo-sisdaf">
+        <img src="{% static 'mobile/images/logo_sisdaf_transparente.png' %}" alt="Imagem do SisDAF">
+    </div>
+
+    <div class="login-container">
+        <form>
+            {% csrf_token %}
+            <div class="form-floating mb-3" style="font-size: 12px;">
+                <input class="form-control" type="text" id="cpf" name="cpf" >
+                <label for="cpf">CPF</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input class="form-control" type="password" id="password" name="password">
+                <label for="password">Senha</label>
+            </div>
+            <div>
+                <input type="submit" class="btn btn-primary" value="Entrar">
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

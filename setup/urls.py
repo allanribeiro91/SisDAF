@@ -15,5 +15,6 @@ urlpatterns = [
     path('', include('apps.consultores_tecnicos.urls')),
     path('', include('apps.sobre_sisdaf.urls')),
     path('', include('apps.gestao_pacientes.urls')),
+    path('', include('apps.mobile.urls')),
     path('select2/', include('django_select2.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
