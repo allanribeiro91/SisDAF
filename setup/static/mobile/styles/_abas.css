@@ -75,7 +75,7 @@ body, html {
 .body-app {
     padding: 9vh 4vw 11vh;
     /* overflow-auto: scroll; Habilita a rolagem se o conteúdo exceder a tela */
-    background-color: #f0eee5;
+
     height: 100%;
 
 }
