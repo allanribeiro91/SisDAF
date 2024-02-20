@@ -49,17 +49,24 @@ body, html {
     align-items: center;
 }
 
-.nav-item i {
-    display: block;
-    text-align: center; /* Centraliza o ícone */
-}
-
 .nav-item {
     text-align: center; /* Centraliza o texto abaixo do ícone */
-    padding: 5px; /* Espaçamento para melhor visualização */
-    font-size: 90%;
+    font-size: 80%;
     padding: 5vw;
+    color: #767676;
 }
+.nav-item i {
+    display: block;
+    text-align: center;
+    font-size: 3vh;
+}
+
+.active {
+    color: #031025;
+
+}
+
+
 
 
 
