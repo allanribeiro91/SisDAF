@@ -31,3 +31,7 @@ body, html {
     border-radius: 10px;
     width: 60%;
 }
+
+.botao-entrar {
+    align-items: center;
+}

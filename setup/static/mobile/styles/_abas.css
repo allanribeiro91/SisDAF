@@ -1,0 +1,74 @@
+/* Estilos gerais */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f0eee5;
+}
+
+/* Header fixo no topo */
+.header-app {
+    position: fixed;
+    height: 8vh;
+    display: flex;
+    justify-content: left;
+    gap: 4px;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Garante que o header fique acima de outros conteúdos */
+    padding-left: 1vh;
+    text-align: left; /* Alinhamento do texto */
+    font-size: 2.5vh;
+    font-weight: normal;
+    font-family: 'Ubuntu', sans-serif;
+    color: #031025;
+}
+
+.header-app img {
+    height: 40%;
+}
+
+/* Navbar fixo na base */
+.navbar-app {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10vh;
+    border-top: solid 1px;
+    border-color: #c8c8c8;
+    box-shadow: 0px 4px 8px 0px black;
+    z-index: 1000; /* Garante que a navbar fique acima de outros conteúdos */
+    padding: 10px 0; /* Espaçamento interno */
+    text-align: center; /* Alinhamento do texto */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-item i {
+    display: block;
+    text-align: center; /* Centraliza o ícone */
+}
+
+.nav-item {
+    text-align: center; /* Centraliza o texto abaixo do ícone */
+    padding: 5px; /* Espaçamento para melhor visualização */
+    font-size: 90%;
+    padding: 5vw;
+}
+
+
+
+
+/* Conteúdo principal com espaçamento para não ficar escondido */
+.body-app {
+    padding: 9vh 4vw 11vh;
+    /* overflow-auto: scroll; Habilita a rolagem se o conteúdo exceder a tela */
+    background-color: #f0eee5;
+    height: 100%;
+
+}
