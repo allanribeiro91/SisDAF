@@ -19,7 +19,7 @@ def mobile_opcoes(request):
 def mobile_modulo_produtosdaf(request):
     nome_modulo = "Produtos Farmacêuticos DAF"
     produtos = ProdutosFarmaceuticos.objects.filter(del_status=False).order_by('produto')
-    # produtos = produtos[:50]
+    produtos = produtos[:50]
 
     conteudo = {
         'nome_modulo': nome_modulo,
