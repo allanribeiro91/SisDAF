@@ -181,6 +181,25 @@ class ProdutosFarmaceuticos(models.Model):
         except AttributeError:
             return 'Erro'
 
+    def componentes_af(self):
+        componentes = []
+
+        if self.comp_basico:
+            componentes.append('Básico')
+
+        if self.comp_especializado:
+            componentes.append('Especializado')
+
+        if self.comp_estrategico:
+            componentes.append('Estratégico')
+
+        if not componentes:
+            return '-'
+        else:
+            # Junta os componentes com vírgulas se a lista não estiver vazia.
+            return ', '.join(componentes)
+
+
     def __str__(self):
         return f"{self.produto} - ID: {self.id}"
 

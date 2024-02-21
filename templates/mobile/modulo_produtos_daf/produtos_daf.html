@@ -2,8 +2,18 @@
 {% load static %}
 {% block extra_head %}
     <title>Produtos DAF</title>
-    <!-- <link rel="stylesheet" href="{% static '\mobile\styles\aba_modulos.css' %}"> -->
+    <link rel="stylesheet" href="{% static '\mobile\styles\mod_produtosdaf.css' %}">
 {% endblock %}
 {% block content %}    
+
+    {% for produto in produtos %}
+        <div class="card-produtodaf" data-id="{{ produto.id }}">
+            <div class="card-produtodaf-nome">{{ produto.denominacao.denominacao }}&nbsp;{{ produto.concentracao }}</div>
+            <div class="card-produtodaf-forma">{{ produto.get_forma_farmaceutica_display }}</div>
+            <div class="card-produtodaf-forma">Tags: {{ produto.produtos_tags }}</div>
+            <div class="card-produtodaf-forma">Componente AF: {{ produto.componentes_af }}</div>
+        </div>
+    {% endfor %}
+    
 
 {% endblock %}
